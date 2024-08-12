@@ -107,7 +107,7 @@ def test_initiate_cloned_component(mock_new_uuid):
     clone: Component = Component(
         component_id="old-id",
         page_id="pre-clone",
-        title="Template qustion 1?",
+        title="Template question 1?",
         type=ComponentType.TEXT_FIELD,
         template_name="Template Component",
         is_template=True,
@@ -149,7 +149,7 @@ def test_clone_single_component(flask_test_client, _db):
     template_component: Component = Component(
         component_id=uuid4(),
         page_id=None,
-        title="Template qustion 1?",
+        title="Template question 1?",
         type=ComponentType.YES_NO_FIELD,
         page_index=1,
         theme_id=None,
@@ -168,6 +168,8 @@ def test_clone_single_component(flask_test_client, _db):
     result = clone_single_component(template_component.component_id)
     assert result
     new_id = result.component_id
+
+    assert old_id != new_id
 
     # check can retrieve new component
     assert _db.session.get(Component, new_id)
@@ -198,7 +200,7 @@ page_id = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=None,
-                title="Template qustion 1?",
+                title="Template question 1?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -210,7 +212,7 @@ page_id = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=None,
-                title="Template qustion 2?",
+                title="Template question 2?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -222,7 +224,7 @@ page_id = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=None,
-                title="Template qustion 3?",
+                title="Template question 3?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -286,6 +288,8 @@ def test_clone_page_no_components(seed_dynamic_data, _db):
     assert result
     new_id = result.page_id
 
+    assert old_id != new_id
+
     # check new page exists
     new_page_from_db = _db.session.query(Page).where(Page.page_id == new_id).one_or_none()
     assert new_page_from_db
@@ -314,7 +318,7 @@ page_id = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=page_id,
-                title="Template qustion 1?",
+                title="Template question 1?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -326,7 +330,7 @@ page_id = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=page_id,
-                title="Template qustion 2?",
+                title="Template question 2?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -338,7 +342,7 @@ page_id = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=page_id,
-                title="Template qustion 3?",
+                title="Template question 3?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -362,6 +366,8 @@ def test_clone_page_with_components(seed_dynamic_data, _db):
     result = clone_single_page(page_id=old_page_id, new_form_id=None)
     assert result
     new_id = result.page_id
+
+    assert old_page_id != new_id
 
     # check new page exists
     new_page_from_db = _db.session.query(Page).where(Page.page_id == new_id).one_or_none()
@@ -494,7 +500,7 @@ page_id_3 = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=page_id_2,
-                title="Template qustion 1?",
+                title="Template question 1?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -506,7 +512,7 @@ page_id_3 = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=page_id_2,
-                title="Template qustion 2?",
+                title="Template question 2?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -518,7 +524,7 @@ page_id_3 = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=page_id_3,
-                title="Template qustion 3?",
+                title="Template question 3?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -648,7 +654,7 @@ page_id_to_clone_2 = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=page_id_to_clone_1,
-                title="Template qustion 1?",
+                title="Template question 1?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -660,7 +666,7 @@ page_id_to_clone_2 = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=page_id_to_clone_1,
-                title="Template qustion 2?",
+                title="Template question 2?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,
@@ -672,7 +678,7 @@ page_id_to_clone_2 = uuid4()
             Component(
                 component_id=uuid4(),
                 page_id=page_id_to_clone_2,
-                title="Template qustion 3?",
+                title="Template question 3?",
                 type=ComponentType.YES_NO_FIELD,
                 page_index=1,
                 theme_id=None,

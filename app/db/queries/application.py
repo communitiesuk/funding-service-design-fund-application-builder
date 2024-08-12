@@ -199,3 +199,285 @@ def clone_single_round(round_id, new_fund_id, new_short_name) -> Round:
         clone_single_section(section.section_id, cloned_round.round_id)
 
     return cloned_round
+
+
+# CRUD operations for Section, Form, Page, and Component
+# CRUD SECTION
+def insert_new_section(new_section_config):
+    """
+    Inserts a section object based on the provided configuration.
+
+    Parameters:
+        new_section_config (dict): A dictionary containing the configuration for the new section.
+            new_section_config keys:
+                - round_id (str): The ID of the round to which the section belongs.
+                - name_in_apply_json (dict): The name of the section as it will be in the Application JSON (support multiple languages/keys).
+                - template_name (str): The name of the template.
+                - is_template (bool): A flag indicating whether the section is a template.
+                - source_template_id (str): The ID of the source template.
+                - audit_info (dict): Audit information for the section.
+                - index (int): The index of the section.
+            Returns:
+                Section: The newly created section object.
+    """
+    section = Section(
+        section_id=uuid4(),
+        round_id=new_section_config.get("round_id", None),
+        name_in_apply_json=new_section_config.get("name_in_apply_json"),
+        template_name=new_section_config.get("template_name", None),
+        is_template=new_section_config.get("is_template", False),
+        source_template_id=new_section_config.get("source_template_id", None),
+        audit_info=new_section_config.get("audit_info", {}),
+        index=new_section_config.get("index"),
+    )
+    db.session.add(section)
+    db.session.commit()
+    return section
+
+
+def update_section(section_id, new_section_config):
+    section = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
+    if section:
+        # Define a list of allowed keys to update
+        allowed_keys = ["round_id", "name_in_apply_json", "template_name", "is_template", "audit_info", "index"]
+
+        for key, value in new_section_config.items():
+            # Update the section if the key is allowed
+            if key in allowed_keys:
+                setattr(section, key, value)
+
+        db.session.commit()
+    return section
+
+
+def delete_section(section_id):
+    section = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
+    db.session.delete(section)
+    db.session.commit()
+    return section
+
+
+# CRUD FORM
+def insert_new_form(new_form_config):
+    """
+    Inserts a form object based on the provided configuration.
+
+    Parameters:
+        new_form_config (dict): A dictionary containing the configuration for the new form.
+            new_form_config keys:
+                - section_id (str): The ID of the section to which the form belongs.
+                - name_in_apply_json (dict): The name of the form as it will be in the Application JSON (support multiple languages/keys).
+                - is_template (bool): A flag indicating whether the form is a template.
+                - template_name (str): The name of the template.
+                - source_template_id (str): The ID of the source template.
+                - audit_info (dict): Audit information for the form.
+                - section_index (int): The index of the form within the section.
+                - runner_publish_name (bool): The path of the form in the form runner (kebab case).
+    Returns:
+        Form: The newly created form object.
+    """
+
+    form = Form(
+        form_id=uuid4(),
+        section_id=new_form_config.get("section_id", None),
+        name_in_apply_json=new_form_config.get("name_in_apply_json"),
+        is_template=new_form_config.get("is_template", False),
+        template_name=new_form_config.get("template_name", None),
+        source_template_id=new_form_config.get("source_template_id", None),
+        audit_info=new_form_config.get("audit_info", {}),
+        section_index=new_form_config.get("section_index"),
+        runner_publish_name=new_form_config.get("runner_publish_name", None),
+    )
+    db.session.add(form)
+    db.session.commit()
+    return form
+
+
+def update_form(form_id, new_form_config):
+    form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
+    if form:
+        # Define a list of allowed keys to update
+        allowed_keys = [
+            "section_id",
+            "name_in_apply_json",
+            "template_name",
+            "is_template",
+            "audit_info",
+            "section_index",
+            "runner_publish_name",
+        ]
+
+        # Iterate over the new_form_config dictionary
+        for key, value in new_form_config.items():
+            # Update the form if the key is allowed
+            if key in allowed_keys:
+                setattr(form, key, value)
+
+        db.session.commit()
+    return form
+
+
+def delete_form(form_id):
+    form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
+    db.session.delete(form)
+    db.session.commit()
+    return form
+
+
+# CRUD PAGE
+def insert_new_page(new_page_config):
+    """
+    Inserts a page object based on the provided configuration.
+
+    Parameters:
+        new_page_config (dict): A dictionary containing the configuration for the new page.
+            new_page_config keys:
+                - form_id (str): The ID of the form to which the page belongs.
+                - name_in_apply_json (str): The name of the page as it will be in the Application JSON.
+                - template_name (str): The name of the template.
+                - is_template (bool): A flag indicating whether the page is a template.
+                - source_template_id (str): The ID of the source template.
+                - audit_info (dict): Audit information for the page.
+                - form_index (int): The index of the page within the form.
+                - display_path (str): The form runner display path of the page (kebab case).
+                - controller (str): The form runner controller path for the page (e.g. './pages/summary.js').
+                Returns:
+            Page: The newly created page object.
+    """
+    page = Page(
+        page_id=uuid4(),
+        form_id=new_page_config.get("form_id", None),
+        name_in_apply_json=new_page_config.get("name_in_apply_json"),
+        template_name=new_page_config.get("template_name", None),
+        is_template=new_page_config.get("is_template", False),
+        source_template_id=new_page_config.get("source_template_id", None),
+        audit_info=new_page_config.get("audit_info", {}),
+        form_index=new_page_config.get("form_index"),
+        display_path=new_page_config.get("display_path"),
+        controller=new_page_config.get("controller", None),
+    )
+    db.session.add(page)
+    db.session.commit()
+    return page
+
+
+def update_page(page_id, new_page_config):
+    page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
+    if page:
+        # Define a list of allowed keys to update
+        allowed_keys = [
+            "form_id",
+            "name_in_apply_json",
+            "template_name",
+            "is_template",
+            "audit_info",
+            "form_index",
+            "display_path",
+            "controller",
+        ]
+
+        for key, value in new_page_config.items():
+            # Update the page if the key is allowed
+            if key in allowed_keys:
+                setattr(page, key, value)
+
+        db.session.commit()
+    return page
+
+
+def delete_page(page_id):
+    page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
+    db.session.delete(page)
+    db.session.commit()
+    return page
+
+
+# CRUD COMPONENT
+def insert_new_component(new_component_config: dict):
+    """
+    Inserts a component object based on the provided configuration.
+
+    Parameters:
+        new_component_config (dict): A dictionary containing the configuration for the new component.
+            new_component_config keys:
+                - page_id (str): The ID of the page to which the component belongs.
+                - theme_id (str): The ID of the theme to which the component belongs.
+                - title (str): The title of the component.
+                - hint_text (str): The hint text for the component.
+                - options (dict): The options such as classes, prefix etc
+                - type (str): The type of the component.
+                - template_name (str): The name of the template.
+                - is_template (bool): A flag indicating whether the component is a template.
+                - source_template_id (str): The ID of the source template.
+                - audit_info (dict): Audit information for the component.
+                - page_index (int): The index of the component within the page.
+                - theme_index (int): The index of the component within the theme.
+                - conditions (dict): The conditions such as potential routes based on the components value (can specify page path).
+                - runner_component_name (str): The name of the runner component.
+                - list_id (str): The ID of the list to which the component belongs.
+            Returns:
+                Component: The newly created component object.
+    """
+    # Instantiate the Component object with the provided and default values
+    component = Component(
+        component_id=uuid4(),
+        page_id=new_component_config.get("page_id", None),
+        theme_id=new_component_config.get("theme_id", None),
+        title=new_component_config.get("title"),
+        hint_text=new_component_config.get("hint_text"),
+        options=new_component_config.get("options", {}),
+        type=new_component_config.get("type"),
+        is_template=new_component_config.get("is_template", False),
+        template_name=new_component_config.get("template_name", None),
+        source_template_id=new_component_config.get("source_template_id", None),
+        audit_info=new_component_config.get("audit_info", {}),
+        page_index=new_component_config.get("page_index"),
+        theme_index=new_component_config.get("theme_index"),
+        conditions=new_component_config.get("conditions", []),
+        runner_component_name=new_component_config.get("runner_component_name"),
+        list_id=new_component_config.get("list_id", None),
+    )
+
+    # Add the component to the session and commit
+    db.session.add(component)
+    db.session.commit()
+
+    # Return the created component object or its ID based on your requirements
+    return component
+
+
+def update_component(component_id, new_component_config):
+    component = db.session.query(Component).where(Component.component_id == component_id).one_or_none()
+    if component:
+        # Define a list of allowed keys to update to prevent updating unintended fields
+        allowed_keys = [
+            "page_id",
+            "theme_id",
+            "title",
+            "hint_text",
+            "options",
+            "type",
+            "template_name",
+            "is_template",
+            "audit_info",
+            "page_index",
+            "theme_index",
+            "conditions",
+            "runner_component_name",
+            "list_id",
+        ]
+
+        for key, value in new_component_config.items():
+            # Update the component if the key is allowed
+            if key in allowed_keys:
+                setattr(component, key, value)
+
+        db.session.commit()
+    return component
+
+
+def delete_component(component_id):
+    component = db.session.query(Component).where(Component.component_id == component_id).one_or_none()
+    db.session.delete(component)
+    db.session.commit()
+    return component

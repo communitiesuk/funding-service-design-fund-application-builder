@@ -1,0 +1,236 @@
+{
+    "metadata": {},
+    "startPage": "/intro-about-your-organisation",
+    "backLinkText": "Go back to application overview",
+    "pages": [
+        {
+            "path": "/organisation-name",
+            "title": "Organisation Name",
+            "components": [
+                {
+                    "options": {
+                        "hideTitle": false,
+                        "classes": ""
+                    },
+                    "type": "TextField",
+                    "title": "What is your organisation's name?",
+                    "hint": "This must match the regsitered legal organisation name",
+                    "schema": {},
+                    "name": "organisation_name",
+                    "metadata": {
+                        "fund_builder_id": "6a7b3d94-b92a-4b49-a02e-ccbcdc05c547"
+                    }
+                },
+                {
+                    "options": {
+                        "hideTitle": false,
+                        "classes": ""
+                    },
+                    "type": "YesNoField",
+                    "title": "Does your organisation use any other names?",
+                    "hint": "",
+                    "schema": {},
+                    "name": "does_your_organisation_use_other_names",
+                    "metadata": {
+                        "fund_builder_id": "e06916c2-f6ad-4257-b8b4-1d646a381963"
+                    }
+                }
+            ],
+            "next": [
+                {
+                    "path": "/organisation-address",
+                    "condition": "organisation_other_names_no"
+                },
+                {
+                    "path": "/organisation-alternative-names",
+                    "condition": "organisation_other_names_yes"
+                }
+            ],
+            "options": {}
+        },
+        {
+            "path": "/organisation-address",
+            "title": "Organisation Address",
+            "components": [
+                {
+                    "options": {
+                        "hideTitle": false,
+                        "classes": ""
+                    },
+                    "type": "UkAddressField",
+                    "title": "What is your organisation's address?",
+                    "hint": "This must match the regsitered organisation address",
+                    "schema": {},
+                    "name": "organisation_address",
+                    "metadata": {
+                        "fund_builder_id": "71c0e632-758b-4f5d-ad01-fa5559033693"
+                    }
+                }
+            ],
+            "next": [
+                {
+                    "path": "/organisation-classification"
+                }
+            ],
+            "options": {}
+        },
+        {
+            "path": "/organisation-classification",
+            "title": "Organisation Classification",
+            "components": [
+                {
+                    "options": {
+                        "hideTitle": false,
+                        "classes": ""
+                    },
+                    "type": "RadiosField",
+                    "title": "How is your organisation classified?",
+                    "hint": "",
+                    "schema": {},
+                    "name": "organisation_classification",
+                    "metadata": {
+                        "fund_builder_id": "0416472e-3e5c-4f8d-8585-81717daae6c0",
+                        "fund_builder_list_id": "2502effd-4461-4a0f-8500-88501ff44540"
+                    },
+                    "list": "classifications_list"
+                }
+            ],
+            "next": [
+                {
+                    "path": "/summary"
+                }
+            ],
+            "options": {}
+        },
+        {
+            "path": "/intro-about-your-organisation",
+            "title": "About your organisation",
+            "components": [
+                {
+                    "name": "start-page-content",
+                    "options": {},
+                    "type": "Html",
+                    "content": "<p class=\"govuk-body\">None</p><p class=\"govuk-body\">We will ask you about:</p> <ul><li>Organisation Name</li><li>Organisation Address</li><li>Organisation Classification</li></ul>",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/organisation-name"
+                }
+            ],
+            "options": {},
+            "controller": "./pages/start.js"
+        },
+        {
+            "path": "/organisation-alternative-names",
+            "title": "Alternative names of your organisation",
+            "components": [
+                {
+                    "options": {
+                        "hideTitle": false,
+                        "classes": ""
+                    },
+                    "type": "TextField",
+                    "title": "Alternative Name 1",
+                    "hint": "",
+                    "schema": {},
+                    "name": "alt_name_1",
+                    "metadata": {
+                        "fund_builder_id": "6d659633-c801-4aca-9ba1-135f5f6cfaa2"
+                    }
+                }
+            ],
+            "next": [
+                {
+                    "path": "/organisation-address"
+                }
+            ],
+            "options": {}
+        },
+        {
+            "path": "/summary",
+            "title": "Check your answers",
+            "components": [],
+            "next": [],
+            "section": "uLwBuz",
+            "controller": "./pages/summary.js"
+        }
+    ],
+    "lists": [
+        {
+            "type": "string",
+            "items": [
+                {
+                    "text": "Charity",
+                    "value": "charity"
+                },
+                {
+                    "text": "Public Limited Company",
+                    "value": "plc"
+                }
+            ],
+            "name": "classifications_list"
+        }
+    ],
+    "conditions": [
+        {
+            "displayName": "organisation_other_names_no",
+            "name": "organisation_other_names_no",
+            "value": {
+                "name": "organisation_other_names_no",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "does_your_organisation_use_other_names",
+                            "type": "YesNoField",
+                            "display": "Does your organisation use any other names?"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "false",
+                            "display": "false"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "organisation_other_names_yes",
+            "name": "organisation_other_names_yes",
+            "value": {
+                "name": "organisation_other_names_yes",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "does_your_organisation_use_other_names",
+                            "type": "YesNoField",
+                            "display": "Does your organisation use any other names?"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "true",
+                            "display": "true"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "fees": [],
+    "sections": [],
+    "outputs": [
+        {
+            "name": "update-form",
+            "title": "Update form in application store",
+            "type": "savePerPage",
+            "outputConfiguration": {
+                "savePerPageUrl": true
+            }
+        }
+    ],
+    "skipSummary": false,
+    "name": "About your organisation"
+}

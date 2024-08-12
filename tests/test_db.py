@@ -6,24 +6,47 @@ import pytest
 
 from app.db.models import Form
 from app.db.models import Fund
+from app.db.models import Organisation
 from app.db.models import Page
 from app.db.models import Round
 from app.db.models import Section
 from app.db.queries.application import get_template_page_by_display_path
 from app.db.queries.fund import add_fund
+from app.db.queries.fund import add_organisation
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
 
 
-def test_add_fund(flask_test_client, _db):
+def test_add_organisation(flask_test_client, _db, clear_test_data):
+    o = Organisation(
+        name="test_org_1",
+        short_name=f"X{randint(0,99999)}",
+        logo_uri="http://www.google.com",
+        funds=[],
+    )
+    result = add_organisation(o)
+    assert result
+    assert result.organisation_id
+
+
+def test_add_fund(flask_test_client, _db, clear_test_data):
+    o = add_organisation(
+        Organisation(
+            name="test_org_2",
+            short_name=f"X{randint(0,99999)}",
+            logo_uri="http://www.google.com",
+            funds=[],
+        )
+    )
     f = Fund(
         name_json={"en": "hello"},
         title_json={"en": "longer hello"},
         description_json={"en": "reeeaaaaallly loooooooog helloooooooooo"},
         welsh_available=False,
         short_name=f"X{randint(0,99999)}",
+        owner_organisation_id=o.organisation_id,
     )
     result = add_fund(f)
     assert result
@@ -64,7 +87,7 @@ def test_add_round(seed_dynamic_data):
     assert result.round_id
 
 
-def test_get_all_funds(flask_test_client, _db):
+def test_get_all_funds(flask_test_client, _db, seed_dynamic_data):
     results = get_all_funds()
     assert results
     assert results[0].fund_id
@@ -91,13 +114,15 @@ def test_get_fund_by_id(seed_dynamic_data):
 
 
 def test_get_fund_by_id_none(flask_test_client, _db):
-    result: Fund = get_fund_by_id(str(uuid4()))
-    assert result is None
+    with pytest.raises(ValueError) as exc_info:
+        get_fund_by_id(str(uuid4()))
+    assert "not found" in str(exc_info.value)
 
 
 def test_get_round_by_id_none(flask_test_client, _db):
-    result: Round = get_round_by_id(str(uuid4()))
-    assert result is None
+    with pytest.raises(ValueError) as exc_info:
+        get_round_by_id(str(uuid4()))
+    assert "not found" in str(exc_info.value)
 
 
 fund_id = uuid4()

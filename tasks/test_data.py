@@ -8,6 +8,7 @@ from app.db.models import Criteria
 from app.db.models import Form
 from app.db.models import Fund
 from app.db.models import Lizt
+from app.db.models import Organisation
 from app.db.models import Page
 from app.db.models import Round
 from app.db.models import Section
@@ -19,6 +20,7 @@ BASIC_FUND_INFO = {
     "title_json": {"en": "funding to improve testing"},
     "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
     "welsh_available": False,
+    "owner_organisation_id": None,
 }
 BASIC_ROUND_INFO = {
     "audit_info": {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
@@ -34,16 +36,25 @@ BASIC_ROUND_INFO = {
 
 
 def init_salmon_fishing_fund():
+    organisation_uuid = uuid4()
+    o: Organisation = Organisation(
+        organisation_id=organisation_uuid,
+        name="Department for Fishing",
+        short_name="DF",
+        logo_uri="http://www.google.com",
+        audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+    )
 
     f: Fund = Fund(
         fund_id=uuid4(),
         name_json={"en": "Salmon Fishing Fund"},
         title_json={"en": "funding to improve access to salmon fishing"},
         description_json={
-            "en": "A £10m fund to improve access to salmong fishing facilities across the devolved nations."
+            "en": "A £10m fund to improve access to salmon fishing facilities across the devolved nations."
         },
         welsh_available=False,
         short_name=f"SFF{randint(0,999)}",
+        owner_organisation_id=o.organisation_id,
     )
 
     r: Round = Round(
@@ -259,10 +270,20 @@ def init_salmon_fishing_fund():
         "criteria": [cri1],
         "subcriteria": [sc1],
         "themes": [t1, t2],
+        "organisations": [o],
     }
 
 
 def init_unit_test_data() -> dict:
+    organisation_uuid = uuid4()
+    o: Organisation = Organisation(
+        organisation_id=organisation_uuid,
+        name=f"Ministry of Testing - {str(organisation_uuid)[:5]}",
+        short_name=f"MoT-{str(organisation_uuid)[:5]}",
+        logo_uri="http://www.google.com",
+        audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+    )
+
     f: Fund = Fund(
         fund_id=uuid4(),
         name_json={"en": "Unit Test Fund 1"},
@@ -270,6 +291,7 @@ def init_unit_test_data() -> dict:
         description_json={"en": "A £10m fund to improve testing across the devolved nations."},
         welsh_available=False,
         short_name=f"UTF{randint(0,999)}",
+        owner_organisation_id=o.organisation_id,
     )
 
     r: Round = Round(
@@ -362,6 +384,7 @@ def init_unit_test_data() -> dict:
     return {
         "lists": [l1],
         "funds": [f],
+        "organisations": [o],
         "rounds": [r],
         "sections": [s1],
         "forms": [f1],
@@ -374,6 +397,8 @@ def init_unit_test_data() -> dict:
 
 
 def insert_test_data(db, test_data={}):
+    db.session.bulk_save_objects(test_data.get("organisations", []))
+    db.session.commit()
     db.session.bulk_save_objects(test_data.get("funds", []))
     db.session.commit()
     db.session.bulk_save_objects(test_data.get("rounds", []))

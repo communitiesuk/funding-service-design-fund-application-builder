@@ -198,7 +198,7 @@
 
     function previewForm() {
         section_form = document.getElementById("form_form")
-        section_form.setAttribute("action", "{{url_for('self_serve_bp.preview_form')}}")
+        section_form.setAttribute("action", "{{url_for('build_fund_bp.preview_form', form_id=form.id)}}")
         section_form.submit()
     }
     function allQuestions() {
@@ -208,7 +208,7 @@
     }
     function saveForm() {
         section_form = document.getElementById("form_form")
-        section_form.setAttribute("action", "{{url_for('self_serve_bp.build_form')}}")
+        section_form.setAttribute("action", "{{url_for('self_serve_bp.form')}}")
         section_form.submit()
     }
 

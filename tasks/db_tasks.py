@@ -59,7 +59,8 @@ def create_test_data(c):
         db = app.extensions["sqlalchemy"]
         db.session.execute(
             text(
-                "TRUNCATE TABLE fund, round, section,form, page, component, criteria, subcriteria, theme, lizt CASCADE;"
+                "TRUNCATE TABLE fund, round, section,form, page, component, criteria, "
+                "subcriteria, theme, lizt, organisation CASCADE;"
             )
         )
         db.session.commit()

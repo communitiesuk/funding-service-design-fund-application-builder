@@ -58,3 +58,4 @@ Flask-WTF==1.2.1
 #   Utils
 #-----------------------------------
 funding-service-design-utils>=4.0.1
+jsonschema

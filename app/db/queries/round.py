@@ -9,4 +9,7 @@ def add_round(round: Round) -> Round:
 
 
 def get_round_by_id(id: str) -> Round:
-    return db.session.get(Round, id)
+    round = db.session.get(Round, id)
+    if not round:
+        raise ValueError(f"Round with id {id} not found")
+    return round

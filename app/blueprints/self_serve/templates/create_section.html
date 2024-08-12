@@ -6,11 +6,11 @@
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 class="govuk-heading-l">Build Form Page</h1>
+        <h1 class="govuk-heading-l">Build Section</h1>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
-                <form method="POST" id="page_form">
-                    <select multiple hidden name="selected_components" id="selected_components"></select>
+                <form method="POST" id="section_form">
+                    <select multiple hidden name="selected_pages" id="selected_pages"></select>
                     {{ form.hidden_tag() }}
                     {{ govukInput({
                     "label": {
@@ -23,6 +23,16 @@
                     "errorMessage": {"text": form.errors.get('id')[0]} if form.errors.get('id') else None
                     }) }}
                     {{ govukInput({
+                        "label": {
+                        "text": form.section_display_name.label ,
+                        "isPageHeading": false
+                        },
+                        "id": form.section_display_name.id,
+                        "name": form.section_display_name.name ,
+                        "value": form.section_display_name.data,
+                        "errorMessage": {"text": form.errors.get('section_display_name')[0]} if form.errors.get('section_display_name') else None
+                        }) }}
+                    {{ govukInput({
                     "label": {
                     "text": form.builder_display_name.label ,
                     "isPageHeading": false
@@ -33,15 +43,15 @@
                     "errorMessage": {"text": form.errors.get('builder_display_name')[0]} if form.errors.get('builder_display_name') else None
                     }) }}
                     {{ govukInput({
-                    "label": {
-                    "text": form.form_display_name.label ,
-                    "isPageHeading": false
-                    },
-                    "id": form.form_display_name.id,
-                    "name": form.form_display_name.name ,
-                    "value": form.form_display_name.data,
-                    "errorMessage": {"text": form.errors.get('form_display_name')[0]} if form.errors.get('form_display_name') else None
-                    }) }}
+                        "label": {
+                        "text": form.index.label ,
+                        "isPageHeading": false
+                        },
+                        "id": form.index.id,
+                        "name": form.index.name ,
+                        "value": form.index.data,
+                        "errorMessage": {"text": form.errors.get('index')[0]} if form.errors.get('index') else None
+                        }) }}
                 </form>
             </fieldset>
         </div>
@@ -52,20 +62,20 @@
     <div class="govuk-grid-column-one-half">
         <div class="govuk-form-group">
             <h3 class="govuk-heading-s">
-                Available Questions
+                Available Forms
             </h3>
             <div id="questions-hint" class="govuk-hint">
-                Drag the questions you want for your Page from the list of available questions to the list of selected
-                questions.
+                Drag the forms you want for your section from the list of available forms to the list of selected
+                forms.
             </div>
             <div id="available_questions">
-                {% for question in available_questions%}
-                <div class="tooltip govuk-task-list__item govuk-tag govuk-tag--blue" id="{{question.id}}">{{
-                    question.display_name }}
+                {% for form in available_forms%}
+                <div class="tooltip govuk-task-list__item govuk-tag govuk-tag--blue" id="{{form.id}}">{{
+                    form.display_name }}
                     <div class="tooltiptext">
-                        <h4 class="govuk-heading-xs">{{question.hover_info.title}}</h4>
+                        <h4 class="govuk-heading-xs">{{form.hover_info.title}}</h4>
                         <ul>
-                            {% for q in question.hover_info.questions %}
+                            {% for q in form.hover_info.pages %}
                             <li>{{q}}</li>
                             {% endfor %}
                         </ul>
@@ -79,10 +89,10 @@
     <div class="govuk-grid-column-one-half">
         <div class="govuk-form-group">
             <h3 class="govuk-heading-s">
-                Selected questions
+                Selected Forms
             </h3>
             <div id="selected_questions-hint" class="govuk-hint">
-                Once you have selected the questions to include, reorder them here.
+                Once you have selected the forms to include, reorder them here.
             </div>
             <div id="selected_questions">
             </div>
@@ -93,16 +103,11 @@
     <p>
         {{ govukButton({
         "text": "Save",
-        "attributes": {"onclick":"savePage()"},
-        }) }}
-        {{ govukButton({
-        "text": "Preview Form",
-        "attributes": {"onclick":"previewForm()"},
-        "classes": "govuk-button--secondary"
+        "attributes": {"onclick":"saveSection()"},
         }) }}
         {{ govukButton({
         "text": "View Questions",
-        "attributes": {"onclick":"allQuestions()"},
+        "attributes": {"onclick":"allQuestionsInSection()"},
         "classes": "govuk-button--secondary"
         }) }}
     </p>
@@ -159,7 +164,7 @@
 
     function updateSelectedQuestionsInForm() {
         selected = document.getElementById("selected_questions");
-        selected_form_element = document.getElementById("selected_components");
+        selected_form_element = document.getElementById("selected_pages");
 
         // remove existing selection
         while (selected_form_element.firstChild) {
@@ -193,25 +198,16 @@
         });
     };
 
-    function downloadJson() {
-        section_form = document.getElementById("page_form")
-        section_form.setAttribute("action", "{{url_for('self_serve_bp.generate_json')}}")
-        section_form.submit()
-    }
 
-    function previewForm() {
-        section_form = document.getElementById("page_form")
-        section_form.setAttribute("action", "{{url_for('self_serve_bp.preview_form')}}")
+
+    function allQuestionsInSection() {
+        section_form = document.getElementById("section_form")
+        section_form.setAttribute("action", "{{url_for('self_serve_bp.view_section_questions')}}")
         section_form.submit()
     }
-    function allQuestions() {
-        section_form = document.getElementById("page_form")
-        section_form.setAttribute("action", "{{url_for('self_serve_bp.view_form_questions')}}")
-        section_form.submit()
-    }
-    function savePage() {
-        section_form = document.getElementById("page_form")
-        section_form.setAttribute("action", "{{url_for('self_serve_bp.build_page')}}")
+    function saveSection() {
+        section_form = document.getElementById("section_form")
+        section_form.setAttribute("action", "{{url_for('self_serve_bp.section')}}")
         section_form.submit()
     }
 

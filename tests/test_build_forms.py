@@ -2,7 +2,7 @@
 
 # import pytest
 
-# from app.question_reuse.generate_form import build_form_json
+# from app.config_generator.generate_form import build_form_json
 
 # @pytest.mark.parametrize(
 #     "input_json,form_id, form_title, exp_results",

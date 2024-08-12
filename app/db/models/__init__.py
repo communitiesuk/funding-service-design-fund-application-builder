@@ -8,6 +8,7 @@ from .assessment_config import Criteria
 from .assessment_config import Subcriteria
 from .assessment_config import Theme
 from .fund import Fund
+from .fund import Organisation
 from .round import Round
 
-__all__ = [Fund, Round, Section, Form, Page, Lizt, Component, ComponentType, Criteria, Subcriteria, Theme]
+__all__ = [Fund, Round, Section, Form, Page, Lizt, Component, ComponentType, Criteria, Subcriteria, Theme, Organisation]

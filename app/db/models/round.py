@@ -53,7 +53,7 @@ class Round(BaseModel):
     # several other fields to add
 
     def __repr__(self):
-        return f"Round({self.short_name - self.title_json['en']}, Sections: {self.sections})"
+        return f"Round({self.short_name} - {self.title_json['en']}, Sections: {self.sections})"
 
     def as_dict(self):
         return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}

@@ -2,6 +2,10 @@ from uuid import uuid4
 
 import pytest
 
+from app.config_generator.generate_form import build_form_json
+from app.config_generator.scripts.generate_assessment_config import (
+    build_assessment_config,
+)
 from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Form
@@ -12,8 +16,6 @@ from app.db.models import Round
 from app.db.models import Section
 from app.db.queries.application import get_component_by_id
 from app.db.queries.fund import get_fund_by_id
-from app.question_reuse.generate_assessment_config import build_assessment_config
-from app.question_reuse.generate_form import build_form_json
 from tasks.test_data import BASIC_FUND_INFO
 from tasks.test_data import BASIC_ROUND_INFO
 

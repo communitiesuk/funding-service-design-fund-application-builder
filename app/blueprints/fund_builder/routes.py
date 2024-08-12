@@ -14,6 +14,8 @@ from flask import url_for
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
+from app.config_generator.generate_all_questions import print_html
+from app.config_generator.generate_form import build_form_json
 from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.application import clone_single_round
@@ -23,8 +25,6 @@ from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
-from app.question_reuse.generate_all_questions import print_html
-from app.question_reuse.generate_form import build_form_json
 from config import Config
 
 # Blueprint for routes used by v1 of FAB - using the DB

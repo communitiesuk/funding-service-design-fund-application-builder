@@ -54,7 +54,7 @@ class Section(BaseModel):
     is_template = Column(Boolean, default=False, nullable=False)
     audit_info = Column(JSON(none_as_null=True))
     forms: Mapped[List["Form"]] = relationship(
-        "Form", order_by="Form.section_index", collection_class=ordering_list("section_index")
+        "Form", order_by="Form.section_index", collection_class=ordering_list("section_index"), passive_deletes="all"
     )
     index = Column(Integer())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
@@ -62,8 +62,11 @@ class Section(BaseModel):
     def __repr__(self):
         return f"Section({self.name_in_apply_json['en']}, Forms: {self.forms})"
 
-    def as_dict(self):
-        return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}
+    def as_dict(self, include_relationships=False):
+        result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}
+        if include_relationships & hasattr(self, "forms"):
+            result["forms"] = [form.as_dict() for form in self.forms if self.forms is not None]
+        return result
 
 
 @dataclass
@@ -85,7 +88,7 @@ class Form(BaseModel):
     audit_info = Column(JSON(none_as_null=True))
     section_index = Column(Integer())
     pages: Mapped[List["Page"]] = relationship(
-        "Page", order_by="Page.form_index", collection_class=ordering_list("form_index")
+        "Page", order_by="Page.form_index", collection_class=ordering_list("form_index"), passive_deletes="all"
     )
     runner_publish_name = Column(db.String())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
@@ -93,8 +96,11 @@ class Form(BaseModel):
     def __repr__(self):
         return f"Form({self.runner_publish_name} - {self.name_in_apply_json['en']}, Pages: {self.pages})"
 
-    def as_dict(self):
-        return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}
+    def as_dict(self, include_relationships=False):
+        result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}
+        if include_relationships & hasattr(self, "pages"):
+            result["pages"] = [page.as_dict() for page in self.pages if self.pages is not None]
+        return result
 
 
 @dataclass
@@ -117,7 +123,10 @@ class Page(BaseModel):
     form_index = Column(Integer())
     display_path = Column(String())
     components: Mapped[List["Component"]] = relationship(
-        "Component", order_by="Component.page_index", collection_class=ordering_list("page_index")
+        "Component",
+        order_by="Component.page_index",
+        collection_class=ordering_list("page_index"),
+        passive_deletes="all",
     )
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     controller = Column(String(), nullable=True)
@@ -125,8 +134,13 @@ class Page(BaseModel):
     def __repr__(self):
         return f"Page(/{self.display_path} - {self.name_in_apply_json['en']}, Components: {self.components})"
 
-    def as_dict(self):
-        return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}
+    def as_dict(self, include_relationships=False):
+        result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}
+
+        if include_relationships & hasattr(self, "components"):
+            result["components"] = [component.as_dict() for component in self.components if self.components is not None]
+
+        return result
 
 
 # Ensure we can only have one template with a particular display_path value

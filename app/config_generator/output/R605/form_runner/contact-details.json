@@ -1,0 +1,105 @@
+{
+    "metadata": {},
+    "startPage": "/intro-contact-details",
+    "backLinkText": "Go back to application overview",
+    "pages": [
+        {
+            "path": "/lead-contact-details",
+            "title": "Lead Contact Details",
+            "components": [
+                {
+                    "options": {
+                        "hideTitle": false,
+                        "classes": ""
+                    },
+                    "type": "TextField",
+                    "title": "Main Contact Name",
+                    "hint": "",
+                    "schema": {},
+                    "name": "main_contact_name",
+                    "metadata": {
+                        "fund_builder_id": "3a2d94d0-fc66-4c8e-a6cf-cdc99a81086d"
+                    }
+                },
+                {
+                    "options": {
+                        "hideTitle": false,
+                        "classes": ""
+                    },
+                    "type": "EmailAddressField",
+                    "title": "Main Contact Email",
+                    "hint": "",
+                    "schema": {},
+                    "name": "main_contact_email",
+                    "metadata": {
+                        "fund_builder_id": "42cf792d-ee38-44f1-a720-07e8b874a56b"
+                    }
+                },
+                {
+                    "options": {
+                        "hideTitle": false,
+                        "classes": ""
+                    },
+                    "type": "UkAddressField",
+                    "title": "Main Contact Address",
+                    "hint": "",
+                    "schema": {},
+                    "name": "main_contact_address",
+                    "metadata": {
+                        "fund_builder_id": "2574c33f-10f9-4796-83ad-d9f0ce9dfa86"
+                    }
+                }
+            ],
+            "next": [
+                {
+                    "path": "/summary"
+                }
+            ],
+            "options": {}
+        },
+        {
+            "path": "/intro-contact-details",
+            "title": "Contact Details",
+            "components": [
+                {
+                    "name": "start-page-content",
+                    "options": {},
+                    "type": "Html",
+                    "content": "<p class=\"govuk-body\">None</p><p class=\"govuk-body\">We will ask you about:</p> <ul><li>Lead Contact Details</li></ul>",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/lead-contact-details"
+                }
+            ],
+            "options": {},
+            "controller": "./pages/start.js"
+        },
+        {
+            "path": "/summary",
+            "title": "Check your answers",
+            "components": [],
+            "next": [],
+            "section": "uLwBuz",
+            "controller": "./pages/summary.js"
+        }
+    ],
+    "lists": [],
+    "conditions": [],
+    "fees": [],
+    "sections": [],
+    "outputs": [
+        {
+            "name": "update-form",
+            "title": "Update form in application store",
+            "type": "savePerPage",
+            "outputConfiguration": {
+                "savePerPageUrl": true
+            }
+        }
+    ],
+    "skipSummary": false,
+    "name": "Contact Details"
+}
