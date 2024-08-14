@@ -2,11 +2,11 @@ import os
 import sys
 from os import getenv
 
-sys.path.insert(1, ".")
-os.environ.update({"FLASK_ENV": "tasks"})
+from app import app
 from invoke import task  # noqa:E402
 
-from app.app import app  # noqa:E402
+sys.path.insert(1, ".")
+os.environ.update({"FLASK_ENV": "tasks"})
 
 from .test_data import init_salmon_fishing_fund  # noqa:E402
 from .test_data import insert_test_data  # noqa:E402

@@ -3,10 +3,11 @@ import sys
 
 import requests
 
+from app import app
+
 sys.path.insert(1, ".")
 from invoke import task  # noqa:E402
 
-from app.app import app  # noqa:E402
 from app.blueprints.self_serve.routes import human_to_kebab_case  # noqa:E402
 from app.config_generator.scripts.generate_fund_round_config import (  # noqa:E402
     generate_config_for_round,
