@@ -2,7 +2,7 @@ import pytest
 from flask_migrate import upgrade
 from sqlalchemy import text
 
-from app.app import create_app
+from app.create_app import create_app
 from tasks.test_data import init_unit_test_data
 from tasks.test_data import insert_test_data
 
