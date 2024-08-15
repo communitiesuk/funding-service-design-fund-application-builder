@@ -71,6 +71,8 @@ editorconfig==0.12.4
     # via
     #   cssbeautifier
     #   jsbeautifier
+et-xmlfile==1.1.0
+    # via openpyxl
 filelock==3.15.4
     # via virtualenv
 flake8==7.0.0
@@ -185,12 +187,18 @@ mypy-extensions==1.0.0
     #   mypy
 nodeenv==1.9.1
     # via pre-commit
+numpy==2.0.1
+    # via pandas
+openpyxl==3.1.5
+    # via -r requirements.in
 packaging==24.1
     # via
     #   black
     #   gunicorn
     #   marshmallow
     #   pytest
+pandas==2.2.2
+    # via -r requirements.in
 pathspec==0.12.1
     # via
     #   black
@@ -237,7 +245,9 @@ pytest-mock==3.14.0
 python-consul==1.1.0
     # via flipper-client
 python-dateutil==2.9.0.post0
-    # via botocore
+    # via
+    #   botocore
+    #   pandas
 python-dotenv==1.0.1
     # via
     #   -r requirements-dev.in
@@ -248,6 +258,7 @@ pytz==2024.1
     # via
     #   flask-babel
     #   funding-service-design-utils
+    #   pandas
 pyyaml==6.0.1
     # via
     #   djlint
@@ -311,6 +322,8 @@ typing-extensions==4.12.2
     #   alembic
     #   mypy
     #   sqlalchemy
+tzdata==2024.1
+    # via pandas
 urllib3==2.2.2
     # via
     #   botocore

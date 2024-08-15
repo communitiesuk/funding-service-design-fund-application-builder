@@ -9,13 +9,13 @@ sys.path.insert(1, ".")
 from invoke import task  # noqa:E402
 
 from app.blueprints.self_serve.routes import human_to_kebab_case  # noqa:E402
-from app.config_generator.scripts.generate_fund_round_config import (  # noqa:E402
+from app.export.config_generator.generate_fund_round_config import (  # noqa:E402
     generate_config_for_round,
 )
-from app.config_generator.scripts.generate_fund_round_form_jsons import (  # noqa:E402
+from app.export.config_generator.generate_fund_round_form_jsons import (  # noqa:E402
     generate_form_jsons_for_round,
 )
-from app.config_generator.scripts.generate_fund_round_html import (  # noqa:E402
+from app.export.config_generator.generate_fund_round_html import (  # noqa:E402
     generate_all_round_html,
 )
 from config import Config  # noqa:E402

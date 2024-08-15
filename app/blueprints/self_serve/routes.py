@@ -22,8 +22,8 @@ from app.blueprints.self_serve.forms.form_form import FormForm
 from app.blueprints.self_serve.forms.page_form import PageForm
 from app.blueprints.self_serve.forms.question_form import QuestionForm
 from app.blueprints.self_serve.forms.section_form import SectionForm
-from app.config_generator.generate_all_questions import print_html
-from app.config_generator.generate_form import build_form_json
+from app.export.config_generator.generate_all_questions import print_html
+from app.export.config_generator.generate_form import build_form_json
 
 FORM_RUNNER_URL = os.getenv("FORM_RUNNER_INTERNAL_HOST", "http://form-runner:3009")
 FORM_RUNNER_URL_REDIRECT = os.getenv("FORM_RUNNER_EXTERNAL_HOST", "http://localhost:3009")
