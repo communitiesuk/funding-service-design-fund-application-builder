@@ -95,12 +95,15 @@ page_2_id = uuid4()
             ),
             Page(
                 page_id=page_2_id,
-                form_id=None,
+                form_id=form_id,
                 display_path="organisation-alternative-names",
                 name_in_apply_json={"en": "Alternative names of your organisation"},
                 form_index=2,
                 is_template=True,
             ),
+        ],
+        "default_next_pages": [
+            {"page_id": page_1_id, "default_next_page_id": page_2_id},
         ],
         "components": [
             Component(

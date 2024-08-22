@@ -18,6 +18,7 @@ from app.shared.data_classes import RoundExport
 ROUND_BASE_PATHS = {
     # Should increment for each new round, anything that shares the same base path will also share
     # the child tree path config.
+    "TEST": 0,
     "COF_R2_W2": 1,
     "COF_R2_W3": 1,
     "COF_R3_W1": 2,
@@ -29,7 +30,6 @@ ROUND_BASE_PATHS = {
     "COF_R4_W1": 9,
     "HSRA": 10,
     "COF_R4_W2": 11,
-    "R605": 12,
 }
 
 

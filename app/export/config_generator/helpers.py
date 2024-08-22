@@ -11,8 +11,11 @@ from app.shared.helpers import convert_to_dict
 
 
 def write_config(config, filename, round_short_name, config_type):
-    # Determine the base output directory
-    base_output_dir = f"app/export/config_generator/output/{round_short_name}/"
+    # Get the directory of the current file
+    current_dir = os.path.dirname(__file__)
+
+    # Construct the path to the output directory relative to this file's location
+    base_output_dir = os.path.join(current_dir, f"output/{round_short_name}/")
 
     if config_type == "form_json":
         output_dir = os.path.join(base_output_dir, "form_runner/")

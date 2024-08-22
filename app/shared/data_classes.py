@@ -5,6 +5,14 @@ from typing import Optional
 
 
 @dataclass
+class Condition:
+    name: str
+    value: str
+    operator: str
+    destination_page_path: str
+
+
+@dataclass
 class SectionName:
     en: str
     cy: str

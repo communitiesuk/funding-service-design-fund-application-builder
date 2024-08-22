@@ -34,6 +34,11 @@ class ComponentType(Enum):
     HTML = "Html"
     YES_NO_FIELD = "YesNoField"
     RADIOS_FIELD = "RadiosField"
+    PARA = "Para"
+    DATE_PARTS_FIELD = "DatePartsField"
+    CHECKBOXES_FIELD = "CheckboxesField"
+    CLIENT_SIDE_FILE_UPLOAD_FIELD = "ClientSideFileUploadField"
+    WEBSITE_FIELD = "WebsiteField"
 
 
 @dataclass
@@ -122,6 +127,7 @@ class Page(BaseModel):
     audit_info = Column(JSON(none_as_null=True))
     form_index = Column(Integer())
     display_path = Column(String())
+    default_next_page_id = Column(UUID(as_uuid=True), ForeignKey("page.page_id"), nullable=True)
     components: Mapped[List["Component"]] = relationship(
         "Component",
         order_by="Component.page_index",
@@ -154,6 +160,7 @@ class Lizt(BaseModel):
         default=uuid.uuid4,
     )
     name = Column(String())
+    title = Column(String())
     type = Column(String())
     items = Column(JSON())
     is_template = Column(Boolean, default=False, nullable=False)

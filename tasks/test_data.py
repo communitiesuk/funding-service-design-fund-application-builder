@@ -34,6 +34,13 @@ BASIC_ROUND_INFO = {
     "privacy_notice_link": "http://www.google.com",
 }
 
+page_one_id = uuid4()
+page_two_id = uuid4()
+page_three_id = uuid4()
+page_four_id = uuid4()
+page_five_id = uuid4()
+alt_page_id = uuid4()
+
 
 def init_salmon_fishing_fund():
     organisation_uuid = uuid4()
@@ -104,36 +111,37 @@ def init_salmon_fishing_fund():
         runner_publish_name="contact-details",
     )
     p1: Page = Page(
-        page_id=uuid4(),
+        page_id=page_one_id,
         form_id=f1.form_id,
         display_path="organisation-name",
         name_in_apply_json={"en": "Organisation Name"},
         form_index=1,
     )
     p2: Page = Page(
-        page_id=uuid4(),
+        page_id=page_two_id,
         display_path="organisation-address",
         form_id=f1.form_id,
         name_in_apply_json={"en": "Organisation Address"},
         form_index=3,
     )
     p3: Page = Page(
-        page_id=uuid4(),
+        page_id=page_three_id,
         form_id=f2.form_id,
         display_path="lead-contact-details",
         name_in_apply_json={"en": "Lead Contact Details"},
         form_index=1,
     )
     p5: Page = Page(
-        page_id=uuid4(),
+        page_id=page_five_id,
         display_path="organisation-classification",
         form_id=f1.form_id,
         name_in_apply_json={"en": "Organisation Classification"},
         form_index=4,
+        default_next_page_id=None,
     )
     p_org_alt_names: Page = Page(
-        page_id=uuid4(),
-        form_id=None,
+        page_id=alt_page_id,
+        form_id=f1.form_id,
         display_path="organisation-alternative-names",
         name_in_apply_json={"en": "Alternative names of your organisation"},
         form_index=2,
@@ -205,13 +213,13 @@ def init_salmon_fishing_fund():
         conditions=[
             {
                 "name": "organisation_other_names_no",
-                "value": "false",  # this must be lowercaes or the navigation doesn't work
+                "value": "false",  # this must be lowercase or the navigation doesn't work
                 "operator": "is",
-                "destination_page_path": "CONTINUE",
+                "destination_page_path": "organisation-address",
             },
             {
                 "name": "organisation_other_names_yes",
-                "value": "true",  # this must be lowercaes or the navigation doesn't work
+                "value": "true",  # this must be lowercase or the navigation doesn't work
                 "operator": "is",
                 "destination_page_path": "organisation-alternative-names",
             },
@@ -266,6 +274,10 @@ def init_salmon_fishing_fund():
         "sections": [s1],
         "forms": [f1, f2],
         "pages": [p1, p2, p3, p5, p_org_alt_names],
+        "default_next_pages": [
+            {"page_id": alt_page_id, "default_next_page_id": page_two_id},
+            {"page_id": page_two_id, "default_next_page_id": page_five_id},
+        ],
         "components": [c1, c2, c4, c5, c6, c8, c3, c7],
         "criteria": [cri1],
         "subcriteria": [sc1],
@@ -339,6 +351,7 @@ def init_unit_test_data() -> dict:
         display_path="organisation-name",
         name_in_apply_json={"en": "Organisation Name"},
         form_index=1,
+        default_next_page_id=None,
     )
 
     cri1: Criteria = Criteria(criteria_id=uuid4(), index=1, round_id=r.round_id, name="Unscored", weighting=0.0)
@@ -396,6 +409,14 @@ def init_unit_test_data() -> dict:
     }
 
 
+def add_default_page_paths(db, default_next_page_config):
+    # set up the default paths
+    for page_config in default_next_page_config:
+        page = Page.query.filter_by(page_id=page_config["page_id"]).first()
+        page.default_next_page_id = page_config["default_next_page_id"]
+    db.session.commit()
+
+
 def insert_test_data(db, test_data={}):
     db.session.bulk_save_objects(test_data.get("organisations", []))
     db.session.commit()
@@ -409,6 +430,7 @@ def insert_test_data(db, test_data={}):
     db.session.commit()
     db.session.bulk_save_objects(test_data.get("pages", []))
     db.session.commit()
+    add_default_page_paths(db, test_data.get("default_next_pages", []))
     db.session.bulk_save_objects(test_data.get("criteria", []))
     db.session.commit()
     db.session.bulk_save_objects(test_data.get("subcriteria", []))
