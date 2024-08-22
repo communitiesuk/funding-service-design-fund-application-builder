@@ -6,16 +6,14 @@ from pathlib import Path
 
 import pytest
 
-from app.export.config_generator.generate_fund_round_config import (
-    generate_config_for_round,
-)
-from app.export.config_generator.generate_fund_round_form_jsons import (
+from app.export_config.generate_fund_round_config import generate_config_for_round
+from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
-from app.export.config_generator.generate_fund_round_html import generate_all_round_html
-from app.export.config_generator.helpers import validate_json
+from app.export_config.generate_fund_round_html import generate_all_round_html
+from app.export_config.helpers import validate_json
 
-output_base_path = Path("app") / "export" / "config_generator" / "output"
+output_base_path = Path("app") / "export_config" / "output"
 
 
 def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
@@ -28,7 +26,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
     mock_round_base_paths = {round_short_name: 99}
 
     # Use monkeypatch to temporarily replace ROUND_BASE_PATHS
-    import app.export.config_generator.generate_fund_round_config as generate_fund_round_config
+    import app.export_config.generate_fund_round_config as generate_fund_round_config
 
     monkeypatch.setattr(generate_fund_round_config, "ROUND_BASE_PATHS", mock_round_base_paths)
     # Execute: Call the function with valid inputs

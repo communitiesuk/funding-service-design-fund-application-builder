@@ -6,12 +6,12 @@ from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Lizt
 from app.db.models import Page
-from app.export.config_generator.generate_form import build_conditions
-from app.export.config_generator.generate_form import build_form_json
-from app.export.config_generator.generate_form import build_lists
-from app.export.config_generator.generate_form import build_navigation
-from app.export.config_generator.generate_form import build_page
-from app.export.config_generator.generate_form import human_to_kebab_case
+from app.export_config.generate_form import build_conditions
+from app.export_config.generate_form import build_form_json
+from app.export_config.generate_form import build_lists
+from app.export_config.generate_form import build_navigation
+from app.export_config.generate_form import build_page
+from app.export_config.generate_form import human_to_kebab_case
 from tests.unit_test_data import mock_c_1
 from tests.unit_test_data import mock_form_1
 
@@ -73,7 +73,7 @@ def test_human_to_kebab(input, exp_output):
 )
 def test_build_lists(mocker, pages, exp_result):
     mocker.patch(
-        "app.export.config_generator.generate_form.get_list_by_id",
+        "app.export_config.generate_form.get_list_by_id",
         return_value=Lizt(
             name="greetings_list",
             type="string",
@@ -602,7 +602,7 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
 )
 def test_build_navigation_with_conditions(mocker, input_pages, input_partial_json, exp_next, exp_conditions):
     mocker.patch(
-        "app.export.config_generator.generate_form.build_page",
+        "app.export_config.generate_form.build_page",
         return_value={"path": "/organisation-alternative-names", "next": []},
     )
     results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)

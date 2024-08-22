@@ -162,4 +162,4 @@ cython_debug/
 #.idea/
 
 # Script output directory
-app/export/config_generator/output/
+app/export_config/output/

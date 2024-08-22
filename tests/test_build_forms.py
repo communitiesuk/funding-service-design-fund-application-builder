@@ -2,7 +2,7 @@
 
 # import pytest
 
-# from app.export.config_generator.generate_form import build_form_json
+# from app.export_config.generate_form import build_form_json
 
 # @pytest.mark.parametrize(
 #     "input_json,form_id, form_title, exp_results",

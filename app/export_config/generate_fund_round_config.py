@@ -7,7 +7,7 @@ from app.db.models import Form
 from app.db.models import Section
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
-from app.export.config_generator.helpers import write_config
+from app.export_config.helpers import write_config
 from app.shared.data_classes import FundExport
 from app.shared.data_classes import FundSectionForm
 from app.shared.data_classes import FundSectionSection

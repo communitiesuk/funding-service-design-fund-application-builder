@@ -27,16 +27,16 @@ from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
-from app.export.config_generator.generate_all_questions import print_html
-from app.export.config_generator.generate_form import build_form_json
-from app.export.config_generator.generate_fund_round_config import (
+from app.export_config.generate_all_questions import print_html
+from app.export_config.generate_form import build_form_json
+from app.export_config.generate_fund_round_config import (
     generate_application_display_config,
 )
-from app.export.config_generator.generate_fund_round_config import generate_fund_config
-from app.export.config_generator.generate_fund_round_form_jsons import (
+from app.export_config.generate_fund_round_config import generate_fund_config
+from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
-from app.export.config_generator.generate_fund_round_html import generate_all_round_html
+from app.export_config.generate_fund_round_html import generate_all_round_html
 from config import Config
 
 # Blueprint for routes used by v1 of FAB - using the DB

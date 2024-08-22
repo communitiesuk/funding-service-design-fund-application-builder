@@ -12,10 +12,8 @@ from app.db.models import Round
 from app.db.models import Section
 from app.db.queries.application import get_component_by_id
 from app.db.queries.fund import get_fund_by_id
-from app.export.config_generator.generate_assessment_config import (
-    build_assessment_config,
-)
-from app.export.config_generator.generate_form import build_form_json
+from app.export_config.generate_assessment_config import build_assessment_config
+from app.export_config.generate_form import build_form_json
 from tasks.test_data import BASIC_FUND_INFO
 from tasks.test_data import BASIC_ROUND_INFO
 
