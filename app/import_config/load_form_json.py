@@ -8,6 +8,7 @@ sys.path.insert(1, ".")
 from dataclasses import asdict  # noqa:E402
 
 from app.app import app  # noqa:E402
+from app.db import db  # noqa:E402
 from app.db.models import Component  # noqa:E402
 from app.db.models import ComponentType  # noqa:E402
 from app.db.models import Form  # noqa:E402
@@ -68,7 +69,8 @@ def insert_component_as_template(component, page_id, page_index, lizts):
             if li["name"] == component_list:
                 new_list = Lizt(
                     is_template=True,
-                    name=li.get("title"),
+                    name=li.get("name"),
+                    title=li.get("title"),
                     type=li.get("type"),
                     items=li.get("items"),
                 )
@@ -103,11 +105,11 @@ def insert_component_as_template(component, page_id, page_index, lizts):
     return new_component
 
 
-def insert_page_as_template(page, form_id, idx):
+def insert_page_as_template(page, form_id):
     new_page = Page(
         form_id=form_id,
         display_path=page.get("path").lstrip("/"),
-        form_index=idx,
+        form_index=None,
         name_in_apply_json={"en": page.get("title")},
         controller=page.get("controller", None),
         is_template=True,
@@ -121,24 +123,51 @@ def insert_page_as_template(page, form_id, idx):
     return new_page
 
 
-def insert_form_config(form_config, form_id, db):
+def find_page_by_path(path):
+    page = db.session.query(Page).filter(Page.display_path == path.lstrip("/")).first()
+    return page
+
+
+def insert_page_default_next_page(pages_config, db_pages):
+    for current_page_config in pages_config:
+        for db_page in db_pages:
+            if db_page.display_path == current_page_config.get("path").lstrip("/"):
+                current_db_page = db_page
+        page_nexts = current_page_config.get("next", [])
+        next_page_path_with_no_condition = next((p for p in page_nexts if not p.get("condition")), None)
+        if not next_page_path_with_no_condition:
+            # no default next page so move on (next page is based on conditions)
+            continue
+
+        # set default next page id
+        for db_page in db_pages:
+            if db_page.display_path == next_page_path_with_no_condition.get("path").lstrip("/"):
+                current_db_page.default_next_page_id = db_page.page_id
+        # Update the page in the database
+        db.session.add(current_db_page)
+    db.session.flush()
+
+
+def insert_form_config(form_config, form_id):
     inserted_pages = []
     inserted_components = []
-    for p_idx, page in enumerate(form_config.get("pages", [])):
-        inserted_page = insert_page_as_template(page, form_id, p_idx)
+    for page in form_config.get("pages", []):
+        inserted_page = insert_page_as_template(page, form_id)
         inserted_pages.append(inserted_page)
         db.session.flush()  # flush to get the page id
         for c_idx, component in enumerate(page.get("components", [])):
             inserted_component = insert_component_as_template(
-                component, inserted_page.page_id, c_idx, form_config["lists"]
+                component, inserted_page.page_id, (c_idx + 1), form_config["lists"]
             )
             inserted_components.append(inserted_component)
         db.session.flush()  # flush to make components available for conditions
         add_conditions_to_components(db, page, form_config["conditions"])
+    insert_page_default_next_page(form_config.get("pages", None), inserted_pages)
+    db
     return inserted_pages, inserted_components
 
 
-def insert_form_as_template(form, db):
+def insert_form_as_template(form):
     section = db.session.query(Section.section_id).first()
     new_form = Form(
         section_id=section.section_id,
@@ -147,7 +176,7 @@ def insert_form_as_template(form, db):
         is_template=True,
         audit_info=None,
         section_index=None,
-        runner_publish_name=filename,
+        runner_publish_name=form["filename"],
         source_template_id=None,
     )
 
@@ -160,28 +189,40 @@ def insert_form_as_template(form, db):
     return new_form
 
 
-def read_json(filename):
-    script_dir = os.path.dirname(__file__)
-    # Construct the path to the Excel file relative to the script's location
-    file_name = os.path.join(script_dir, filename)
-    # Read json file into python dict
-    with open(file_name, "r") as json_file:
-        form = json.load(json_file)
-    return form
+def read_json_from_directory(directory_path):
+    form_configs = []
+    for filename in os.listdir(directory_path):
+        if filename.endswith(".json"):
+            file_path = os.path.join(directory_path, filename)
+            with open(file_path, "r") as json_file:
+                form = json.load(json_file)
+                form["filename"] = filename
+                form_configs.append(form)
+    return form_configs
+
+
+def load_form_jsons(override_fund_config):
+    db = app.extensions["sqlalchemy"]  # Move db definition here
+    try:
+        if not override_fund_config:
+            db = app.extensions["sqlalchemy"]
+            script_dir = os.path.dirname(__file__)
+            full_directory_path = os.path.join(script_dir, "files_to_import")
+            form_configs = read_json_from_directory(full_directory_path)
+        else:
+            form_configs = override_fund_config
+        for form_config in form_configs:
+            # prepare all row commits
+            inserted_form = insert_form_as_template(form_config)
+            db.session.flush()  # flush to get the form id
+            inserted_pages, inserted_components = insert_form_config(form_config, inserted_form.form_id)
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        raise e
 
 
 if __name__ == "__main__":
     with app.app_context():
-        try:
-            db = app.extensions["sqlalchemy"]
-            filename = "asset-information-cof-r3-w2.json"
-            form_config = read_json(filename)
-            # prepare all row commits
-            inserted_form = insert_form_as_template(form_config, db)
-            db.session.flush()  # flush to get the form id
-            inserted_pages, inserted_components = insert_form_config(form_config, inserted_form.form_id, db)
-            db.session.commit()
-        except Exception as e:
-            print(e)
-            db.session.rollback()
-            raise e
+        load_form_jsons()
