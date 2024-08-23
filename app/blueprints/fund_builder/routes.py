@@ -230,9 +230,9 @@ def create_export_files(round_id):
     round_short_name = get_round_by_id(round_id).short_name
 
     # Directory to zip
-    directory_to_zip = f"app/export/config_generator/output/{round_short_name}/"
+    directory_to_zip = f"app/export_config/output/{round_short_name}/"
     # Output zip file path (temporary)
-    output_zip_path = f"app/export/config_generator/output/{round_short_name}.zip"
+    output_zip_path = f"app/export_config/output/{round_short_name}.zip"
 
     # Create a zip archive of the directory
     shutil.make_archive(output_zip_path.replace(".zip", ""), "zip", directory_to_zip)

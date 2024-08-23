@@ -201,7 +201,7 @@ def read_json_from_directory(directory_path):
     return form_configs
 
 
-def load_form_jsons(override_fund_config):
+def load_form_jsons(override_fund_config=None):
     db = app.extensions["sqlalchemy"]  # Move db definition here
     try:
         if not override_fund_config:
