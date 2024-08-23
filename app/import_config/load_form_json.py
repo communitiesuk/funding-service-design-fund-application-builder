@@ -7,7 +7,7 @@ import sys
 sys.path.insert(1, ".")
 from dataclasses import asdict  # noqa:E402
 
-from app.app import app  # noqa:E402
+from app.create_app import app  # noqa:E402
 from app.db import db  # noqa:E402
 from app.db.models import Component  # noqa:E402
 from app.db.models import ComponentType  # noqa:E402
