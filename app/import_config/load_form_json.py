@@ -208,9 +208,9 @@ def read_json_from_directory(directory_path):
 
 
 def load_form_jsons(override_fund_config=None):
+    db = app.extensions["sqlalchemy"]
     try:
         if not override_fund_config:
-            db = app.extensions["sqlalchemy"]
             script_dir = os.path.dirname(__file__)
             full_directory_path = os.path.join(script_dir, "files_to_import")
             form_configs = read_json_from_directory(full_directory_path)
