@@ -8,8 +8,6 @@ airium==0.2.6
     # via -r requirements.in
 alembic==1.13.2
     # via flask-migrate
-async-timeout==4.0.3
-    # via redis
 attrs==24.2.0
     # via
     #   jsonschema
@@ -20,7 +18,7 @@ beautifulsoup4==4.12.3
     # via
     #   -r requirements-dev.in
     #   funding-service-design-utils
-black==24.3.0
+black==24.8.0
     # via -r requirements-dev.in
 blinker==1.8.2
     # via
@@ -224,7 +222,9 @@ pyflakes==3.2.0
 pygments==2.18.0
     # via rich
 pyjwt[crypto]==2.8.0
-    # via funding-service-design-utils
+    # via
+    #   funding-service-design-utils
+    #   pyjwt
 pyscss==1.4.0
     # via -r requirements.in
 pytest==8.2.2
@@ -305,6 +305,7 @@ sqlalchemy[mypy]==2.0.31
     #   alembic
     #   flask-sqlalchemy
     #   marshmallow-sqlalchemy
+    #   sqlalchemy
     #   sqlalchemy-json
     #   sqlalchemy-utils
 sqlalchemy-json==0.7.0
