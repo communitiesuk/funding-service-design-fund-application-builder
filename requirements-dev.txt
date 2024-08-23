@@ -8,8 +8,6 @@ airium==0.2.6
     # via -r requirements.in
 alembic==1.13.2
     # via flask-migrate
-async-timeout==4.0.3
-    # via redis
 attrs==24.2.0
     # via
     #   jsonschema
@@ -26,16 +24,8 @@ blinker==1.8.2
     # via
     #   flask
     #   sentry-sdk
-boto3==1.34.144
-    # via flipper-client
-botocore==1.34.144
-    # via
-    #   boto3
-    #   s3transfer
 brotli==1.1.0
     # via flask-compress
-cachetools==5.4.0
-    # via flipper-client
 certifi==2024.7.4
     # via
     #   requests
@@ -116,9 +106,7 @@ flask-talisman==1.1.0
     # via -r requirements.in
 flask-wtf==1.2.1
     # via -r requirements.in
-flipper-client==1.3.2
-    # via funding-service-design-utils
-funding-service-design-utils==4.0.1
+funding-service-design-utils==5.0.3
     # via -r requirements.in
 govuk-frontend-jinja==3.1.0
     # via -r requirements.in
@@ -148,10 +136,6 @@ jinja2==3.1.4
     #   flask-babel
     #   govuk-frontend-jinja
     #   pytest-html
-jmespath==1.0.1
-    # via
-    #   boto3
-    #   botocore
 jsbeautifier==1.15.1
     # via
     #   cssbeautifier
@@ -217,14 +201,14 @@ pycodestyle==2.11.1
     # via flake8
 pycparser==2.22
     # via cffi
-pyee==6.0.0
-    # via flipper-client
 pyflakes==3.2.0
     # via flake8
 pygments==2.18.0
     # via rich
 pyjwt[crypto]==2.8.0
-    # via funding-service-design-utils
+    # via
+    #   funding-service-design-utils
+    #   pyjwt
 pyscss==1.4.0
     # via -r requirements.in
 pytest==8.2.2
@@ -242,12 +226,8 @@ pytest-metadata==3.1.1
     # via pytest-html
 pytest-mock==3.14.0
     # via -r requirements-dev.in
-python-consul==1.1.0
-    # via flipper-client
 python-dateutil==2.9.0.post0
-    # via
-    #   botocore
-    #   pandas
+    # via pandas
 python-dotenv==1.0.1
     # via
     #   -r requirements-dev.in
@@ -265,9 +245,7 @@ pyyaml==6.0.1
     #   funding-service-design-utils
     #   pre-commit
 redis==4.6.0
-    # via
-    #   flask-redis
-    #   flipper-client
+    # via flask-redis
 referencing==0.35.1
     # via
     #   jsonschema
@@ -278,15 +256,12 @@ requests==2.32.3
     # via
     #   -r requirements.in
     #   funding-service-design-utils
-    #   python-consul
 rich==12.6.0
     # via funding-service-design-utils
 rpds-py==0.20.0
     # via
     #   jsonschema
     #   referencing
-s3transfer==0.10.2
-    # via boto3
 sentry-sdk[flask]==2.10.0
     # via funding-service-design-utils
 six==1.16.0
@@ -294,9 +269,7 @@ six==1.16.0
     #   cssbeautifier
     #   jsbeautifier
     #   pyscss
-    #   python-consul
     #   python-dateutil
-    #   thrift
 soupsieve==2.5
     # via beautifulsoup4
 sqlalchemy[mypy]==2.0.31
@@ -305,6 +278,7 @@ sqlalchemy[mypy]==2.0.31
     #   alembic
     #   flask-sqlalchemy
     #   marshmallow-sqlalchemy
+    #   sqlalchemy
     #   sqlalchemy-json
     #   sqlalchemy-utils
 sqlalchemy-json==0.7.0
@@ -313,8 +287,6 @@ sqlalchemy-utils==0.41.2
     # via
     #   -r requirements.in
     #   funding-service-design-utils
-thrift==0.20.0
-    # via flipper-client
 tqdm==4.66.4
     # via djlint
 typing-extensions==4.12.2
@@ -326,7 +298,6 @@ tzdata==2024.1
     # via pandas
 urllib3==2.2.2
     # via
-    #   botocore
     #   requests
     #   sentry-sdk
 virtualenv==20.26.3
