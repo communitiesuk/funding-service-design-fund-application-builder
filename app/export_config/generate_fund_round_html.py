@@ -1,10 +1,10 @@
 from flask import current_app
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
-from app.config_generator.generate_all_questions import print_html
-from app.config_generator.generate_form import build_form_json
-from app.config_generator.scripts.helpers import write_config
 from app.db.queries.round import get_round_by_id
+from app.export_config.generate_all_questions import print_html
+from app.export_config.generate_form import build_form_json
+from app.export_config.helpers import write_config
 
 
 def generate_all_round_html(round_id):

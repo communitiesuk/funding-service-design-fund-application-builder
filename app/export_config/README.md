@@ -1,4 +1,4 @@
-# FAB Config output
+# FAB Config Output
 
 This directory contains the scripts and output required to generate the FAB configuration files.
 
@@ -60,19 +60,19 @@ inv generate-round-html {roundid}
 The scripts generate the following output file structure:
 ```plaintext
 app/
-    config_generator/
-        - scripts/
-            -- **
-        -- output/
-            -- round_short_name/
-            -- form_runner/
-                -- form_name.json
-            -- fund_store/
-                -- fund_config.py
-                -- round_config.py
-                -- sections_config.py
-            -- html/
-                -- full_aplication.html
+    - export/
+        - config_generator/
+            -- scripts[.py]
+            - output/
+                - round_short_name/
+                - form_runner/
+                    -- form_name.json
+                - fund_store/
+                    -- fund_config.py
+                    -- round_config.py
+                    -- sections_config.py
+                - html/
+                    -- full_aplication.html
 ```
 
 <!-- TODO: Is this now covered by cloning? >> -->

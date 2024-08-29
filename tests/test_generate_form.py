@@ -2,16 +2,16 @@ from uuid import uuid4
 
 import pytest
 
-from app.config_generator.generate_form import build_conditions
-from app.config_generator.generate_form import build_form_json
-from app.config_generator.generate_form import build_lists
-from app.config_generator.generate_form import build_navigation
-from app.config_generator.generate_form import build_page
-from app.config_generator.generate_form import human_to_kebab_case
 from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Lizt
 from app.db.models import Page
+from app.export_config.generate_form import build_conditions
+from app.export_config.generate_form import build_form_json
+from app.export_config.generate_form import build_lists
+from app.export_config.generate_form import build_navigation
+from app.export_config.generate_form import build_page
+from app.export_config.generate_form import human_to_kebab_case
 from tests.unit_test_data import mock_c_1
 from tests.unit_test_data import mock_form_1
 
@@ -62,18 +62,13 @@ def test_human_to_kebab(input, exp_output):
                     "type": "string",
                     "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
                 },
-                {
-                    "name": "greetings_list",
-                    "type": "string",
-                    "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
-                },
             ],
         ),
     ],
 )
 def test_build_lists(mocker, pages, exp_result):
     mocker.patch(
-        "app.config_generator.generate_form.get_list_by_id",
+        "app.export_config.generate_form.get_list_by_id",
         return_value=Lizt(
             name="greetings_list",
             type="string",
@@ -224,11 +219,10 @@ mock_pages = [
                         "title": "Organisation name",
                         "hint": "This must match your registered legal organisation name",
                         "schema": {},
-                        "metadata": {"fund_builder_id": str(mock_c_1.component_id)},
+                        "metadata": {},
                     }
                 ],
                 "next": [],
-                "options": {},
             },
         )
     ],
@@ -394,9 +388,10 @@ def test_build_conditions(input_component, exp_results):
                     display_path="organisation-single-name",
                     name_in_apply_json={"en": "Organisation Name"},
                     form_index=1,
+                    default_next_page_id=id2,
                 ),
                 Page(
-                    page_id=uuid4(),
+                    page_id=id2,
                     form_id=uuid4(),
                     display_path="organisation-charitable-objects",
                     name_in_apply_json={"en": "What are your organisation's charitable objects?"},
@@ -479,7 +474,7 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                                     "name": "organisation_other_names_no",
                                     "operator": "is",
                                     "value": "no",
-                                    "destination_page_path": "CONTINUE",
+                                    "destination_page_path": "summary",
                                 },
                                 {
                                     "name": "organisation_other_names_yes",
@@ -492,13 +487,13 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                         )
                     ],
                 ),
-                # Page(
-                #     page_id=uuid4(),
-                #     form_id=uuid4(),
-                #     display_path="organisation-alternative-names",
-                #     name_in_apply_json={"en": "Organisation Alternative Names"},
-                #     form_index=2,
-                # ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-alternative-names",
+                    name_in_apply_json={"en": "Organisation Alternative Names"},
+                    form_index=2,
+                ),
             ],
             {
                 "conditions": [],
@@ -529,21 +524,13 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                         "next": [],
                         "options": {},
                     },
-                    # {
-                    #     "path": "/organisation-alternative-names",
-                    #     "title": "Organisation Alternative Names",
-                    #     "components": [
-                    #         # {
-                    #         #     "name": "reuse-charitable-objects",
-                    #         #     "options": {"hideTitle": True, "maxWords": "500"},
-                    #         #     "type": "FreeTextField",
-                    #         #     "title": "What are your organisation's charitable objects?",
-                    #         #     "hint": "You can find this in your organisation's governing document.",
-                    #         # },
-                    #     ],
-                    #     "next": [],
-                    #     "options": {},
-                    # },
+                    {
+                        "path": "/organisation-alternative-names",
+                        "title": "Organisation Alternative Names",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
                 ],
             },
             {
@@ -610,7 +597,7 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
 )
 def test_build_navigation_with_conditions(mocker, input_pages, input_partial_json, exp_next, exp_conditions):
     mocker.patch(
-        "app.config_generator.generate_form.build_page",
+        "app.export_config.generate_form.build_page",
         return_value={"path": "/organisation-alternative-names", "next": []},
     )
     results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)

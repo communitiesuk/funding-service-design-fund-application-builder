@@ -32,7 +32,6 @@ BASIC_PAGE_STRUCTURE = {
     "title": None,
     "components": [],
     "next": [],
-    "options": {},
 }
 
 
@@ -90,7 +89,9 @@ def build_component(component: Component) -> dict:
         "hint": component.hint_text or "",
         "schema": {},
         "name": component.runner_component_name,
-        "metadata": {"fund_builder_id": str(component.component_id)},
+        "metadata": {
+            # "fund_builder_id": str(component.component_id) TODO why do we need this?
+        },
     }
     # add a reference to the relevant list if this component use a list
     if component.lizt:
@@ -133,22 +134,25 @@ def build_page(page: Page = None, page_display_path: str = None) -> dict:
 
 # Goes through the set of pages and updates the conditions and next properties to account for branching
 def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
-    # TODO order by index not order in list
-    # Think this is sorted now that the collection is sorted by index, but needs testing
-    for i in range(0, len(input_pages)):
-        if i < len(input_pages) - 1:
-            next_path = input_pages[i + 1].display_path
-        elif i == len(input_pages) - 1:
-            next_path = "summary"
+    for page in input_pages:
+        # find page in prepared output results
+        this_page_in_results = next(p for p in partial_form_json["pages"] if p["path"] == f"/{page.display_path}")
+
+        if page.controller and page.controller.endswith("summary.js"):
+            continue
+        next_page_id = page.default_next_page_id
+        if next_page_id:
+            find_next_page = lambda id: next(p for p in input_pages if p.page_id == id)  # noqa:E731
+            default_next_page = find_next_page(next_page_id)
+            next_path = default_next_page.display_path
+            # add the default next page
+            this_page_in_results["next"].append({"path": f"/{next_path}"})
         else:
+            # all page paths are conditionals which will be processed later
             next_path = None
 
-        this_page = input_pages[i]
-        this_page_in_results = next(p for p in partial_form_json["pages"] if p["path"] == f"/{this_page.display_path}")
-
         has_conditions = False
-
-        for component in this_page.components:
+        for component in page.components:
             if not component.conditions:
                 continue
             form_json_conditions = build_conditions(component)
@@ -159,18 +163,18 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
                 if condition["destination_page_path"] == "CONTINUE":
                     destination_path = f"/{next_path}"
                 else:
-                    destination_path = f"/{condition['destination_page_path']}"
-
+                    destination_path = f"/{condition['destination_page_path'].lstrip('/')}"
+                # TODO No longer needed since db schema change?
                 # If this points to a pre-built page flow, add that in now (it won't be in the input)
-                if (
-                    destination_path not in [page["path"] for page in partial_form_json["pages"]]
-                    and not destination_path == "/summary"
-                ):
-                    sub_page = build_page(page_display_path=destination_path[1:])
-                    if not sub_page.get("next", None):
-                        sub_page["next"] = [{"path": f"/{next_path}"}]
+                # if (
+                #     destination_path not in [page["path"] for page in partial_form_json["pages"]]
+                #     and not destination_path == "/summary"
+                # ):
+                #     sub_page = build_page(page_display_path=destination_path[1:])
+                #     if not sub_page.get("next", None):
+                #         sub_page["next"] = [{"path": f"/{next_path}"}]
 
-                    partial_form_json["pages"].append(sub_page)
+                #     partial_form_json["pages"].append(sub_page)
 
                 this_page_in_results["next"].append(
                     {
@@ -179,9 +183,8 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
                     }
                 )
 
-        # If there were no conditions we just continue to the next page
-        if not has_conditions:
-            this_page_in_results["next"].append({"path": f"/{next_path}"})
+        if not has_conditions and not next_path:
+            this_page_in_results["next"].append({"path": "/summary"})
 
     return partial_form_json
 
@@ -193,10 +196,24 @@ def build_lists(pages: list[dict]) -> list:
         for component in page["components"]:
             if component.get("list"):
                 list_from_db = get_list_by_id(component["metadata"]["fund_builder_list_id"])
-                list = {"type": list_from_db.type, "items": list_from_db.items, "name": list_from_db.name}
-                lists.append(list)
+                list_dict = {
+                    "type": list_from_db.type,
+                    "items": list_from_db.items,
+                    "name": list_from_db.name,
+                    "title": list_from_db.title,
+                }
+                # Check if the list already exists in lists by name
+                if not any(existing_list["name"] == list_dict["name"] for existing_list in lists):
+                    lists.append(list_dict)
+            # Remove the metadata key from component (no longer needed)
+            component.pop("metadata", None)  # The second argument prevents KeyError if 'metadata' is not found
 
     return lists
+
+
+def _find_page_by_controller(pages, controller_name) -> dict:
+
+    return next((p for p in pages if p.controller and p.controller.endswith(controller_name)), None)
 
 
 def build_start_page(content: str, form: Form) -> dict:
@@ -252,10 +269,15 @@ def build_form_json(form: Form) -> dict:
     for page in form.pages:
         results["pages"].append(build_page(page=page))
 
-    # Create the start page
-    start_page = build_start_page(content=None, form=form)
-    results["pages"].append(start_page)
-    results["startPage"] = start_page["path"]
+    # start page is the page with the controller ending start.js
+    start_page = _find_page_by_controller(form.pages, "start.js")
+    if start_page:
+        results["startPage"] = f"/{start_page.display_path}"
+    else:
+        # Create the start page
+        start_page = build_start_page(content=None, form=form)
+        results["pages"].append(start_page)
+        results["startPage"] = start_page["path"]
 
     # Build navigation and add any pages from branching logic
     results = build_navigation(results, form.pages)
@@ -264,6 +286,8 @@ def build_form_json(form: Form) -> dict:
     results["lists"] = build_lists(results["pages"])
 
     # Add on the summary page
-    results["pages"].append(SUMMARY_PAGE)
+    summary_page = _find_page_by_controller(form.pages, "summary.js")
+    if not summary_page:
+        results["pages"].append(SUMMARY_PAGE)
 
     return results

@@ -59,3 +59,5 @@ Flask-WTF==1.2.1
 #-----------------------------------
 funding-service-design-utils>=4.0.1
 jsonschema
+openpyxl
+pandas

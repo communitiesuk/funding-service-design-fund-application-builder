@@ -1,6 +1,4 @@
 import os
-from dataclasses import asdict
-from dataclasses import is_dataclass
 from datetime import date
 
 import jsonschema
@@ -9,20 +7,15 @@ from jsonschema import validate
 
 from app.blueprints.self_serve.routes import human_to_kebab_case
 from app.blueprints.self_serve.routes import human_to_snake_case
-
-
-def convert_to_dict(obj):
-    if is_dataclass(obj):
-        return asdict(obj)
-    elif isinstance(obj, list):
-        return [asdict(item) if is_dataclass(item) else item for item in obj]
-    else:
-        return obj
+from app.shared.helpers import convert_to_dict
 
 
 def write_config(config, filename, round_short_name, config_type):
-    # Determine the base output directory
-    base_output_dir = f"app/config_generator/output/{round_short_name}/"
+    # Get the directory of the current file
+    current_dir = os.path.dirname(__file__)
+
+    # Construct the path to the output directory relative to this file's location
+    base_output_dir = os.path.join(current_dir, f"output/{round_short_name}/")
 
     if config_type == "form_json":
         output_dir = os.path.join(base_output_dir, "form_runner/")

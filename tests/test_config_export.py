@@ -6,18 +6,14 @@ from pathlib import Path
 
 import pytest
 
-from app.config_generator.scripts.generate_fund_round_config import (
-    generate_config_for_round,
-)
-from app.config_generator.scripts.generate_fund_round_form_jsons import (
+from app.export_config.generate_fund_round_config import generate_config_for_round
+from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
-from app.config_generator.scripts.generate_fund_round_html import (
-    generate_all_round_html,
-)
-from app.config_generator.scripts.helpers import validate_json
+from app.export_config.generate_fund_round_html import generate_all_round_html
+from app.export_config.helpers import validate_json
 
-output_base_path = Path("app") / "config_generator" / "output"
+output_base_path = Path("app") / "export_config" / "output"
 
 
 def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
@@ -30,7 +26,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
     mock_round_base_paths = {round_short_name: 99}
 
     # Use monkeypatch to temporarily replace ROUND_BASE_PATHS
-    import app.config_generator.scripts.generate_fund_round_config as generate_fund_round_config
+    import app.export_config.generate_fund_round_config as generate_fund_round_config
 
     monkeypatch.setattr(generate_fund_round_config, "ROUND_BASE_PATHS", mock_round_base_paths)
     # Execute: Call the function with valid inputs
@@ -158,7 +154,27 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
     expected_files = [
         {
             "path": output_base_path / round_short_name / "form_runner" / f"{form_publish_name}.json",
-            "expected_output": '{"metadata": {}, "startPage": "/intro-about-your-organisation", "backLinkText": "Go back to application overview", "pages": [{"path": "/organisation-name", "title": "Organisation Name", "components": [{"options": {"hideTitle": false, "classes": ""}, "type": "TextField", "title": "What is your organisation\'s name?", "hint": "This must match the regsitered legal organisation name", "schema": {}, "name": "organisation_name"}, {"options": {"hideTitle": false, "classes": ""}, "type": "RadiosField", "title": "How is your organisation classified?", "hint": "", "schema": {}, "name": "organisation_classification", "list": "classifications_list"}], "next": [{"path": "/summary"}], "options": {}}, {"path": "/intro-about-your-organisation", "title": "About your organisation", "components": [{"name": "start-page-content", "options": {}, "type": "Html", "content": "<p class=\\"govuk-body\\">None</p><p class=\\"govuk-body\\">We will ask you about:</p> <ul><li>Organisation Name</li></ul>", "schema": {}}], "next": [{"path": "/organisation-name"}], "options": {}, "controller": "./pages/start.js"}, {"path": "/summary", "title": "Check your answers", "components": [], "next": [], "section": "uLwBuz", "controller": "./pages/summary.js"}], "lists": [{"type": "string", "items": [{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}], "name": "classifications_list"}], "conditions": [], "fees": [], "sections": [], "outputs": [{"name": "update-form", "title": "Update form in application store", "type": "savePerPage", "outputConfiguration": {"savePerPageUrl": true}}], "skipSummary": false, "name": "About your organisation"}',  # noqa: E501
+            "expected_output": (
+                '{"metadata": {}, "startPage": "/intro-about-your-organisation", "backLinkText": '
+                '"Go back to application overview", "pages": [{"path": "/organisation-name", "title": '
+                '"Organisation Name", "components": [{"options": {"hideTitle": false, "classes": ""}, '
+                '"type": "TextField", "title": "What is your organisation\'s name?", "hint": "This '
+                'must match the regsitered legal organisation name", "schema": {}, "name": '
+                '"organisation_name"}, {"options": {"hideTitle": false, "classes": ""}, "type": '
+                '"RadiosField", "title": "How is your organisation classified?", "hint": "", "schema":'
+                ' {}, "name": "organisation_classification", "list": "classifications_list"}], "next":'
+                ' [{"path": "/summary"}]}, {"path": "/intro-about-your-organisation", "title": "About'
+                ' your organisation", "components": [{"name": "start-page-content", "options": {}, '
+                '"type": "Html", "content": "<p class=\\"govuk-body\\">None</p><p class=\\"govuk-body\\">'
+                'We will ask you about:</p> <ul><li>Organisation Name</li></ul>", "schema": {}}], "next":'
+                ' [{"path": "/organisation-name"}], "controller": "./pages/start.js"}, {"path": "/summary",'
+                ' "title": "Check your answers", "components": [], "next": [], "section": "uLwBuz", "controller":'
+                ' "./pages/summary.js"}], "lists": [{"type": "string", "items": [{"text": "Charity", "value":'
+                ' "charity"}, {"text": "Public Limited Company", "value": "plc"}], "name": "classifications_list",'
+                ' "title": null}], "conditions": [], "fees": [], "sections": [], "outputs": [{"name": "update-form",'
+                ' "title": "Update form in application store", "type": "savePerPage", "outputConfiguration":'
+                ' {"savePerPageUrl": true}}], "skipSummary": false, "name": "About your organisation"}'
+            ),
         }
     ]
     try:

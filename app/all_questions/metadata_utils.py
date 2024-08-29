@@ -300,7 +300,11 @@ def determine_title_and_text_for_component(
         extract_from_html(soup, text)
         update_wording_for_multi_input_fields(text)
 
-    if component["type"].casefold() in FIELD_TYPES_WITH_MAX_WORDS and not is_child:
+    if (
+        component["type"].casefold() in FIELD_TYPES_WITH_MAX_WORDS
+        and not is_child
+        and "maxWords" in component["options"]
+    ):
         text.append(f"(Max {component['options']['maxWords']} words)")
 
     if "list" in component:

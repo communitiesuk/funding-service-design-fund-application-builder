@@ -1,23 +1,24 @@
 import copy
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Dict
-from typing import Optional
 
 from flask import current_app
 
-from app.config_generator.scripts.helpers import write_config
 from app.db import db
 from app.db.models import Form
 from app.db.models import Section
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
+from app.export_config.helpers import write_config
+from app.shared.data_classes import FundExport
+from app.shared.data_classes import FundSectionForm
+from app.shared.data_classes import FundSectionSection
+from app.shared.data_classes import RoundExport
 
 # TODO : The Round path might be better as a placeholder to avoid conflict in the actual fund store.
 # Decide on this further down the line.
 ROUND_BASE_PATHS = {
     # Should increment for each new round, anything that shares the same base path will also share
     # the child tree path config.
+    "TEST": 0,
     "COF_R2_W2": 1,
     "COF_R2_W3": 1,
     "COF_R3_W1": 2,
@@ -29,36 +30,7 @@ ROUND_BASE_PATHS = {
     "COF_R4_W1": 9,
     "HSRA": 10,
     "COF_R4_W2": 11,
-    "R605": 12,
 }
-
-
-@dataclass
-class SectionName:
-    en: str
-    cy: str
-
-
-@dataclass
-class FormNameJson:
-    en: str
-    cy: str
-
-
-@dataclass
-class FundSectionBase:
-    section_name: SectionName
-    tree_path: str
-
-
-@dataclass
-class FundSectionSection(FundSectionBase):
-    requires_feedback: Optional[bool] = None
-
-
-@dataclass
-class FundSectionForm(FundSectionBase):
-    form_name_json: FormNameJson
 
 
 def generate_application_display_config(round_id):
@@ -103,92 +75,6 @@ def generate_application_display_config(round_id):
                 )
             )
     write_config(ordered_sections, "sections_config", round.short_name, "python_file")
-
-
-@dataclass
-class NameJson:
-    en: str
-    cy: str
-
-
-@dataclass
-class TitleJson:
-    en: str
-    cy: str
-
-
-@dataclass
-class DescriptionJson:
-    en: str
-    cy: str
-
-
-@dataclass
-class ContactUsBannerJson:
-    en: str = ""
-    cy: str = ""
-
-
-@dataclass
-class FeedbackSurveyConfig:
-    has_feedback_survey: Optional[bool] = None
-    has_section_feedback: Optional[bool] = None
-    is_feedback_survey_optional: Optional[bool] = None
-    is_section_feedback_optional: Optional[bool] = None
-
-
-@dataclass
-class EligibilityConfig:
-    has_eligibility: Optional[bool] = None
-
-
-@dataclass
-class FundExport:
-    id: str
-    short_name: dict
-    welsh_available: bool
-    owner_organisation_name: str
-    owner_organisation_shortname: str
-    owner_organisation_logo_uri: str
-    name_json: NameJson = field(default_factory=NameJson)
-    title_json: TitleJson = field(default_factory=TitleJson)
-    description_json: DescriptionJson = field(default_factory=DescriptionJson)
-
-
-@dataclass
-class RoundExport:
-    id: Optional[str] = None
-    fund_id: Optional[str] = None
-    short_name: Optional[str] = None
-    opens: Optional[str] = None  # Assuming date/time as string; adjust type as needed
-    assessment_start: Optional[str] = None  # Adjust type as needed
-    deadline: Optional[str] = None  # Adjust type as needed
-    application_reminder_sent: Optional[bool] = None
-    reminder_date: Optional[str] = None  # Adjust type as needed
-    assessment_deadline: Optional[str] = None  # Adjust type as needed
-    prospectus: Optional[str] = None
-    privacy_notice: Optional[str] = None
-    reference_contact_page_over_email: Optional[bool] = None
-    contact_email: Optional[str] = None
-    contact_phone: Optional[str] = None
-    contact_textphone: Optional[str] = None
-    support_times: Optional[str] = None
-    support_days: Optional[str] = None
-    instructions_json: Optional[Dict[str, str]] = None  # Assuming simple dict; adjust as needed
-    feedback_link: Optional[str] = None
-    project_name_field_id: Optional[str] = None
-    application_guidance_json: Optional[Dict[str, str]] = None  # Adjust as needed
-    guidance_url: Optional[str] = None
-    all_uploaded_documents_section_available: Optional[bool] = None
-    application_fields_download_available: Optional[bool] = None
-    display_logo_on_pdf_exports: Optional[bool] = None
-    mark_as_complete_enabled: Optional[bool] = None
-    is_expression_of_interest: Optional[bool] = None
-    eoi_decision_schema: Optional[str] = None  # Adjust type as
-    feedback_survey_config: FeedbackSurveyConfig = field(default_factory=FeedbackSurveyConfig)
-    eligibility_config: EligibilityConfig = field(default_factory=EligibilityConfig)
-    title_json: TitleJson = field(default_factory=TitleJson)
-    contact_us_banner_json: ContactUsBannerJson = field(default_factory=ContactUsBannerJson)
 
 
 def generate_fund_config(round_id):

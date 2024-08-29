@@ -1,21 +1,23 @@
 import json
+import os
+import shutil
 from datetime import datetime
 from random import randint
 
 import requests
 from flask import Blueprint
 from flask import Response
+from flask import after_this_request
 from flask import flash
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import send_file
 from flask import url_for
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
-from app.config_generator.generate_all_questions import print_html
-from app.config_generator.generate_form import build_form_json
 from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.application import clone_single_round
@@ -25,6 +27,16 @@ from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
+from app.export_config.generate_all_questions import print_html
+from app.export_config.generate_form import build_form_json
+from app.export_config.generate_fund_round_config import (
+    generate_application_display_config,
+)
+from app.export_config.generate_fund_round_config import generate_fund_config
+from app.export_config.generate_fund_round_form_jsons import (
+    generate_form_jsons_for_round,
+)
+from app.export_config.generate_fund_round_html import generate_all_round_html
 from config import Config
 
 # Blueprint for routes used by v1 of FAB - using the DB
@@ -207,3 +219,29 @@ def view_all_questions(round_id):
     )
     html = print_html(print_data)
     return render_template("view_questions.html", round=round, fund=fund, question_html=html)
+
+
+@build_fund_bp.route("/create_export_files/<round_id>", methods=["GET"])
+def create_export_files(round_id):
+    generate_form_jsons_for_round(round_id)
+    generate_all_round_html(round_id)
+    generate_application_display_config(round_id)
+    generate_fund_config(round_id)
+    round_short_name = get_round_by_id(round_id).short_name
+
+    # Directory to zip
+    directory_to_zip = f"app/export_config/output/{round_short_name}/"
+    # Output zip file path (temporary)
+    output_zip_path = f"app/export_config/output/{round_short_name}.zip"
+
+    # Create a zip archive of the directory
+    shutil.make_archive(output_zip_path.replace(".zip", ""), "zip", directory_to_zip)
+
+    # Ensure the file is removed after sending it
+    @after_this_request
+    def remove_file(response):
+        os.remove(output_zip_path)
+        return response
+
+    # Return the zipped folder for the user to download
+    return send_file(output_zip_path, as_attachment=True, download_name=f"{round_short_name}.zip")

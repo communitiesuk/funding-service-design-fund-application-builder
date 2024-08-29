@@ -48,6 +48,8 @@ cryptography==42.0.8
     # via pyjwt
 cssmin==0.2.0
     # via -r requirements.in
+et-xmlfile==1.1.0
+    # via openpyxl
 flask==3.0.3
     # via
     #   -r requirements.in
@@ -131,10 +133,16 @@ mypy==1.10.1
     # via sqlalchemy
 mypy-extensions==1.0.0
     # via mypy
+numpy==2.0.1
+    # via pandas
+openpyxl==3.1.5
+    # via -r requirements.in
 packaging==24.1
     # via
     #   gunicorn
     #   marshmallow
+pandas==2.2.2
+    # via -r requirements.in
 psycopg2-binary==2.9.9
     # via -r requirements.in
 pycparser==2.22
@@ -150,7 +158,9 @@ pyscss==1.4.0
 python-consul==1.1.0
     # via flipper-client
 python-dateutil==2.9.0.post0
-    # via botocore
+    # via
+    #   botocore
+    #   pandas
 python-dotenv==1.0.1
     # via funding-service-design-utils
 python-json-logger==2.0.7
@@ -159,6 +169,7 @@ pytz==2024.1
     # via
     #   flask-babel
     #   funding-service-design-utils
+    #   pandas
 pyyaml==6.0.1
     # via funding-service-design-utils
 redis==4.6.0
@@ -213,6 +224,8 @@ typing-extensions==4.12.2
     #   alembic
     #   mypy
     #   sqlalchemy
+tzdata==2024.1
+    # via pandas
 urllib3==2.2.2
     # via
     #   botocore
