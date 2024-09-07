@@ -3,7 +3,7 @@ services:
   fab:
     hostname: fab
     build:
-      context: ../funding-service-design-fund-application-builder
+      context: .
       dockerfile: Dockerfile.pullpreview
     volumes: [
       '../funding-service-design-fund-application-builder:/app',
