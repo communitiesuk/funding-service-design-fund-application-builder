@@ -5,7 +5,6 @@ on:
 
 jobs:
   paketo_build:
-    needs: [ setup ]
     permissions:
       packages: write
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/package.yml@main
@@ -16,6 +15,7 @@ jobs:
       assets_required: false
 
   deploy_pullpreview:
+    needs: [ paketo_build ]
     permissions:
       contents: read # to fetch code (actions/checkout)
       deployments: write # to delete deployments
