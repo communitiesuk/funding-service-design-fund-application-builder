@@ -63,9 +63,6 @@ def publish_form_json_to_runner(c, filename):
     with open(filename, "r") as file:
         form_json = file.read()
         form_dict = json.loads(form_json)
-        form_dict["outputs"][0]["outputConfiguration"][
-            "savePerPageUrl"
-        ] = f"http://{Config.FAB_HOST}{Config.FAB_SAVE_PER_PAGE}"
         try:
             publish_response = requests.post(
                 url=f"{Config.FORM_RUNNER_URL}/publish",

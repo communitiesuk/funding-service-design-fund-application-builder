@@ -171,9 +171,8 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
                 ' "title": "Check your answers", "components": [], "next": [], "section": "uLwBuz", "controller":'
                 ' "./pages/summary.js"}], "lists": [{"type": "string", "items": [{"text": "Charity", "value":'
                 ' "charity"}, {"text": "Public Limited Company", "value": "plc"}], "name": "classifications_list",'
-                ' "title": null}], "conditions": [], "fees": [], "sections": [], "outputs": [{"name": "update-form",'
-                ' "title": "Update form in application store", "type": "savePerPage", "outputConfiguration":'
-                ' {"savePerPageUrl": true}}], "skipSummary": false, "name": "About your organisation"}'
+                ' "title": null}], "conditions": [], "fees": [], "sections": [], "outputs": [], "skipSummary": false,'
+                ' "name": "About your organisation"}'
             ),
         }
     ]

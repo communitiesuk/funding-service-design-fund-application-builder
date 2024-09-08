@@ -52,20 +52,6 @@ form_schema = {
         "fees": {"type": "array"},
         "outputs": {
             "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {"type": "string"},
-                    "title": {"type": "string"},
-                    "type": {"type": "string"},
-                    "outputConfiguration": {
-                        "type": "object",
-                        "properties": {"savePerPageUrl": {"type": "boolean"}},
-                        "required": ["savePerPageUrl"],
-                    },
-                },
-                "required": ["name", "title", "type", "outputConfiguration"],
-            },
         },
         "skipSummary": {"type": "boolean"},
         # Add other top-level keys as needed

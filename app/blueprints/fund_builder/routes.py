@@ -166,10 +166,6 @@ def preview_form(form_id):
     form = get_form_by_id(form_id)
     form_json = build_form_json(form)
 
-    # Update the savePerPageUrl to point at the dev route to save responses
-    form_json["outputs"][0]["outputConfiguration"][
-        "savePerPageUrl"
-    ] = f"http://{Config.FAB_HOST}{Config.FAB_SAVE_PER_PAGE}"
     try:
         publish_response = requests.post(
             url=f"{Config.FORM_RUNNER_URL}/publish", json={"id": form.runner_publish_name, "configuration": form_json}
@@ -189,9 +185,9 @@ def download_form_json(form_id):
     form = get_form_by_id(form_id)
     form_json = build_form_json(form)
 
-    form_json["outputs"][0]["outputConfiguration"][
-        "savePerPageUrl"
-    ] = f"http://{Config.FAB_HOST}{Config.FAB_SAVE_PER_PAGE}"
+    # form_json["outputs"][0]["outputConfiguration"][
+    #     "savePerPageUrl"
+    # ] = f"http://{Config.FAB_HOST}{Config.FAB_SAVE_PER_PAGE}"
     return Response(
         response=json.dumps(form_json),
         mimetype="application/json",

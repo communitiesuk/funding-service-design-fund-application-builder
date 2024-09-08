@@ -9,20 +9,12 @@ from app.db.queries.application import get_template_page_by_display_path
 BASIC_FORM_STRUCTURE = {
     "metadata": {},
     "startPage": None,
-    "backLinkText": "Go back to application overview",
     "pages": [],
     "lists": [],
     "conditions": [],
     "fees": [],
     "sections": [],
-    "outputs": [
-        {
-            "name": "update-form",
-            "title": "Update form in application store",
-            "type": "savePerPage",
-            "outputConfiguration": {"savePerPageUrl": True},
-        }
-    ],
+    "outputs": [],
     "skipSummary": False,
     "name": "",
 }
