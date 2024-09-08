@@ -2,7 +2,10 @@
 services:
   fab:
     hostname: fab
-    image: ghcr.io/communitiesuk/funding-service-design-fund-application-builder:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.pullpreview
+    command: service postgresql start && /bin/bash -c "python -m flask db upgrade && python -m flask run --no-debugger --host 0.0.0.0 --port 8080"
     volumes: [
       '../funding-service-design-fund-application-builder:/app',
       '../funding-service-design-fund-application-builder/postgresql:/var/lib/postgresql/data',
