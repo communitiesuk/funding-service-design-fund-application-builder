@@ -29,7 +29,7 @@ jobs:
     steps:
       - name: Inject env specific values into compose
         run: |
-          yq -i '.services.fab.image = "docker pull ghcr.io/communitiesuk/funding-service-design-fund-application-builder:sha-${{ github.sha }}"'  docker-compose.e2e.yml
+          yq -i '.services.fab.image = "ghcr.io/communitiesuk/funding-service-design-fund-application-builder:sha-${{ github.sha }}"'  docker-compose.pullpreview.yml
           cat docker-compose.pullpreview.yml
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v2
