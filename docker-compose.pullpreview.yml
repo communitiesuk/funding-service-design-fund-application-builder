@@ -2,9 +2,7 @@
 services:
   fab:
     hostname: fab
-    build:
-      context: .
-      dockerfile: Dockerfile.pullpreview
+    image: ghcr.io/communitiesuk/funding-service-design-fund-application-builder:latest
     volumes: [
       '../funding-service-design-fund-application-builder:/app',
       '../funding-service-design-fund-application-builder/postgresql:/var/lib/postgresql/data',

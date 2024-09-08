@@ -1,10 +1,21 @@
 name: PullPreview
 on:
   pull_request:
-    types: [labeled, unlabeled, synchronize, closed, reopened]
+    types: [ labeled, unlabeled, synchronize, closed, reopened ]
 
 jobs:
-  deploy:
+  paketo_build:
+    needs: [ setup ]
+    permissions:
+      packages: write
+    uses: communitiesuk/funding-service-design-workflows/.github/workflows/package.yml@main
+    with:
+      version_to_build: sha-${{ github.sha }}
+      owner: ${{ github.repository_owner }}
+      application: funding-service-design-fund-application-builder
+      assets_required: false
+
+  deploy_pullpreview:
     permissions:
       contents: read # to fetch code (actions/checkout)
       deployments: write # to delete deployments
@@ -14,18 +25,22 @@ jobs:
     name: deploy
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    environment: ${{ inputs.environment || 'dev' }}
+    environment: 'dev'
     steps:
-    - name: configure aws credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/GithubCopilotDeploy
-        role-session-name: FUNDING_SERVICE_DESIGN_FUND_APPLICATION_BUILDER_PULLPREVIEW
-        aws-region: eu-west-2
-    - uses: actions/checkout@v2
-    - uses: pullpreview/action@v5.6.1
-      with:
-        compose_files: docker-compose.pullpreview.yml
-        ports: 8080/tcp
-        default_port: 8080
-        admins: gidsg
+      - name: Inject env specific values into compose
+        run: |
+          yq -i '.services.fab.image = "docker pull ghcr.io/communitiesuk/funding-service-design-fund-application-builder:sha-${{ github.sha }}"'  docker-compose.e2e.yml
+          cat docker-compose.pullpreview.yml
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/GithubCopilotDeploy
+          role-session-name: FUNDING_SERVICE_DESIGN_FUND_APPLICATION_BUILDER_PULLPREVIEW
+          aws-region: eu-west-2
+      - uses: actions/checkout@v2
+      - uses: pullpreview/action@v5.6.1
+        with:
+          compose_files: docker-compose.pullpreview.yml
+          ports: 8080/tcp
+          default_port: 8080
+          admins: gidsg
