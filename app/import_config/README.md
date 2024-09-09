@@ -10,4 +10,4 @@ To import a form JSON, each file should be places in the following directory:
 
 The import can be triggered manually by running the following command:
 
-    python app/import_config/import_config.py
+    python app/import_config/load_form_json.py

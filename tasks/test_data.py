@@ -69,7 +69,7 @@ def init_salmon_fishing_fund():
         fund_id=f.fund_id,
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
         title_json={"en": "round the first"},
-        short_name=f"R{randint(0,999)}",
+        short_name="TEST",
         opens=datetime.now(),
         deadline=datetime.now(),
         assessment_start=datetime.now(),

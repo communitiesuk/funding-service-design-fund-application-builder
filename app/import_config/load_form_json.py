@@ -67,20 +67,26 @@ def insert_component_as_template(component, page_id, page_index, lizts):
     if component_list:
         for li in lizts:
             if li["name"] == component_list:
-                new_list = Lizt(
-                    is_template=True,
-                    name=li.get("name"),
-                    title=li.get("title"),
-                    type=li.get("type"),
-                    items=li.get("items"),
-                )
-                try:
-                    db.session.add(new_list)
-                except Exception as e:
-                    print(e)
-                    raise e
-                db.session.flush()  # flush to get the list id
-                list_id = new_list.list_id
+                # Check if the list already exists
+                existing_list = db.session.query(Lizt).filter_by(name=li.get("name")).first()
+                if existing_list is None:
+                    new_list = Lizt(
+                        is_template=True,
+                        name=li.get("name"),
+                        title=li.get("title"),
+                        type=li.get("type"),
+                        items=li.get("items"),
+                    )
+                    try:
+                        db.session.add(new_list)
+                    except Exception as e:
+                        print(e)
+                        raise e
+                    db.session.flush()  # flush to get the list id
+                    list_id = new_list.list_id
+                else:
+                    # If the list already exists, you can use its ID or handle it as needed
+                    list_id = existing_list.list_id
                 break
 
     new_component = Component(
@@ -201,11 +207,10 @@ def read_json_from_directory(directory_path):
     return form_configs
 
 
-def load_form_jsons(override_fund_config):
-    db = app.extensions["sqlalchemy"]  # Move db definition here
+def load_form_jsons(override_fund_config=None):
+    db = app.extensions["sqlalchemy"]
     try:
         if not override_fund_config:
-            db = app.extensions["sqlalchemy"]
             script_dir = os.path.dirname(__file__)
             full_directory_path = os.path.join(script_dir, "files_to_import")
             form_configs = read_json_from_directory(full_directory_path)
