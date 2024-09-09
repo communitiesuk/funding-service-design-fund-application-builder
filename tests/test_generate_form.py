@@ -62,11 +62,6 @@ def test_human_to_kebab(input, exp_output):
                     "type": "string",
                     "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
                 },
-                {
-                    "name": "greetings_list",
-                    "type": "string",
-                    "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
-                },
             ],
         ),
     ],

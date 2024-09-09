@@ -2,8 +2,9 @@ import os
 import sys
 from os import getenv
 
-from app import app
 from invoke import task  # noqa:E402
+
+from app import app
 
 sys.path.insert(1, ".")
 os.environ.update({"FLASK_ENV": "tasks"})

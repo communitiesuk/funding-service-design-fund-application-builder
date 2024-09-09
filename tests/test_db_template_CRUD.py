@@ -1,6 +1,8 @@
 import uuid
 from copy import deepcopy
 
+from sqlalchemy.exc import IntegrityError
+
 from app.db.models import ComponentType
 from app.db.models.application_config import Component
 from app.db.models.application_config import Form
@@ -51,17 +53,17 @@ def test_insert_new_section(flask_test_client, _db, clear_test_data, seed_dynami
     assert template_section.round_id == new_template_section_config["round_id"]
     assert template_section.name_in_apply_json == new_template_section_config["name_in_apply_json"]
     assert template_section.template_name == new_template_section_config["template_name"]
-    assert template_section.is_template == True
-    assert new_section.source_template_id == None
+    assert template_section.is_template is True
+    assert new_section.source_template_id is None
     assert template_section.audit_info == new_template_section_config["audit_info"]
     assert template_section.index == new_template_section_config["index"]
 
     assert isinstance(new_section, Section)
     assert new_section.round_id == new_section_config["round_id"]
     assert new_section.name_in_apply_json == new_section_config["name_in_apply_json"]
-    assert new_section.template_name == None
-    assert new_section.is_template == False
-    assert new_section.source_template_id == None
+    assert new_section.template_name is None
+    assert new_section.is_template is False
+    assert new_section.source_template_id is None
     assert new_section.audit_info == new_section_config["audit_info"]
     assert new_section.index == new_section_config["index"]
 
@@ -73,9 +75,9 @@ def test_update_section(flask_test_client, _db, clear_test_data, seed_dynamic_da
 
     assert new_section.round_id == new_section_config["round_id"]
     assert new_section.name_in_apply_json == new_section_config["name_in_apply_json"]
-    assert new_section.template_name == None
-    assert new_section.is_template == False
-    assert new_section.source_template_id == None
+    assert new_section.template_name is None
+    assert new_section.is_template is False
+    assert new_section.source_template_id is None
     assert new_section.audit_info == new_section_config["audit_info"]
     assert new_section.index == new_section_config["index"]
 
@@ -101,10 +103,7 @@ def test_delete_section(flask_test_client, _db, clear_test_data, seed_dynamic_da
     assert new_section.audit_info == new_section_config["audit_info"]
 
     delete_section(new_section.section_id)
-    assert _db.session.query(Section).filter(Section.section_id == new_section.section_id).one_or_none() == None
-
-
-from sqlalchemy.exc import IntegrityError
+    assert _db.session.query(Section).filter(Section.section_id == new_section.section_id).one_or_none() is None
 
 
 def test_failed_delete_section_with_fk_to_forms(flask_test_client, _db, clear_test_data, seed_dynamic_data):
@@ -162,19 +161,19 @@ def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_d
     assert new_template_form.section_id == new_template_form_config["section_id"]
     assert new_template_form.name_in_apply_json == new_template_form_config["name_in_apply_json"]
     assert new_template_form.template_name == new_template_form_config["template_name"]
-    assert new_template_form.is_template == True
-    assert new_template_form.source_template_id == None
+    assert new_template_form.is_template is True
+    assert new_template_form.source_template_id is None
     assert new_template_form.audit_info == new_template_form_config["audit_info"]
     assert new_template_form.section_index == new_template_form_config["section_index"]
-    assert new_template_form.runner_publish_name == None
+    assert new_template_form.runner_publish_name is None
 
     new_form = insert_new_form(new_form_config)
     assert isinstance(new_form, Form)
     assert new_form.section_id == new_form_config["section_id"]
     assert new_form.name_in_apply_json == new_form_config["name_in_apply_json"]
-    assert new_form.template_name == None
-    assert new_form.source_template_id == None  # not cloned, its a new non-template form
-    assert new_form.is_template == False
+    assert new_form.template_name is None
+    assert new_form.source_template_id is None  # not cloned, its a new non-template form
+    assert new_form.is_template is False
     assert new_form.audit_info == new_form_config["audit_info"]
     assert new_form.section_index == new_form_config["section_index"]
     assert new_form.runner_publish_name == new_form_config["runner_publish_name"]
@@ -193,9 +192,9 @@ def test_update_form(flask_test_client, _db, clear_test_data, seed_dynamic_data)
 
     assert new_form.section_id == new_form_config["section_id"]
     assert new_form.name_in_apply_json == new_form_config["name_in_apply_json"]
-    assert new_form.template_name == None
-    assert new_form.is_template == False
-    assert new_form.source_template_id == None
+    assert new_form.template_name is None
+    assert new_form.is_template is False
+    assert new_form.source_template_id is None
     assert new_form.audit_info == new_form_config["audit_info"]
     assert new_form.section_index == new_form_config["section_index"]
     assert new_form.runner_publish_name == new_form_config["runner_publish_name"]
@@ -224,7 +223,7 @@ def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data)
     assert new_form.audit_info == new_form_config["audit_info"]
 
     delete_form(new_form.form_id)
-    assert _db.session.query(Form).filter(Form.form_id == new_form.form_id).one_or_none() == None
+    assert _db.session.query(Form).filter(Form.form_id == new_form.form_id).one_or_none() is None
 
 
 def test_failed_delete_form_with_fk_to_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
@@ -283,8 +282,8 @@ def test_insert_new_page(flask_test_client, _db, clear_test_data, seed_dynamic_d
     assert new_template_page.form_id is None
     assert new_template_page.name_in_apply_json == new_template_page_config["name_in_apply_json"]
     assert new_template_page.template_name == new_template_page_config["template_name"]
-    assert new_template_page.is_template == True
-    assert new_template_page.source_template_id == None
+    assert new_template_page.is_template is True
+    assert new_template_page.source_template_id is None
     assert new_template_page.audit_info == new_template_page_config["audit_info"]
     assert new_template_page.form_index == new_template_page_config["form_index"]
     assert new_template_page.display_path == new_page_config["display_path"]
@@ -294,9 +293,9 @@ def test_insert_new_page(flask_test_client, _db, clear_test_data, seed_dynamic_d
     assert isinstance(new_page, Page)
     assert new_page.form_id == new_page_config["form_id"]
     assert new_page.name_in_apply_json == new_page_config["name_in_apply_json"]
-    assert new_page.template_name == None
-    assert new_page.is_template == False
-    assert new_page.source_template_id == None
+    assert new_page.template_name is None
+    assert new_page.is_template is False
+    assert new_page.source_template_id is None
     assert new_page.audit_info == new_page_config["audit_info"]
     assert new_page.form_index == new_page_config["form_index"]
     assert new_page.display_path == new_page_config["display_path"]
@@ -309,9 +308,9 @@ def test_update_page(flask_test_client, _db, clear_test_data, seed_dynamic_data)
 
     assert new_page.form_id is None
     assert new_page.name_in_apply_json == new_page_config["name_in_apply_json"]
-    assert new_page.template_name == None
-    assert new_page.is_template == False
-    assert new_page.source_template_id == None
+    assert new_page.template_name is None
+    assert new_page.is_template is False
+    assert new_page.source_template_id is None
     assert new_page.audit_info == new_page_config["audit_info"]
     assert new_page.form_index == new_page_config["form_index"]
     assert new_page.display_path == new_page_config["display_path"]
@@ -338,7 +337,7 @@ def test_delete_page(flask_test_client, _db, clear_test_data, seed_dynamic_data)
     assert new_page.audit_info == new_page_config["audit_info"]
 
     delete_page(new_page.page_id)
-    assert _db.session.query(Page).filter(Page.page_id == new_page.page_id).one_or_none() == None
+    assert _db.session.query(Page).filter(Page.page_id == new_page.page_id).one_or_none() is None
 
 
 def test_failed_delete_page_with_fk_to_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
@@ -448,9 +447,9 @@ def test_insert_new_component(flask_test_client, _db, clear_test_data, seed_dyna
     assert component.hint_text == new_component_config["hint_text"]
     assert component.options == new_component_config["options"]
     assert component.type == new_component_config["type"]
-    assert component.is_template == False
-    assert component.template_name == None
-    assert component.source_template_id == None
+    assert component.is_template is False
+    assert component.template_name is None
+    assert component.source_template_id is None
     assert component.audit_info == new_component_config["audit_info"]
     assert component.page_index == new_component_config["page_index"]
     assert component.theme_index == new_component_config["theme_index"]
@@ -466,9 +465,9 @@ def test_insert_new_component(flask_test_client, _db, clear_test_data, seed_dyna
     assert template_component.hint_text == new_template_component_config["hint_text"]
     assert template_component.options == new_template_component_config["options"]
     assert template_component.type == new_template_component_config["type"]
-    assert template_component.is_template == True
+    assert template_component.is_template is True
     assert template_component.template_name == new_template_component_config["template_name"]
-    assert template_component.source_template_id == None
+    assert template_component.source_template_id is None
     assert template_component.audit_info == new_template_component_config["audit_info"]
     assert template_component.page_index == new_template_component_config["page_index"]
     assert template_component.theme_index == new_template_component_config["theme_index"]
@@ -489,7 +488,7 @@ def test_update_component(flask_test_client, _db, clear_test_data, seed_dynamic_
 
     assert component.title == new_component_config["title"]
     assert component.audit_info == new_component_config["audit_info"]
-    assert component.is_template == False
+    assert component.is_template is False
 
     # Update new_component_config
     updated_component_config = deepcopy(new_component_config)
@@ -501,7 +500,7 @@ def test_update_component(flask_test_client, _db, clear_test_data, seed_dynamic_
     assert isinstance(updated_component, Component)
     assert updated_component.title == updated_component_config["title"]
     assert updated_component.audit_info == updated_component_config["audit_info"]
-    assert updated_component.is_template == False
+    assert updated_component.is_template is False
 
 
 def test_delete_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
@@ -518,4 +517,4 @@ def test_delete_component(flask_test_client, _db, clear_test_data, seed_dynamic_
     assert component.audit_info == new_component_config["audit_info"]
 
     delete_component(component.component_id)
-    assert _db.session.query(Component).filter(Component.component_id == component.component_id).one_or_none() == None
+    assert _db.session.query(Component).filter(Component.component_id == component.component_id).one_or_none() is None

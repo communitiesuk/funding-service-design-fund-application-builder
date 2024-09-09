@@ -171,7 +171,7 @@ def test_build_form_json_with_conditions(seed_dynamic_data):
 
     org_name_page = next((p for p in result["pages"] if p["path"] == exp_second_path), None)
     assert org_name_page
-    assert len(org_name_page["next"]) == 2
+    assert len(org_name_page["next"]) == 3
     assert len(org_name_page["components"]) == 2
 
     alt_names_page = next((p for p in result["pages"] if p["path"] == "/organisation-alternative-names"), None)

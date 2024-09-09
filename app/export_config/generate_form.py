@@ -135,19 +135,21 @@ def build_page(page: Page = None, page_display_path: str = None) -> dict:
 # Goes through the set of pages and updates the conditions and next properties to account for branching
 def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
     for page in input_pages:
+        # find page in prepared output results
+        this_page_in_results = next(p for p in partial_form_json["pages"] if p["path"] == f"/{page.display_path}")
+
         if page.controller and page.controller.endswith("summary.js"):
             continue
         next_page_id = page.default_next_page_id
         if next_page_id:
             find_next_page = lambda id: next(p for p in input_pages if p.page_id == id)  # noqa:E731
-            next_page = find_next_page(next_page_id)
-            next_path = next_page.display_path
+            default_next_page = find_next_page(next_page_id)
+            next_path = default_next_page.display_path
+            # add the default next page
+            this_page_in_results["next"].append({"path": f"/{next_path}"})
         else:
             # all page paths are conditionals which will be processed later
             next_path = None
-
-        # find page in prepared output results
-        this_page_in_results = next(p for p in partial_form_json["pages"] if p["path"] == f"/{page.display_path}")
 
         has_conditions = False
         for component in page.components:
@@ -181,9 +183,6 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
                     }
                 )
 
-        # If there were no conditions we just continue to the next page
-        if not has_conditions and next_path:
-            this_page_in_results["next"].append({"path": f"/{next_path}"})
         if not has_conditions and not next_path:
             this_page_in_results["next"].append({"path": "/summary"})
 
@@ -197,14 +196,16 @@ def build_lists(pages: list[dict]) -> list:
         for component in page["components"]:
             if component.get("list"):
                 list_from_db = get_list_by_id(component["metadata"]["fund_builder_list_id"])
-                list = {
+                list_dict = {
                     "type": list_from_db.type,
                     "items": list_from_db.items,
                     "name": list_from_db.name,
                     "title": list_from_db.title,
                 }
-                lists.append(list)
-            # Remove the metadata key from built_component (no longer needed)
+                # Check if the list already exists in lists by name
+                if not any(existing_list["name"] == list_dict["name"] for existing_list in lists):
+                    lists.append(list_dict)
+            # Remove the metadata key from component (no longer needed)
             component.pop("metadata", None)  # The second argument prevents KeyError if 'metadata' is not found
 
     return lists
