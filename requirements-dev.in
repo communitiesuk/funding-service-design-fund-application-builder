@@ -4,7 +4,7 @@
 #   Pytest
 #-----------------------------------
 
-pytest==8.2.2
+pytest==8.3.2
 pytest-mock==3.14.0
 pytest-html>=3.2.0
 pytest-env==1.1.3
