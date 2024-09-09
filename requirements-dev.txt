@@ -227,7 +227,7 @@ pyjwt[crypto]==2.8.0
     #   pyjwt
 pyscss==1.4.0
     # via -r requirements.in
-pytest==8.2.2
+pytest==8.3.2
     # via
     #   -r requirements-dev.in
     #   pytest-env
