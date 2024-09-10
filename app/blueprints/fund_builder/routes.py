@@ -18,14 +18,19 @@ from flask import url_for
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
+from app.blueprints.fund_builder.forms.section import SectionForm
 from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.application import clone_single_round
 from app.db.queries.application import get_form_by_id
+from app.db.queries.application import get_section_by_id
+from app.db.queries.application import insert_new_section
+from app.db.queries.application import update_section
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
+from app.db.queries.round import get_all_rounds
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_all_questions import print_html
 from app.export_config.generate_form import build_form_json
@@ -48,6 +53,62 @@ build_fund_bp = Blueprint(
 )
 
 
+@build_fund_bp.route("/fund/round/configure", methods=["GET", "POST"])
+def configure_round():
+    """
+    Renders a template providing a drop down list of funds. If a fund is selected, renders its config info
+    """
+    all_rounds = get_all_rounds()
+
+    params = {
+        "all_rounds": [{"text": f"{r.short_name} - {r.title_json['en']}", "value": str(r.round_id)} for r in all_rounds]
+    }
+    if request.method == "POST":
+        round_id = request.form.get("round_id")
+        round = get_round_by_id(round_id)
+        params["round"] = round
+        params["selected_round_id"] = round_id
+
+    return render_template("application.html", **params)
+
+
+@build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])
+def section(round_id):
+    form: SectionForm = SectionForm()
+    form.round_id.data = round_id
+    if form.validate_on_submit():
+        round = get_round_by_id(form.round_id.data)
+        count_existing_sections = len(round.sections)
+        if form.section_id.data:
+            update_section(
+                form.section_id.data,
+                {
+                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
+                },
+            )
+        else:
+            insert_new_section(
+                {
+                    "round_id": form.round_id.data,
+                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
+                    "index": count_existing_sections,
+                }
+            )
+
+        flash(f"Saved section {form.name_in_apply_en.data}")
+        return redirect(url_for("build_fund_bp.configure_round"), code=307)
+    if section_id := request.args.get("section_id"):
+        existing_section = get_section_by_id(section_id)
+        form.section_id.data = section_id
+        form.name_in_apply_en.data = existing_section.name_in_apply_json["en"]
+
+    return render_template(
+        "section.html",
+        form=form,
+        round_id=str(round_id),
+    )
+
+
 def all_funds_as_govuk_select_items(all_funds: list) -> list:
     """
     Reformats a list of funds into a list of display/value items that can be passed to a govUk select macro
@@ -66,6 +127,7 @@ def view_fund():
         fund_id = request.form.get("fund_id")
         fund = get_fund_by_id(fund_id)
         params["fund"] = fund
+        params["selected_fund_id"] = fund_id
 
     return render_template("view_fund_config.html", **params)
 

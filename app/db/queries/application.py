@@ -5,8 +5,21 @@ from app.db.models import Component
 from app.db.models import Form
 from app.db.models import Lizt
 from app.db.models import Page
-from app.db.models.application_config import Section
+from app.db.models import Section
 from app.db.models.round import Round
+
+
+def get_all_template_sections() -> list[Section]:
+    return db.session.query(Section).where(Section.is_template == True).all()  # noqa:E712
+
+
+def get_section_by_id(section_id) -> Section:
+    s = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
+    return s
+
+
+def get_all_template_forms() -> list[Form]:
+    return db.session.query(Form).where(Form.is_template == True).all()  # noqa:E712
 
 
 def get_form_for_component(component: Component) -> Form:
