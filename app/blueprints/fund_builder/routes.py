@@ -80,6 +80,9 @@ def configure_round():
 def section(round_id):
     form: SectionForm = SectionForm()
     form.round_id.data = round_id
+    params = {
+        "round_id": str(round_id),
+    }
     if form.validate_on_submit():
         round = get_round_by_id(form.round_id.data)
         count_existing_sections = len(round.sections)
@@ -105,12 +108,27 @@ def section(round_id):
         existing_section = get_section_by_id(section_id)
         form.section_id.data = section_id
         form.name_in_apply_en.data = existing_section.name_in_apply_json["en"]
+        params["forms_in_section"] = existing_section.forms
+        params["available_template_forms"] = [
+            {"text": f"{f.template_name} - {f.name_in_apply_json['en']}", "value": str(f.form_id)}
+            for f in get_all_template_forms()
+        ]
 
-    return render_template(
-        "section.html",
-        form=form,
-        round_id=str(round_id),
-    )
+    return render_template("section.html", form=form, **params)
+
+
+@build_fund_bp.route("/fund/round/<round_id>/section/<section_id>/forms", methods=["POST"])
+def configure_forms_in_section(round_id, section_id):
+    if request.method == "POST":
+        if request.args.get("action") == "remove":
+            form_id = request.args.get("form_id")
+            # TODO figure out if we want to do a soft or hard delete here
+            update_form(form_id, {"section_id": None})
+        else:
+            template_id = request.form.get("template_id")
+            clone_single_form(form_id=template_id, new_section_id=section_id)
+
+    return redirect(url_for("build_fund_bp.section", round_id=round_id, section_id=section_id))
 
 
 @build_fund_bp.route("/fund/round/configure", methods=["GET", "POST"])
