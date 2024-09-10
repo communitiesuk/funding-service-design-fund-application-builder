@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% set pageHeading %}
+    View All Templates
+{% endset %}
+{% block content %}
+    <div class="govuk-grid-row">
+        <h1 class="govuk-heading-l">{{pageHeading}}</h1>
+    </div>
+    <div class="govuk-grid-row">
+        <h2 class="govuk-heading-m">Sections</h2>
+        <ul class="govuk-body">
+        {% for section in sections %}
+           <li> {{section.template_name}}</li>
+        {% endfor %}</ul>
+    </div>
+    <div class="govuk-grid-row">
+        <h2 class="govuk-heading-m">Forms</h2>
+        <ul class="govuk-body">
+        {% for form in forms %}
+           <li> {{form.template_name}}</li>
+        {% endfor %}</ul>
+    </div>
+{% endblock %}

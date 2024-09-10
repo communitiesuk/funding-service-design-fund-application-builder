@@ -65,7 +65,7 @@ class Section(BaseModel):
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
     def __repr__(self):
-        return f"Section({self.name_in_apply_json['en']}, Forms: {self.forms})"
+        return f"Section([{self.section_id}], {self.name_in_apply_json['en']}, Forms: {self.forms})"
 
     def as_dict(self, include_relationships=False):
         result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}
