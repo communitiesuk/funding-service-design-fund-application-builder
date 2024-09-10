@@ -16,9 +16,37 @@
                     {{ govukButton({
                         "text": "Save"
                         }) }}
-                    </form>
-                </fieldset>
-            </div>
+                </form>
+            </fieldset>
         </div>
     </div>
-    {% endblock content %}
+</div>
+{%if form.section_id.data %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h2 class="govuk-heading-m">Forms in this section</h2>
+        {% for app_form in forms_in_section %}
+        <form method="POST" action="{{url_for('build_fund_bp.configure_forms_in_section', round_id=round_id, section_id=app_form.section_id, form_id=app_form.form_id, action='remove')}}">
+            <span class="govuk-body">{{app_form.section_index}}&nbsp;{{app_form.name_in_apply_json["en"]}}</span>
+            {{govukButton({"text":"Remove","classes": "govuk-button--secondary"}) }}
+        </form>
+        {% endfor %}
+        <h3 class="govuk-heading-s">Add Form From Template</h3>
+        <form method="POST" action="{{url_for('build_fund_bp.configure_forms_in_section', round_id=round_id,section_id=form.section_id.data)}}">
+
+            {{ govukSelect({
+                "id": "template_id",
+                "name": "template_id",
+                "label": {
+                  "text": "Create form from template"
+                },
+                "items": available_template_forms})}}
+
+        {{ govukButton({
+            "text": "Add"
+            }) }}
+    </form>
+    </div>
+</div>
+{% endif %}
+{% endblock content %}

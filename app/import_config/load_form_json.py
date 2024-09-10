@@ -178,11 +178,11 @@ def insert_form_as_template(form):
     new_form = Form(
         section_id=section.section_id,
         name_in_apply_json={"en": form.get("name")},
-        template_name=form.get("name"),
+        template_name=form["filename"],
         is_template=True,
         audit_info=None,
         section_index=None,
-        runner_publish_name=form["filename"],
+        runner_publish_name=form["filename"].split(".")[0],
         source_template_id=None,
     )
 
