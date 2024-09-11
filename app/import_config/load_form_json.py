@@ -169,7 +169,7 @@ def insert_form_config(form_config, form_id):
         db.session.flush()  # flush to make components available for conditions
         add_conditions_to_components(db, page, form_config["conditions"])
     insert_page_default_next_page(form_config.get("pages", None), inserted_pages)
-    db
+    db.session.flush()
     return inserted_pages, inserted_components
 
 
