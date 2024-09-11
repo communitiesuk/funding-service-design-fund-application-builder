@@ -14,7 +14,6 @@ from app.db.models import ComponentType  # noqa:E402
 from app.db.models import Form  # noqa:E402
 from app.db.models import Lizt  # noqa:E402
 from app.db.models import Page  # noqa:E402
-from app.db.models import Section  # noqa:E402
 from app.shared.data_classes import Condition  # noqa:E402
 from app.shared.helpers import find_enum  # noqa:E402
 
@@ -174,9 +173,9 @@ def insert_form_config(form_config, form_id):
 
 
 def insert_form_as_template(form):
-    section = db.session.query(Section.section_id).first()
+    #  section = db.session.query(Section.section_id).first()
     new_form = Form(
-        section_id=section.section_id,
+        section_id=None,  # ection.section_id,
         name_in_apply_json={"en": form.get("name")},
         template_name=form["filename"],
         is_template=True,
