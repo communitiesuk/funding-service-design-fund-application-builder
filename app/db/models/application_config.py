@@ -30,6 +30,7 @@ class ComponentType(Enum):
     TEXT_FIELD = "TextField"
     FREE_TEXT_FIELD = "FreeTextField"
     EMAIL_ADDRESS_FIELD = "EmailAddressField"
+    TELEPHONE_NUMBER_FIELD = "TelephoneNumberField"
     UK_ADDRESS_FIELD = "UkAddressField"
     HTML = "Html"
     YES_NO_FIELD = "YesNoField"
@@ -150,7 +151,7 @@ class Page(BaseModel):
 
 
 # Ensure we can only have one template with a particular display_path value
-Index("ix_template_page_name", Page.display_path, unique=True, postgresql_where="Page.is_template = true")
+Index("ix_template_page_name", Page.display_path, Page.form_id, unique=True, postgresql_where="Page.is_template = true")
 
 
 class Lizt(BaseModel):

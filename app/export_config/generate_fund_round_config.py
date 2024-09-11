@@ -38,7 +38,7 @@ def generate_application_display_config(round_id):
     ordered_sections = []
     # get round
     round = get_round_by_id(round_id)
-    round_base_path = ROUND_BASE_PATHS[round.short_name]
+    round_base_path = ROUND_BASE_PATHS.get(round.short_name, 0)  # so this works for dummy data
     "sort by Section.index"
     sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
     current_app.logger.info(f"Generating application display config for round {round_id}")
