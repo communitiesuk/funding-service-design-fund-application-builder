@@ -98,7 +98,7 @@ def section(round_id):
                 {
                     "round_id": form.round_id.data,
                     "name_in_apply_json": {"en": form.name_in_apply_en.data},
-                    "index": count_existing_sections,
+                    "index": max(count_existing_sections + 1, 1),
                 }
             )
 
@@ -126,7 +126,9 @@ def configure_forms_in_section(round_id, section_id):
             update_form(form_id, {"section_id": None})
         else:
             template_id = request.form.get("template_id")
-            clone_single_form(form_id=template_id, new_section_id=section_id)
+            section = get_section_by_id(section_id=section_id)
+            new_section_index = max(len(section.forms) + 1, 1)
+            clone_single_form(form_id=template_id, new_section_id=section_id, section_index=new_section_index)
 
     return redirect(url_for("build_fund_bp.section", round_id=round_id, section_id=section_id))
 
