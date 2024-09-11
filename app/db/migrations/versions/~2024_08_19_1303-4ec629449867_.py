@@ -22,6 +22,7 @@ def upgrade():
     op.execute("ALTER TYPE componenttype ADD VALUE 'CHECKBOXES_FIELD';")
     op.execute("ALTER TYPE componenttype ADD VALUE 'CLIENT_SIDE_FILE_UPLOAD_FIELD';")
     op.execute("ALTER TYPE componenttype ADD VALUE 'WEBSITE_FIELD';")
+    op.execute("ALTER TYPE componenttype ADD VALUE 'TELEPHONE_NUMBER_FIELD';")
     # ### end Alembic commands ###
 
 
