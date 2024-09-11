@@ -143,22 +143,6 @@ def _fix_cloned_default_pages(cloned_pages: list[Page]):
     return cloned_pages
 
 
-def _fix_cloned_default_pages(cloned_pages: list[Page]):
-    # Go through each page
-    # Get the page ID of the default next page (this will be a template page)
-    # Find the cloned page that was created from that template
-    # Get that cloned page's ID
-    # Update this default_next_page to point to the cloned page
-
-    for clone in cloned_pages:
-        if clone.default_next_page_id:
-            template_id = clone.default_next_page_id
-            concrete_next_page = next(p for p in cloned_pages if p.source_template_id == template_id)
-            clone.default_next_page_id = concrete_next_page.page_id
-
-    return cloned_pages
-
-
 def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> Form:
     form_to_clone: Form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     clone = _initiate_cloned_form(form_to_clone, new_section_id, section_index=section_index)
