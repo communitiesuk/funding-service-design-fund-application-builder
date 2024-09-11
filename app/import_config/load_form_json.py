@@ -173,7 +173,6 @@ def insert_form_config(form_config, form_id):
 
 
 def insert_form_as_template(form):
-    #  section = db.session.query(Section.section_id).first()
     form_name = next(p for p in form["pages"] if p["controller"] and p["controller"].endswith("start.js"))["title"]
     new_form = Form(
         section_id=None,
