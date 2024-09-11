@@ -30,6 +30,12 @@
                     "classes": "govuk-button--secondary"
                     })
                     }}
+                    {{ govukButton({
+                                            "text": "Remove",
+                                            "href": url_for("build_fund_bp.section",round_id=round.round_id, section_id=section.section_id, action="remove") ,
+                    "classes": "govuk-button--secondary"
+                    })
+                    }}
                 </div>
             </div>
         {% endfor %}

@@ -66,8 +66,7 @@ def configure_round():
     params = {
         "all_rounds": [{"text": f"{r.short_name} - {r.title_json['en']}", "value": str(r.round_id)} for r in all_rounds]
     }
-    if request.method == "POST":
-        round_id = request.form.get("round_id")
+    if round_id := request.form.get("round_id") or request.args.get("round_id"):
         round = get_round_by_id(round_id)
         params["round"] = round
         params["selected_round_id"] = round_id
@@ -82,6 +81,9 @@ def section(round_id):
     params = {
         "round_id": str(round_id),
     }
+    if request.args.get("action") == "remove":
+        update_section(request.args.get("section_id"), {"round_id": None})  # TODO remove properly
+        return redirect(url_for("build_fund_bp.configure_round", round_id=round_id, _method="POST", code=307))
     if form.validate_on_submit():
         round = get_round_by_id(form.round_id.data)
         count_existing_sections = len(round.sections)
