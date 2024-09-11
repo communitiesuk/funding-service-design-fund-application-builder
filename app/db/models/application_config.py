@@ -39,6 +39,8 @@ class ComponentType(Enum):
     CHECKBOXES_FIELD = "CheckboxesField"
     CLIENT_SIDE_FILE_UPLOAD_FIELD = "ClientSideFileUploadField"
     WEBSITE_FIELD = "WebsiteField"
+    MULTILINE_TEXT_FIELD = "MultilineTextField"
+
 
 
 @dataclass
@@ -225,6 +227,8 @@ class Component(BaseModel):
             "yesnofield": "text",
             "freetextfield": "free_text",
             "checkboxesfield": "list",
+            #TODO add multilinetext field and update types of components in sync with formrunner
+            #"multilinetextfield": "list",
             "multiinputfield": "table",
             "clientsidefileuploadfield": "s3bucketPath",
             "radiosfield": "text",
