@@ -185,9 +185,6 @@ def download_form_json(form_id):
     form = get_form_by_id(form_id)
     form_json = build_form_json(form)
 
-    # form_json["outputs"][0]["outputConfiguration"][
-    #     "savePerPageUrl"
-    # ] = f"http://{Config.FAB_HOST}{Config.FAB_SAVE_PER_PAGE}"
     return Response(
         response=json.dumps(form_json),
         mimetype="application/json",
