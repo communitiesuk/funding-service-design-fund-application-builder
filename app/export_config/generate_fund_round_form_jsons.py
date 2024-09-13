@@ -14,7 +14,6 @@ form_schema = {
         "name": {"type": "string"},
         "metadata": {"type": "object"},
         "startPage": {"type": "string"},
-        "backLinkText": {"type": "string"},
         "sections": {"type": "array"},
         "pages": {
             "type": "array",
@@ -59,7 +58,6 @@ form_schema = {
     "required": [
         "metadata",
         "startPage",
-        "backLinkText",
         "pages",
         "lists",
         "conditions",
