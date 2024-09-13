@@ -19,7 +19,6 @@ from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
 from app.blueprints.fund_builder.forms.section import SectionForm
-from app.blueprints.fund_builder.forms.section import SectionForm
 from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.application import clone_single_form
@@ -134,84 +133,6 @@ def configure_forms_in_section(round_id, section_id):
 
     return redirect(url_for("build_fund_bp.section", round_id=round_id, section_id=section_id))
 
-
-@build_fund_bp.route("/fund/round/configure", methods=["GET", "POST"])
-def configure_round():
-    """
-    Renders a template providing a drop down list of funds. If a fund is selected, renders its config info
-    """
-    all_rounds = get_all_rounds()
-
-    params = {
-        "all_rounds": [{"text": f"{r.short_name} - {r.title_json['en']}", "value": str(r.round_id)} for r in all_rounds]
-    }
-    if round_id := request.form.get("round_id") or request.args.get("round_id"):
-        round = get_round_by_id(round_id)
-        params["round"] = round
-        params["selected_round_id"] = round_id
-
-    return render_template("application.html", **params)
-
-
-@build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])
-def section(round_id):
-    form: SectionForm = SectionForm()
-    form.round_id.data = round_id
-    params = {
-        "round_id": str(round_id),
-    }
-    if request.args.get("action") == "remove":
-        update_section(request.args.get("section_id"), {"round_id": None})  # TODO remove properly
-        return redirect(url_for("build_fund_bp.configure_round", round_id=round_id, _method="POST", code=307))
-    if form.validate_on_submit():
-        round = get_round_by_id(form.round_id.data)
-        count_existing_sections = len(round.sections)
-        if form.section_id.data:
-            update_section(
-                form.section_id.data,
-                {
-                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
-                },
-            )
-        else:
-            insert_new_section(
-                {
-                    "round_id": form.round_id.data,
-                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
-                    "index": max(count_existing_sections + 1, 1),
-                }
-            )
-
-        flash(f"Saved section {form.name_in_apply_en.data}")
-        return redirect(url_for("build_fund_bp.configure_round"), code=307)
-    if section_id := request.args.get("section_id"):
-        existing_section = get_section_by_id(section_id)
-        form.section_id.data = section_id
-        form.name_in_apply_en.data = existing_section.name_in_apply_json["en"]
-        params["forms_in_section"] = existing_section.forms
-        params["available_template_forms"] = [
-            {"text": f"{f.template_name} - {f.name_in_apply_json['en']}", "value": str(f.form_id)}
-            for f in get_all_template_forms()
-        ]
-
-    return render_template("section.html", form=form, **params)
-
-
-@build_fund_bp.route("/fund/round/<round_id>/section/<section_id>/forms", methods=["POST"])
-def configure_forms_in_section(round_id, section_id):
-    if request.method == "POST":
-        if request.args.get("action") == "remove":
-            form_id = request.args.get("form_id")
-            # TODO figure out if we want to do a soft or hard delete here
-            update_form(form_id, {"section_id": None})
-        else:
-            template_id = request.form.get("template_id")
-            section = get_section_by_id(section_id=section_id)
-            new_section_index = max(len(section.forms) + 1, 1)
-            clone_single_form(form_id=template_id, new_section_id=section_id, section_index=new_section_index)
-
-    return redirect(url_for("build_fund_bp.section", round_id=round_id, section_id=section_id))
- 
 
 def all_funds_as_govuk_select_items(all_funds: list) -> list:
     """
