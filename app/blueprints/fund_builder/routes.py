@@ -83,7 +83,7 @@ def section(round_id):
     }
     if request.args.get("action") == "remove":
         update_section(request.args.get("section_id"), {"round_id": None})  # TODO remove properly
-        return redirect(url_for("build_fund_bp.configure_round", round_id=round_id, _method="POST", code=307))
+        return redirect(url_for("build_fund_bp.view_app_config", round_id=round_id))
     if form.validate_on_submit():
         round = get_round_by_id(form.round_id.data)
         count_existing_sections = len(round.sections)
@@ -299,6 +299,30 @@ def view_all_questions(round_id):
     for section in sections_in_round:
         forms = [{"name": form.runner_publish_name, "form_data": build_form_json(form)} for form in section.forms]
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
+
+    print_data = generate_print_data_for_sections(
+        section_data,
+        lang="en",
+    )
+    html = print_html(print_data)
+    return render_template("view_questions.html", round=round, fund=fund, question_html=html)
+
+
+@build_fund_bp.route("/fund/round/<round_id>/all_questions/<form_id>", methods=["GET"])
+def view_form_questions(round_id, form_id):
+    """
+    Generates the form data for this form, then uses that to generate the 'All Questions'
+    data for that form and returns that to render in a template.
+    """
+    round = get_round_by_id(round_id)
+    fund = get_fund_by_id(round.fund_id)
+    form = get_form_by_id(form_id=form_id)
+    section_data = [
+        {
+            "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
+            "forms": [{"name": form.runner_publish_name, "form_data": build_form_json(form)}],
+        }
+    ]
 
     print_data = generate_print_data_for_sections(
         section_data,

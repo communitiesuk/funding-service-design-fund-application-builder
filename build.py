@@ -71,6 +71,7 @@ def build_govuk_assets(static_dist_root="app/static/dist"):
 
     # Copy css
     os.makedirs("./app/static/dist/styles")
+    shutil.copyfile("./app/static/src/styles/fab.css", "./app/static/dist/styles/fab.css")
 
     # Copy over JS source
     os.makedirs("./app/static/dist/js")
