@@ -8,6 +8,7 @@ from app.db.models import ComponentType
 from app.db.models import Page
 from app.db.models.application_config import Form
 from app.db.models.application_config import Section
+from app.db.queries.application import _fix_cloned_default_pages
 from app.db.queries.application import _initiate_cloned_component
 from app.db.queries.application import _initiate_cloned_form
 from app.db.queries.application import _initiate_cloned_page
@@ -303,6 +304,46 @@ def test_clone_page_no_components(seed_dynamic_data, _db):
 page_id = uuid4()
 
 
+def test_fix_clone_default_pages():
+
+    original_pages = [
+        Page(page_id=uuid4(), is_template=True),
+        Page(page_id=uuid4(), is_template=True),
+        Page(page_id=uuid4(), is_template=True),
+        Page(page_id=uuid4(), is_template=True),
+    ]
+
+    cloned_pages = [
+        Page(
+            page_id=uuid4(),
+            is_template=False,
+            source_template_id=original_pages[0].page_id,
+            default_next_page_id=original_pages[1].page_id,
+        ),
+        Page(
+            page_id=uuid4(),
+            is_template=False,
+            source_template_id=original_pages[1].page_id,
+            default_next_page_id=original_pages[2].page_id,
+        ),
+        Page(
+            page_id=uuid4(),
+            is_template=False,
+            source_template_id=original_pages[2].page_id,
+            default_next_page_id=original_pages[3].page_id,
+        ),
+        Page(
+            page_id=uuid4(), is_template=False, source_template_id=original_pages[3].page_id, default_next_page_id=None
+        ),
+    ]
+
+    results = _fix_cloned_default_pages(cloned_pages)
+    assert results[0].default_next_page_id == results[1].page_id
+    assert results[1].default_next_page_id == results[2].page_id
+    assert results[2].default_next_page_id == results[3].page_id
+    assert results[3].default_next_page_id is None
+
+
 @pytest.mark.seed_config(
     {
         "pages": [
@@ -454,6 +495,7 @@ def test_clone_form_with_page(seed_dynamic_data, _db):
     assert cloned_form
     assert len(cloned_form.pages) == 1
     new_page_id = cloned_form.pages[0].page_id
+    assert cloned_form.pages[0].form_id == result.form_id
 
     old_form_from_db = _db.session.get(Form, old_form.form_id)
     assert old_form_from_db

@@ -19,6 +19,7 @@
 <div class="govuk-width-container {{ containerClasses }}">
   {% block beforeContent %}{% endblock beforeContent %}
   <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
+    <p><a class="govuk-link" href="/">Home</a></p>
     {% block content %}{% endblock content %}
   </main>
 </div>

@@ -5,8 +5,21 @@ from app.db.models import Component
 from app.db.models import Form
 from app.db.models import Lizt
 from app.db.models import Page
-from app.db.models.application_config import Section
+from app.db.models import Section
 from app.db.models.round import Round
+
+
+def get_all_template_sections() -> list[Section]:
+    return db.session.query(Section).where(Section.is_template == True).all()  # noqa:E712
+
+
+def get_section_by_id(section_id) -> Section:
+    s = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
+    return s
+
+
+def get_all_template_forms() -> list[Form]:
+    return db.session.query(Form).where(Form.is_template == True).all()  # noqa:E712
 
 
 def get_form_for_component(component: Component) -> Form:
@@ -64,7 +77,7 @@ def _initiate_cloned_page(to_clone: Page, new_form_id=None):
     return clone
 
 
-def _initiate_cloned_form(to_clone: Form, new_section_id: str) -> Form:
+def _initiate_cloned_form(to_clone: Form, new_section_id: str, section_index=0) -> Form:
     clone = Form(**to_clone.as_dict())
     clone.form_id = uuid4()
     clone.section_id = new_section_id
@@ -72,6 +85,7 @@ def _initiate_cloned_form(to_clone: Form, new_section_id: str) -> Form:
     clone.source_template_id = to_clone.form_id
     clone.template_name = None
     clone.pages = []
+    clone.section_index = section_index
     return clone
 
 
@@ -113,9 +127,25 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
     return clone
 
 
-def clone_single_form(form_id: str, new_section_id=None) -> Form:
+def _fix_cloned_default_pages(cloned_pages: list[Page]):
+    # Go through each page
+    # Get the page ID of the default next page (this will be a template page)
+    # Find the cloned page that was created from that template
+    # Get that cloned page's ID
+    # Update this default_next_page to point to the cloned page
+
+    for clone in cloned_pages:
+        if clone.default_next_page_id:
+            template_id = clone.default_next_page_id
+            concrete_next_page = next(p for p in cloned_pages if p.source_template_id == template_id)
+            clone.default_next_page_id = concrete_next_page.page_id
+
+    return cloned_pages
+
+
+def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> Form:
     form_to_clone: Form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    clone = _initiate_cloned_form(form_to_clone, new_section_id)
+    clone = _initiate_cloned_form(form_to_clone, new_section_id, section_index=section_index)
 
     cloned_pages = []
     cloned_components = []
@@ -125,6 +155,7 @@ def clone_single_form(form_id: str, new_section_id=None) -> Form:
         cloned_pages.append(cloned_page)
         cloned_components.extend(_initiate_cloned_components_for_page(page_to_clone.components, cloned_page.page_id))
     db.session.add_all([clone, *cloned_pages, *cloned_components])
+    cloned_pages = _fix_cloned_default_pages(cloned_pages)
     db.session.commit()
 
     return clone

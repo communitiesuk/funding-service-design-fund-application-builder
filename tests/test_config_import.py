@@ -22,7 +22,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, _db):
     expected_page_count_for_form = 19
     expected_component_count_for_form = 25
     # check form config is in the database
-    forms = _db.session.query(Form).filter(Form.template_name == "Apply for funding to save an asset in your community")
+    forms = _db.session.query(Form).filter(Form.template_name == "test-import-form.json")
     assert forms.count() == expected_form_count
     form = forms.first()
     pages = _db.session.query(Page).filter(Page.form_id == form.form_id)
