@@ -3,7 +3,6 @@ from app.blueprints.self_serve.data.not_a_db import FORMS
 from app.blueprints.self_serve.data.not_a_db import LISTS
 from app.blueprints.self_serve.data.not_a_db import PAGES
 from app.blueprints.self_serve.data.not_a_db import SECTIONS
-from app.db.queries.application import insert_new_section
 
 saved_responses = []
 saved_sections = {}

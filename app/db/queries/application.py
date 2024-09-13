@@ -184,9 +184,9 @@ def clone_multiple_components(component_ids: list[str], new_page_id=None, new_th
 def clone_single_round(round_id, new_fund_id, new_short_name) -> Round:
     round_to_clone = db.session.query(Round).where(Round.round_id == round_id).one_or_none()
     cloned_round = Round(**round_to_clone.as_dict())
+    cloned_round.fund_id = new_fund_id
     cloned_round.short_name = new_short_name
     cloned_round.round_id = uuid4()
-    cloned_round.fund_id = new_fund_id
     cloned_round.is_template = False
     cloned_round.source_template_id = round_to_clone.round_id
     cloned_round.template_name = None
@@ -211,7 +211,8 @@ def insert_new_section(new_section_config):
         new_section_config (dict): A dictionary containing the configuration for the new section.
             new_section_config keys:
                 - round_id (str): The ID of the round to which the section belongs.
-                - name_in_apply_json (dict): The name of the section as it will be in the Application JSON (support multiple languages/keys).
+                - name_in_apply_json (dict): The name of the section as it will be in the Application
+                JSON (support multiple languages/keys).
                 - template_name (str): The name of the template.
                 - is_template (bool): A flag indicating whether the section is a template.
                 - source_template_id (str): The ID of the source template.
@@ -266,7 +267,8 @@ def insert_new_form(new_form_config):
         new_form_config (dict): A dictionary containing the configuration for the new form.
             new_form_config keys:
                 - section_id (str): The ID of the section to which the form belongs.
-                - name_in_apply_json (dict): The name of the form as it will be in the Application JSON (support multiple languages/keys).
+                - name_in_apply_json (dict): The name of the form as it will be in the Application
+                JSON (support multiple languages/keys).
                 - is_template (bool): A flag indicating whether the form is a template.
                 - template_name (str): The name of the template.
                 - source_template_id (str): The ID of the source template.
@@ -412,7 +414,8 @@ def insert_new_component(new_component_config: dict):
                 - audit_info (dict): Audit information for the component.
                 - page_index (int): The index of the component within the page.
                 - theme_index (int): The index of the component within the theme.
-                - conditions (dict): The conditions such as potential routes based on the components value (can specify page path).
+                - conditions (dict): The conditions such as potential routes based on the
+                components value (can specify page path).
                 - runner_component_name (str): The name of the runner component.
                 - list_id (str): The ID of the list to which the component belongs.
             Returns:
