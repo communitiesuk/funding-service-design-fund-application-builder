@@ -305,29 +305,43 @@ page_id = uuid4()
 
 
 def test_fix_clone_default_pages():
-    # DISCLAIMER: Written on the train when I'd been up since 5am so may not be the most efficient/best approach!
-    uuids = [
-        uuid4(),
-        uuid4(),
-        uuid4(),
-        uuid4(),
-        uuid4(),
-        uuid4(),
+
+    original_pages = [
+        Page(page_id=uuid4(), is_template=True),
+        Page(page_id=uuid4(), is_template=True),
+        Page(page_id=uuid4(), is_template=True),
+        Page(page_id=uuid4(), is_template=True),
     ]
 
-    pages = [
-        Page(page_id=uuids[0], is_template=False, source_template_id=uuids[4]),
-        Page(page_id=uuids[1], is_template=False, source_template_id=uuids[5]),
-        Page(page_id=uuids[2], is_template=False, default_next_page_id=uuids[4]),
-        Page(page_id=uuids[3], is_template=False, default_next_page_id=uuids[5]),
-        Page(page_id=uuids[4], is_template=True),
-        Page(page_id=uuids[5], is_template=True),
+    cloned_pages = [
+        Page(
+            page_id=uuid4(),
+            is_template=False,
+            source_template_id=original_pages[0].page_id,
+            default_next_page_id=original_pages[1].page_id,
+        ),
+        Page(
+            page_id=uuid4(),
+            is_template=False,
+            source_template_id=original_pages[1].page_id,
+            default_next_page_id=original_pages[2].page_id,
+        ),
+        Page(
+            page_id=uuid4(),
+            is_template=False,
+            source_template_id=original_pages[2].page_id,
+            default_next_page_id=original_pages[3].page_id,
+        ),
+        Page(
+            page_id=uuid4(), is_template=False, source_template_id=original_pages[3].page_id, default_next_page_id=None
+        ),
     ]
 
-    cloned_pages = [pages[0], pages[1], pages[2], pages[3]]
     results = _fix_cloned_default_pages(cloned_pages)
-    assert results[2].default_next_page_id == uuids[0]
-    assert results[3].default_next_page_id == uuids[1]
+    assert results[0].default_next_page_id == results[1].page_id
+    assert results[1].default_next_page_id == results[2].page_id
+    assert results[2].default_next_page_id == results[3].page_id
+    assert results[3].default_next_page_id is None
 
 
 @pytest.mark.seed_config(
