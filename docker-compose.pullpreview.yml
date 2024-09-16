@@ -1,21 +1,33 @@
-
 services:
   fab:
     hostname: fab
     build:
-      context: .
-      dockerfile: Dockerfile.pullpreview
-    command: service postgresql start && /bin/bash -c "python -m flask db upgrade && python -m flask run --no-debugger --host 0.0.0.0 --port 8080"
-    volumes: [
-      '../funding-service-design-fund-application-builder:/app',
-      '../funding-service-design-fund-application-builder/postgresql:/var/lib/postgresql/data',
-    ]
+      context: ../funding-service-design-fund-application-builder
+      dockerfile: Dockerfile
+      args:
+        - USE_DEV_REQUIREMENTS=true
+    volumes: ['../funding-service-design-fund-application-builder:/app']
+    command: ["sh", "-c", "python -m flask db upgrade && python -m debugpy --listen 0.0.0.0:5601 -m flask run --no-debugger --host 0.0.0.0 --port 8080"]
     ports:
-      - 5432:5432
       - 8080:8080
+      - 5686:5601
     environment:
-      - FORM_RUNNER_INTERNAL_HOST=http://localhost:3009
+      - FORM_RUNNER_INTERNAL_HOST=http://form-runner:3009
       - FORM_RUNNER_EXTERNAL_HOST=http://localhost:3009
-      - DATABASE_URL=postgresql://postgres:password@localhost:5432/fund_builder
+      - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fund_builder   # pragma: allowlist secret
       - FLASK_DEBUG=0
       - FLASK_ENV=development
+    depends_on: [fab-db, form-runner]
+
+  fab-db:
+    image: postgres
+    container_name: fab-db
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=fund_builder
+      - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fund_builder
+      - DATABASE_URL_UNIT_TEST=postgresql://postgres:password@fab-db:5432/fab_unit_test

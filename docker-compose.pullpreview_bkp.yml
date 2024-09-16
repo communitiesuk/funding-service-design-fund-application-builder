@@ -1,0 +1,21 @@
+
+services:
+  fab:
+    hostname: fab
+    build:
+      context: .
+      dockerfile: Dockerfile.pullpreview
+    command: service postgresql start && /bin/bash -c "python -m flask db upgrade && python -m flask run --no-debugger --host 0.0.0.0 --port 8080"
+    volumes: [
+      '../funding-service-design-fund-application-builder:/app',
+      '../funding-service-design-fund-application-builder/postgresql:/var/lib/postgresql/data',
+    ]
+    ports:
+      - 5432:5432
+      - 8080:8080
+    environment:
+      - FORM_RUNNER_INTERNAL_HOST=http://localhost:3009
+      - FORM_RUNNER_EXTERNAL_HOST=http://localhost:3009
+      - DATABASE_URL=postgresql://postgres:password@localhost:5432/fund_builder
+      - FLASK_DEBUG=0
+      - FLASK_ENV=development
