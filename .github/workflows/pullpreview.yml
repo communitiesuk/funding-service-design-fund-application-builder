@@ -25,7 +25,6 @@ jobs:
           push: true
           file: ./Dockerfile.pullpreview
           build-args: |
-            LAST_TAG='${{env.VERSION}}'
             LAST_COMMIT='${{ github.sha }}'
 
   deploy:
