@@ -12,12 +12,12 @@ services:
       - 8080:8080
       - 5686:5601
     environment:
-      - FORM_RUNNER_INTERNAL_HOST=http://form-runner:3009
-      - FORM_RUNNER_EXTERNAL_HOST=http://localhost:3009
+      - FORM_RUNNER_INTERNAL_HOST=http://pr-20-pullpreview-ip-35-178-176-218.my.pullpreview.com:3009
+      - FORM_RUNNER_EXTERNAL_HOST=http://pr-20-pullpreview-ip-35-178-176-218.my.pullpreview.com:3009
       - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fund_builder   # pragma: allowlist secret
       - FLASK_DEBUG=0
       - FLASK_ENV=development
-    depends_on: [fab-db, form-runner]
+    depends_on: [fab-db]
 
   fab-db:
     image: postgres
