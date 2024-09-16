@@ -9,19 +9,52 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
 
-  paketo_build:
+  docker-build:
+    runs-on: ubuntu-latest
     needs: [ setup ]
-    permissions:
-      packages: write
-    uses: communitiesuk/funding-service-design-workflows/.github/workflows/package.yml@main
-    with:
-      version_to_build: sha-${{ github.sha }}
-      owner: ${{ github.repository_owner }}
-      application: funding-service-design-fund-application-builder
-      assets_required: false
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: "Set version in env"
+        id: set-version
+        run: |
+          source version
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Docker metadata
+        id: metadata
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{env.IMAGE_REPO_PATH}}/${{env.IMAGE_NAME}}
+          tags: |
+            type=sha,format=long
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=raw,value=${{env.VERSION}},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=raw,value=latest
+            type=ref,event=branch
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          tags: ${{ steps.metadata.outputs.tags}}
+          labels: ${{ steps.metadata.outputs.labels }}
+          push: true
+          file: ./Dockerfile.pullpreview
+          build-args: |
+            LAST_TAG='${{env.VERSION}}'
+            LAST_COMMIT='${{ github.sha }}'
 
   deploy:
-    needs: [ setup, paketo_build ]
+    needs: [ setup, docker-build ]
     permissions:
       contents: read # to fetch code (actions/checkout)
       deployments: write # to delete deployments

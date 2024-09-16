@@ -1,26 +1,21 @@
-# Start with a Python base image
-FROM python:3.10-slim
-# Install PostgreSQL
-RUN apt-get update && \
-    apt-get install -y postgresql postgresql-contrib
-# Set environment variables for PostgreSQL
-ENV POSTGRES_USER=postgres \
-    POSTGRES_PASSWORD=password \
-    POSTGRES_DB=fund_builder
-# Expose the default PostgreSQL port
-EXPOSE 5432
-# Create a directory for the app
+###############################################################################
+#
+#       Fund Application Builder (FAB) Dev Image
+#
+###############################################################################
+
+FROM python:3.10-bullseye as fab-dev
+ARG USE_DEV_REQUIREMENTS
+
 WORKDIR /app
-# Copy application files
+
+COPY requirements.txt requirements.txt
+COPY requirements-dev.txt requirements-dev.txt
+
+RUN python3 -m pip install --upgrade pip && pip install -r requirements-dev.txt;
+
 COPY . .
-# Install Python dependencies into a virtual environment
-RUN pip install --upgrade pip && pip install -r requirements-dev.txt
-# Configure PostgreSQL (set up user, database, etc.)
-RUN service postgresql start && \
-    su - postgres -c "psql -c \"ALTER USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';\"" && \
-    su - postgres -c "psql -c \"CREATE DATABASE ${POSTGRES_DB};\"" && \
-    su - postgres -c "psql -c \"GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO ${POSTGRES_USER};\""
-# Expose Flask app port
+
 EXPOSE 8080
-# Start PostgreSQL and the Flask app using the virtual environment
-CMD service postgresql start && /bin/bash -c "python -m flask db upgrade && python -m flask run --no-debugger --host 0.0.0.0 --port 8080"
+
+CMD ["flask", "run", "--port", "8080", "--host", "0.0.0.0"]
