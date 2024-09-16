@@ -1,12 +1,7 @@
 services:
   fab:
-    hostname: fab
-    build:
-      context: ../funding-service-design-fund-application-builder
-      dockerfile: Dockerfile
-      args:
-        - USE_DEV_REQUIREMENTS=true
-    volumes: ['../funding-service-design-fund-application-builder:/app']
+    container_name: fab
+    image: ghcr.io/communitiesuk/funding-service-design-form-designer-adapter:latest
     command: ["sh", "-c", "python -m flask db upgrade && python -m debugpy --listen 0.0.0.0:5601 -m flask run --no-debugger --host 0.0.0.0 --port 8080"]
     ports:
       - 8080:8080
