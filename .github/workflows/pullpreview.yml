@@ -24,7 +24,6 @@ jobs:
           tags: |
             type=sha,format=long
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-            type=raw,value=latest
             type=ref,event=branch
 
       - name: Build and push docker image
