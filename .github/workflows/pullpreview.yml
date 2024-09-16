@@ -9,26 +9,19 @@ jobs:
     with:
       environment: ${{ inputs.environment }}
 
-  docker-build:
-    runs-on: ubuntu-latest
+  paketo_build:
     needs: [ setup ]
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Build and push docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          tags: ${{ steps.metadata.outputs.tags}}
-          labels: ${{ steps.metadata.outputs.labels }}
-          push: true
-          file: ./Dockerfile.pullpreview
-          build-args: |
-            LAST_COMMIT='${{ github.sha }}'
+    permissions:
+      packages: write
+    uses: communitiesuk/funding-service-design-workflows/.github/workflows/package.yml@main
+    with:
+      version_to_build: sha-${{ github.sha }}
+      owner: ${{ github.repository_owner }}
+      application: funding-service-design-fund-application-builder
+      assets_required: false
 
   deploy:
-    needs: [ setup, docker-build ]
+    needs: [ setup, paketo_build ]
     permissions:
       contents: read # to fetch code (actions/checkout)
       deployments: write # to delete deployments
