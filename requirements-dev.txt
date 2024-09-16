@@ -59,7 +59,7 @@ cssbeautifier==1.15.1
     # via djlint
 cssmin==0.2.0
     # via -r requirements.in
-debugpy==1.8.2
+debugpy==1.8.5
     # via -r requirements-dev.in
 distlib==0.3.8
     # via virtualenv
