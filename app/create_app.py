@@ -57,6 +57,7 @@ def create_app() -> Flask:
             PrefixLoader({"govuk_frontend_jinja": PackageLoader("govuk_frontend_jinja")}),
         ]
     )
+    flask_app.jinja_env.add_extension("jinja2.ext.do")
 
     return flask_app
 

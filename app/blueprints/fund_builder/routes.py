@@ -33,7 +33,6 @@ from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
-from app.db.queries.round import get_all_rounds
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_all_questions import print_html
 from app.export_config.generate_form import build_form_json
@@ -54,24 +53,6 @@ build_fund_bp = Blueprint(
     url_prefix="/",
     template_folder="templates",
 )
-
-
-@build_fund_bp.route("/fund/round/configure", methods=["GET", "POST"])
-def configure_round():
-    """
-    Renders a template providing a drop down list of funds. If a fund is selected, renders its config info
-    """
-    all_rounds = get_all_rounds()
-
-    params = {
-        "all_rounds": [{"text": f"{r.short_name} - {r.title_json['en']}", "value": str(r.round_id)} for r in all_rounds]
-    }
-    if round_id := request.form.get("round_id") or request.args.get("round_id"):
-        round = get_round_by_id(round_id)
-        params["round"] = round
-        params["selected_round_id"] = round_id
-
-    return render_template("application.html", **params)
 
 
 @build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])
@@ -103,8 +84,8 @@ def section(round_id):
                 }
             )
 
-        flash(f"Saved section {form.name_in_apply_en.data}")
-        return redirect(url_for("build_fund_bp.configure_round"), code=307)
+        # flash(f"Saved section {form.name_in_apply_en.data}")
+        return redirect(url_for("build_fund_bp.view_app_config", round_id=round.round_id))
     if section_id := request.args.get("section_id"):
         existing_section = get_section_by_id(section_id)
         form.section_id.data = section_id
@@ -154,7 +135,7 @@ def view_fund():
         params["fund"] = fund
         params["selected_fund_id"] = fund_id
 
-    return render_template("view_fund_config.html", **params)
+    return render_template("fund_config.html", **params)
 
 
 @build_fund_bp.route("/fund/round/<round_id>/application_config")
@@ -164,7 +145,7 @@ def view_app_config(round_id):
     """
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
-    return render_template("view_application_config.html", round=round, fund=fund)
+    return render_template("build_application.html", round=round, fund=fund)
 
 
 @build_fund_bp.route("/fund/<fund_id>/round/<round_id>/clone")
@@ -174,16 +155,6 @@ def clone_round(round_id, fund_id):
     flash(f"Cloned new round: {cloned.short_name}")
 
     return redirect(url_for("build_fund_bp.view_fund", fund_id=fund_id))
-
-
-@build_fund_bp.route("/fund/round/<round_id>/assessment_config")
-def view_assess_config(round_id):
-    """
-    Renders a template displaying assessment configuration info for the chosen round
-    """
-    round = get_round_by_id(round_id)
-    fund = get_fund_by_id(round.fund_id)
-    return render_template("view_assessment_config.html", round=round, fund=fund)
 
 
 @build_fund_bp.route("/fund", methods=["GET", "POST"])
@@ -305,7 +276,13 @@ def view_all_questions(round_id):
         lang="en",
     )
     html = print_html(print_data)
-    return render_template("view_questions.html", round=round, fund=fund, question_html=html)
+    return render_template(
+        "view_questions.html",
+        round=round,
+        fund=fund,
+        question_html=html,
+        title=f"All Questions for {fund.short_name} - {round.short_name}",
+    )
 
 
 @build_fund_bp.route("/fund/round/<round_id>/all_questions/<form_id>", methods=["GET"])
@@ -328,8 +305,10 @@ def view_form_questions(round_id, form_id):
         section_data,
         lang="en",
     )
-    html = print_html(print_data)
-    return render_template("view_questions.html", round=round, fund=fund, question_html=html)
+    html = print_html(print_data, True)
+    return render_template(
+        "view_questions.html", round=round, fund=fund, question_html=html, title=form.name_in_apply_json["en"]
+    )
 
 
 @build_fund_bp.route("/create_export_files/<round_id>", methods=["GET"])
