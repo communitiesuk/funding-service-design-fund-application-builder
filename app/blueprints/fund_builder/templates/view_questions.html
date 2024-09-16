@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% set pageHeading %}All Questions for Round {{fund.short_name}} - {{round.short_name}} {% endset %}
+{% set pageHeading %}{{title}} {% endset %}
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-l">[Preview] Full list of application questions</span>
+        <span class="govuk-caption-l">[Preview] Application questions</span>
         <h1 class="govuk-heading-xl">{{pageHeading}}</h1>
         {{ question_html|safe}}
     </div>

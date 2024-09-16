@@ -357,6 +357,7 @@ def build_components_from_page(
         title, text = determine_title_and_text_for_component(
             c, include_html_components=include_html_components, form_lists=form_lists
         )
+        field_type = c["type"]
         if not title and not text:
             continue
 
@@ -386,6 +387,7 @@ def build_components_from_page(
             "title": title,
             "text": text,
             "hide_title": c["options"]["hideTitle"] if "hideTitle" in c["options"] else False,
+            "type": field_type,
         }
         components.append(component)
     return components
