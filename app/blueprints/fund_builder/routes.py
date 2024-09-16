@@ -115,7 +115,6 @@ def configure_forms_in_section(round_id, section_id):
     return redirect(url_for("build_fund_bp.section", round_id=round_id, section_id=section_id))
 
 
-
 def all_funds_as_govuk_select_items(all_funds: list) -> list:
     """
     Reformats a list of funds into a list of display/value items that can be passed to a govUk select macro
