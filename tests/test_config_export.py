@@ -155,8 +155,8 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
         {
             "path": output_base_path / round_short_name / "form_runner" / f"{form_publish_name}.json",
             "expected_output": (
-                '{"metadata": {}, "startPage": "/intro-about-your-organisation", "backLinkText": '
-                '"Go back to application overview", "pages": [{"path": "/organisation-name", "title": '
+                '{"metadata": {}, "startPage": "/intro-about-your-organisation", '
+                '"pages": [{"path": "/organisation-name", "title": '
                 '"Organisation Name", "components": [{"options": {"hideTitle": false, "classes": ""}, '
                 '"type": "TextField", "title": "What is your organisation\'s name?", "hint": "This '
                 'must match the regsitered legal organisation name", "schema": {}, "name": '
@@ -171,9 +171,8 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
                 ' "title": "Check your answers", "components": [], "next": [], "section": "uLwBuz", "controller":'
                 ' "./pages/summary.js"}], "lists": [{"type": "string", "items": [{"text": "Charity", "value":'
                 ' "charity"}, {"text": "Public Limited Company", "value": "plc"}], "name": "classifications_list",'
-                ' "title": null}], "conditions": [], "fees": [], "sections": [], "outputs": [{"name": "update-form",'
-                ' "title": "Update form in application store", "type": "savePerPage", "outputConfiguration":'
-                ' {"savePerPageUrl": true}}], "skipSummary": false, "name": "About your organisation"}'
+                ' "title": null}], "conditions": [], "fees": [], "sections": [], "outputs": [], "skipSummary": false,'
+                ' "name": "About your organisation"}'
             ),
         }
     ]

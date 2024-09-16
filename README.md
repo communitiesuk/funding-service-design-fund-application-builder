@@ -48,55 +48,12 @@ Below is a docker-compose file that will start both the FAB app, and the form ru
 ```
     workspace
      | - dc
-     |      - docker-compose.yml
-     | - digital-form-builder
+     |      - docker-compose-dev.yml
+     | - digital-form-builder-adapter
      | - funding-service-design-fund-application-builder
 ```
+To run locally using digital-form-builder-adapter 
 
-```
-services:
-  fab:
-    hostname: fab
-    build:
-      context: ../funding-service-design-fund-application-builder
-      dockerfile: Dockerfile
-    command: ["sh", "-c", "python -m flask db upgrade && inv create-test-data && python -m flask run --host 0.0.0.0 --port 8080"]
-    ports:
-      - 8080:8080
-    environment:
-      - FORM_RUNNER_INTERNAL_HOST=http://form-runner:3009
-      - FORM_RUNNER_EXTERNAL_HOST=http://localhost:3009
-      - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fund_builder   # pragma: allowlist secret
-    depends_on: [fab-db]
+docker-compose -f docker-compose-dev.yml up
 
-  fab-db:
-    image: postgres
-    environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=fund_builder
-
-  form-runner:
-    build:
-      context: ../digital-form-builder
-      dockerfile: ./fsd_config/Dockerfile
-    command: yarn runner startdebug
-    links:
-      - fab:fab
-    ports:
-      - 3009:3009
-      - 9228:9228
-    environment:
-      - LOG_LEVEL=debug
-      - 'NODE_CONFIG={"safelist": ["fab"]}'
-      - CONTACT_US_URL=http://localhost:3008/contact_us
-      - FEEDBACK_LINK=http://localhost:3008/feedback
-      - COOKIE_POLICY_URL=http://localhost:3008/cookie_policy
-      - ACCESSIBILITY_STATEMENT_URL=http://localhost:3008/accessibility_statement
-      - SERVICE_START_PAGE=http://localhost:3008/account
-      - MULTIFUND_URL=http://localhost:3008/account
-      - LOGOUT_URL=http://localhost:3004/sessions/sign-out
-      - PRIVACY_POLICY_URL=http://localhost:3008/privacy
-      - ELIGIBILITY_RESULT_URL=http://localhost:3008/eligibility-result
-      - PREVIEW_MODE=true
-      - NODE_ENV=development
 ```

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "macros/wtfToGovUk.html" import input %}
+{% from "macros/wtfToGovUk.html" import dateinput %}
 {% from "macros/wtfToGovUk.html" import yes_no %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
@@ -20,11 +21,11 @@
                         "items": all_funds})}}
                     {{input(form.title_en)}}
                     {{input(form.short_name)}}
-                    {{input(form.opens)}}
-                    {{input(form.deadline)}}
-                    {{input(form.assessment_start)}}
-                    {{input(form.reminder_date)}}
-                    {{input(form.assessment_deadline)}}
+                    {{dateinput(form.opens)}}
+                    {{dateinput(form.deadline)}}
+                    {{dateinput(form.assessment_start)}}
+                    {{dateinput(form.reminder_date)}}
+                    {{dateinput(form.assessment_deadline)}}
                     {{input(form.prospectus_link)}}
                     {{input(form.privacy_notice_link)}}
 
