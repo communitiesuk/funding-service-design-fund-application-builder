@@ -122,6 +122,7 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
         cloned_forms.append(cloned_form)
 
     db.session.add_all([clone, *cloned_forms, *cloned_pages, *cloned_components])
+    cloned_pages = _fix_cloned_default_pages(cloned_pages)
     db.session.commit()
 
     return clone
