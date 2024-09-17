@@ -2,11 +2,13 @@ from uuid import uuid4
 
 import pytest
 
+from app.blueprints.fund_builder.routes import clone_single_round
 from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Page
 from app.db.models.application_config import Form
 from app.db.models.application_config import Section
+from app.db.queries.application import _fix_cloned_default_pages
 from app.db.queries.application import _initiate_cloned_component
 from app.db.queries.application import _initiate_cloned_form
 from app.db.queries.application import _initiate_cloned_page
@@ -302,6 +304,46 @@ def test_clone_page_no_components(seed_dynamic_data, _db):
 page_id = uuid4()
 
 
+def test_fix_clone_default_pages():
+
+    original_pages = [
+        Page(page_id=uuid4(), is_template=True),
+        Page(page_id=uuid4(), is_template=True),
+        Page(page_id=uuid4(), is_template=True),
+        Page(page_id=uuid4(), is_template=True),
+    ]
+
+    cloned_pages = [
+        Page(
+            page_id=uuid4(),
+            is_template=False,
+            source_template_id=original_pages[0].page_id,
+            default_next_page_id=original_pages[1].page_id,
+        ),
+        Page(
+            page_id=uuid4(),
+            is_template=False,
+            source_template_id=original_pages[1].page_id,
+            default_next_page_id=original_pages[2].page_id,
+        ),
+        Page(
+            page_id=uuid4(),
+            is_template=False,
+            source_template_id=original_pages[2].page_id,
+            default_next_page_id=original_pages[3].page_id,
+        ),
+        Page(
+            page_id=uuid4(), is_template=False, source_template_id=original_pages[3].page_id, default_next_page_id=None
+        ),
+    ]
+
+    results = _fix_cloned_default_pages(cloned_pages)
+    assert results[0].default_next_page_id == results[1].page_id
+    assert results[1].default_next_page_id == results[2].page_id
+    assert results[2].default_next_page_id == results[3].page_id
+    assert results[3].default_next_page_id is None
+
+
 @pytest.mark.seed_config(
     {
         "pages": [
@@ -453,6 +495,7 @@ def test_clone_form_with_page(seed_dynamic_data, _db):
     assert cloned_form
     assert len(cloned_form.pages) == 1
     new_page_id = cloned_form.pages[0].page_id
+    assert cloned_form.pages[0].form_id == result.form_id
 
     old_form_from_db = _db.session.get(Form, old_form.form_id)
     assert old_form_from_db
@@ -742,3 +785,44 @@ def test_clone_section_with_forms(seed_dynamic_data, _db):
     assert new_page_1.components[0].component_id not in old_component_ids_1
     assert new_page_1.components[1].component_id not in old_component_ids_1
     assert new_page_2.components[0].component_id not in old_component_ids_2
+
+
+def test_clone_round(seed_dynamic_data, _db):
+    # find seeded round id
+    fund = seed_dynamic_data["funds"][0]
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    old_section_ids = [s.section_id for s in seed_dynamic_data["sections"]]
+    old_form_ids = [f.form_id for f in seed_dynamic_data["forms"]]
+    old_page_ids = [p.page_id for p in seed_dynamic_data["pages"]]
+    old_component_ids = [c.component_id for c in seed_dynamic_data["components"]]
+    assert len(old_section_ids) > 0, "Need at least one section to clone"
+    assert len(old_form_ids) > 0, "Need at least one form to clone"
+    assert len(old_page_ids) > 0, "Need at least one page to clone"
+    assert len(old_component_ids) > 0, "Need at least one component to clone"
+
+    cloned_round = clone_single_round(round_id, fund.fund_id, fund.short_name)
+    cloned_sections = _db.session.query(Section).filter(Section.round_id == cloned_round.round_id).all()
+    cloned_section_ids = [s.section_id for s in cloned_sections]
+    cloned_forms = _db.session.query(Form).filter(Form.section_id.in_(cloned_section_ids)).all()
+    cloned_form_ids = [f.form_id for f in cloned_forms]
+    cloned_pages = _db.session.query(Page).filter(Page.form_id.in_(cloned_form_ids)).all()
+    cloned_page_ids = [p.page_id for p in cloned_pages]
+
+    # assert cloned_round is different
+    assert cloned_round.round_id != round_id
+
+    # assert cloned sections are different (ids)
+    assert len(cloned_sections) == len(old_section_ids)
+    assert all([s.section_id != old_id for s, old_id in zip(cloned_sections, old_section_ids)])
+
+    # assert cloned forms are different (ids)
+    assert len(cloned_forms) == len(old_form_ids)
+    assert all([f.form_id != old_id for f, old_id in zip(cloned_forms, old_form_ids)])
+
+    # assert cloned pages are different (ids)
+    assert len(cloned_pages) == len(old_page_ids)
+    assert all([p.page_id != old_id for p, old_id in zip(cloned_pages, old_page_ids)])
+
+    # assert cloned components are different (ids)
+    cloned_components = _db.session.query(Component).filter(Component.page_id.in_(cloned_page_ids)).all()
+    assert all([c.component_id != old_id for c, old_id in zip(cloned_components, old_component_ids)])

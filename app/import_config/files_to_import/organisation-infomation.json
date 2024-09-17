@@ -1,0 +1,502 @@
+{
+    "metadata": {},
+    "startPage": "/name-your-application",
+    "pages": [
+        {
+            "path": "/name-your-application",
+            "title": "Name your application",
+            "components": [
+                {
+                    "name": "COlBrB",
+                    "options": {},
+                    "type": "TextField",
+                    "title": "Name your organisation",
+                    "hint": "This is what your application will be called and will help you find it when you save and return.  ",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/organisation-name"
+                }
+            ],
+            "controller": "./pages/start.js"
+        },
+        {
+            "path": "/organisation-name",
+            "title": "Organisation name",
+            "components": [
+                {
+                    "name": "yptqZX",
+                    "options": {},
+                    "type": "TextField",
+                    "title": "Organisation name",
+                    "hint": "This must match your registered legal \norganisation name.",
+                    "schema": {}
+                },
+                {
+                    "name": "BIxPht",
+                    "options": {
+                        "exposeToContext": true
+                    },
+                    "type": "YesNoField",
+                    "title": "Does your organisation use any  other names?",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/alternative-organisation-names",
+                    "condition": "lgQzEs"
+                },
+                {
+                    "path": "/registered-organisation-address"
+                }
+            ]
+        },
+        {
+            "path": "/alternative-organisation-names",
+            "title": "Alternative organisation names",
+            "components": [
+                {
+                    "name": "Ianpnw",
+                    "options": {},
+                    "type": "TextField",
+                    "title": "Alternative name 1",
+                    "schema": {}
+                },
+                {
+                    "name": "CTyQWf",
+                    "options": {
+                        "required": false
+                    },
+                    "type": "TextField",
+                    "title": "Alternative name 2",
+                    "schema": {}
+                },
+                {
+                    "name": "XWsTKi",
+                    "options": {
+                        "required": false
+                    },
+                    "type": "TextField",
+                    "title": "Alternative name 3",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/registered-organisation-address"
+                }
+            ]
+        },
+        {
+            "path": "/registered-organisation-address",
+            "title": "Registered organisation address",
+            "components": [
+                {
+                    "name": "fWPSFw",
+                    "options": {},
+                    "type": "UkAddressField",
+                    "title": "Registered organisation address",
+                    "schema": {}
+                },
+                {
+                    "name": "sBRPjm",
+                    "options": {
+                        "required": true,
+                        "exposeToContext": true
+                    },
+                    "type": "YesNoField",
+                    "title": "Is your correspondence address  different to the organisation  address? ",
+                    "values": {
+                        "type": "listRef"
+                    },
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/how-long-has-your-organisation-been-operating"
+                },
+                {
+                    "path": "/alternative-organisation-address",
+                    "condition": "IDVkcD"
+                }
+            ]
+        },
+        {
+            "path": "/alternative-organisation-address",
+            "title": "Alternative organisation address",
+            "components": [
+                {
+                    "name": "vFAPcU",
+                    "options": {},
+                    "type": "UkAddressField",
+                    "title": "Alternative organisation address",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/how-long-has-your-organisation-been-operating"
+                }
+            ]
+        },
+        {
+            "path": "/how-long-has-your-organisation-been-operating",
+            "title": "How long has your organisation been operating?",
+            "components": [
+                {
+                    "name": "zJCwtU",
+                    "options": {},
+                    "type": "RadiosField",
+                    "title": "How long has your organisation been operating?",
+                    "hint": "Select one option.",
+                    "list": "RfMTRE",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/how-is-your-organisation-classified"
+                }
+            ]
+        },
+        {
+            "path": "/how-is-your-organisation-classified",
+            "title": "How is your organisation classified?",
+            "components": [
+                {
+                    "name": "TiKRCy",
+                    "options": {
+                        "exposeToContext": true
+                    },
+                    "type": "RadiosField",
+                    "title": "How is your organisation classified?",
+                    "list": "hIdeMS",
+                    "schema": {},
+                    "values": {
+                        "type": "listRef"
+                    }
+                }
+            ],
+            "next": [
+                {
+                    "path": "/type-of-organisation",
+                    "condition": "JbdMiD"
+                },
+                {
+                    "path": "/what-is-your-organisations-main-purpose"
+                }
+            ]
+        },
+        {
+            "path": "/type-of-organisation",
+            "title": "Type of organisation",
+            "components": [
+                {
+                    "name": "Gwffox",
+                    "options": {},
+                    "type": "TextField",
+                    "title": "Type of organisation",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/what-is-your-organisations-main-purpose"
+                }
+            ]
+        },
+        {
+            "path": "/what-is-your-organisations-main-purpose",
+            "title": "What is your organisation's main purpose?",
+            "components": [
+                {
+                    "name": "NHrbzp",
+                    "options": {},
+                    "type": "MultilineTextField",
+                    "title": "What is your organisation's main purpose?",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/what-are-your-organisations-charitable-objects"
+                }
+            ]
+        },
+        {
+            "path": "/what-are-your-organisations-charitable-objects",
+            "title": "What are your organisation's charitable objects?",
+            "components": [
+                {
+                    "name": "YajnbX",
+                    "options": {},
+                    "type": "MultilineTextField",
+                    "title": "What are your organisation's charitable objects?",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/tell-us-about-your-organisations-main-activities"
+                }
+            ]
+        },
+        {
+            "path": "/tell-us-about-your-organisations-main-activities",
+            "title": "Tell us about your organisation's main activities",
+            "components": [
+                {
+                    "name": "oPRoIH",
+                    "options": {},
+                    "type": "MultilineTextField",
+                    "title": "Main activity 1",
+                    "schema": {}
+                },
+                {
+                    "name": "NyRDZz",
+                    "options": {
+                        "required": false
+                    },
+                    "type": "MultilineTextField",
+                    "title": "Activity 2",
+                    "schema": {}
+                },
+                {
+                    "name": "uzcNFr",
+                    "options": {
+                        "required": false
+                    },
+                    "type": "MultilineTextField",
+                    "title": "Activity 3",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/website-and-social-media"
+                }
+            ]
+        },
+        {
+            "path": "/website-and-social-media",
+            "title": "Website and social media",
+            "components": [
+                {
+                    "name": "mKRYeZ",
+                    "options": {
+                        "required": false
+                    },
+                    "type": "WebsiteField",
+                    "title": "Website",
+                    "schema": {}
+                },
+                {
+                    "name": "MchsWa",
+                    "options": {
+                        "required": false
+                    },
+                    "type": "WebsiteField",
+                    "title": "Social media link 1",
+                    "hint": "For example, your company's Facebook, Instagram or Twitter accounts (if applicable)",
+                    "schema": {}
+                },
+                {
+                    "name": "vuzmuP",
+                    "options": {
+                        "required": false
+                    },
+                    "type": "WebsiteField",
+                    "title": "Social media link 2",
+                    "hint": "For example, your company's Facebook, Instagram or Twitter accounts (if applicable)",
+                    "schema": {}
+                },
+                {
+                    "name": "GUdRfh",
+                    "options": {},
+                    "type": "WebsiteField",
+                    "hint": "For example, your company's Facebook, Instagram or Twitter accounts (if applicable)",
+                    "title": "Social media link 3",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/check-your-answers-JhIdAf"
+                }
+            ]
+        },
+        {
+            "path": "/check-your-answers-JhIdAf",
+            "title": "Check your answers",
+            "components": [],
+            "next": [],
+            "controller": "./pages/summary.js"
+        }
+    ],
+    "lists": [
+        {
+            "title": "orgslist",
+            "name": "MKPFgi",
+            "type": "string",
+            "items": [
+                {
+                    "text": "org1",
+                    "value": "org1",
+                    "condition": "FRfKzH"
+                },
+                {
+                    "text": "org2",
+                    "value": "org2",
+                    "condition": "FOtfdc"
+                }
+            ]
+        },
+        {
+            "title": "other",
+            "name": "bErzTp",
+            "type": "string",
+            "items": [
+                {
+                    "text": "others",
+                    "value": "other"
+                }
+            ]
+        },
+        {
+            "title": "Organisation operating time",
+            "name": "RfMTRE",
+            "type": "string",
+            "items": [
+                {
+                    "text": "Less than 1 year",
+                    "value": "Less than 1 year"
+                },
+                {
+                    "text": "More than 1 year, but less than 3",
+                    "value": "More than 1 year, but less than 3"
+                },
+                {
+                    "text": "More than 3 years",
+                    "value": "More than 3 years"
+                }
+            ]
+        },
+        {
+            "title": "Organisation classification",
+            "name": "hIdeMS",
+            "type": "string",
+            "items": [
+                {
+                    "text": "Charitable incorporated organisation (CIO)",
+                    "value": "Charitable incorporated organisation (CIO)"
+                },
+                {
+                    "text": "Co-operative",
+                    "description": "For example, a community benefit society",
+                    "value": "Co-operative"
+                },
+                {
+                    "text": "Community interest company (CIC)",
+                    "value": "Community interest company (CIC)"
+                },
+                {
+                    "text": "Company limited by guarantee",
+                    "value": "Company limited by guarantee"
+                },
+                {
+                    "text": "None of these",
+                    "value": "None of these"
+                }
+            ]
+        }
+    ],
+    "sections": [],
+    "conditions": [
+        {
+            "displayName": "Alternative organisation name",
+            "name": "lgQzEs",
+            "value": {
+                "name": "Alternative organisation name",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "BIxPht",
+                            "type": "YesNoField",
+                            "display": "Does your organisation use any  other names?"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "true",
+                            "display": "true"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "Alternative organisation address",
+            "name": "IDVkcD",
+            "value": {
+                "name": "Alternative organisation address",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "sBRPjm",
+                            "type": "YesNoField",
+                            "display": "Is your correspondence address  different to the organisation  address? "
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "true",
+                            "display": "true"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "Other organisation type",
+            "name": "JbdMiD",
+            "value": {
+                "name": "Other organisation type",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "TiKRCy",
+                            "type": "RadiosField",
+                            "display": "How is your organisation classified?"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "None of these",
+                            "display": "None of these"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "fees": [],
+    "outputs": [],
+    "version": 2,
+    "skipSummary": false,
+    "feeOptions": {
+        "allowSubmissionWithoutPayment": true,
+        "maxAttempts": 3,
+        "showPaymentSkippedWarningPage": false
+    },
+    "markAsComplete": false,
+    "name": "Organisation information template (September 2024)",
+    "feedback": {
+        "feedbackForm": false,
+        "url": ""
+    },
+    "phaseBanner": {}
+}

@@ -5,8 +5,21 @@ from app.db.models import Component
 from app.db.models import Form
 from app.db.models import Lizt
 from app.db.models import Page
-from app.db.models.application_config import Section
+from app.db.models import Section
 from app.db.models.round import Round
+
+
+def get_all_template_sections() -> list[Section]:
+    return db.session.query(Section).where(Section.is_template == True).all()  # noqa:E712
+
+
+def get_section_by_id(section_id) -> Section:
+    s = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
+    return s
+
+
+def get_all_template_forms() -> list[Form]:
+    return db.session.query(Form).where(Form.is_template == True).all()  # noqa:E712
 
 
 def get_form_for_component(component: Component) -> Form:
@@ -64,7 +77,7 @@ def _initiate_cloned_page(to_clone: Page, new_form_id=None):
     return clone
 
 
-def _initiate_cloned_form(to_clone: Form, new_section_id: str) -> Form:
+def _initiate_cloned_form(to_clone: Form, new_section_id: str, section_index=0) -> Form:
     clone = Form(**to_clone.as_dict())
     clone.form_id = uuid4()
     clone.section_id = new_section_id
@@ -72,6 +85,7 @@ def _initiate_cloned_form(to_clone: Form, new_section_id: str) -> Form:
     clone.source_template_id = to_clone.form_id
     clone.template_name = None
     clone.pages = []
+    clone.section_index = section_index
     return clone
 
 
@@ -113,9 +127,25 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
     return clone
 
 
-def clone_single_form(form_id: str, new_section_id=None) -> Form:
+def _fix_cloned_default_pages(cloned_pages: list[Page]):
+    # Go through each page
+    # Get the page ID of the default next page (this will be a template page)
+    # Find the cloned page that was created from that template
+    # Get that cloned page's ID
+    # Update this default_next_page to point to the cloned page
+
+    for clone in cloned_pages:
+        if clone.default_next_page_id:
+            template_id = clone.default_next_page_id
+            concrete_next_page = next(p for p in cloned_pages if p.source_template_id == template_id)
+            clone.default_next_page_id = concrete_next_page.page_id
+
+    return cloned_pages
+
+
+def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> Form:
     form_to_clone: Form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    clone = _initiate_cloned_form(form_to_clone, new_section_id)
+    clone = _initiate_cloned_form(form_to_clone, new_section_id, section_index=section_index)
 
     cloned_pages = []
     cloned_components = []
@@ -125,6 +155,7 @@ def clone_single_form(form_id: str, new_section_id=None) -> Form:
         cloned_pages.append(cloned_page)
         cloned_components.extend(_initiate_cloned_components_for_page(page_to_clone.components, cloned_page.page_id))
     db.session.add_all([clone, *cloned_pages, *cloned_components])
+    cloned_pages = _fix_cloned_default_pages(cloned_pages)
     db.session.commit()
 
     return clone
@@ -184,9 +215,9 @@ def clone_multiple_components(component_ids: list[str], new_page_id=None, new_th
 def clone_single_round(round_id, new_fund_id, new_short_name) -> Round:
     round_to_clone = db.session.query(Round).where(Round.round_id == round_id).one_or_none()
     cloned_round = Round(**round_to_clone.as_dict())
+    cloned_round.fund_id = new_fund_id
     cloned_round.short_name = new_short_name
     cloned_round.round_id = uuid4()
-    cloned_round.fund_id = new_fund_id
     cloned_round.is_template = False
     cloned_round.source_template_id = round_to_clone.round_id
     cloned_round.template_name = None
@@ -211,7 +242,8 @@ def insert_new_section(new_section_config):
         new_section_config (dict): A dictionary containing the configuration for the new section.
             new_section_config keys:
                 - round_id (str): The ID of the round to which the section belongs.
-                - name_in_apply_json (dict): The name of the section as it will be in the Application JSON (support multiple languages/keys).
+                - name_in_apply_json (dict): The name of the section as it will be in the Application
+                JSON (support multiple languages/keys).
                 - template_name (str): The name of the template.
                 - is_template (bool): A flag indicating whether the section is a template.
                 - source_template_id (str): The ID of the source template.
@@ -266,7 +298,8 @@ def insert_new_form(new_form_config):
         new_form_config (dict): A dictionary containing the configuration for the new form.
             new_form_config keys:
                 - section_id (str): The ID of the section to which the form belongs.
-                - name_in_apply_json (dict): The name of the form as it will be in the Application JSON (support multiple languages/keys).
+                - name_in_apply_json (dict): The name of the form as it will be in the Application
+                JSON (support multiple languages/keys).
                 - is_template (bool): A flag indicating whether the form is a template.
                 - template_name (str): The name of the template.
                 - source_template_id (str): The ID of the source template.
@@ -412,7 +445,8 @@ def insert_new_component(new_component_config: dict):
                 - audit_info (dict): Audit information for the component.
                 - page_index (int): The index of the component within the page.
                 - theme_index (int): The index of the component within the theme.
-                - conditions (dict): The conditions such as potential routes based on the components value (can specify page path).
+                - conditions (dict): The conditions such as potential routes based on the
+                components value (can specify page path).
                 - runner_component_name (str): The name of the runner component.
                 - list_id (str): The ID of the list to which the component belongs.
             Returns:

@@ -30,6 +30,7 @@ class ComponentType(Enum):
     TEXT_FIELD = "TextField"
     FREE_TEXT_FIELD = "FreeTextField"
     EMAIL_ADDRESS_FIELD = "EmailAddressField"
+    TELEPHONE_NUMBER_FIELD = "TelephoneNumberField"
     UK_ADDRESS_FIELD = "UkAddressField"
     HTML = "Html"
     YES_NO_FIELD = "YesNoField"
@@ -39,6 +40,8 @@ class ComponentType(Enum):
     CHECKBOXES_FIELD = "CheckboxesField"
     CLIENT_SIDE_FILE_UPLOAD_FIELD = "ClientSideFileUploadField"
     WEBSITE_FIELD = "WebsiteField"
+    MULTILINE_TEXT_FIELD = "MultilineTextField"
+
 
 
 @dataclass
@@ -65,7 +68,7 @@ class Section(BaseModel):
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
     def __repr__(self):
-        return f"Section({self.name_in_apply_json['en']}, Forms: {self.forms})"
+        return f"Section([{self.section_id}], {self.name_in_apply_json['en']}, Forms: {self.forms})"
 
     def as_dict(self, include_relationships=False):
         result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}
@@ -150,7 +153,7 @@ class Page(BaseModel):
 
 
 # Ensure we can only have one template with a particular display_path value
-Index("ix_template_page_name", Page.display_path, unique=True, postgresql_where="Page.is_template = true")
+Index("ix_template_page_name", Page.display_path, Page.form_id, unique=True, postgresql_where="Page.is_template = true")
 
 
 class Lizt(BaseModel):
@@ -225,6 +228,8 @@ class Component(BaseModel):
             "yesnofield": "text",
             "freetextfield": "free_text",
             "checkboxesfield": "list",
+            #TODO add multilinetext field and update types of components in sync with formrunner
+            #"multilinetextfield": "list",
             "multiinputfield": "table",
             "clientsidefileuploadfield": "s3bucketPath",
             "radiosfield": "text",

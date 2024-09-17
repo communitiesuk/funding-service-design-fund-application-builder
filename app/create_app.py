@@ -8,6 +8,7 @@ import static_assets
 from app.blueprints.dev.routes import dev_bp
 from app.blueprints.fund_builder.routes import build_fund_bp
 from app.blueprints.self_serve.routes import self_serve_bp
+from app.blueprints.templates.routes import template_bp
 from app.db.models import Fund  # noqa:F401
 from app.db.models import Round  # noqa:F401
 
@@ -19,6 +20,7 @@ def create_app() -> Flask:
     flask_app.register_blueprint(self_serve_bp)
     flask_app.register_blueprint(dev_bp)
     flask_app.register_blueprint(build_fund_bp)
+    flask_app.register_blueprint(template_bp)
 
     flask_app.config.from_object("config.Config")
 

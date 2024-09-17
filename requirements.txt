@@ -8,8 +8,6 @@ airium==0.2.6
     # via -r requirements.in
 alembic==1.13.2
     # via flask-migrate
-async-timeout==4.0.3
-    # via redis
 attrs==24.2.0
     # via
     #   jsonschema
@@ -44,7 +42,7 @@ click==8.1.7
     # via flask
 commonmark==0.9.1
     # via rich
-cryptography==42.0.8
+cryptography==43.0.1
     # via pyjwt
 cssmin==0.2.0
     # via -r requirements.in
@@ -152,7 +150,9 @@ pyee==6.0.0
 pygments==2.18.0
     # via rich
 pyjwt[crypto]==2.8.0
-    # via funding-service-design-utils
+    # via
+    #   funding-service-design-utils
+    #   pyjwt
 pyscss==1.4.0
     # via -r requirements.in
 python-consul==1.1.0
@@ -209,6 +209,7 @@ sqlalchemy[mypy]==2.0.31
     #   alembic
     #   flask-sqlalchemy
     #   marshmallow-sqlalchemy
+    #   sqlalchemy
     #   sqlalchemy-json
     #   sqlalchemy-utils
 sqlalchemy-json==0.7.0

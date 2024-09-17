@@ -554,6 +554,7 @@ form_json_to_assessment_display_types = {
     "freetextfield": "free_text",
     "checkboxesfield": "list",
     "multiinputfield": "table",
+    "multilinetextfield": "text",
     "clientsidefileuploadfield": "s3bucketPath",
     "radiosfield": "text",
     "emailaddressfield": "text",
