@@ -55,19 +55,26 @@ build_fund_bp = Blueprint(
 )
 
 
+@build_fund_bp.route("/")
+def index():
+    return render_template("index.html")
+
+
 @build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])
 def section(round_id):
+    round_obj = get_round_by_id(round_id)
+    fund_obj = get_fund_by_id(round_obj.fund_id)
     form: SectionForm = SectionForm()
     form.round_id.data = round_id
     params = {
         "round_id": str(round_id),
     }
+    existing_section = None
     if request.args.get("action") == "remove":
         update_section(request.args.get("section_id"), {"round_id": None})  # TODO remove properly
-        return redirect(url_for("build_fund_bp.view_app_config", round_id=round_id))
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
     if form.validate_on_submit():
-        round = get_round_by_id(form.round_id.data)
-        count_existing_sections = len(round.sections)
+        count_existing_sections = len(round_obj.sections)
         if form.section_id.data:
             update_section(
                 form.section_id.data,
@@ -85,7 +92,7 @@ def section(round_id):
             )
 
         # flash(f"Saved section {form.name_in_apply_en.data}")
-        return redirect(url_for("build_fund_bp.view_app_config", round_id=round.round_id))
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_obj.round_id))
     if section_id := request.args.get("section_id"):
         existing_section = get_section_by_id(section_id)
         form.section_id.data = section_id
@@ -96,6 +103,14 @@ def section(round_id):
             for f in get_all_template_forms()
         ]
 
+    params["breadcrumb_items"] = [
+        {"text": fund_obj.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund_obj.fund_id)},
+        {
+            "text": round_obj.title_json["en"],
+            "href": url_for("build_fund_bp.build_application", fund_id=fund_obj.fund_id, round_id=round_obj.round_id),
+        },
+        {"text": existing_section.name_in_apply_json["en"] if existing_section else "Add Section", "href": "#"},
+    ]
     return render_template("section.html", form=form, **params)
 
 
@@ -129,23 +144,35 @@ def view_fund():
     Renders a template providing a drop down list of funds. If a fund is selected, renders its config info
     """
     params = {"all_funds": all_funds_as_govuk_select_items(get_all_funds())}
+    fund = None
     if request.method == "POST":
         fund_id = request.form.get("fund_id")
+    else:
+        fund_id = request.args.get("fund_id")
+    if fund_id:
         fund = get_fund_by_id(fund_id)
         params["fund"] = fund
         params["selected_fund_id"] = fund_id
+    params["breadcrumb_items"] = [
+        {"text": "Home", "href": url_for("build_fund_bp.index")},
+        {"text": fund.title_json["en"] if fund else "Manage Application Configuration", "href": "#"},
+    ]
 
     return render_template("fund_config.html", **params)
 
 
 @build_fund_bp.route("/fund/round/<round_id>/application_config")
-def view_app_config(round_id):
+def build_application(round_id):
     """
     Renders a template displaying application configuration info for the chosen round
     """
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
-    return render_template("build_application.html", round=round, fund=fund)
+    breadcrumb_items = [
+        {"text": fund.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund.fund_id)},
+        {"text": round.title_json["en"], "href": "#"},
+    ]
+    return render_template("build_application.html", round=round, fund=fund, breadcrumb_items=breadcrumb_items)
 
 
 @build_fund_bp.route("/fund/<fund_id>/round/<round_id>/clone")

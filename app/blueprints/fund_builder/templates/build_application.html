@@ -7,7 +7,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">Build Application</h1>
-            <h2 class="govuk-heading-m">{{ fund.short_name }} - {{ round.short_name }}</h2>
+            <h2 class="govuk-heading-m">{{ fund.short_name }} - {{round.title_json["en"]}} ({{ round.short_name }})</h2>
         </div>
     </div>
     {{ govukButton({
@@ -50,7 +50,6 @@
                                 <a href="{{ url_for('build_fund_bp.view_form_questions', round_id=round.round_id, form_id=form.form_id) }}">View</a>&nbsp;
                                 <a href='{{ url_for("build_fund_bp.download_form_json", form_id=form.form_id) }}'>Download</a>&nbsp;
                                 <a href='{{ url_for("build_fund_bp.preview_form", form_id=form.form_id) }}'>Preview</a>&nbsp;
-                                <a href="{{ url_for('build_fund_bp.configure_forms_in_section', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id, action='remove') }}">Remove</a>&nbsp;
                             </span>
                         </li>
                     {% endfor %}

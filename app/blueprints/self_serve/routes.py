@@ -37,11 +37,6 @@ self_serve_bp = Blueprint(
 )
 
 
-@self_serve_bp.route("/")
-def index():
-    return render_template("index.html")
-
-
 @self_serve_bp.route("/download_json", methods=["POST"])
 def generate_json():
     form_json = generate_form_config_from_request()["form_json"]
