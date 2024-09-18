@@ -23,11 +23,12 @@ from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.application import clone_single_form
 from app.db.queries.application import clone_single_round
+from app.db.queries.application import delete_form
+from app.db.queries.application import delete_section
 from app.db.queries.application import get_all_template_forms
 from app.db.queries.application import get_form_by_id
 from app.db.queries.application import get_section_by_id
 from app.db.queries.application import insert_new_section
-from app.db.queries.application import update_form
 from app.db.queries.application import update_section
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
@@ -71,7 +72,7 @@ def section(round_id):
     }
     existing_section = None
     if request.args.get("action") == "remove":
-        update_section(request.args.get("section_id"), {"round_id": None})  # TODO remove properly
+        delete_section(section_id=request.args.get("section_id"), cascade=True)
         return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
     if form.validate_on_submit():
         count_existing_sections = len(round_obj.sections)
@@ -119,8 +120,7 @@ def configure_forms_in_section(round_id, section_id):
     if request.method == "POST":
         if request.args.get("action") == "remove":
             form_id = request.args.get("form_id")
-            # TODO figure out if we want to do a soft or hard delete here
-            update_form(form_id, {"section_id": None})
+            delete_form(form_id=form_id, cascade=True)
         else:
             template_id = request.form.get("template_id")
             section = get_section_by_id(section_id=section_id)
@@ -178,7 +178,9 @@ def build_application(round_id):
 @build_fund_bp.route("/fund/<fund_id>/round/<round_id>/clone")
 def clone_round(round_id, fund_id):
 
-    cloned = clone_single_round(round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0,999)}")
+    cloned = clone_single_round(
+        round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0,999)}"  # nosec B311
+    )
     flash(f"Cloned new round: {cloned.short_name}")
 
     return redirect(url_for("build_fund_bp.view_fund", fund_id=fund_id))
@@ -273,7 +275,7 @@ def download_form_json(form_id):
     return Response(
         response=json.dumps(form_json),
         mimetype="application/json",
-        headers={"Content-Disposition": f"attachment;filename=form-{randint(0,999)}.json"},
+        headers={"Content-Disposition": f"attachment;filename=form-{randint(0,999)}.json"},  # nosec B311
     )
 
 
