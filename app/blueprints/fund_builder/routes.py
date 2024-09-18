@@ -231,7 +231,6 @@ def round():
                 assessment_deadline=form.assessment_deadline.data,
                 prospectus_link=form.prospectus_link.data,
                 privacy_notice_link=form.privacy_notice_link.data,
-                application_reminder_sent=form.application_reminder_sent.data,
                 contact_us_banner_json=form.contact_us_banner_json.data,
                 reference_contact_page_over_email=form.reference_contact_page_over_email.data,
                 contact_email=form.contact_email.data,
