@@ -11,6 +11,8 @@ class DevelopmentConfig(Config):
     # Logging
     FSD_LOG_LEVEL = logging.DEBUG
 
+    SECRET_KEY = getenv("SECRET_KEY", "local")
+
     SQLALCHEMY_DATABASE_URI = getenv(
         "DATABASE_URL",
         "postgresql://postgres:password@fab-db:5432/fab",  # pragma: allowlist secret
