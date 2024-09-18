@@ -11,7 +11,7 @@ class DevelopmentConfig(Config):
     # Logging
     FSD_LOG_LEVEL = logging.DEBUG
 
-    SECRET_KEY = getenv("SECRET_KEY", "local")
+    SECRET_KEY = "dev"
 
     SQLALCHEMY_DATABASE_URI = getenv(
         "DATABASE_URL",

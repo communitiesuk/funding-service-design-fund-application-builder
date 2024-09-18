@@ -3,6 +3,7 @@ from os import getenv
 from os import environ
 
 from fsd_utils import configclass
+from fsd_utils import CommonConfig
 
 
 @configclass
@@ -10,7 +11,7 @@ class DefaultConfig(object):
     # Logging
     FSD_LOG_LEVEL = logging.WARNING
 
-    SECRET_KEY = getenv("SECRET_KEY")
+    SECRET_KEY = CommonConfig.SECRET_KEY
 
     FAB_HOST = getenv("FAB_HOST", "fab:8080/")
     FAB_SAVE_PER_PAGE = getenv("FAB_SAVE_PER_PAGE", "dev/save")
