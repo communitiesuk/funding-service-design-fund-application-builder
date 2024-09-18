@@ -76,6 +76,7 @@ jobs:
       environment: dev
       app_name: fund-application-builder
       version: sha-${{ github.sha }}
+      db_name: fs-fund-builder
 
   post_dev_deploy_tests:
     needs: dev_deploy
@@ -103,6 +104,7 @@ jobs:
       environment: test
       app_name: fund-application-builder
       version: sha-${{ github.sha }}
+      db_name: fs-fund-builder
 
   post_test_deploy_tests:
     needs: test_deploy
@@ -131,6 +133,7 @@ jobs:
       environment: uat
       app_name: fund-application-builder
       version: sha-${{ github.sha }}
+      db_name: fs-fund-builder
 
   post_uat_deploy_tests:
     needs: uat_deploy
@@ -159,3 +162,4 @@ jobs:
       environment: prod
       app_name: fund-application-builder
       version: sha-${{ github.sha }}
+      db_name: fs-fund-builder
