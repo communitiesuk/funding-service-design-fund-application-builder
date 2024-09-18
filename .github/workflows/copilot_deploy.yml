@@ -64,7 +64,7 @@ jobs:
       version_to_build: sha-${{ github.sha }}
       owner: ${{ github.repository_owner }}
       application: funding-service-design-fund-application-builder
-      assets_required: false
+      assets_required: true
 
   dev_deploy:
     needs: [ pre_deploy_tests, paketo_build, setup ]
