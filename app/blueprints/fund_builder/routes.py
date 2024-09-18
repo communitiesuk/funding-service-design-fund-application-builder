@@ -178,7 +178,9 @@ def build_application(round_id):
 @build_fund_bp.route("/fund/<fund_id>/round/<round_id>/clone")
 def clone_round(round_id, fund_id):
 
-    cloned = clone_single_round(round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0,999)}")
+    cloned = clone_single_round(
+        round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0,999)}"
+    )  # nosec B311
     flash(f"Cloned new round: {cloned.short_name}")
 
     return redirect(url_for("build_fund_bp.view_fund", fund_id=fund_id))
@@ -273,7 +275,7 @@ def download_form_json(form_id):
     return Response(
         response=json.dumps(form_json),
         mimetype="application/json",
-        headers={"Content-Disposition": f"attachment;filename=form-{randint(0,999)}.json"},
+        headers={"Content-Disposition": f"attachment;filename=form-{randint(0,999)}.json"},  # nosec B311
     )
 
 
