@@ -10,6 +10,7 @@ from config.envs.default import DefaultConfig as Config
 class DevelopmentConfig(Config):
     # Logging
     FSD_LOG_LEVEL = logging.DEBUG
+    SECRET_KEY = "dev"  # pragma: allowlist secret
 
     SQLALCHEMY_DATABASE_URI = getenv(
         "DATABASE_URL",
