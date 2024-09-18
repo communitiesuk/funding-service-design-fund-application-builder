@@ -17,6 +17,7 @@ services:
       - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fund_builder   # pragma: allowlist secret
       - FLASK_DEBUG=0
       - FLASK_ENV=development
+      - SECRET_KEY=local
     depends_on: [fab-db, form-runner]
 
   fab-db:
