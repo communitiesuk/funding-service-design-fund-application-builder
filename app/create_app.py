@@ -16,7 +16,6 @@ from app.db.models import Round  # noqa:F401
 def create_app() -> Flask:
 
     flask_app = Flask("__name__", static_url_path="/assets")
-    flask_app.secret_key = "dev"  # pragma: allowlist secret
     flask_app.register_blueprint(self_serve_bp)
     flask_app.register_blueprint(dev_bp)
     flask_app.register_blueprint(build_fund_bp)
@@ -57,6 +56,7 @@ def create_app() -> Flask:
             PrefixLoader({"govuk_frontend_jinja": PackageLoader("govuk_frontend_jinja")}),
         ]
     )
+    flask_app.jinja_env.add_extension("jinja2.ext.do")
 
     return flask_app
 

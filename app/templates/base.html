@@ -1,5 +1,5 @@
 {% extends "govuk_frontend_jinja/template.html" %}
-
+{% from "govuk_frontend_jinja/components/breadcrumbs/macro.html" import govukBreadcrumbs %}
 {% set assetPath = url_for('static', filename='').rstrip('/') %}
 
 {% block pageTitle %}{{ [pageHeading.rstrip('\n'), service_title]|join(' – ') if pageHeading else service_title }}{% endblock pageTitle %}
@@ -19,7 +19,10 @@
 <div class="govuk-width-container {{ containerClasses }}">
   {% block beforeContent %}{% endblock beforeContent %}
   <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
-    <p><a class="govuk-link" href="/">Home</a></p>
+
+{{ govukBreadcrumbs({
+  "items": breadcrumb_items
+}) }}
     {% block content %}{% endblock content %}
   </main>
 </div>

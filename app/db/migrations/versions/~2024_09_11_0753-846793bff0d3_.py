@@ -1,7 +1,7 @@
-"""empty message
+"""Alter index to allow multiple forms to have pages of the same name
 
 Revision ID: 846793bff0d3
-Revises: 117417bed885
+Revises: d69508409404
 Create Date: 2024-09-11 07:53:22.075755
 
 """

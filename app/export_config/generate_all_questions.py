@@ -42,7 +42,7 @@ def print_html_toc(air: Airium, sections: dict):
                     air(details["title_text"])
 
 
-def print_components(air: Airium, components: list):
+def print_components(air: Airium, components: list, show_field_types: bool = False):
     """Prints the components within a page
 
     Args:
@@ -51,24 +51,27 @@ def print_components(air: Airium, components: list):
     """
     for c in components:
         # Print the title
-        if not c["hide_title"] and c["title"] is not None:
-            with air.p(klass="govuk-body"):
-                air(f"{c['title']}")
-
-        for t in c["text"]:
-            # Print lists as <ul> bullet lists
-            if isinstance(t, list):
-                with air.ul(klass="govuk-list govuk-list--bullet"):
-                    for bullet in t:
-                        with air.li(klass=""):
-                            air(bullet)
-            else:
-                # Just print the text
+        with air.div(klass="govuk-body all-questions-component"):
+            if not c["hide_title"] and c["title"] is not None:
                 with air.p(klass="govuk-body"):
-                    air(t)
+                    air(f"{c['title']}")
+                    if show_field_types:
+                        air(f" [{c['type']}]")
+
+            for t in c["text"]:
+                # Print lists as <ul> bullet lists
+                if isinstance(t, list):
+                    with air.ul(klass="govuk-list govuk-list--bullet"):
+                        for bullet in t:
+                            with air.li(klass=""):
+                                air(bullet)
+                else:
+                    # Just print the text
+                    with air.p(klass="govuk-body"):
+                        air(t)
 
 
-def print_html(sections: dict) -> str:
+def print_html(sections: dict, show_field_types=False) -> str:
     """Prints the html for the supplied sections
 
     Args:
@@ -110,7 +113,7 @@ def print_html(sections: dict) -> str:
                         air(f"{header_info['heading_number']}. {header_info['title']}")
 
                 # Print components within this form
-                print_components(air, header_info["components"])
+                print_components(air, header_info["components"], show_field_types)
 
             idx_section += 1
 

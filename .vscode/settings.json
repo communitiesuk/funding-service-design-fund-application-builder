@@ -1,6 +1,7 @@
-{    "workbench.colorCustomizations": {
-      "titleBar.activeBackground": "#bf4bb7",
-      "titleBar.activeForeground": "#fdfbfb",
+{
+    "workbench.colorCustomizations": {
+        "titleBar.activeBackground": "#bf4bb7",
+        "titleBar.activeForeground": "#fdfbfb",
     },
     "python.testing.pytestArgs": [
         "tests"
@@ -13,4 +14,7 @@
         "strings": false
     },
     "editor.quickSuggestionsDelay": 10,
+    "black-formatter.interpreter": [
+        "/usr/local/bin/python",
+    ],
 }

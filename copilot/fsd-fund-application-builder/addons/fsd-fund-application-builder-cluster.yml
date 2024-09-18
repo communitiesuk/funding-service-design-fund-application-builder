@@ -165,7 +165,7 @@ Outputs:
     Description: "The URL of this database."
     Value:
       !Sub
-      - "postgres://${USERNAME}:${PASSWORD}@${HOSTNAME}:${PORT}/${DBNAME}"
+      - "postgresql://${USERNAME}:${PASSWORD}@${HOSTNAME}:${PORT}/${DBNAME}"
       - USERNAME: !Join [ "",  [ '{{resolve:secretsmanager:', !Ref fsdfundapplicationbuilderclusterAuroraSecret, ":SecretString:username}}" ]]  # pragma: allowlist secret
         PASSWORD: !Join [ "",  [ '{{resolve:secretsmanager:', !Ref fsdfundapplicationbuilderclusterAuroraSecret, ":SecretString:password}}" ]]  # pragma: allowlist secret
         HOSTNAME: !Join [ "",  [ '{{resolve:secretsmanager:', !Ref fsdfundapplicationbuilderclusterAuroraSecret, ":SecretString:host}}" ]]  # pragma: allowlist secret

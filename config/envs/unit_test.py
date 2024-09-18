@@ -12,6 +12,8 @@ class UnitTestConfig(Config):
     # Logging
     FSD_LOG_LEVEL = logging.DEBUG
 
+    SECRET_KEY = "unit_test"
+
     SQLALCHEMY_DATABASE_URI = getenv(
         "DATABASE_URL_UNIT_TEST",
         "postgresql://postgres:postgres@127.0.0.1:5432/fab_unit_test",  # pragma: allowlist secret

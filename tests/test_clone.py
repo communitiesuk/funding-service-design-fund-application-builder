@@ -28,7 +28,7 @@ def mock_new_uuid(mocker):
 
 
 # =====================================================================================================================
-# These functions mock the _initiate_cloned_XXX functions and don't use the db
+# These functions test the _initiate_cloned_XXX functions and don't use the db
 # =====================================================================================================================
 
 
@@ -143,7 +143,7 @@ def test_initiate_cloned_component(mock_new_uuid):
 
 
 # =====================================================================================================================
-# These functions mock the clone_XXX functions and DO use the db
+# These functions test the clone_XXX functions and DO use the db
 # =====================================================================================================================
 
 
@@ -794,10 +794,24 @@ def test_clone_round(seed_dynamic_data, _db):
     old_section_ids = [s.section_id for s in seed_dynamic_data["sections"]]
     old_form_ids = [f.form_id for f in seed_dynamic_data["forms"]]
     old_page_ids = [p.page_id for p in seed_dynamic_data["pages"]]
+
+    # add a second page so we can check updates of default_next_page_id
+    p2: Page = Page(
+        page_id=uuid4(),
+        form_id=old_form_ids[0],
+        display_path="second-page",
+        name_in_apply_json={"en": "Second Page"},
+        form_index=2,
+        default_next_page_id=old_page_ids[0],
+    )
+    _db.session.add(p2)
+    _db.session.commit()
+    old_page_ids.append(p2.page_id)
+
     old_component_ids = [c.component_id for c in seed_dynamic_data["components"]]
     assert len(old_section_ids) > 0, "Need at least one section to clone"
     assert len(old_form_ids) > 0, "Need at least one form to clone"
-    assert len(old_page_ids) > 0, "Need at least one page to clone"
+    assert len(old_page_ids) > 1, "Need at least two pages to clone"
     assert len(old_component_ids) > 0, "Need at least one component to clone"
 
     cloned_round = clone_single_round(round_id, fund.fund_id, fund.short_name)
@@ -805,7 +819,7 @@ def test_clone_round(seed_dynamic_data, _db):
     cloned_section_ids = [s.section_id for s in cloned_sections]
     cloned_forms = _db.session.query(Form).filter(Form.section_id.in_(cloned_section_ids)).all()
     cloned_form_ids = [f.form_id for f in cloned_forms]
-    cloned_pages = _db.session.query(Page).filter(Page.form_id.in_(cloned_form_ids)).all()
+    cloned_pages: list[Page] = _db.session.query(Page).filter(Page.form_id.in_(cloned_form_ids)).all()
     cloned_page_ids = [p.page_id for p in cloned_pages]
 
     # assert cloned_round is different
@@ -822,6 +836,8 @@ def test_clone_round(seed_dynamic_data, _db):
     # assert cloned pages are different (ids)
     assert len(cloned_pages) == len(old_page_ids)
     assert all([p.page_id != old_id for p, old_id in zip(cloned_pages, old_page_ids)])
+    for p in cloned_pages:
+        assert p.default_next_page_id not in old_page_ids
 
     # assert cloned components are different (ids)
     cloned_components = _db.session.query(Component).filter(Component.page_id.in_(cloned_page_ids)).all()

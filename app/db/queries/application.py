@@ -1,5 +1,7 @@
 from uuid import uuid4
 
+from sqlalchemy import delete
+
 from app.db import db
 from app.db.models import Component
 from app.db.models import Form
@@ -122,6 +124,7 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
         cloned_forms.append(cloned_form)
 
     db.session.add_all([clone, *cloned_forms, *cloned_pages, *cloned_components])
+    cloned_pages = _fix_cloned_default_pages(cloned_pages)
     db.session.commit()
 
     return clone
@@ -282,8 +285,12 @@ def update_section(section_id, new_section_config):
     return section
 
 
-def delete_section(section_id):
+def delete_section(section_id, cascade: bool = False):
     section = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
+    if cascade:
+        _delete_all_components_in_pages(page_ids=[page.page_id for form in section.forms for page in form.pages])
+        _delete_all_pages_in_forms(form_ids=[f.form_id for f in section.forms])
+        _delete_all_forms_in_sections(section_ids=[section_id])
     db.session.delete(section)
     db.session.commit()
     return section
@@ -350,8 +357,17 @@ def update_form(form_id, new_form_config):
     return form
 
 
-def delete_form(form_id):
+def _delete_all_forms_in_sections(section_ids: list):
+    stmt = delete(Form).filter(Form.section_id.in_(section_ids))
+    db.session.execute(stmt)
+    db.session.commit()
+
+
+def delete_form(form_id, cascade: bool = False):
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
+    if cascade:
+        _delete_all_components_in_pages(page_ids=[p.page_id for p in form.pages])
+        _delete_all_pages_in_forms(form_ids=[form_id])
     db.session.delete(form)
     db.session.commit()
     return form
@@ -418,8 +434,16 @@ def update_page(page_id, new_page_config):
     return page
 
 
-def delete_page(page_id):
+def _delete_all_pages_in_forms(form_ids: list):
+    stmt = delete(Page).filter(Page.form_id.in_(form_ids))
+    db.session.execute(stmt)
+    db.session.commit()
+
+
+def delete_page(page_id, cascade: bool = False):
     page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
+    if cascade:
+        _delete_all_components_in_pages(page_ids=[page_id])
     db.session.delete(page)
     db.session.commit()
     return page
@@ -515,3 +539,9 @@ def delete_component(component_id):
     db.session.delete(component)
     db.session.commit()
     return component
+
+
+def _delete_all_components_in_pages(page_ids):
+    stmt = delete(Component).filter(Component.page_id.in_(page_ids))
+    db.session.execute(stmt)
+    db.session.commit()

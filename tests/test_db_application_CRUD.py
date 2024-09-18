@@ -1,11 +1,13 @@
 import uuid
 from copy import deepcopy
 
+import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.db.models import ComponentType
 from app.db.models.application_config import Component
 from app.db.models.application_config import Form
+from app.db.models.application_config import Lizt
 from app.db.models.application_config import Page
 from app.db.models.application_config import Section
 from app.db.queries.application import delete_component
@@ -106,6 +108,25 @@ def test_delete_section(flask_test_client, _db, clear_test_data, seed_dynamic_da
     assert _db.session.query(Section).filter(Section.section_id == new_section.section_id).one_or_none() is None
 
 
+def test_failed_delete_section_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+    new_section_config["round_id"] = None
+    section = insert_new_section(new_section_config)
+    # CREATE FK link to Form
+    new_form_config["section_id"] = section.section_id
+    form = insert_new_form(new_form_config)
+    # check inserted form has same section_id
+    assert form.section_id == section.section_id
+    assert isinstance(section, Section)
+    assert section.audit_info == new_section_config["audit_info"]
+    assert isinstance(form, Form)
+    new_form_id = form.form_id
+
+    delete_section(form.section_id, cascade=True)
+
+    assert _db.session.query(Section).filter(Section.section_id == section.section_id).one_or_none() is None
+    assert _db.session.query(Form).where(Form.form_id == new_form_id).one_or_none() is None
+
+
 def test_failed_delete_section_with_fk_to_forms(flask_test_client, _db, clear_test_data, seed_dynamic_data):
     new_section_config["round_id"] = None
     section = insert_new_section(new_section_config)
@@ -117,12 +138,9 @@ def test_failed_delete_section_with_fk_to_forms(flask_test_client, _db, clear_te
     assert isinstance(section, Section)
     assert section.audit_info == new_section_config["audit_info"]
 
-    try:
-        delete_section(form.section_id)
-        assert False, "Expected IntegrityError was not raised"
-    except IntegrityError:
-        _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
-        assert True  # Explicitly pass the test to indicate the expected error was caught
+    with pytest.raises(IntegrityError):
+        delete_section(form.section_id, cascade=False)
+    _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
 
     existing_section = _db.session.query(Section).filter(Section.section_id == section.section_id).one_or_none()
     assert existing_section is not None, "Section was unexpectedly deleted"
@@ -226,6 +244,23 @@ def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data)
     assert _db.session.query(Form).filter(Form.form_id == new_form.form_id).one_or_none() is None
 
 
+def test_delete_form_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+    new_form_config["section_id"] = None
+    new_form = insert_new_form(new_form_config)
+    # CREATE FK link to Form
+    new_page_config["form_id"] = new_form.form_id
+    new_page = insert_new_page(new_page_config)
+
+    assert isinstance(new_form, Form)
+    assert new_form.audit_info == new_form_config["audit_info"]
+    assert isinstance(new_page, Page)
+    new_page_id = new_page.page_id
+
+    delete_form(new_form.form_id, cascade=True)
+    assert _db.session.query(Form).filter(Form.form_id == new_form.form_id).one_or_none() is None
+    assert _db.session.query(Page).where(Page.page_id == new_page_id).one_or_none() is None
+
+
 def test_failed_delete_form_with_fk_to_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
     new_form_config["section_id"] = None
     form = insert_new_form(new_form_config)
@@ -233,12 +268,9 @@ def test_failed_delete_form_with_fk_to_page(flask_test_client, _db, clear_test_d
     new_page_config["form_id"] = form.form_id
     page = insert_new_page(new_page_config)
 
-    try:
-        delete_form(page.form_id)
-        assert False, "Expected IntegrityError was not raised"
-    except IntegrityError:
-        _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
-        assert True  # Explicitly pass the test to indicate the expected error was caught
+    with pytest.raises(IntegrityError):
+        delete_form(page.form_id, cascade=False)
+    _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
 
     existing_form = _db.session.query(Form).filter(Form.form_id == form.form_id).one_or_none()
     assert existing_form is not None, "Form was unexpectedly deleted"
@@ -340,6 +372,27 @@ def test_delete_page(flask_test_client, _db, clear_test_data, seed_dynamic_data)
     assert _db.session.query(Page).filter(Page.page_id == new_page.page_id).one_or_none() is None
 
 
+def test_delete_page_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+    new_page_config["form_id"] = None
+    new_page = insert_new_page(new_page_config)
+
+    assert isinstance(new_page, Page)
+    page_id_to_delete = new_page.page_id
+    assert new_page.audit_info == new_page_config["audit_info"]
+
+    # create component on that page
+    new_component_config["page_id"] = new_page.page_id
+    new_component_config["list_id"] = None
+    new_component_config["theme_id"] = None
+    new_component = insert_new_component(new_component_config=new_component_config)
+    assert isinstance(new_component, Component)
+    component_id_to_delete = new_component.component_id
+
+    delete_page(new_page.page_id, cascade=True)
+    assert _db.session.query(Page).where(Page.page_id == page_id_to_delete).one_or_none() is None
+    assert _db.session.query(Component).where(Component.component_id == component_id_to_delete).one_or_none() is None
+
+
 def test_failed_delete_page_with_fk_to_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
     new_page_config["form_id"] = None
     new_page = insert_new_page(new_page_config)
@@ -353,12 +406,9 @@ def test_failed_delete_page_with_fk_to_component(flask_test_client, _db, clear_t
     assert isinstance(new_page, Page)
     assert new_page.audit_info == new_page_config["audit_info"]
 
-    try:
-        delete_page(component.page_id)
-        assert False, "Expected IntegrityError was not raised"
-    except IntegrityError:
-        _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
-        assert True  # Explicitly pass the test to indicate the expected error was caught
+    with pytest.raises(IntegrityError):
+        delete_page(new_page.page_id, cascade=False)
+    _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
 
     existing_page = _db.session.query(Page).filter(Page.page_id == new_page.page_id).one_or_none()
     assert existing_page is not None, "Page was unexpectedly deleted"
@@ -518,3 +568,40 @@ def test_delete_component(flask_test_client, _db, clear_test_data, seed_dynamic_
 
     delete_component(component.component_id)
     assert _db.session.query(Component).filter(Component.component_id == component.component_id).one_or_none() is None
+    assert _db.session.query(Lizt).where(Lizt.list_id == list_id).one_or_none() is not None
+
+
+def test_delete_section_with_full_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+    new_section_config["round_id"] = None
+    new_section = insert_new_section(new_section_config)
+    assert isinstance(new_section, Section)
+    new_section_id = new_section.section_id
+
+    # CREATE FK link to Form
+    new_form_config["section_id"] = new_section_id
+    new_form = insert_new_form(new_form_config)
+    assert isinstance(new_form, Form)
+    assert new_form.section_id == new_section_id
+    new_form_id = new_form.form_id
+
+    # create FK link to page
+    new_page_config["form_id"] = new_form_id
+    new_page = insert_new_page(new_page_config)
+    assert isinstance(new_page, Page)
+    assert new_page.form_id == new_form_id
+    new_page_id = new_page.page_id
+
+    # create component on that page
+    new_component_config["page_id"] = new_page_id
+    new_component_config["list_id"] = None
+    new_component_config["theme_id"] = None
+    new_component = insert_new_component(new_component_config=new_component_config)
+    assert isinstance(new_component, Component)
+    new_component_id = new_component.component_id
+
+    # Should successfully delete everything with cascade == true
+    delete_section(new_section_id, cascade=True)
+    assert _db.session.query(Section).where(Section.section_id == new_section_id).one_or_none() is None
+    assert _db.session.query(Form).where(Form.form_id == new_form_id).one_or_none() is None
+    assert _db.session.query(Page).where(Page.page_id == new_page_id).one_or_none() is None
+    assert _db.session.query(Component).where(Component.component_id == new_component_id).one_or_none() is None

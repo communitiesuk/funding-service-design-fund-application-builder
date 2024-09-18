@@ -3,12 +3,15 @@ services:
     build:
       context: .
       target: fab-dev
+      args:
+        - USE_DEV_REQUIREMENTS=true
     volumes:
       - .:/fab:cached
     command: sleep infinity
     environment:
       - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fab
       - DATABASE_URL_UNIT_TEST=postgresql://postgres:password@fab-db:5432/fab_unit_test
+      - SECRET_KEY=local
 
 
   fab-db:
