@@ -3,6 +3,8 @@ services:
     build:
       context: .
       target: fab-dev
+      args:
+        - USE_DEV_REQUIREMENTS=true
     volumes:
       - .:/fab:cached
     command: sleep infinity
