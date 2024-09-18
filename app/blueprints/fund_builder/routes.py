@@ -179,8 +179,8 @@ def build_application(round_id):
 def clone_round(round_id, fund_id):
 
     cloned = clone_single_round(
-        round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0,999)}"
-    )  # nosec B311
+        round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0,999)}"  # nosec B311
+    )
     flash(f"Cloned new round: {cloned.short_name}")
 
     return redirect(url_for("build_fund_bp.view_fund", fund_id=fund_id))
