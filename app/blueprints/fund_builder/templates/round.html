@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% from "macros/wtfToGovUk.html" import input %}
 {% from "macros/wtfToGovUk.html" import dateinput %}
+{% from "macros/wtfToGovUk.html" import multilineinput %}
 {% from "macros/wtfToGovUk.html" import yes_no %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
@@ -28,7 +29,25 @@
                     {{dateinput(form.assessment_deadline)}}
                     {{input(form.prospectus_link)}}
                     {{input(form.privacy_notice_link)}}
-
+                    {{ multilineinput(form.contact_us_banner_json) }}
+                    {{ yes_no(form.reference_contact_page_over_email) }}
+                    {{ input(form.contact_email) }}
+                    {{ input(form.contact_phone) }}
+                    {{ input(form.contact_textphone) }}
+                    {{ input(form.support_times) }}
+                    {{ input(form.support_days) }}
+                    {{ multilineinput(form.instructions_json) }}
+                    {{input(form.feedback_link)}}
+                    {{ input(form.project_name_field_id) }}
+                    {{ multilineinput(form.application_guidance_json) }}
+                    {{ input(form.guidance_url) }}
+                    {{ yes_no(form.application_fields_download_available) }}
+                    {{ yes_no(form.display_logo_on_pdf_exports) }}
+                    {{ yes_no(form.mark_as_complete_enabled) }}
+                    {{ yes_no(form.is_expression_of_interest) }}
+                    {{ multilineinput(form.feedback_survey_config) }}
+                    {{ multilineinput(form.eligibility_config) }}
+                    {{ multilineinput(form.eoi_decision_schema) }}
                     {{ govukButton({
                     "text": "Save"
                     }) }}

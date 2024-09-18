@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
+from wtforms import BooleanField
 from wtforms import DateTimeField
 from wtforms import HiddenField
 from wtforms import StringField
+from wtforms import TextAreaField
 from wtforms import URLField
 from wtforms.validators import URL
 from wtforms.validators import DataRequired
@@ -29,3 +31,24 @@ class RoundForm(FlaskForm):
                                 format="%d-%m-%Y %H:%M", validators=[DataRequired()])
     prospectus_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
     privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), URL()])
+    application_reminder_sent = BooleanField(default=False)
+    contact_us_banner_json = TextAreaField("Contact Us Banner")
+    reference_contact_page_over_email = BooleanField(default=False)
+    contact_email = StringField("Contact Email", validators=[DataRequired()])
+    contact_phone = StringField("Contact Phone", validators=[DataRequired()])
+    contact_textphone = StringField("Contact Textphone", validators=[DataRequired()])
+    support_times = StringField("Support times", validators=[DataRequired()])
+    support_days = StringField("Support Days", validators=[DataRequired()])
+    instructions_json = TextAreaField("Instructions")
+    feedback_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
+    project_name_field_id = StringField("Project name", validators=[DataRequired()])
+    application_guidance_json = TextAreaField("Application Guidance")
+    guidance_url = URLField("Guidance link", validators=[DataRequired(), URL()])
+    all_uploaded_documents_section_available = BooleanField(default=False)
+    application_fields_download_available = BooleanField(default=False)
+    display_logo_on_pdf_exports = BooleanField(default=False)
+    mark_as_complete_enabled = BooleanField(default=False)
+    is_expression_of_interest = BooleanField(default=False)
+    feedback_survey_config = TextAreaField("Feedback Survey")
+    eligibility_config = TextAreaField("Eligibility config")
+    eoi_decision_schema = TextAreaField("EOI Decision schema")
