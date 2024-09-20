@@ -43,7 +43,6 @@ class ComponentType(Enum):
     MULTILINE_TEXT_FIELD = "MultilineTextField"
 
 
-
 @dataclass
 class Section(BaseModel):
 
@@ -228,8 +227,8 @@ class Component(BaseModel):
             "yesnofield": "text",
             "freetextfield": "free_text",
             "checkboxesfield": "list",
-            #TODO add multilinetext field and update types of components in sync with formrunner
-            #"multilinetextfield": "list",
+            # TODO add multilinetext field and update types of components in sync with formrunner
+            # "multilinetextfield": "list",
             "multiinputfield": "table",
             "clientsidefileuploadfield": "s3bucketPath",
             "radiosfield": "text",

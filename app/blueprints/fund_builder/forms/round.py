@@ -1,6 +1,9 @@
+import datetime
+
 from flask_wtf import FlaskForm
+from flask_wtf import Form
 from wtforms import BooleanField
-from wtforms import DateTimeField
+from wtforms import FormField
 from wtforms import HiddenField
 from wtforms import StringField
 from wtforms import TextAreaField
@@ -8,6 +11,63 @@ from wtforms import URLField
 from wtforms.validators import URL
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
+from wtforms.validators import ValidationError
+
+
+def get_datetime(form_field):
+    day = int(form_field.day.data)
+    month = int(form_field.month.data)
+    year = int(form_field.year.data)
+    hour = int(form_field.hour.data)
+    minutes = int(form_field.minutes.data)
+    form_field_datetime = datetime.datetime(year, month, day, hour=hour, minute=minutes).strftime("%m-%d-%Y %H:%M")
+    return form_field_datetime
+
+
+class DateInputForm(Form):
+    day = StringField("Day", validators=[DataRequired(), Length(min=1, max=2)])
+    month = StringField("Month", validators=[DataRequired(), Length(min=1, max=2)])
+    year = StringField("Year", validators=[DataRequired(), Length(min=1, max=4)])
+    hour = StringField("Hour", validators=[DataRequired(), Length(min=1, max=2)])
+    minutes = StringField("Minutes", validators=[DataRequired(), Length(min=1, max=2)])
+
+    def validate_day(self, field):
+        try:
+            day = int(field.data)
+            if day < 1 or day > 31:
+                raise ValidationError("Day must be between 1 and 31 inclusive.")
+        except ValueError:
+            raise ValidationError("Invalid Day")
+
+    def validate_month(self, field):
+        try:
+            month = int(field.data)
+            if month < 1 or month > 12:
+                raise ValidationError("Month must be between 1 and 12")
+        except ValueError:
+            raise ValidationError("Invalid month")
+
+    def validate_year(self, field):
+        try:
+            int(field.data)
+        except ValueError:
+            raise ValidationError("Invalid Year")
+
+    def validate_hour(self, field):
+        try:
+            day = int(field.data)
+            if day < 0 or day > 23:
+                raise ValidationError("Hour must be between 0 and 23 inclusive.")
+        except ValueError:
+            raise ValidationError("Invalid Day")
+
+    def validate_minutes(self, field):
+        try:
+            day = int(field.data)
+            if day < 0 or day >= 60:
+                raise ValidationError("Minutes must be between 0 and 59 inclusive.")
+        except ValueError:
+            raise ValidationError("Invalid Day")
 
 
 class RoundForm(FlaskForm):
@@ -19,21 +79,16 @@ class RoundForm(FlaskForm):
         description="Choose a unique short name with 6 or fewer characters",
         validators=[DataRequired(), Length(max=6)],
     )
-    opens = DateTimeField("Opens", description="Enter date in dd-mm-yyyy hh:mm format",
-                                format="%d-%m-%Y %H:%M", validators=[DataRequired()])
-    deadline = DateTimeField("Deadline", description="Enter date in dd-mm-yyyy hh:mm format",
-                                format="%d-%m-%Y %H:%M", validators=[DataRequired()])
-    assessment_start = DateTimeField("Assessment Start", description="Enter date in dd-mm-yyyy hh:mm format",
-                                format="%d-%m-%Y %H:%M", validators=[DataRequired()])
-    reminder_date = DateTimeField("Reminder Date", description="Enter date in dd-mm-yyyy hh:mm format",
-                                format="%d-%m-%Y %H:%M", validators=[DataRequired()])
-    assessment_deadline = DateTimeField("Assessment Deadline", description="Enter date in dd-mm-yyyy hh:mm format",
-                                format="%d-%m-%Y %H:%M", validators=[DataRequired()])
+    opens = FormField(DateInputForm, label="Opens")
+    deadline = FormField(DateInputForm, label="Deadline")
+    assessment_start = FormField(DateInputForm, label="Assessment_start")
+    reminder_date = FormField(DateInputForm, label="Reminder_date")
+    assessment_deadline = FormField(DateInputForm, label="Assessment_deadline")
     prospectus_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
     privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), URL()])
     application_reminder_sent = BooleanField(default=False)
     contact_us_banner_json = TextAreaField("Contact Us Banner")
-    reference_contact_page_over_email = BooleanField(default=False)
+    reference_contact_page_over_email = BooleanField("Reference contact page over email", default=False)
     contact_email = StringField("Contact Email", validators=[DataRequired()])
     contact_phone = StringField("Contact Phone", validators=[DataRequired()])
     contact_textphone = StringField("Contact Textphone", validators=[DataRequired()])

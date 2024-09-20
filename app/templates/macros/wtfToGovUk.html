@@ -33,20 +33,6 @@
 {%endmacro%}
 
 
-{% macro dateinput(form_field) %}
-{{ govukInput({
-"label": {
-"text": form_field.label ,
-"isPageHeading": false
-},
-"id": form_field.id,
-"name": form_field.name ,
-"value": form_field.data.strftime('%d-%m-%Y %H:%M') if form_field.data else '',
-"errorMessage": {"text": form_field.errors[0]} if (form_field.errors | length > 0) else None,
-"hint":{"text":form_field.description}
-}) }}
-{%endmacro%}
-
 {% macro yes_no(form_field) %}
 {{ govukRadios({
 "name": form_field.name,
@@ -58,5 +44,48 @@
     }
 },
 "items": [{"value":1, "text": "Yes"}, {"value":"", "text":"No"}]
+})}}
+{%endmacro%}
+
+{% macro dateinput(form_field) %}
+{{ govukDateInput({
+    "name": form_field.name ,
+    "namePrefix": form_field.name,
+    "fieldset": {
+    "legend": {
+        "text": form_field.label,
+        "isPageHeading": false,
+        }
+    },
+    "id": form_field.id,
+    "items": [
+        {
+          "name": "day",
+          "value": form_field.day.data,
+          "classes": "govuk-input--width-2",
+        },
+        {
+          "name": "month",
+          "value": form_field.month.data,
+          "classes": "govuk-input--width-2",
+        },
+        {
+          "name": "year",
+          "value": form_field.year.data,
+          "classes": "govuk-input--width-4",
+        },
+        {
+          "name": "hour",
+          "value": form_field.hour.data,
+          "classes": "govuk-input--width-2",
+        },
+{
+          "name": "minutes",
+          "value": form_field.minutes.data,
+          "classes": "govuk-input--width-2",
+        }
+    ],
+    "errorMessage": {"text": form_field.errors[0]} if (form_field.errors | length > 0) else None,
+    "hint":{"text":form_field.description}
 })}}
 {%endmacro%}

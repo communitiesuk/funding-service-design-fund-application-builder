@@ -18,6 +18,7 @@ from flask import url_for
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
+from app.blueprints.fund_builder.forms.round import get_datetime
 from app.blueprints.fund_builder.forms.section import SectionForm
 from app.db.models.fund import Fund
 from app.db.models.round import Round
@@ -224,11 +225,11 @@ def round():
                 audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
                 title_json={"en": form.title_en.data},
                 short_name=form.short_name.data,
-                opens=form.opens.data,
-                deadline=form.deadline.data,
-                assessment_start=form.assessment_start.data,
-                reminder_date=form.reminder_date.data,
-                assessment_deadline=form.assessment_deadline.data,
+                opens=get_datetime(form.opens),
+                deadline=get_datetime(form.deadline),
+                assessment_start=get_datetime(form.assessment_start),
+                reminder_date=get_datetime(form.reminder_date),
+                assessment_deadline=get_datetime(form.assessment_deadline),
                 prospectus_link=form.prospectus_link.data,
                 privacy_notice_link=form.privacy_notice_link.data,
                 contact_us_banner_json=form.contact_us_banner_json.data,
@@ -238,10 +239,10 @@ def round():
                 contact_textphone=form.contact_textphone.data,
                 support_times=form.support_times.data,
                 support_days=form.support_days.data,
-                instructions_json=form.instructions_json.data,
+                instructions_json={"en": form.instructions_json.data},
                 feedback_link=form.feedback_link.data,
                 project_name_field_id=form.project_name_field_id.data,
-                application_guidance_json=form.application_guidance_json.data,
+                application_guidance_json={"en": form.application_guidance_json.data},
                 guidance_url=form.guidance_url.data,
                 all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data,
                 application_fields_download_available=form.application_fields_download_available.data,
@@ -253,7 +254,7 @@ def round():
         )
 
         flash(f"Saved round {form.title_en.data}")
-        return redirect(url_for("self_serve_bp.index"))
+        return redirect(url_for("build_fund_bp.index"))
 
     return render_template(
         "round.html",

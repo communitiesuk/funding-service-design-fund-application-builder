@@ -101,7 +101,7 @@ def test_add_round(seed_dynamic_data):
             is_expression_of_interest=False,
             feedback_survey_config={},
             eligibility_config={},
-            eoi_decision_schema={}
+            eoi_decision_schema={},
         )
     )
     assert result
@@ -195,8 +195,7 @@ fund_id = uuid4()
                 is_expression_of_interest=False,
                 feedback_survey_config={},
                 eligibility_config={},
-                eoi_decision_schema={}
-
+                eoi_decision_schema={},
             )
         ],
     }
