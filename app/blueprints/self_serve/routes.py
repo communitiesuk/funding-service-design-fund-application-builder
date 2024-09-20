@@ -114,7 +114,7 @@ def section():
     if request.method == "POST" and form.validate_on_submit():
         save_template_section(form.as_dict())
         flash(message=f"Section '{form['builder_display_name'].data}' was saved")
-        return redirect(url_for("self_serve_bp.index"))
+        return redirect(url_for("build_fund_bp.index"))
 
     saved_forms = get_saved_forms()
     available_forms = []
@@ -149,7 +149,7 @@ def form():
         }
         save_template_form(new_form)
         flash(message=f'Form {new_form["form_display_name"]} was saved')
-        return redirect(url_for("self_serve_bp.index"))
+        return redirect(url_for("build_fund_bp.index"))
 
     available_pages = []
     pages = get_pages_to_display_in_builder()
@@ -187,7 +187,7 @@ def page():
         }
         save_template_page(new_page)
         flash(message=f"Page '{form.builder_display_name.data}' was saved")
-        return redirect(url_for("self_serve_bp.index"))
+        return redirect(url_for("build_fund_bp.index"))
     components = get_all_components()
     available_questions = [
         {
@@ -213,5 +213,5 @@ def question():
     if request.method == "POST" and form.validate_on_submit():
         save_template_component(question)
         flash(message=f"Question '{question['title']}' was saved")
-        return redirect(url_for("self_serve_bp.index"))
+        return redirect(url_for("build_fund_bp.index"))
     return render_template("create_question.html", form=form)

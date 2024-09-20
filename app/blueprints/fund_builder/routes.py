@@ -205,7 +205,7 @@ def fund():
             )
         )
         flash(f"Saved fund {form.name_en.data}")
-        return redirect(url_for("self_serve_bp.index"))
+        return redirect(url_for("build_fund_bp.index"))
 
     return render_template("fund.html", form=form)
 
