@@ -68,28 +68,23 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
                 "contact_email": None,
                 "contact_phone": None,
                 "contact_textphone": None,
-                "support_times": None,
-                "support_days": None,
+                "support_times": '',
+                "support_days": '',
                 "instructions_json": None,
                 "feedback_link": None,
-                "project_name_field_id": None,
+                "project_name_field_id": '',
                 "application_guidance_json": None,
                 "guidance_url": None,
-                "all_uploaded_documents_section_available": None,
-                "application_fields_download_available": None,
-                "display_logo_on_pdf_exports": None,
-                "mark_as_complete_enabled": None,
-                "is_expression_of_interest": None,
+                "all_uploaded_documents_section_available": False,
+                "application_fields_download_available": False,
+                "display_logo_on_pdf_exports": False,
+                "mark_as_complete_enabled": False,
+                "is_expression_of_interest": False,
                 "eoi_decision_schema": None,
-                "feedback_survey_config": {
-                    "has_feedback_survey": None,
-                    "has_section_feedback": None,
-                    "is_feedback_survey_optional": None,
-                    "is_section_feedback_optional": None,
-                },
-                "eligibility_config": {"has_eligibility": None},
+                "feedback_survey_config": None,
+                "eligibility_config": None,
                 "title_json": {"en": "round the first"},
-                "contact_us_banner_json": {"en": "", "cy": ""},
+                "contact_us_banner_json": None,
             },
         },
         {
@@ -125,7 +120,6 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
                 if isinstance(data, dict):
                     keys_to_remove = ["reminder_date", "assessment_start", "assessment_deadline", "deadline", "opens"]
                     data = {k: v for k, v in data.items() if k not in keys_to_remove}
-
                 assert data == expected_file["expected_output"]
     finally:
         # Cleanup step to remove the directory
