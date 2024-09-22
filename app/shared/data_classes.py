@@ -125,5 +125,5 @@ class RoundExport:
     # check to use EligibilityConfig
     eligibility_config: Optional[Dict[str, str]] = None
     title_json: TitleJson = field(default_factory=TitleJson)
-    #check to use EligibilityConfig
+    # check to use EligibilityConfig
     contact_us_banner_json: Optional[Dict[str, str]] = None

@@ -232,7 +232,7 @@ def round():
                 assessment_deadline=get_datetime(form.assessment_deadline),
                 prospectus_link=form.prospectus_link.data,
                 privacy_notice_link=form.privacy_notice_link.data,
-                contact_us_banner_json={'en': form.contact_us_banner_json.data, "cy":None},
+                contact_us_banner_json={"en": form.contact_us_banner_json.data, "cy": None},
                 reference_contact_page_over_email=form.reference_contact_page_over_email.data,
                 contact_email=form.contact_email.data,
                 contact_phone=form.contact_phone.data,

@@ -24,7 +24,7 @@ def get_datetime(form_field):
         form_field_datetime = datetime.datetime(year, month, day, hour=hour, minute=minutes).strftime("%m-%d-%Y %H:%M")
         return form_field_datetime
     except ValueError:
-        raise ValidationError(f'Invalid date entered for {form_field}')
+        raise ValidationError(f"Invalid date entered for {form_field}")
 
 
 class DateInputForm(Form):
