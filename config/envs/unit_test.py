@@ -12,7 +12,7 @@ class UnitTestConfig(Config):
     # Logging
     FSD_LOG_LEVEL = logging.DEBUG
 
-    SECRET_KEY = "unit_test"
+    SECRET_KEY = "unit_test"  # pragma: allowlist secret
 
     SQLALCHEMY_DATABASE_URI = getenv(
         "DATABASE_URL_UNIT_TEST",

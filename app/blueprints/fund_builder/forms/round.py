@@ -2,9 +2,9 @@ import datetime
 
 from flask_wtf import FlaskForm
 from flask_wtf import Form
-from wtforms import BooleanField
 from wtforms import FormField
 from wtforms import HiddenField
+from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import URLField
@@ -89,9 +89,11 @@ class RoundForm(FlaskForm):
     assessment_deadline = FormField(DateInputForm, label="Assessment Deadline")
     prospectus_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
     privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), URL()])
-    application_reminder_sent = BooleanField(default=False)
+    application_reminder_sent = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     contact_us_banner_json = TextAreaField("Contact Us Banner")
-    reference_contact_page_over_email = BooleanField("Reference contact page over email", default=False)
+    reference_contact_page_over_email = RadioField(
+        "Reference contact page over emai", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
     contact_email = StringField("Contact Email", validators=[DataRequired()])
     contact_phone = StringField("Contact Phone", validators=[DataRequired()])
     contact_textphone = StringField("Contact Textphone", validators=[DataRequired()])
@@ -102,11 +104,11 @@ class RoundForm(FlaskForm):
     project_name_field_id = StringField("Project name", validators=[DataRequired()])
     application_guidance_json = TextAreaField("Application Guidance")
     guidance_url = URLField("Guidance link", validators=[DataRequired(), URL()])
-    all_uploaded_documents_section_available = BooleanField(default=False)
-    application_fields_download_available = BooleanField(default=False)
-    display_logo_on_pdf_exports = BooleanField(default=False)
-    mark_as_complete_enabled = BooleanField(default=False)
-    is_expression_of_interest = BooleanField(default=False)
+    all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
+    application_fields_download_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
+    display_logo_on_pdf_exports = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
+    mark_as_complete_enabled = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
+    is_expression_of_interest = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     feedback_survey_config = TextAreaField("Feedback Survey")
     eligibility_config = TextAreaField("Eligibility config")
     eoi_decision_schema = TextAreaField("EOI Decision schema")

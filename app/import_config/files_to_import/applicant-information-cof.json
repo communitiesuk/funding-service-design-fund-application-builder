@@ -1,7 +1,6 @@
 {
   "metadata": {},
   "startPage": "/applicant-information",
-  "backLinkText": "Go back to application overview",
   "pages": [
     {
       "title": "Applicant information",
@@ -84,16 +83,7 @@
   ],
   "conditions": [],
   "fees": [],
-  "outputs": [
-    {
-      "name": "update-form",
-      "title": "Update form in application store",
-      "type": "savePerPage",
-      "outputConfiguration": {
-        "savePerPageUrl": "True"
-      }
-    }
-  ],
+  "outputs": [],
   "version": 2,
   "skipSummary": false,
   "name": "Apply for funding to save an asset in your community"
