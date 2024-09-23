@@ -250,7 +250,7 @@ def round():
                 mark_as_complete_enabled=form.mark_as_complete_enabled.data == "true",
                 is_expression_of_interest=form.is_expression_of_interest.data == "true",
                 feedback_survey_config=form.feedback_survey_config.data,
-                eoi_decision_schema=form.eoi_decision_schemadata,
+                eoi_decision_schema=form.eoi_decision_schema.data,
             )
         )
 
