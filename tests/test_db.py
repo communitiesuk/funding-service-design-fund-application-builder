@@ -292,7 +292,7 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert result_section.forms[1].form_id == form1.form_id
     assert result_section.forms[2].form_id == formX.form_id
     assert result_section.forms[3].form_id == form2.form_id
-    assert result_section.forms[3].section_index == 3
+    assert result_section.forms[3].section_index == 4
 
 
 section_id = uuid4()
