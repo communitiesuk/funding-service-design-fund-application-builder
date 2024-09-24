@@ -43,7 +43,6 @@ class ComponentType(Enum):
     MULTILINE_TEXT_FIELD = "MultilineTextField"
 
 
-
 @dataclass
 class Section(BaseModel):
 
@@ -62,7 +61,10 @@ class Section(BaseModel):
     is_template = Column(Boolean, default=False, nullable=False)
     audit_info = Column(JSON(none_as_null=True))
     forms: Mapped[List["Form"]] = relationship(
-        "Form", order_by="Form.section_index", collection_class=ordering_list("section_index"), passive_deletes="all"
+        "Form",
+        order_by="Form.section_index",
+        collection_class=ordering_list("section_index", count_from=1),
+        passive_deletes="all",
     )
     index = Column(Integer())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
@@ -228,8 +230,8 @@ class Component(BaseModel):
             "yesnofield": "text",
             "freetextfield": "free_text",
             "checkboxesfield": "list",
-            #TODO add multilinetext field and update types of components in sync with formrunner
-            #"multilinetextfield": "list",
+            # TODO add multilinetext field and update types of components in sync with formrunner
+            # "multilinetextfield": "list",
             "multiinputfield": "table",
             "clientsidefileuploadfield": "s3bucketPath",
             "radiosfield": "text",

@@ -10,6 +10,7 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy import inspect
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import Boolean
@@ -48,7 +49,12 @@ class Round(BaseModel):
     is_template = Column(Boolean, default=False, nullable=False)
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     template_name = Column(String(), nullable=True)
-    sections: Mapped[list["Section"]] = relationship("Section")
+    sections: Mapped[list["Section"]] = relationship(
+        "Section",
+        order_by="Section.index",
+        collection_class=ordering_list("index", count_from=1),
+        passive_deletes="all",
+    )
     criteria: Mapped[list["Criteria"]] = relationship("Criteria")
     # several other fields to add
 

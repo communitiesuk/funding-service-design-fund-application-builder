@@ -10,6 +10,8 @@ from app.db.models import Organisation
 from app.db.models import Page
 from app.db.models import Round
 from app.db.models import Section
+from app.db.queries.application import delete_form_from_section
+from app.db.queries.application import delete_section_from_round
 from app.db.queries.application import get_template_page_by_display_path
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import add_organisation
@@ -17,6 +19,8 @@ from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
+from tasks.test_data import BASIC_FUND_INFO
+from tasks.test_data import BASIC_ROUND_INFO
 
 
 def test_add_organisation(flask_test_client, _db, clear_test_data):
@@ -247,3 +251,77 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert result_section.forms[2].form_id == formX.form_id
     assert result_section.forms[3].form_id == form2.form_id
     assert result_section.forms[3].section_index == 3
+
+
+section_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
+        "forms": [
+            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+        ],
+    }
+)
+def test_form_sorting_removal(seed_dynamic_data, _db):
+    section = seed_dynamic_data["sections"][0]
+
+    result_section: Section = _db.session.query(Section).where(Section.section_id == section.section_id).one_or_none()
+    assert len(result_section.forms) == 3
+    form2 = result_section.forms[1]
+    assert form2.section_index == 2
+
+    delete_form_from_section(section_id=result_section.section_id, form_id=form2.form_id)
+
+    updated_section: Section = _db.session.query(Section).where(Section.section_id == section.section_id).one_or_none()
+    assert len(updated_section.forms) == 2
+    assert updated_section.forms[0].section_index == 1
+    assert updated_section.forms[1].section_index == 2
+
+
+# Create a section with one form, at index 1
+round_id = uuid4()
+fund_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
+        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "sections": [
+            Section(
+                name_in_apply_json={
+                    "en": "hello section",
+                },
+                index=2,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section2"},
+                index=2,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section3"},
+                index=3,
+                round_id=round_id,
+            ),
+        ],
+    }
+)
+def test_section_sorting(seed_dynamic_data, _db):
+    round: Round = get_round_by_id(round_id)
+    assert len(round.sections) == 3
+    last_section_id = round.sections[2].section_id
+    assert round.sections[2].index == 3
+    section_to_delete = round.sections[1]
+
+    delete_section_from_round(section_id=section_to_delete.section_id, round_id=round_id)
+
+    updated_round = get_round_by_id(round_id)
+    assert len(updated_round.sections) == 2
+    assert round.sections[1].section_id == last_section_id
+    assert round.sections[1].index == 2
