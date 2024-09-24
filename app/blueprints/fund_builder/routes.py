@@ -24,8 +24,8 @@ from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.application import clone_single_form
 from app.db.queries.application import clone_single_round
-from app.db.queries.application import delete_form
-from app.db.queries.application import delete_section
+from app.db.queries.application import delete_form_from_section
+from app.db.queries.application import delete_section_from_round
 from app.db.queries.application import get_all_template_forms
 from app.db.queries.application import get_form_by_id
 from app.db.queries.application import get_section_by_id
@@ -73,7 +73,7 @@ def section(round_id):
     }
     existing_section = None
     if request.args.get("action") == "remove":
-        delete_section(section_id=request.args.get("section_id"), cascade=True)
+        delete_section_from_round(round_id=round_id, section_id=request.args.get("section_id"), cascade=True)
         return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
     if form.validate_on_submit():
         count_existing_sections = len(round_obj.sections)
@@ -121,7 +121,7 @@ def configure_forms_in_section(round_id, section_id):
     if request.method == "POST":
         if request.args.get("action") == "remove":
             form_id = request.args.get("form_id")
-            delete_form(form_id=form_id, cascade=True)
+            delete_form_from_section(section_id=section_id, form_id=form_id, cascade=True)
         else:
             template_id = request.form.get("template_id")
             section = get_section_by_id(section_id=section_id)

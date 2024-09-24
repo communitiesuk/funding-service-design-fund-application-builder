@@ -61,7 +61,10 @@ class Section(BaseModel):
     is_template = Column(Boolean, default=False, nullable=False)
     audit_info = Column(JSON(none_as_null=True))
     forms: Mapped[List["Form"]] = relationship(
-        "Form", order_by="Form.section_index", collection_class=ordering_list("section_index"), passive_deletes="all"
+        "Form",
+        order_by="Form.section_index",
+        collection_class=ordering_list("section_index", count_from=1),
+        passive_deletes="all",
     )
     index = Column(Integer())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
