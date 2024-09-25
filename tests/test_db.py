@@ -7,13 +7,11 @@ import pytest
 from app.db.models import Form
 from app.db.models import Fund
 from app.db.models import Organisation
-from app.db.models import Page
 from app.db.models import Round
 from app.db.models import Section
 from app.db.queries.application import delete_form_from_section
 from app.db.queries.application import delete_section_from_round
 from app.db.queries.application import get_section_by_id
-from app.db.queries.application import get_template_page_by_display_path
 from app.db.queries.application import move_form_down
 from app.db.queries.application import move_form_up
 from app.db.queries.application import move_section_down
@@ -214,35 +212,6 @@ def test_get_round_by_id(seed_dynamic_data):
 
     result: Round = get_round_by_id(seed_dynamic_data["rounds"][0].round_id)
     assert result.title_json["en"] == "round the first"
-
-
-@pytest.mark.seed_config(
-    {
-        "pages": [
-            Page(
-                page_id=uuid4(),
-                form_id=None,
-                display_path="testing_templates_path",
-                is_template=True,
-                name_in_apply_json={"en": "Template Path"},
-                form_index=0,
-            ),
-            Page(
-                page_id=uuid4(),
-                form_id=None,
-                display_path="testing_templates_path",
-                is_template=False,
-                name_in_apply_json={"en": "Not Template Path"},
-                form_index=0,
-            ),
-        ]
-    }
-)
-def test_get_template_page_by_display_path(seed_dynamic_data):
-
-    result = get_template_page_by_display_path("testing_templates_path")
-    assert result
-    assert result.page_id == seed_dynamic_data["pages"][0].page_id
 
 
 section_id = uuid4()
