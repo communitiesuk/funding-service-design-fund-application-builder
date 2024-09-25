@@ -1,3 +1,4 @@
+from unittest import mock
 from uuid import uuid4
 
 import pytest
@@ -6,6 +7,7 @@ from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Lizt
 from app.db.models import Page
+from app.export_config.generate_form import build_component
 from app.export_config.generate_form import build_conditions
 from app.export_config.generate_form import build_form_json
 from app.export_config.generate_form import build_lists
@@ -13,6 +15,7 @@ from app.export_config.generate_form import build_navigation
 from app.export_config.generate_form import build_page
 from app.export_config.generate_form import human_to_kebab_case
 from tests.unit_test_data import mock_c_1
+from tests.unit_test_data import mock_c_2
 from tests.unit_test_data import mock_form_1
 
 
@@ -227,9 +230,66 @@ mock_pages = [
         )
     ],
 )
-def test_build_page(mocker, input_page, exp_result):
+def test_build_page_and_components(input_page, exp_result):
     result = build_page(input_page)
     assert result == exp_result
+
+
+def test_build_page_controller_specified():
+    input_page: Page = Page(name_in_apply_json={"en": "Name in json"}, controller="startPageController")
+    result_page = build_page(page=input_page)
+    assert result_page
+    assert result_page["controller"] == "startPageController"
+
+
+def test_build_page_controller_not_specified():
+    input_page: Page = Page(name_in_apply_json={"en": "Name in json"}, controller=None)
+    result_page = build_page(page=input_page)
+    assert result_page
+    assert ("controller" in result_page) is False
+
+
+@pytest.mark.parametrize(
+    "input_page",
+    [
+        (
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[mock_c_1],
+            )
+        ),
+        (
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[mock_c_1, mock_c_2],
+            )
+        ),
+        (
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[],
+            )
+        ),
+    ],
+)
+def test_build_page(input_page):
+    with mock.patch("app.export_config.generate_form.build_component", new_value=lambda c: c) as mock_build_component:
+        result_page = build_page(input_page)
+        assert result_page
+        assert mock_build_component.call_count == len(input_page.components)
+        assert len(result_page["components"]) == len(input_page.components)
 
 
 id = uuid4()
@@ -339,6 +399,71 @@ def test_build_conditions(input_component, exp_results):
     assert results == exp_results
 
 
+list_id = uuid4()
+
+
+@pytest.mark.parametrize(
+    "component_to_build, exp_result",
+    [
+        (
+            Component(
+                component_id=uuid4(),
+                type=ComponentType.TEXT_FIELD,
+                title="Test Title",
+                hint_text="This must be a hint",
+                page_id=None,
+                page_index=1,
+                theme_id=None,
+                runner_component_name="test-name",
+                options={
+                    "hideTitle": False,
+                    "classes": "govuk-!-width-full",
+                },
+            ),
+            {
+                "name": "test-name",
+                "options": {
+                    "hideTitle": False,
+                    "classes": "govuk-!-width-full",
+                },
+                "type": "TextField",
+                "title": "Test Title",
+                "hint": "This must be a hint",
+                "schema": {},
+                "metadata": {},
+            },
+        ),
+        (
+            Component(
+                component_id=uuid4(),
+                type=ComponentType.TEXT_FIELD,
+                title="Test Title",
+                hint_text="This must be a hint",
+                page_id=None,
+                page_index=1,
+                theme_id=None,
+                runner_component_name="test-name",
+                options={},
+                lizt=Lizt(name="test-list", list_id=list_id),
+            ),
+            {
+                "name": "test-name",
+                "options": {},
+                "type": "TextField",
+                "title": "Test Title",
+                "hint": "This must be a hint",
+                "schema": {},
+                "metadata": {"fund_builder_list_id": str(list_id)},
+                "list": "test-list",
+            },
+        ),
+    ],
+)
+def test_build_component(component_to_build, exp_result):
+    result = build_component(component=component_to_build)
+    assert result == exp_result
+
+
 @pytest.mark.parametrize(
     "input_pages,input_partial_json, exp_next",
     [
@@ -442,9 +567,36 @@ def test_build_conditions(input_component, exp_results):
                 "/organisation-charitable-objects": [{"path": "/summary"}],
             },
         ),
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="summary",
+                    name_in_apply_json={"en": "Summary"},
+                    form_index=1,
+                    controller="summary.js",
+                )
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/summary",
+                        "title": "Summary",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                ],
+            },
+            {
+                "/summary": [],
+            },
+        ),
     ],
 )
-def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages, exp_next):
+def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_next):
 
     results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
     for page in results["pages"]:

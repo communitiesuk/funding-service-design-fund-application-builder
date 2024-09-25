@@ -4,7 +4,6 @@ from app.db.models import Component
 from app.db.models import Form
 from app.db.models import Page
 from app.db.queries.application import get_list_by_id
-from app.db.queries.application import get_template_page_by_display_path
 
 BASIC_FORM_STRUCTURE = {
     "metadata": {},
@@ -88,23 +87,16 @@ def build_component(component: Component) -> dict:
     # add a reference to the relevant list if this component use a list
     if component.lizt:
         built_component.update({"list": component.lizt.name})
-        built_component["metadata"].update({"fund_builder_list_id": str(component.list_id)})
+        built_component["metadata"].update({"fund_builder_list_id": str(component.lizt.list_id)})
     return built_component
 
 
-def build_page(page: Page = None, page_display_path: str = None) -> dict:
+def build_page(page: Page = None) -> dict:
     """
-    Builds the form runner JSON structure for the supplied page. If that page is None, retrieves a template
-    page with the display_path matching page_display_path.
-
-    This accounts for conditional logic where the destination target will be the display path of a template
-    page, but that page does not actually live in the main hierarchy as branching logic uses a fixed set of
-    conditions at this stage.
+    Builds the form runner JSON structure for the supplied page.
 
     Then builds all the components on this page and adds them to the page json structure
     """
-    if not page:
-        page = get_template_page_by_display_path(page_display_path)
     built_page = copy.deepcopy(BASIC_PAGE_STRUCTURE)
     built_page.update(
         {
@@ -156,17 +148,6 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
                     destination_path = f"/{next_path}"
                 else:
                     destination_path = f"/{condition['destination_page_path'].lstrip('/')}"
-                # TODO No longer needed since db schema change?
-                # If this points to a pre-built page flow, add that in now (it won't be in the input)
-                # if (
-                #     destination_path not in [page["path"] for page in partial_form_json["pages"]]
-                #     and not destination_path == "/summary"
-                # ):
-                #     sub_page = build_page(page_display_path=destination_path[1:])
-                #     if not sub_page.get("next", None):
-                #         sub_page["next"] = [{"path": f"/{next_path}"}]
-
-                #     partial_form_json["pages"].append(sub_page)
 
                 this_page_in_results["next"].append(
                     {
