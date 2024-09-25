@@ -46,7 +46,7 @@ def add_conditions_to_components(db, page, conditions):
 
                 # Create a new Condition instance with a different variable name
                 new_condition = Condition(
-                    name=condition_data["value"]["name"],
+                    name=condition_data["name"],
                     value=condition_data["value"]["conditions"][0]["value"]["value"],
                     operator=condition_data["value"]["conditions"][0]["operator"],
                     destination_page_path=path["path"],
@@ -87,14 +87,20 @@ def insert_component_as_template(component, page_id, page_index, lizts):
                     # If the list already exists, you can use its ID or handle it as needed
                     list_id = existing_list.list_id
                 break
+    component_type = component.get("type", None)
+    if component_type is None or find_enum(ComponentType, component_type) is None:
+        raise ValueError(f"Component type not found: {component_type}")
+    else:
+        confirmed_component_type = find_enum(ComponentType, component_type)
 
     new_component = Component(
         page_id=page_id,
         theme_id=None,
-        title=component.get("title", ""),
+        title=component.get("title", None),
+        content=component.get("content", None),
         hint_text=component.get("hint", None),
         options=component.get("options", None),
-        type=find_enum(ComponentType, component.get("type", None)),
+        type=confirmed_component_type,
         template_name=component.get("title"),
         is_template=True,
         page_index=page_index,
@@ -173,7 +179,9 @@ def insert_form_config(form_config, form_id):
 
 
 def insert_form_as_template(form):
-    form_name = next(p for p in form["pages"] if p["controller"] and p["controller"].endswith("start.js"))["title"]
+    form_name = next(p for p in form["pages"] if p.get("controller") and p.get("controller").endswith("start.js"))[
+        "title"
+    ]
     new_form = Form(
         section_id=None,
         name_in_apply_json={"en": form_name},

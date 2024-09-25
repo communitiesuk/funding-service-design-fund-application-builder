@@ -1,17 +1,28 @@
 import json
 import os
 
+import pytest
+
 from app.db.models import Component
 from app.db.models import Form
 from app.db.models import Page
 from app.import_config.load_form_json import load_form_jsons
 
 
-def test_generate_config_for_round_valid_input(seed_dynamic_data, _db):
+# add files in /test_data t orun the below test against each file
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "test-import-form.json",
+        "optional-all-components.json",
+        "required-all-components.json",
+    ],
+)
+def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename):
     form_configs = []
-    filename = "test-import-form.json"
     script_dir = os.path.dirname(__file__)
-    file_path = os.path.join(script_dir, filename)
+    test_data_dir = os.path.join(script_dir, "test_data")
+    file_path = os.path.join(test_data_dir, filename)
     with open(file_path, "r") as json_file:
         form = json.load(json_file)
         form["filename"] = filename

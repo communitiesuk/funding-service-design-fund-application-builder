@@ -3,6 +3,8 @@ import copy
 from app.db.models import Component
 from app.db.models import Form
 from app.db.models import Page
+from app.db.models.application_config import READ_ONLY_COMPONENTS
+from app.db.models.application_config import ComponentType
 from app.db.queries.application import get_list_by_id
 from app.db.queries.application import get_template_page_by_display_path
 
@@ -74,21 +76,40 @@ def build_component(component: Component) -> dict:
     """
     Builds the component json in form runner format for the supplied Component object
     """
-    built_component = {
-        "options": component.options or {},
-        "type": component.type.value,
-        "title": component.title,
-        "hint": component.hint_text or "",
-        "schema": {},
-        "name": component.runner_component_name,
-        "metadata": {
-            # "fund_builder_id": str(component.component_id) TODO why do we need this?
-        },
-    }
+    # Depends on component (if read only type then this needs to be a different structure)
+
+    if component.type in READ_ONLY_COMPONENTS:
+        built_component = {
+            "type": component.type.value if component.type else None,
+            "content": component.content,
+            "options": component.options or {},
+            "schema": {},
+            "title": component.title,
+            "name": component.runner_component_name,
+        }
+        # Remove keys with None values (it varies for read only components)
+        built_component = {k: v for k, v in built_component.items() if v is not None}
+    else:
+        built_component = {
+            "options": component.options or {},
+            "type": component.type.value,
+            "title": component.title,
+            "hint": component.hint_text or "",
+            "schema": {},
+            "name": component.runner_component_name,
+            "metadata": {
+                # "fund_builder_id": str(component.component_id) TODO why do we need this?
+            },
+        }
     # add a reference to the relevant list if this component use a list
-    if component.lizt:
+    if component.type.value is ComponentType.YES_NO_FIELD.value:
+        # implicit list
+        built_component.update({"values": {"type": "listRef"}})
+    elif component.lizt:
         built_component.update({"list": component.lizt.name})
         built_component["metadata"].update({"fund_builder_list_id": str(component.list_id)})
+        built_component.update({"values": {"type": "listRef"}})
+
     return built_component
 
 
