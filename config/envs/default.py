@@ -1,9 +1,9 @@
 import logging
-from os import getenv
 from os import environ
+from os import getenv
 
-from fsd_utils import configclass
 from fsd_utils import CommonConfig
+from fsd_utils import configclass
 
 
 @configclass

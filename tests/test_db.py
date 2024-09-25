@@ -10,13 +10,23 @@ from app.db.models import Organisation
 from app.db.models import Page
 from app.db.models import Round
 from app.db.models import Section
+from app.db.queries.application import delete_form_from_section
+from app.db.queries.application import delete_section_from_round
+from app.db.queries.application import get_section_by_id
 from app.db.queries.application import get_template_page_by_display_path
+from app.db.queries.application import move_form_down
+from app.db.queries.application import move_form_up
+from app.db.queries.application import move_section_down
+from app.db.queries.application import move_section_up
+from app.db.queries.application import swap_elements_in_list
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import add_organisation
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
+from tasks.test_data import BASIC_FUND_INFO
+from tasks.test_data import BASIC_ROUND_INFO
 
 
 def test_add_organisation(flask_test_client, _db, clear_test_data):
@@ -81,6 +91,27 @@ def test_add_round(seed_dynamic_data):
             assessment_deadline=datetime.now(),
             prospectus_link="http://www.google.com",
             privacy_notice_link="http://www.google.com",
+            application_reminder_sent=False,
+            contact_us_banner_json={},
+            reference_contact_page_over_email=False,
+            contact_email="test@test.com",
+            contact_phone="0123334444",
+            contact_textphone="0123334444",
+            support_times="9am to 5pm",
+            support_days="Monday to Friday",
+            instructions_json={},
+            feedback_link="http://www.google.com",
+            project_name_field_id="12312312312",
+            application_guidance_json={},
+            guidance_url="http://www.google.com",
+            all_uploaded_documents_section_available=False,
+            application_fields_download_available=False,
+            display_logo_on_pdf_exports=False,
+            mark_as_complete_enabled=False,
+            is_expression_of_interest=False,
+            feedback_survey_config={},
+            eligibility_config={},
+            eoi_decision_schema={},
         )
     )
     assert result
@@ -154,6 +185,27 @@ fund_id = uuid4()
                 assessment_deadline=datetime.now(),
                 prospectus_link="http://www.google.com",
                 privacy_notice_link="http://www.google.com",
+                application_reminder_sent=False,
+                contact_us_banner_json={},
+                reference_contact_page_over_email=False,
+                contact_email="test@test.com",
+                contact_phone="0123334444",
+                contact_textphone="0123334444",
+                support_times="9am to 5pm",
+                support_days="Monday to Friday",
+                instructions_json={},
+                feedback_link="http://www.google.com",
+                project_name_field_id="12312312312",
+                application_guidance_json={},
+                guidance_url="http://www.google.com",
+                all_uploaded_documents_section_available=False,
+                application_fields_download_available=False,
+                display_logo_on_pdf_exports=False,
+                mark_as_complete_enabled=False,
+                is_expression_of_interest=False,
+                feedback_survey_config={},
+                eligibility_config={},
+                eoi_decision_schema={},
             )
         ],
     }
@@ -246,4 +298,293 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert result_section.forms[1].form_id == form1.form_id
     assert result_section.forms[2].form_id == formX.form_id
     assert result_section.forms[3].form_id == form2.form_id
-    assert result_section.forms[3].section_index == 3
+    assert result_section.forms[3].section_index == 4
+
+
+section_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
+        "forms": [
+            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+        ],
+    }
+)
+def test_form_sorting_removal(seed_dynamic_data, _db):
+    section = seed_dynamic_data["sections"][0]
+
+    result_section: Section = _db.session.query(Section).where(Section.section_id == section.section_id).one_or_none()
+    assert len(result_section.forms) == 3
+    form2 = result_section.forms[1]
+    assert form2.section_index == 2
+
+    delete_form_from_section(section_id=result_section.section_id, form_id=form2.form_id)
+
+    updated_section: Section = _db.session.query(Section).where(Section.section_id == section.section_id).one_or_none()
+    assert len(updated_section.forms) == 2
+    assert updated_section.forms[0].section_index == 1
+    assert updated_section.forms[1].section_index == 2
+
+
+# Create a section with one form, at index 1
+round_id = uuid4()
+fund_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
+        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "sections": [
+            Section(
+                name_in_apply_json={
+                    "en": "hello section",
+                },
+                index=1,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section2"},
+                index=2,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section3"},
+                index=3,
+                round_id=round_id,
+            ),
+        ],
+    }
+)
+def test_section_sorting_removal(seed_dynamic_data, _db):
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round: Round = get_round_by_id(round_id)
+    assert len(round.sections) == 3
+    last_section_id = round.sections[2].section_id
+    assert round.sections[2].index == 3
+    section_to_delete = round.sections[1]
+
+    delete_section_from_round(section_id=section_to_delete.section_id, round_id=round_id)
+
+    updated_round = get_round_by_id(round_id)
+    assert len(updated_round.sections) == 2
+    assert round.sections[1].section_id == last_section_id
+    assert round.sections[1].index == 2
+
+
+round_id = uuid4()
+fund_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
+        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "sections": [
+            Section(
+                name_in_apply_json={
+                    "en": "hello section",
+                },
+                index=1,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section2"},
+                index=2,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section3"},
+                index=3,
+                round_id=round_id,
+            ),
+        ],
+    }
+)
+@pytest.mark.parametrize(
+    "index_to_move, exp_new_index",
+    [
+        (1, 2),  # move 1 ->2
+        (2, 3),  # move 2 -> 3
+    ],
+)
+def test_section_sorting_move_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round: Round = get_round_by_id(round_id)
+    assert len(round.sections) == 3
+
+    section_to_move_down = round.sections[index_to_move - 1]  # numbering starts at 1 not 0
+    id_to_move = section_to_move_down.section_id
+    assert section_to_move_down.index == index_to_move
+
+    section_that_moves_up = round.sections[index_to_move]
+    assert section_that_moves_up.index == index_to_move + 1
+    section_id_that_moves_up = section_that_moves_up.section_id
+
+    move_section_down(round_id=round_id, section_index_to_move_down=index_to_move)
+
+    updated_round = get_round_by_id(round_id)
+    # total sections shouldn't change
+    assert len(round.sections) == 3
+
+    # check new position
+    moved_down_section = updated_round.sections[index_to_move]
+    assert moved_down_section.section_id == id_to_move
+    assert moved_down_section.index == exp_new_index
+
+    # check the section that was after this one has now moved up
+    moved_up_section = updated_round.sections[index_to_move - 1]
+    assert moved_up_section.section_id == section_id_that_moves_up
+    assert moved_up_section.index == exp_new_index - 1
+
+
+round_id = uuid4()
+fund_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
+        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "sections": [
+            Section(
+                name_in_apply_json={
+                    "en": "section a",
+                },
+                index=1,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "section b"},
+                index=2,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "section c"},
+                index=3,
+                round_id=round_id,
+            ),
+        ],
+    }
+)
+@pytest.mark.parametrize(
+    "index_to_move, exp_new_index",
+    [
+        (2, 1),  # move 2 -> 1
+        (3, 2),  # move 3 -> 2
+    ],
+)
+def test_move_section_up(seed_dynamic_data, _db, index_to_move, exp_new_index):
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round: Round = get_round_by_id(round_id)
+    assert len(round.sections) == 3
+
+    section_to_move_up = round.sections[index_to_move - 1]  # list index starts at 0 not 1
+    id_to_move = section_to_move_up.section_id
+    assert section_to_move_up.index == index_to_move
+
+    section_that_gets_moved_down = round.sections[index_to_move - 2]
+    id_that_gets_moved_down = section_that_gets_moved_down.section_id
+    assert section_that_gets_moved_down.index == index_to_move - 1
+
+    move_section_up(round_id=round_id, section_index_to_move_up=index_to_move)
+
+    updated_round = get_round_by_id(round_id)
+    assert len(updated_round.sections) == 3
+
+    # Check section that moved up
+    moved_up_section = updated_round.sections[index_to_move - 2]
+    assert moved_up_section.section_id == id_to_move
+    assert moved_up_section.index == exp_new_index
+    # Check the section that got moved down
+    moved_down_section = updated_round.sections[index_to_move - 1]
+    assert moved_down_section.section_id == id_that_gets_moved_down
+    assert moved_down_section.index == exp_new_index + 1
+
+
+section_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
+        "forms": [
+            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+        ],
+    }
+)
+@pytest.mark.parametrize("index_to_move, exp_new_index", [(2, 1), (3, 2)])
+def test_move_form_up(seed_dynamic_data, _db, index_to_move, exp_new_index):
+    section_id = seed_dynamic_data["sections"][0].section_id
+    section = get_section_by_id(section_id)
+    assert len(section.forms) == 3
+
+    id_to_move_up = section.forms[index_to_move - 1].form_id
+    assert section.forms[index_to_move - 1].section_index == index_to_move
+
+    id_to_move_down = section.forms[index_to_move - 2].form_id
+    assert section.forms[index_to_move - 2].section_index == exp_new_index
+
+    move_form_up(section_id, index_to_move)
+
+    updated_section = get_section_by_id(section_id)
+    assert len(updated_section.forms) == 3
+
+    assert updated_section.forms[index_to_move - 2].form_id == id_to_move_up
+    assert updated_section.forms[index_to_move - 1].form_id == id_to_move_down
+
+
+section_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
+        "forms": [
+            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+        ],
+    }
+)
+@pytest.mark.parametrize("index_to_move, exp_new_index", [(1, 2), (2, 3)])
+def test_move_form_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
+    section_id = seed_dynamic_data["sections"][0].section_id
+    section = get_section_by_id(section_id)
+    assert len(section.forms) == 3
+
+    id_to_move_down = section.forms[index_to_move - 1].form_id
+    assert section.forms[index_to_move - 1].section_index == index_to_move
+
+    id_to_move_up = section.forms[index_to_move].form_id
+    assert section.forms[index_to_move].section_index == index_to_move + 1
+
+    move_form_down(section_id, index_to_move)
+
+    updated_section = get_section_by_id(section_id)
+    assert len(updated_section.forms) == 3
+
+    assert updated_section.forms[index_to_move].form_id == id_to_move_down
+    assert updated_section.forms[index_to_move - 1].form_id == id_to_move_up
+
+
+@pytest.mark.parametrize(
+    "input_list, idx_a, idx_b, exp_result",
+    [
+        (["a", "b", "c", "d"], 0, 1, ["b", "a", "c", "d"]),
+        (["a", "b", "c", "d"], 1, 3, ["a", "d", "c", "b"]),
+        (["a", "b", "c", "d"], -1, 3, ["a", "b", "c", "d"]),
+        (["a", "b", "c", "d"], -1, -123123, ["a", "b", "c", "d"]),
+        (["a", "b", "c", "d"], 1, -123123, ["a", "b", "c", "d"]),
+        (["a", "b", "c", "d"], 1, 4, ["a", "b", "c", "d"]),
+    ],
+)
+def test_swap_elements(input_list, idx_a, idx_b, exp_result):
+    result = swap_elements_in_list(input_list, idx_a, idx_b)
+    assert result == exp_result

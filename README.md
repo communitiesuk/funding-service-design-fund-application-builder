@@ -52,7 +52,7 @@ Below is a docker-compose file that will start both the FAB app, and the form ru
      | - digital-form-builder-adapter
      | - funding-service-design-fund-application-builder
 ```
-To run locally using digital-form-builder-adapter 
+To run locally using digital-form-builder-adapter
 
 docker-compose -f docker-compose-dev.yml up
 

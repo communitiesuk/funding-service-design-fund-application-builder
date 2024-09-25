@@ -9,6 +9,7 @@ from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models import Section
 from app.db.models.round import Round
+from app.db.queries.round import get_round_by_id
 
 
 def get_all_template_sections() -> list[Section]:
@@ -111,7 +112,7 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
     cloned_components = []
     # loop through forms in this section and clone each one
     for form_to_clone in section_to_clone.forms:
-        cloned_form = _initiate_cloned_form(form_to_clone, clone.section_id)
+        cloned_form = _initiate_cloned_form(form_to_clone, clone.section_id, section_index=form_to_clone.section_index)
         # loop through pages in this section and clone each one
         for page_to_clone in form_to_clone.pages:
             cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=cloned_form.form_id)
@@ -285,7 +286,39 @@ def update_section(section_id, new_section_config):
     return section
 
 
+def delete_section_from_round(round_id, section_id, cascade: bool = False):
+    """Removes a section from the application config for a round. Uses `reorder()` on the
+    round to update numbering so if there are 3 sections in a round numbered as follows:
+    - 1 Round A
+    - 2 Round B
+    - 3 Round C
+
+    And then round B is deleted, you get
+    - 1 Round A
+    - 2 Round C
+
+    Args:
+        round_id (UUID): ID of the round to remove the section from
+        section_id (UUID): ID of the section to remove
+        cascade (bool, optional): Whether to cascade delete forms within this section. Defaults to False.
+    """
+    delete_section(section_id=section_id, cascade=cascade)
+    round = get_round_by_id(id=round_id)
+    round.sections.reorder()
+    db.session.commit()
+
+
 def delete_section(section_id, cascade: bool = False):
+    """Removes a section from the database. If cascade=True, will also cascade the delete
+    to all forms within this section, and on down the hierarchy. This DOES NOT update
+    numbering of any other sections in the round. If you want this, use
+    `.delete_section_from_round()` instead.
+
+    Args:
+        section_id (_type_): section ID to delete
+        cascade (bool, optional): Whether to cascade the delete down the hierarchy. Defaults to False.
+
+    """
     section = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
     if cascade:
         _delete_all_components_in_pages(page_ids=[page.page_id for form in section.forms for page in form.pages])
@@ -363,7 +396,39 @@ def _delete_all_forms_in_sections(section_ids: list):
     db.session.commit()
 
 
+def delete_form_from_section(section_id, form_id, cascade: bool = False):
+    """Deletes a form from a section and renumbers all remaining forms accordingly. If cascade==True,
+    cascades the delete to pages and then components within this form
+
+    So for example if you have 3 sections:
+    - 1 Section A
+    - 2 Section B
+    - 3 Section C
+    Then delete section B, they are renumbered as:
+    - 1 Section A
+    - 2 Section C
+
+    Args:
+        section_id (_type_): Section ID to remove the form from
+        form_id (_type_): Form ID of the form to remove
+        cascade (bool, optional): Whether to cascade the delete down the hierarchy. Defaults to False.
+    """
+    delete_form(form_id=form_id, cascade=cascade)
+    section = get_section_by_id(section_id=section_id)
+    section.forms.reorder()
+    db.session.commit()
+
+
 def delete_form(form_id, cascade: bool = False):
+    """Deletes a form. If cascade==True, cascades this delete down through the hierarchy to
+    pages within this form and then components on those pages. It DOES NOT update the section_index
+    property of remaining forms. If you want this functionality, call #delete_form_from_section() instead.
+
+    Args:
+        form_id (UUID): ID of the form to delete
+        cascade (bool, optional): Whether to cascade the delete down the hierarchy. Defaults to False.
+
+    """
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     if cascade:
         _delete_all_components_in_pages(page_ids=[p.page_id for p in form.pages])
@@ -544,4 +609,135 @@ def delete_component(component_id):
 def _delete_all_components_in_pages(page_ids):
     stmt = delete(Component).filter(Component.page_id.in_(page_ids))
     db.session.execute(stmt)
+    db.session.commit()
+
+
+# Section and form reordering
+
+
+def swap_elements_in_list(containing_list: list, index_a: int, index_b: int) -> list:
+    """Swaps the elements at the specified indices in the supplied list.
+    If either index is outside the valid range, returns the list unchanged.
+
+    Args:
+        containing_list (list): List containing the elements to swap
+        index_a (int): List index (0-based) of the first element to swap
+        index_b (int): List index (0-based) of the second element to swap
+
+    Returns:
+        list: The updated list
+    """
+    if 0 <= index_a < len(containing_list) and 0 <= index_b < len(containing_list):
+        containing_list[index_a], containing_list[index_b] = containing_list[index_b], containing_list[index_a]
+    return containing_list
+
+
+def move_section_down(round_id, section_index_to_move_down: int):
+    """Moves a section one place down in the ordered list of sections in a round.
+    In this case down means visually down, so the index number will increase by 1.
+
+    Element | Section.index | Index in list
+        A   |   1           |   0
+        B   |   2           |   1
+        C   |   3           |   2
+
+    Then move B down, which results in C moving up
+
+    Element | Section.index | Index in list
+        A   |   1           |   0
+        C   |   2           |   1
+        B   |   3           |   2
+
+    Args:
+        round_id (UUID): Round ID to move this section within
+        section_index_to_move_down (int): Current Section.index value of the section to move
+    """
+    round: Round = get_round_by_id(round_id)
+    list_index_to_move_down = section_index_to_move_down - 1  # Need the 0-based index inside the list
+    round.sections = swap_elements_in_list(round.sections, list_index_to_move_down, list_index_to_move_down + 1)
+    db.session.commit()
+
+
+def move_section_up(round_id, section_index_to_move_up: int):
+    """Moves a section one place up in the ordered list of sections in a round.
+    In this case up means visually up, so the index number will decrease by 1.
+
+
+    Element | Section.index | Index in list
+        A   |   1           |   0
+        B   |   2           |   1
+        C   |   3           |   2
+
+    Then move B up, which results in A moving down
+
+    Element | Section.index | Index in list
+        B   |   1           |   0
+        A   |   2           |   1
+        C   |   3           |   2
+
+    Args:
+        round_id (UUID): Round ID to move this section within
+        section_index_to_move_up (int): Current Section.index value of the section to move
+    """
+
+    round: Round = get_round_by_id(round_id)
+    list_index_to_move_up = section_index_to_move_up - 1  # Need the 0-based index inside the list
+    round.sections = swap_elements_in_list(round.sections, list_index_to_move_up, list_index_to_move_up - 1)
+
+    db.session.commit()
+
+
+def move_form_down(section_id, form_index_to_move_down: int):
+    """Moves a form one place down in the ordered list of forms in a section.
+    In this case down means visually down, so the index number will increase by 1.
+
+    Element | Form.section_index    | Index in list
+        A   |   1                   |   0
+        B   |   2                   |   1
+        C   |   3                   |   2
+
+    Then move B down, which results in C moving up
+
+    Element | Form.section_index    | Index in list
+        A   |   1                   |   0
+        C   |   2                   |   1
+        B   |   3                   |   2
+
+    Args:
+        section_id (UUID): Section ID to move this form within
+        form_index_to_move_down (int): Current Form.section_index value of the form to move
+    """
+    section: Section = get_section_by_id(section_id)
+    list_index_to_move_down = form_index_to_move_down - 1  # Need the 0-based index inside the list
+
+    section.forms = swap_elements_in_list(section.forms, list_index_to_move_down, list_index_to_move_down + 1)
+    db.session.commit()
+
+
+def move_form_up(section_id, form_index_to_move_up: int):
+    """Moves a form one place up in the ordered list of forms in a section.
+    In this case up means visually up, so the index number will decrease by 1.
+
+
+    Element | Form.section_index    | Index in list
+        A   |   1                   |   0
+        B   |   2                   |   1
+        C   |   3                   |   2
+
+    Then move B up, which results in A moving down
+
+    Element | Form.section_index    | Index in list
+        B   |   1                   |   0
+        A   |   2                   |   1
+        C   |   3                   |   2
+
+    Args:
+        section_id (UUID): Section ID to move this form within
+        form_index_to_move_up (int): Current Form.section_index value of the form to up
+    """
+
+    section: Section = get_section_by_id(section_id)
+    list_index_to_move_up = form_index_to_move_up - 1  # Need the 0-based index inside the list
+
+    section.forms = swap_elements_in_list(section.forms, list_index_to_move_up, list_index_to_move_up - 1)
     db.session.commit()

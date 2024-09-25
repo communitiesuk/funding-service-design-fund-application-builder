@@ -119,8 +119,11 @@ class RoundExport:
     display_logo_on_pdf_exports: Optional[bool] = None
     mark_as_complete_enabled: Optional[bool] = None
     is_expression_of_interest: Optional[bool] = None
-    eoi_decision_schema: Optional[str] = None  # Adjust type as
-    feedback_survey_config: FeedbackSurveyConfig = field(default_factory=FeedbackSurveyConfig)
-    eligibility_config: EligibilityConfig = field(default_factory=EligibilityConfig)
+    eoi_decision_schema: Optional[Dict[str, str]] = None
+    # check to use FeedbackSurveyConfig
+    feedback_survey_config: Optional[Dict[str, str]] = None
+    # check to use EligibilityConfig
+    eligibility_config: Optional[Dict[str, str]] = None
     title_json: TitleJson = field(default_factory=TitleJson)
-    contact_us_banner_json: ContactUsBannerJson = field(default_factory=ContactUsBannerJson)
+    # check to use EligibilityConfig
+    contact_us_banner_json: Optional[Dict[str, str]] = None

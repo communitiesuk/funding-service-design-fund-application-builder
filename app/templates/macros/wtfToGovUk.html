@@ -1,6 +1,8 @@
 {%- from "govuk_frontend_jinja/components/input/macro.html" import govukInput -%}
 {%- from "govuk_frontend_jinja/components/checkboxes/macro.html" import govukCheckboxes -%}
 {% from "govuk_frontend_jinja/components/radios/macro.html" import govukRadios %}
+{% from "govuk_frontend_jinja/components/textarea/macro.html" import govukTextarea %}
+{% from "govuk_frontend_jinja/components/date-input/macro.html" import govukDateInput %}
 
 {% macro input(form_field) %}
 {{ govukInput({
@@ -16,19 +18,20 @@
 }) }}
 {%endmacro%}
 
-{% macro dateinput(form_field) %}
-{{ govukInput({
+{% macro multilineinput(form_field) %}
+{{ govukTextarea({
 "label": {
 "text": form_field.label ,
 "isPageHeading": false
 },
 "id": form_field.id,
 "name": form_field.name ,
-"value": form_field.data.strftime('%d-%m-%Y %H:%M') if form_field.data else '',
+"value": form_field.data,
 "errorMessage": {"text": form_field.errors[0]} if (form_field.errors | length > 0) else None,
 "hint":{"text":form_field.description}
 }) }}
 {%endmacro%}
+
 
 {% macro yes_no(form_field) %}
 {{ govukRadios({
@@ -36,10 +39,55 @@
 "classes": "govuk-radios--inline",
 "fieldset": {
 "legend": {
-"text": form_field.label,
-"isPageHeading": false,
-}
+    "text": form_field.label,
+    "isPageHeading": false,
+    }
 },
-"items": [{"value":1, "text": "Yes"}, {"value":"", "text":"No"}]
+"items": [{"value":'true', "text": "Yes", "checked": form_field.data == 'true'}, {"value":'false', "text":"No",
+"checked": form_field.data == 'false'}]
+})}}
+{%endmacro%}
+
+{% macro dateinput(form_field) %}
+{{ govukDateInput({
+    "name": form_field.name ,
+    "namePrefix": form_field.name,
+    "fieldset": {
+    "legend": {
+        "text": form_field.label,
+        "isPageHeading": false,
+        }
+    },
+    "id": form_field.id,
+    "items": [
+        {
+          "name": "day",
+          "value": form_field.day.data,
+          "classes": "govuk-input--width-2",
+        },
+        {
+          "name": "month",
+          "value": form_field.month.data,
+          "classes": "govuk-input--width-2",
+        },
+        {
+          "name": "year",
+          "value": form_field.year.data,
+          "classes": "govuk-input--width-4",
+        },
+        {
+          "name": "hour",
+          "value": form_field.hour.data,
+          "classes": "govuk-input--width-2",
+        },
+{
+          "name": "minutes",
+          "value": form_field.minutes.data,
+          "classes": "govuk-input--width-2",
+        }
+    ],
+    "errorMessage": {"text": "Enter valid datetime" } if (form_field.day.errors or form_field.month.errors
+     or form_field.year.errors or form_field.hour.errors or form_field.minutes.errors| length > 0) else None,
+    "hint":{"text":form_field.description}
 })}}
 {%endmacro%}

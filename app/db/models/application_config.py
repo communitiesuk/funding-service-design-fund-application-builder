@@ -81,13 +81,16 @@ class Section(BaseModel):
     is_template = Column(Boolean, default=False, nullable=False)
     audit_info = Column(JSON(none_as_null=True))
     forms: Mapped[List["Form"]] = relationship(
-        "Form", order_by="Form.section_index", collection_class=ordering_list("section_index"), passive_deletes="all"
+        "Form",
+        order_by="Form.section_index",
+        collection_class=ordering_list("section_index", count_from=1),
+        passive_deletes="all",
     )
     index = Column(Integer())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
     def __repr__(self):
-        return f"Section([{self.section_id}], {self.name_in_apply_json['en']}, Forms: {self.forms})"
+        return f"Section({self.index}, {self.name_in_apply_json['en']} [{self.section_id}], Forms: {self.forms})"
 
     def as_dict(self, include_relationships=False):
         result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}
@@ -121,7 +124,10 @@ class Form(BaseModel):
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
     def __repr__(self):
-        return f"Form({self.runner_publish_name} - {self.name_in_apply_json['en']}, Pages: {self.pages})"
+        return (
+            f"Form({self.section_index}, {self.runner_publish_name}"
+            + f"- {self.name_in_apply_json['en']}, Pages: {self.pages})"
+        )
 
     def as_dict(self, include_relationships=False):
         result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}

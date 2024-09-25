@@ -18,17 +18,22 @@ from flask import url_for
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
+from app.blueprints.fund_builder.forms.round import get_datetime
 from app.blueprints.fund_builder.forms.section import SectionForm
 from app.db.models.fund import Fund
 from app.db.models.round import Round
 from app.db.queries.application import clone_single_form
 from app.db.queries.application import clone_single_round
-from app.db.queries.application import delete_form
-from app.db.queries.application import delete_section
+from app.db.queries.application import delete_form_from_section
+from app.db.queries.application import delete_section_from_round
 from app.db.queries.application import get_all_template_forms
 from app.db.queries.application import get_form_by_id
 from app.db.queries.application import get_section_by_id
 from app.db.queries.application import insert_new_section
+from app.db.queries.application import move_form_down
+from app.db.queries.application import move_form_up
+from app.db.queries.application import move_section_down
+from app.db.queries.application import move_section_up
 from app.db.queries.application import update_section
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
@@ -71,8 +76,15 @@ def section(round_id):
         "round_id": str(round_id),
     }
     existing_section = None
+    # TODO there must be a better way than a pile of ifs...
     if request.args.get("action") == "remove":
-        delete_section(section_id=request.args.get("section_id"), cascade=True)
+        delete_section_from_round(round_id=round_id, section_id=request.args.get("section_id"), cascade=True)
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+    if request.args.get("action") == "move_up":
+        move_section_up(round_id=round_id, section_index_to_move_up=int(request.args.get("index")))
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+    if request.args.get("action") == "move_down":
+        move_section_down(round_id=round_id, section_index_to_move_down=int(request.args.get("index")))
         return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
     if form.validate_on_submit():
         count_existing_sections = len(round_obj.sections)
@@ -115,17 +127,22 @@ def section(round_id):
     return render_template("section.html", form=form, **params)
 
 
-@build_fund_bp.route("/fund/round/<round_id>/section/<section_id>/forms", methods=["POST"])
+@build_fund_bp.route("/fund/round/<round_id>/section/<section_id>/forms", methods=["POST", "GET"])
 def configure_forms_in_section(round_id, section_id):
-    if request.method == "POST":
+    if request.method == "GET":
         if request.args.get("action") == "remove":
             form_id = request.args.get("form_id")
-            delete_form(form_id=form_id, cascade=True)
-        else:
-            template_id = request.form.get("template_id")
-            section = get_section_by_id(section_id=section_id)
-            new_section_index = max(len(section.forms) + 1, 1)
-            clone_single_form(form_id=template_id, new_section_id=section_id, section_index=new_section_index)
+            delete_form_from_section(section_id=section_id, form_id=form_id, cascade=True)
+        if request.args.get("action") == "move_up":
+            move_form_up(section_id=section_id, form_index_to_move_up=int(request.args.get("index")))
+        if request.args.get("action") == "move_down":
+            move_form_down(section_id=section_id, form_index_to_move_down=int(request.args.get("index")))
+
+    if request.method == "POST":
+        template_id = request.form.get("template_id")
+        section = get_section_by_id(section_id=section_id)
+        new_section_index = max(len(section.forms) + 1, 1)
+        clone_single_form(form_id=template_id, new_section_id=section_id, section_index=new_section_index)
 
     return redirect(url_for("build_fund_bp.section", round_id=round_id, section_id=section_id))
 
@@ -198,7 +215,7 @@ def fund():
                 name_json={"en": form.name_en.data},
                 title_json={"en": form.title_en.data},
                 description_json={"en": form.description_en.data},
-                welsh_available=form.welsh_available.data,
+                welsh_available=form.welsh_available.data == "true",
                 short_name=form.short_name.data,
                 audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
             )
@@ -224,13 +241,32 @@ def round():
                 audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
                 title_json={"en": form.title_en.data},
                 short_name=form.short_name.data,
-                opens=form.opens.data,
-                deadline=form.deadline.data,
-                assessment_start=form.assessment_start.data,
-                reminder_date=form.reminder_date.data,
-                assessment_deadline=form.assessment_deadline.data,
+                opens=get_datetime(form.opens),
+                deadline=get_datetime(form.deadline),
+                assessment_start=get_datetime(form.assessment_start),
+                reminder_date=get_datetime(form.reminder_date),
+                assessment_deadline=get_datetime(form.assessment_deadline),
                 prospectus_link=form.prospectus_link.data,
                 privacy_notice_link=form.privacy_notice_link.data,
+                contact_us_banner_json={"en": form.contact_us_banner_json.data, "cy": None},
+                reference_contact_page_over_email=form.reference_contact_page_over_email.data == "true",
+                contact_email=form.contact_email.data,
+                contact_phone=form.contact_phone.data,
+                contact_textphone=form.contact_textphone.data,
+                support_times=form.support_times.data,
+                support_days=form.support_days.data,
+                instructions_json={"en": form.instructions_json.data, "cy": None},
+                feedback_link=form.feedback_link.data,
+                project_name_field_id=form.project_name_field_id.data,
+                application_guidance_json={"en": form.application_guidance_json.data, "cy": None},
+                guidance_url=form.guidance_url.data,
+                all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data == "true",
+                application_fields_download_available=form.application_fields_download_available.data == "true",
+                display_logo_on_pdf_exports=form.display_logo_on_pdf_exports.data == "true",
+                mark_as_complete_enabled=form.mark_as_complete_enabled.data == "true",
+                is_expression_of_interest=form.is_expression_of_interest.data == "true",
+                feedback_survey_config=form.feedback_survey_config.data,
+                eoi_decision_schema=form.eoi_decision_schema.data,
             )
         )
 
