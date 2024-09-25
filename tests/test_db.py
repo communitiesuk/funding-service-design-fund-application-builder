@@ -18,6 +18,7 @@ from app.db.queries.application import move_form_down
 from app.db.queries.application import move_form_up
 from app.db.queries.application import move_section_down
 from app.db.queries.application import move_section_up
+from app.db.queries.application import swap_elements_in_list
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import add_organisation
 from app.db.queries.fund import get_all_funds
@@ -571,3 +572,19 @@ def test_move_form_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
 
     assert updated_section.forms[index_to_move].form_id == id_to_move_down
     assert updated_section.forms[index_to_move - 1].form_id == id_to_move_up
+
+
+@pytest.mark.parametrize(
+    "input_list, idx_a, idx_b, exp_result",
+    [
+        (["a", "b", "c", "d"], 0, 1, ["b", "a", "c", "d"]),
+        (["a", "b", "c", "d"], 1, 3, ["a", "d", "c", "b"]),
+        (["a", "b", "c", "d"], -1, 3, ["a", "b", "c", "d"]),
+        (["a", "b", "c", "d"], -1, -123123, ["a", "b", "c", "d"]),
+        (["a", "b", "c", "d"], 1, -123123, ["a", "b", "c", "d"]),
+        (["a", "b", "c", "d"], 1, 4, ["a", "b", "c", "d"]),
+    ],
+)
+def test_swap_elements(input_list, idx_a, idx_b, exp_result):
+    result = swap_elements_in_list(input_list, idx_a, idx_b)
+    assert result == exp_result
