@@ -112,7 +112,7 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
     cloned_components = []
     # loop through forms in this section and clone each one
     for form_to_clone in section_to_clone.forms:
-        cloned_form = _initiate_cloned_form(form_to_clone, clone.section_id)
+        cloned_form = _initiate_cloned_form(form_to_clone, clone.section_id, section_index=form_to_clone.section_index)
         # loop through pages in this section and clone each one
         for page_to_clone in form_to_clone.pages:
             cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=cloned_form.form_id)
