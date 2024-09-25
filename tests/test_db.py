@@ -452,90 +452,6 @@ fund_id = uuid4()
         "sections": [
             Section(
                 name_in_apply_json={
-                    "en": "hello section",
-                },
-                index=1,
-                round_id=round_id,
-            ),
-            Section(
-                name_in_apply_json={"en": "hello section2"},
-                index=2,
-                round_id=round_id,
-            ),
-            Section(
-                name_in_apply_json={"en": "hello section3"},
-                index=3,
-                round_id=round_id,
-            ),
-        ],
-    }
-)
-def test_move_section_down_error(
-    seed_dynamic_data,
-    _db,
-):
-    round_id = seed_dynamic_data["rounds"][0].round_id
-    round: Round = get_round_by_id(round_id)
-    assert len(round.sections) == 3
-
-    index_to_move = 3
-    section_to_move_down = round.sections[index_to_move - 1]  # numbering starts at 1 not 0
-    assert section_to_move_down.index == index_to_move
-
-    # Attempt to move the last one in the list further down - should fail
-    with pytest.raises(IndexError):
-        move_section_down(round_id=round_id, section_index_to_move_down=index_to_move)
-
-
-@pytest.mark.seed_config(
-    {
-        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
-        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
-        "sections": [
-            Section(
-                name_in_apply_json={
-                    "en": "hello section",
-                },
-                index=1,
-                round_id=round_id,
-            ),
-            Section(
-                name_in_apply_json={"en": "hello section2"},
-                index=2,
-                round_id=round_id,
-            ),
-            Section(
-                name_in_apply_json={"en": "hello section3"},
-                index=3,
-                round_id=round_id,
-            ),
-        ],
-    }
-)
-def test_move_section_up_error(
-    seed_dynamic_data,
-    _db,
-):
-    round_id = seed_dynamic_data["rounds"][0].round_id
-    round: Round = get_round_by_id(round_id)
-    assert len(round.sections) == 3
-
-    index_to_move = 1
-    section_to_move_up = round.sections[index_to_move - 1]  # numbering starts at 1 not 0
-    assert section_to_move_up.index == index_to_move
-
-    # Attempt to move the first one in the list further up - should fail
-    with pytest.raises(IndexError):
-        move_section_up(round_id=round_id, section_index_to_move_up=index_to_move)
-
-
-@pytest.mark.seed_config(
-    {
-        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
-        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
-        "sections": [
-            Section(
-                name_in_apply_json={
                     "en": "section a",
                 },
                 index=1,
@@ -636,28 +552,6 @@ section_id = uuid4()
         ],
     }
 )
-def test_move_form_up_error(seed_dynamic_data, _db):
-    section_id = seed_dynamic_data["sections"][0].section_id
-    section = get_section_by_id(section_id)
-    assert len(section.forms) == 3
-
-    with pytest.raises(IndexError):
-        move_form_up(section_id, 1)
-
-
-section_id = uuid4()
-
-
-@pytest.mark.seed_config(
-    {
-        "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
-        "forms": [
-            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
-        ],
-    }
-)
 @pytest.mark.parametrize("index_to_move, exp_new_index", [(1, 2), (2, 3)])
 def test_move_form_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
     section_id = seed_dynamic_data["sections"][0].section_id
@@ -677,25 +571,3 @@ def test_move_form_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
 
     assert updated_section.forms[index_to_move].form_id == id_to_move_down
     assert updated_section.forms[index_to_move - 1].form_id == id_to_move_up
-
-
-section_id = uuid4()
-
-
-@pytest.mark.seed_config(
-    {
-        "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
-        "forms": [
-            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
-        ],
-    }
-)
-def test_move_form_down_error(seed_dynamic_data, _db):
-    section_id = seed_dynamic_data["sections"][0].section_id
-    section = get_section_by_id(section_id)
-    assert len(section.forms) == 3
-
-    with pytest.raises(IndexError):
-        move_form_down(section_id, 3)

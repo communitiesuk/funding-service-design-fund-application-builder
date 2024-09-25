@@ -615,6 +615,23 @@ def _delete_all_components_in_pages(page_ids):
 # Section and form reordering
 
 
+def swap_elements_in_list(containing_list: list, index_a: int, index_b: int) -> list:
+    """Swaps the elements at the specified indices in the supplied list.
+    If either index is outside the valid range, returns the list unchanged.
+
+    Args:
+        containing_list (list): List containing the elements to swap
+        index_a (int): List index (0-based) of the first element to swap
+        index_b (int): List index (0-based) of the second element to swap
+
+    Returns:
+        list: The updated list
+    """
+    if 0 <= index_a < len(containing_list) and 0 <= index_b < len(containing_list):
+        containing_list[index_a], containing_list[index_b] = containing_list[index_b], containing_list[index_a]
+    return containing_list
+
+
 def move_section_down(round_id, section_index_to_move_down: int):
     """Moves a section one place down in the ordered list of sections in a round.
     In this case down means visually down, so the index number will increase by 1.
@@ -636,13 +653,8 @@ def move_section_down(round_id, section_index_to_move_down: int):
         section_index_to_move_down (int): Current Section.index value of the section to move
     """
     round: Round = get_round_by_id(round_id)
-    if section_index_to_move_down >= len(round.sections):
-        raise IndexError("Cannot move the last section down")
     list_index_to_move_down = section_index_to_move_down - 1  # Need the 0-based index inside the list
-    # Remove the seciton we are moving from the list
-    moved_section = round.sections.pop(list_index_to_move_down)
-    # Reinsert it at the new position - because the list index is 0-based, this equates to the old Section.index
-    round.sections.insert(section_index_to_move_down, moved_section)
+    round.sections = swap_elements_in_list(round.sections, list_index_to_move_down, list_index_to_move_down + 1)
     db.session.commit()
 
 
@@ -670,12 +682,7 @@ def move_section_up(round_id, section_index_to_move_up: int):
 
     round: Round = get_round_by_id(round_id)
     list_index_to_move_up = section_index_to_move_up - 1  # Need the 0-based index inside the list
-    if section_index_to_move_up == 1:
-        raise IndexError("Cannot move the first section up")
-    # Remove the seciton we are moving from the list
-    moved_section = round.sections.pop(index=list_index_to_move_up)
-    # Reinsert it at the new position - because the list index is 0-based, this equates to the old Section.index
-    round.sections.insert(list_index_to_move_up - 1, moved_section)
+    round.sections = swap_elements_in_list(round.sections, list_index_to_move_up, list_index_to_move_up - 1)
 
     db.session.commit()
 
@@ -701,13 +708,9 @@ def move_form_down(section_id, form_index_to_move_down: int):
         form_index_to_move_down (int): Current Form.section_index value of the form to move
     """
     section: Section = get_section_by_id(section_id)
-    if form_index_to_move_down >= len(section.forms):
-        raise IndexError("Cannot move the last form down")
     list_index_to_move_down = form_index_to_move_down - 1  # Need the 0-based index inside the list
-    # Remove the form we are moving from the list
-    moved_form = section.forms.pop(list_index_to_move_down)
-    # Reinsert it at the new position - because the list index is 0-based, this equates to the old Form.index
-    section.forms.insert(form_index_to_move_down, moved_form)
+
+    section.forms = swap_elements_in_list(section.forms, list_index_to_move_down, list_index_to_move_down + 1)
     db.session.commit()
 
 
@@ -735,11 +738,6 @@ def move_form_up(section_id, form_index_to_move_up: int):
 
     section: Section = get_section_by_id(section_id)
     list_index_to_move_up = form_index_to_move_up - 1  # Need the 0-based index inside the list
-    if form_index_to_move_up == 1:
-        raise IndexError("Cannot move the first form up")
-    # Remove the form we are moving from the list
-    moved_form = section.forms.pop(index=list_index_to_move_up)
-    # Reinsert it at the new position - because the list index is 0-based, this equates to the old Form.section_index
-    section.forms.insert(list_index_to_move_up - 1, moved_form)
 
+    section.forms = swap_elements_in_list(section.forms, list_index_to_move_up, list_index_to_move_up - 1)
     db.session.commit()
