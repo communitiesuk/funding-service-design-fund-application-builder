@@ -610,3 +610,71 @@ def _delete_all_components_in_pages(page_ids):
     stmt = delete(Component).filter(Component.page_id.in_(page_ids))
     db.session.execute(stmt)
     db.session.commit()
+
+
+# Section and form reordering
+
+
+def move_section_down(round_id, section_index_to_move_down):
+    """Moves a section one place down in the ordered list of sections in a round.
+    In this case down means visually down, so the index number will increase by 1.
+
+    Element | Section.index | Index in list
+        A   |   1           |   0
+        B   |   2           |   1
+        C   |   3           |   2
+
+    Then move B down, which results in C moving up
+
+    Element | Section.index | Index in list
+        A   |   1           |   0
+        C   |   2           |   1
+        B   |   3           |   2
+
+    Args:
+        round_id (UUID): Round ID to move this section within
+        section_id_to_move_down (UUID): ID of the section to move down
+    """
+    round: Round = get_round_by_id(round_id)
+    if section_index_to_move_down >= len(round.sections):
+        raise IndexError("Cannot move the last section down")
+    list_index_to_move_down = section_index_to_move_down - 1  # Need the 0-based index inside the list
+    # Remove the seciton we are moving from the list
+    moved_section = round.sections.pop(list_index_to_move_down)
+    # Reinsert it at the new position - because the list index is 0-based, this equates to the old Section.index
+    round.sections.insert(section_index_to_move_down, moved_section)
+    db.session.commit()
+
+
+def move_section_up(round_id, section_index_to_move_up):
+    """Moves a section one place up in the ordered list of sections in a round.
+    In this case up means visually up, so the index number will decrease by 1.
+
+
+    Element | Section.index | Index in list
+        A   |   1           |   0
+        B   |   2           |   1
+        C   |   3           |   2
+
+    Then move B up, which results in A moving down
+
+    Element | Section.index | Index in list
+        B   |   1           |   0
+        A   |   2           |   1
+        C   |   3           |   2
+
+    Args:
+        round_id (UUID): Round ID to move this section within
+        section_id_to_move_down (UUID): ID of the section to move up
+    """
+
+    round: Round = get_round_by_id(round_id)
+    list_index_to_move_up = section_index_to_move_up - 1  # Need the 0-based index inside the list
+    if section_index_to_move_up == 1:
+        raise IndexError("Cannot move the first section up")
+    # Remove the seciton we are moving from the list
+    moved_section = round.sections.pop(index=list_index_to_move_up)
+    # Reinsert it at the new position - because the list index is 0-based, this equates to the old Section.index
+    round.sections.insert(list_index_to_move_up - 1, moved_section)
+
+    db.session.commit()
