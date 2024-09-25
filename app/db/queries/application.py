@@ -615,7 +615,7 @@ def _delete_all_components_in_pages(page_ids):
 # Section and form reordering
 
 
-def move_section_down(round_id, section_index_to_move_down):
+def move_section_down(round_id, section_index_to_move_down: int):
     """Moves a section one place down in the ordered list of sections in a round.
     In this case down means visually down, so the index number will increase by 1.
 
@@ -633,7 +633,7 @@ def move_section_down(round_id, section_index_to_move_down):
 
     Args:
         round_id (UUID): Round ID to move this section within
-        section_id_to_move_down (UUID): ID of the section to move down
+        section_index_to_move_down (int): Current Section.index value of the section to move
     """
     round: Round = get_round_by_id(round_id)
     if section_index_to_move_down >= len(round.sections):
@@ -646,7 +646,7 @@ def move_section_down(round_id, section_index_to_move_down):
     db.session.commit()
 
 
-def move_section_up(round_id, section_index_to_move_up):
+def move_section_up(round_id, section_index_to_move_up: int):
     """Moves a section one place up in the ordered list of sections in a round.
     In this case up means visually up, so the index number will decrease by 1.
 
@@ -665,7 +665,7 @@ def move_section_up(round_id, section_index_to_move_up):
 
     Args:
         round_id (UUID): Round ID to move this section within
-        section_id_to_move_down (UUID): ID of the section to move up
+        section_index_to_move_up (int): Current Section.index value of the section to move
     """
 
     round: Round = get_round_by_id(round_id)
@@ -676,5 +676,70 @@ def move_section_up(round_id, section_index_to_move_up):
     moved_section = round.sections.pop(index=list_index_to_move_up)
     # Reinsert it at the new position - because the list index is 0-based, this equates to the old Section.index
     round.sections.insert(list_index_to_move_up - 1, moved_section)
+
+    db.session.commit()
+
+
+def move_form_down(section_id, form_index_to_move_down: int):
+    """Moves a form one place down in the ordered list of forms in a section.
+    In this case down means visually down, so the index number will increase by 1.
+
+    Element | Form.section_index    | Index in list
+        A   |   1                   |   0
+        B   |   2                   |   1
+        C   |   3                   |   2
+
+    Then move B down, which results in C moving up
+
+    Element | Form.section_index    | Index in list
+        A   |   1                   |   0
+        C   |   2                   |   1
+        B   |   3                   |   2
+
+    Args:
+        section_id (UUID): Section ID to move this form within
+        form_index_to_move_down (int): Current Form.section_index value of the form to move
+    """
+    section: Section = get_section_by_id(section_id)
+    if form_index_to_move_down >= len(section.forms):
+        raise IndexError("Cannot move the last form down")
+    list_index_to_move_down = form_index_to_move_down - 1  # Need the 0-based index inside the list
+    # Remove the form we are moving from the list
+    moved_form = section.forms.pop(list_index_to_move_down)
+    # Reinsert it at the new position - because the list index is 0-based, this equates to the old Form.index
+    section.forms.insert(form_index_to_move_down, moved_form)
+    db.session.commit()
+
+
+def move_form_up(section_id, form_index_to_move_up: int):
+    """Moves a form one place up in the ordered list of forms in a section.
+    In this case up means visually up, so the index number will decrease by 1.
+
+
+    Element | Form.section_index    | Index in list
+        A   |   1                   |   0
+        B   |   2                   |   1
+        C   |   3                   |   2
+
+    Then move B up, which results in A moving down
+
+    Element | Form.section_index    | Index in list
+        B   |   1                   |   0
+        A   |   2                   |   1
+        C   |   3                   |   2
+
+    Args:
+        section_id (UUID): Section ID to move this form within
+        form_index_to_move_up (int): Current Form.section_index value of the form to up
+    """
+
+    section: Section = get_section_by_id(section_id)
+    list_index_to_move_up = form_index_to_move_up - 1  # Need the 0-based index inside the list
+    if form_index_to_move_up == 1:
+        raise IndexError("Cannot move the first form up")
+    # Remove the form we are moving from the list
+    moved_form = section.forms.pop(index=list_index_to_move_up)
+    # Reinsert it at the new position - because the list index is 0-based, this equates to the old Form.section_index
+    section.forms.insert(list_index_to_move_up - 1, moved_form)
 
     db.session.commit()
