@@ -312,7 +312,7 @@ def delete_section(section_id, cascade: bool = False):
     """Removes a section from the database. If cascade=True, will also cascade the delete
     to all forms within this section, and on down the hierarchy. This DOES NOT update
     numbering of any other sections in the round. If you want this, use
-    #delete_section_from_round() instead.
+    `.delete_section_from_round()` instead.
 
     Args:
         section_id (_type_): section ID to delete

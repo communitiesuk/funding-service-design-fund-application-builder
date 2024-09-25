@@ -30,6 +30,8 @@ from app.db.queries.application import get_all_template_forms
 from app.db.queries.application import get_form_by_id
 from app.db.queries.application import get_section_by_id
 from app.db.queries.application import insert_new_section
+from app.db.queries.application import move_section_down
+from app.db.queries.application import move_section_up
 from app.db.queries.application import update_section
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
@@ -72,8 +74,15 @@ def section(round_id):
         "round_id": str(round_id),
     }
     existing_section = None
+    # TODO there must be a better way than a pile of ifs...
     if request.args.get("action") == "remove":
         delete_section_from_round(round_id=round_id, section_id=request.args.get("section_id"), cascade=True)
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+    if request.args.get("action") == "move_up":
+        move_section_up(round_id=round_id, section_index_to_move_up=int(request.args.get("index")))
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+    if request.args.get("action") == "move_down":
+        move_section_down(round_id=round_id, section_index_to_move_down=int(request.args.get("index")))
         return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
     if form.validate_on_submit():
         count_existing_sections = len(round_obj.sections)
