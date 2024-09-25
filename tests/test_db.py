@@ -13,6 +13,8 @@ from app.db.models import Section
 from app.db.queries.application import delete_form_from_section
 from app.db.queries.application import delete_section_from_round
 from app.db.queries.application import get_template_page_by_display_path
+from app.db.queries.application import move_section_down
+from app.db.queries.application import move_section_up
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import add_organisation
 from app.db.queries.fund import get_all_funds
@@ -338,7 +340,7 @@ fund_id = uuid4()
                 name_in_apply_json={
                     "en": "hello section",
                 },
-                index=2,
+                index=1,
                 round_id=round_id,
             ),
             Section(
@@ -354,7 +356,8 @@ fund_id = uuid4()
         ],
     }
 )
-def test_section_sorting(seed_dynamic_data, _db):
+def test_section_sorting_removal(seed_dynamic_data, _db):
+    round_id = seed_dynamic_data["rounds"][0].round_id
     round: Round = get_round_by_id(round_id)
     assert len(round.sections) == 3
     last_section_id = round.sections[2].section_id
@@ -367,3 +370,217 @@ def test_section_sorting(seed_dynamic_data, _db):
     assert len(updated_round.sections) == 2
     assert round.sections[1].section_id == last_section_id
     assert round.sections[1].index == 2
+
+
+round_id = uuid4()
+fund_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
+        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "sections": [
+            Section(
+                name_in_apply_json={
+                    "en": "hello section",
+                },
+                index=1,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section2"},
+                index=2,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section3"},
+                index=3,
+                round_id=round_id,
+            ),
+        ],
+    }
+)
+@pytest.mark.parametrize(
+    "index_to_move, exp_new_index",
+    [
+        (1, 2),  # move 1 ->2
+        (2, 3),  # move 2 -> 3
+    ],
+)
+def test_section_sorting_move_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round: Round = get_round_by_id(round_id)
+    assert len(round.sections) == 3
+
+    section_to_move_down = round.sections[index_to_move - 1]  # numbering starts at 1 not 0
+    id_to_move = section_to_move_down.section_id
+    assert section_to_move_down.index == index_to_move
+
+    section_that_moves_up = round.sections[index_to_move]
+    assert section_that_moves_up.index == index_to_move + 1
+    section_id_that_moves_up = section_that_moves_up.section_id
+
+    move_section_down(round_id=round_id, section_index_to_move_down=index_to_move)
+
+    updated_round = get_round_by_id(round_id)
+    # total sections shouldn't change
+    assert len(round.sections) == 3
+
+    # check new position
+    moved_down_section = updated_round.sections[index_to_move]
+    assert moved_down_section.section_id == id_to_move
+    assert moved_down_section.index == exp_new_index
+
+    # check the section that was after this one has now moved up
+    moved_up_section = updated_round.sections[index_to_move - 1]
+    assert moved_up_section.section_id == section_id_that_moves_up
+    assert moved_up_section.index == exp_new_index - 1
+
+
+round_id = uuid4()
+fund_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
+        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "sections": [
+            Section(
+                name_in_apply_json={
+                    "en": "hello section",
+                },
+                index=1,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section2"},
+                index=2,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section3"},
+                index=3,
+                round_id=round_id,
+            ),
+        ],
+    }
+)
+def test_move_section_down_error(
+    seed_dynamic_data,
+    _db,
+):
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round: Round = get_round_by_id(round_id)
+    assert len(round.sections) == 3
+
+    index_to_move = 3
+    section_to_move_down = round.sections[index_to_move - 1]  # numbering starts at 1 not 0
+    assert section_to_move_down.index == index_to_move
+
+    # Attempt to move the last one in the list further down - should fail
+    with pytest.raises(IndexError):
+        move_section_down(round_id=round_id, section_index_to_move_down=index_to_move)
+
+
+@pytest.mark.seed_config(
+    {
+        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
+        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "sections": [
+            Section(
+                name_in_apply_json={
+                    "en": "hello section",
+                },
+                index=1,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section2"},
+                index=2,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "hello section3"},
+                index=3,
+                round_id=round_id,
+            ),
+        ],
+    }
+)
+def test_move_section_up_error(
+    seed_dynamic_data,
+    _db,
+):
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round: Round = get_round_by_id(round_id)
+    assert len(round.sections) == 3
+
+    index_to_move = 1
+    section_to_move_up = round.sections[index_to_move - 1]  # numbering starts at 1 not 0
+    assert section_to_move_up.index == index_to_move
+
+    # Attempt to move the first one in the list further up - should fail
+    with pytest.raises(IndexError):
+        move_section_up(round_id=round_id, section_index_to_move_up=index_to_move)
+
+
+@pytest.mark.seed_config(
+    {
+        "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
+        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "sections": [
+            Section(
+                name_in_apply_json={
+                    "en": "section a",
+                },
+                index=1,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "section b"},
+                index=2,
+                round_id=round_id,
+            ),
+            Section(
+                name_in_apply_json={"en": "section c"},
+                index=3,
+                round_id=round_id,
+            ),
+        ],
+    }
+)
+@pytest.mark.parametrize(
+    "index_to_move, exp_new_index",
+    [
+        (2, 1),  # move 2 -> 1
+        (3, 2),  # move 3 -> 2
+    ],
+)
+def test_move_section_up(seed_dynamic_data, _db, index_to_move, exp_new_index):
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round: Round = get_round_by_id(round_id)
+    assert len(round.sections) == 3
+
+    section_to_move_up = round.sections[index_to_move - 1]  # list index starts at 0 not 1
+    id_to_move = section_to_move_up.section_id
+    assert section_to_move_up.index == index_to_move
+
+    section_that_gets_moved_down = round.sections[index_to_move - 2]
+    id_that_gets_moved_down = section_that_gets_moved_down.section_id
+    assert section_that_gets_moved_down.index == index_to_move - 1
+
+    move_section_up(round_id=round_id, section_index_to_move_up=index_to_move)
+
+    updated_round = get_round_by_id(round_id)
+    assert len(updated_round.sections) == 3
+
+    # Check section that moved up
+    moved_up_section = updated_round.sections[index_to_move - 2]
+    assert moved_up_section.section_id == id_to_move
+    assert moved_up_section.index == exp_new_index
+    # Check the section that got moved down
+    moved_down_section = updated_round.sections[index_to_move - 1]
+    assert moved_down_section.section_id == id_that_gets_moved_down
+    assert moved_down_section.index == exp_new_index + 1
