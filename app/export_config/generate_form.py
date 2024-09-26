@@ -75,7 +75,7 @@ def build_component(component: Component) -> dict:
     """
     built_component = {
         "options": component.options or {},
-        "type": component.type.value,
+        "type": component.type.value if component.type else "TextField",
         "title": component.title,
         "hint": component.hint_text or "",
         "schema": {},
@@ -139,8 +139,8 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
         for component in page.components:
             if not component.conditions:
                 continue
-            form_json_conditions = build_conditions(component)
             has_conditions = True
+            form_json_conditions = build_conditions(component)
             partial_form_json["conditions"].extend(form_json_conditions)
 
             for condition in component.conditions:

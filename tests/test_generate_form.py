@@ -467,6 +467,7 @@ def test_build_component(component_to_build, exp_result):
 @pytest.mark.parametrize(
     "input_pages,input_partial_json, exp_next",
     [
+        # Simple flow of 1 page then summary (summary not in input pages)
         (
             [
                 Page(
@@ -505,6 +506,64 @@ def test_build_component(component_to_build, exp_result):
                 "/organisation-single-name": [{"path": "/summary"}],
             },
         ),
+        # 1 page then summary (summary is in input pages)
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-single-name",
+                    name_in_apply_json={"en": "Organisation Name"},
+                    form_index=1,
+                    default_next_page_id="summary-id",
+                ),
+                Page(
+                    page_id="summary-id",
+                    form_id=uuid4(),
+                    display_path="summary-page",
+                    name_in_apply_json={"en": "Summary Page"},
+                    form_index=1,
+                    controller="summary.js",
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-single-name",
+                        "title": "Organisation Name",
+                        "components": [
+                            {
+                                "name": "reuse-organisation-name",
+                                "options": {
+                                    "hideTitle": False,
+                                    "classes": "govuk-!-width-full",
+                                },
+                                "type": "TextField",
+                                "title": "Organisation name",
+                                "hint": "This must match your registered legal organisation name",
+                                "schema": {},
+                            }
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/summary-page",
+                        "title": "Summary Page",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                        "controller": "summary.js",
+                    },
+                ],
+            },
+            {
+                "/organisation-single-name": [{"path": "/summary-page"}],
+                "/summary-page": [],
+            },
+        ),
+        # Simple flow of 2 pages then summary
         (
             [
                 Page(
@@ -567,6 +626,7 @@ def test_build_component(component_to_build, exp_result):
                 "/organisation-charitable-objects": [{"path": "/summary"}],
             },
         ),
+        # Just a summary page
         (
             [
                 Page(
@@ -608,6 +668,7 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
 @pytest.mark.parametrize(
     "input_pages,input_partial_json ,exp_next, exp_conditions",
     [
+        # One page, 2 possible nexts, both based on defined conditions
         (
             [
                 Page(
@@ -654,24 +715,8 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
                         "path": "/organisation-name",
                         "title": "Organisation Name",
                         "components": [
-                            {
-                                # "name": "reuse-organisation-name",
-                                # "options": {
-                                #     "hideTitle": False,
-                                #     "classes": "govuk-!-width-full",
-                                # },
-                                # "type": "TextField",
-                                # "title": "Organisation name",
-                                # "hint": "This must match your registered legal organisation name",
-                                # "schema": {},
-                            },
-                            {
-                                # "name": "reuse_organisation_other_names_yes_no",
-                                # "options": {},
-                                # "type": "YesNoField",
-                                # "title": "Does your organisation use any other names?",
-                                # "schema": {},
-                            },
+                            {},  # don't care about these right now...
+                            {},
                         ],
                         "next": [],
                         "options": {},
@@ -744,7 +789,323 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
                     },
                 },
             ],
-        )
+        ),
+        # One page, 2 possible nexts, based on a condition and a default
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-name",
+                    name_in_apply_json={"en": "Organisation Name"},
+                    form_index=1,
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="test_title_2",
+                            type=ComponentType.TEXT_FIELD,
+                            conditions=[
+                                {
+                                    "name": "organisation_other_names_yes",
+                                    "operator": "is",
+                                    "value": "yes",
+                                    "destination_page_path": "organisation-alternative-names",
+                                },
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                    default_next_page_id="summary-id",
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-alternative-names",
+                    name_in_apply_json={"en": "Organisation Alternative Names"},
+                    form_index=2,
+                ),
+                Page(
+                    page_id="summary-id",
+                    form_id=uuid4(),
+                    display_path="summary-page",
+                    name_in_apply_json={"en": "Summary Page"},
+                    form_index=1,
+                    controller="summary.js",
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-name",
+                        "title": "Organisation Name",
+                        "components": [
+                            {},  # don't care about these right now...
+                            {},
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/organisation-alternative-names",
+                        "title": "Organisation Alternative Names",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/summary-page",
+                        "title": "Summary Page",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                        "controller": "summary.js",
+                    },
+                ],
+            },
+            {
+                "/organisation-name": [
+                    {
+                        "path": "/summary-page",
+                    },
+                    {
+                        "path": "/organisation-alternative-names",
+                        "condition": "organisation_other_names_yes",
+                    },
+                ],
+                "/organisation-alternative-names": [{"path": "/summary"}],
+                "/summary-page": [],
+            },
+            [
+                {
+                    "displayName": "organisation_other_names_yes",
+                    "name": "organisation_other_names_yes",
+                    "value": {
+                        "name": "organisation_other_names_yes",
+                        "conditions": [
+                            {
+                                "field": {
+                                    "name": "test_c_1",
+                                    "type": "TextField",
+                                    "display": "test_title_2",
+                                },
+                                "operator": "is",
+                                "value": {
+                                    "type": "Value",
+                                    "value": "yes",
+                                    "display": "yes",
+                                },
+                            }
+                        ],
+                    },
+                },
+            ],
+        ),
+        # TODO One page, 3 possible nexts based on complex conditions (coordinators)
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                {
+                                    "name": "org_type_a",
+                                    "operator": "is",
+                                    "value": "A1",
+                                    "destination_page_path": "org-type-a",
+                                },
+                                {
+                                    "name": "org_type_b",
+                                    "operator": "is",
+                                    "value": "B1",
+                                    "destination_page_path": "org-type-b",
+                                },
+                                # TODO combine these 2 using coordinators after Adam's change
+                                {
+                                    "name": "org_type_c",
+                                    "operator": "is",
+                                    "value": "C1",
+                                    "destination_page_path": "org-type-c",
+                                },
+                                {
+                                    "name": "org_type_c",
+                                    "operator": "is",
+                                    "value": "C2",
+                                    "destination_page_path": "org-type-c",
+                                },
+                            ],
+                            runner_component_name="org_type_component",
+                        )
+                    ],
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="org-type-a",
+                    name_in_apply_json={"en": "Organisation Type A"},
+                    form_index=2,
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="org-type-b",
+                    name_in_apply_json={"en": "Organisation Type B"},
+                    form_index=2,
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="org-type-c",
+                    name_in_apply_json={"en": "Organisation Type C"},
+                    form_index=2,
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [
+                            {},  # don't care about these right now...
+                            {},
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/org-type-a",
+                        "title": "org-type-a",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/org-type-b",
+                        "title": "org-type-b",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/org-type-c",
+                        "title": "org-type-c",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                ],
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/org-type-a",
+                        "condition": "org-type-a",
+                    },
+                    {
+                        "path": "/org-type-b",
+                        "condition": "org-type-b",
+                    },
+                    {
+                        "path": "/org-type-c",
+                        "condition": "org-type-c",
+                    },
+                ],
+                "/org-type-a": [{"path": "/summary"}],
+                "/org-type-b": [{"path": "/summary"}],
+                "/org-type-c": [{"path": "/summary"}],
+            },
+            [
+                {
+                    "displayName": "org-type-a",
+                    "name": "org-type-a",
+                    "value": {
+                        "name": "org-type-a",
+                        "conditions": [
+                            {
+                                "field": {
+                                    "name": "org_type_component",
+                                    "type": "RadiosField",
+                                    "display": "org_type",
+                                },
+                                "operator": "is",
+                                "value": {
+                                    "type": "Value",
+                                    "value": "A",
+                                    "display": "A",
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    "displayName": "org-type-b",
+                    "name": "org-type-b",
+                    "value": {
+                        "name": "org-type-b",
+                        "conditions": [
+                            {
+                                "field": {
+                                    "name": "org_type_component",
+                                    "type": "RadiosField",
+                                    "display": "org_type",
+                                },
+                                "operator": "is",
+                                "value": {
+                                    "type": "Value",
+                                    "value": "B",
+                                    "display": "B",
+                                },
+                            },
+                        ],
+                    },
+                },
+                {
+                    "displayName": "org-type-c",
+                    "name": "org-type-c",
+                    "value": {
+                        "name": "org-type-c",
+                        "conditions": [
+                            {
+                                "field": {
+                                    "name": "org_type_component",
+                                    "type": "RadiosField",
+                                    "display": "org_type",
+                                },
+                                "operator": "is",
+                                "value": {
+                                    "type": "Value",
+                                    "value": "C1",
+                                    "display": "C1",
+                                },
+                            },
+                            {
+                                "coordinator": "or",
+                                "field": {
+                                    "name": "org_type_component",
+                                    "type": "RadiosField",
+                                    "display": "org_type",
+                                },
+                                "operator": "is",
+                                "value": {
+                                    "type": "Value",
+                                    "value": "C2",
+                                    "display": "C2",
+                                },
+                            },
+                        ],
+                    },
+                },
+            ],
+        ),
     ],
 )
 def test_build_navigation_with_conditions(mocker, input_pages, input_partial_json, exp_next, exp_conditions):
