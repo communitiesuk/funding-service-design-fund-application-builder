@@ -31,34 +31,37 @@ def add_conditions_to_components(db, page, conditions):
             # Use the conditions dictionary for faster lookup
             if target_condition_name in conditions_dict:
                 condition_data = conditions_dict[target_condition_name]
-                runner_component_name = condition_data["value"]["conditions"][0]["field"]["name"]
+                for condition in condition_data["value"]["conditions"]:
+                    condition_name = condition_data["name"]
+                    condition_display_name = condition_data["displayName"]
+                    runner_component_name = condition["field"]["name"]
 
-                # Use the cache to reduce database queries
-                if runner_component_name not in components_cache:
-                    component_to_update = (
-                        db.session.query(Component)
-                        .filter(Component.runner_component_name == runner_component_name)
-                        .first()
+                    # Use the cache to reduce database queries
+                    if runner_component_name not in components_cache:
+                        component_to_update = (
+                            db.session.query(Component)
+                            .filter(Component.runner_component_name == runner_component_name)
+                            .first()
+                        )
+                        components_cache[runner_component_name] = component_to_update
+                    else:
+                        component_to_update = components_cache[runner_component_name]
+
+                    # Create a new Condition instance with a different variable name
+                    new_condition = Condition(
+                        name=condition_name,
+                        display_name=condition_display_name,
+                        value=condition["value"],
+                        coordinator=condition.get("coordinator", None),
+                        operator=condition["operator"],
+                        destination_page_path=path["path"],
                     )
-                    components_cache[runner_component_name] = component_to_update
-                else:
-                    component_to_update = components_cache[runner_component_name]
 
-                # Create a new Condition instance with a different variable name
-                new_condition = Condition(
-                    name=condition_data["name"],
-                    coordinator=condition_data.get("coordinator", None),
-                    display_name=condition_data["displayName"],
-                    value=condition_data["value"]["conditions"][0]["value"]["value"],
-                    operator=condition_data["value"]["conditions"][0]["operator"],
-                    destination_page_path=path["path"],
-                )
-
-                # Add the new condition to the conditions list of the component to update
-                if component_to_update.conditions:
-                    component_to_update.conditions.append(asdict(new_condition))
-                else:
-                    component_to_update.conditions = [asdict(new_condition)]
+                    # Add the new condition to the conditions list of the component to update
+                    if component_to_update.conditions:
+                        component_to_update.conditions.append(asdict(new_condition))
+                    else:
+                        component_to_update.conditions = [asdict(new_condition)]
 
 
 def insert_component_as_template(component, page_id, page_index, lizts):

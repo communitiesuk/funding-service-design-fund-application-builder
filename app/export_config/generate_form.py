@@ -50,16 +50,18 @@ def build_conditions(component: Component) -> list:
                 "display": component.title,
             },
             "operator": condition["operator"],
-            "value": {
-                "type": "Value",
-                "value": condition["value"],
-                "display": condition["value"],
-            },
+            "value": condition["value"],
         }
 
         # Add 'coordinator' only if it exists
-        if hasattr(component, "coordinator") and component.coordinator is not None:
-            condition_entry["coordinator"] = component.coordinator
+        if condition.get("coordinator"):
+            condition_entry["coordinator"] = condition.get("coordinator")
+
+        if condition["name"] in [c["name"] for c in results]:
+            # If this condition already exists, add it to the existing condition
+            existing_condition = next(c for c in results if c["name"] == condition["name"])
+            existing_condition["value"]["conditions"].append(condition_entry)
+            continue
 
         result = {
             "displayName": condition["display_name"],
