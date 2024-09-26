@@ -9,12 +9,10 @@ from app.db.queries.application import get_list_by_id
 from app.db.queries.application import get_template_page_by_display_path
 
 BASIC_FORM_STRUCTURE = {
-    "metadata": {},
     "startPage": None,
     "pages": [],
     "lists": [],
     "conditions": [],
-    "fees": [],
     "sections": [],
     "outputs": [],
     "skipSummary": False,
@@ -45,28 +43,33 @@ def build_conditions(component: Component) -> list:
     """
     results = []
     for condition in component.conditions:
-        result = {
-            "displayName": condition["name"],
-            "name": condition["name"],
+        condition_entry = {
+            "field": {
+                "name": component.runner_component_name,
+                "type": component.type.value,
+                "display": component.title,
+            },
+            "operator": condition["operator"],
             "value": {
-                "name": condition["name"],
-                "conditions": [
-                    {
-                        "field": {
-                            "name": component.runner_component_name,
-                            "type": component.type.value,
-                            "display": component.title,
-                        },
-                        "operator": condition["operator"],
-                        "value": {
-                            "type": "Value",
-                            "value": condition["value"],
-                            "display": condition["value"],
-                        },
-                    }
-                ],
+                "type": "Value",
+                "value": condition["value"],
+                "display": condition["value"],
             },
         }
+
+        # Add 'coordinator' only if it exists
+        if hasattr(component, "coordinator") and component.coordinator is not None:
+            condition_entry["coordinator"] = component.coordinator
+
+        result = {
+            "displayName": condition["display_name"],
+            "name": condition["name"],
+            "value": {
+                "name": condition["display_name"],
+                "conditions": [condition_entry],
+            },
+        }
+
         results.append(result)
 
     return results

@@ -47,6 +47,8 @@ def add_conditions_to_components(db, page, conditions):
                 # Create a new Condition instance with a different variable name
                 new_condition = Condition(
                     name=condition_data["name"],
+                    coordinator=condition_data.get("coordinator", None),
+                    display_name=condition_data["displayName"],
                     value=condition_data["value"]["conditions"][0]["value"]["value"],
                     operator=condition_data["value"]["conditions"][0]["operator"],
                     destination_page_path=path["path"],
@@ -105,7 +107,7 @@ def insert_component_as_template(component, page_id, page_index, lizts):
         is_template=True,
         page_index=page_index,
         # theme_index=component.get('theme_index', None), TODO: add theme_index to json
-        runner_component_name=component.get("name", ""),
+        runner_component_name=component.get("name", None),
         list_id=list_id,
     )
     try:

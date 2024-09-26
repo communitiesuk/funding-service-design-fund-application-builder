@@ -229,7 +229,7 @@ class Component(BaseModel):
     conditions = Column(JSON(none_as_null=True))
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     runner_component_name = Column(
-        String(), nullable=False
+        String(), nullable=True  # None for display only fields
     )  # TODO add validation to make sure it's only letters, numbers and _
     list_id = Column(
         UUID(as_uuid=True),

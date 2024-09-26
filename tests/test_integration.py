@@ -139,12 +139,14 @@ page_2_id = uuid4()
                         "value": "false",  # this must be lowercaes or the navigation doesn't work
                         "operator": "is",
                         "destination_page_path": "CONTINUE",
+                        "display_name": "Other Name No",
                     },
                     {
                         "name": "organisation_other_names_yes",
                         "value": "true",  # this must be lowercaes or the navigation doesn't work
                         "operator": "is",
                         "destination_page_path": "organisation-alternative-names",
+                        "display_name": "Other Name Yes",
                     },
                 ],
             ),
@@ -251,7 +253,7 @@ output_base_path = Path("app") / "export_config" / "output"
 @pytest.mark.parametrize(
     "filename,expected_page_count_for_form,expected_component_count_for_form",
     [
-        ("test-import-form.json", 19, 25),
+        ("org-info.json", 18, 43),
         ("optional-all-components.json", 8, 27),
         ("required-all-components.json", 8, 27),
     ],
@@ -307,7 +309,14 @@ def test_generate_config_for_round_valid_input(
         # compare the import file with the generated file
         with open(generated_json_form, "r") as file:
             output_form = json.load(file)
-        # compare the contents of the files
+
+        # Compare the contents of the files
+
+        # ensure the keys of the output form are in the input form keys
+        assert set(output_form.keys()) - {"name"} <= set(
+            input_form.keys()
+        ), "Output form keys are not a subset of input form keys, ignoring 'name'"
+
         # check that content of each page (including page[components] and page[next] within form[pages] is the same
         for input_page in input_form["pages"]:
             # find page in output pages

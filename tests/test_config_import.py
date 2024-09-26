@@ -13,7 +13,6 @@ from app.import_config.load_form_json import load_form_jsons
 @pytest.mark.parametrize(
     "filename",
     [
-        "test-import-form.json",
         "optional-all-components.json",
         "required-all-components.json",
     ],
@@ -30,10 +29,10 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename)
     load_form_jsons(form_configs)
 
     expected_form_count = 1
-    expected_page_count_for_form = 19
-    expected_component_count_for_form = 25
+    expected_page_count_for_form = 8
+    expected_component_count_for_form = 27
     # check form config is in the database
-    forms = _db.session.query(Form).filter(Form.template_name == "test-import-form.json")
+    forms = _db.session.query(Form).filter(Form.template_name == filename)
     assert forms.count() == expected_form_count
     form = forms.first()
     pages = _db.session.query(Page).filter(Page.form_id == form.form_id)

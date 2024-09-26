@@ -213,12 +213,14 @@ def init_salmon_fishing_fund():
         conditions=[
             {
                 "name": "organisation_other_names_no",
+                "display_name": "Other Name No",
                 "value": "false",  # this must be lowercase or the navigation doesn't work
                 "operator": "is",
                 "destination_page_path": "organisation-address",
             },
             {
                 "name": "organisation_other_names_yes",
+                "display_name": "Other Name Yes",
                 "value": "true",  # this must be lowercase or the navigation doesn't work
                 "operator": "is",
                 "destination_page_path": "organisation-alternative-names",

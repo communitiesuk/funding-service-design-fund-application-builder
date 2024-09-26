@@ -245,29 +245,27 @@ id2 = uuid4()
                 title="test_title",
                 type=ComponentType.TEXT_FIELD,
                 conditions=[
-                    {"name": "test_condition", "operator": "is", "value": "yes"},
+                    {
+                        "name": "test_condition",
+                        "display_name": "display name",
+                        "operator": "is",
+                        "value": "yes",
+                        "destination_page_path": "./who-knows",
+                    },
                 ],
                 runner_component_name="test_name",
             ),
             [
                 {
-                    "displayName": "test_condition",
+                    "displayName": "display name",
                     "name": "test_condition",
                     "value": {
-                        "name": "test_condition",
+                        "name": "display name",
                         "conditions": [
                             {
-                                "field": {
-                                    "name": "test_name",
-                                    "type": "TextField",
-                                    "display": "test_title",
-                                },
+                                "field": {"name": "test_name", "type": "TextField", "display": "test_title"},
                                 "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "yes",
-                                    "display": "yes",
-                                },
+                                "value": {"type": "Value", "value": "yes", "display": "yes"},
                             }
                         ],
                     },
@@ -280,53 +278,49 @@ id2 = uuid4()
                 title="test_title_2",
                 type=ComponentType.TEXT_FIELD,
                 conditions=[
-                    {"name": "test_condition", "operator": "is", "value": "yes"},
-                    {"name": "test_condition2", "operator": "is", "value": "no"},
+                    {
+                        "name": "test_condition",
+                        "display_name": "display name",
+                        "operator": "is",
+                        "value": "yes",
+                        "destination_page_path": "./who-knows",
+                    },
+                    {
+                        "name": "test_condition2",
+                        "display_name": "display name",
+                        "operator": "is",
+                        "value": "no",
+                        "destination_page_path": "./who-knows2",
+                    },
                 ],
                 runner_component_name="test_name",
             ),
             [
                 {
-                    "displayName": "test_condition",
+                    "displayName": "display name",
                     "name": "test_condition",
                     "value": {
-                        "name": "test_condition",
+                        "name": "display name",
                         "conditions": [
                             {
-                                "field": {
-                                    "name": "test_name",
-                                    "type": "TextField",
-                                    "display": "test_title_2",
-                                },
+                                "field": {"name": "test_name", "type": "TextField", "display": "test_title_2"},
                                 "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "yes",
-                                    "display": "yes",
-                                },
-                            },
+                                "value": {"type": "Value", "value": "yes", "display": "yes"},
+                            }
                         ],
                     },
                 },
                 {
-                    "displayName": "test_condition2",
+                    "displayName": "display name",
                     "name": "test_condition2",
                     "value": {
-                        "name": "test_condition2",
+                        "name": "display name",
                         "conditions": [
                             {
-                                "field": {
-                                    "name": "test_name",
-                                    "type": "TextField",
-                                    "display": "test_title_2",
-                                },
+                                "field": {"name": "test_name", "type": "TextField", "display": "test_title_2"},
                                 "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "no",
-                                    "display": "no",
-                                },
-                            },
+                                "value": {"type": "Value", "value": "no", "display": "no"},
+                            }
                         ],
                     },
                 },
@@ -472,12 +466,14 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                             conditions=[
                                 {
                                     "name": "organisation_other_names_no",
+                                    "display_name": "organisation_other_names_no",
                                     "operator": "is",
                                     "value": "no",
                                     "destination_page_path": "summary",
                                 },
                                 {
                                     "name": "organisation_other_names_yes",
+                                    "display_name": "organisation_other_names_yes",
                                     "operator": "is",
                                     "value": "yes",
                                     "destination_page_path": "organisation-alternative-names",

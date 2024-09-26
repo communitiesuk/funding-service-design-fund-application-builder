@@ -7,6 +7,8 @@ from typing import Optional
 @dataclass
 class Condition:
     name: str
+    coordinator: str
+    display_name: str
     value: str
     operator: str
     destination_page_path: str
