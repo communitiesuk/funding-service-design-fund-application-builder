@@ -1,3 +1,7 @@
+{% from "macros/wtfToGovUk.html" import input %}
+{%- from "govuk_frontend_jinja/components/file-upload/macro.html" import govukFileUpload -%}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+
 {% extends "base.html" %}
 {% set pageHeading %}
     View All Templates
@@ -17,7 +21,19 @@
         <h2 class="govuk-heading-m">Forms</h2>
         <ul class="govuk-body">
         {% for form in forms %}
-           <li> {{form.template_name}}</li>
+            <li class="govuk-body"><a class="govuk-link" href="{{url_for('build_fund_bp.preview_form', form_id=form.form_id)}}">{{form.template_name}}</a></li>
         {% endfor %}</ul>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ uploadform.hidden_tag()}}
+                        {{ input(uploadform.template_name)}}
+                        {{ govukFileUpload(uploadform.file) }}
+                        {{ govukButton({"text": "Add"}) }}
+                    </form>
+                </fieldset>
+        </div>
     </div>
 {% endblock %}
