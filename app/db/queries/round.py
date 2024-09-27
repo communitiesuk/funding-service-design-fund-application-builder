@@ -10,6 +10,11 @@ def add_round(round: Round) -> Round:
     return round
 
 
+def update_round(round: Round) -> Round:
+    db.session.commit()
+    return round
+
+
 def get_round_by_id(id: str) -> Round:
     round = db.session.get(Round, id)
     if not round:

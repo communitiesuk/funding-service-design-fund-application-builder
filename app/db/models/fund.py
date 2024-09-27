@@ -7,6 +7,7 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import Boolean
@@ -43,10 +44,12 @@ class Fund(BaseModel):
         default=uuid.uuid4,
         nullable=False,
     )
-    name_json = Column("name_json", JSON(none_as_null=True), nullable=False, unique=False)
-    title_json = Column("title_json", JSON(none_as_null=True), nullable=False, unique=False)
+    name_json = Column("name_json", MutableDict.as_mutable(JSON(none_as_null=True)), nullable=False, unique=False)
+    title_json = Column("title_json", MutableDict.as_mutable(JSON(none_as_null=True)), nullable=False, unique=False)
     short_name = Column("short_name", db.String(15), nullable=False, unique=True)
-    description_json = Column("description_json", JSON(none_as_null=True), nullable=False, unique=False)
+    description_json = Column(
+        "description_json", MutableDict.as_mutable(JSON(none_as_null=True)), nullable=False, unique=False
+    )
     welsh_available = Column("welsh_available", Boolean, default=False, nullable=False)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
