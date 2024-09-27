@@ -32,7 +32,7 @@ class DateInputForm(Form):
     month = StringField("Month", validators=[DataRequired(), Length(min=1, max=2)])
     year = StringField("Year", validators=[DataRequired(), Length(min=1, max=4)])
     hour = StringField("Hour", validators=[DataRequired(), Length(min=1, max=2)])
-    minute = StringField("minute", validators=[DataRequired(), Length(min=1, max=2)])
+    minute = StringField("Minute", validators=[DataRequired(), Length(min=1, max=2)])
 
     def validate_day(self, field):
         try:

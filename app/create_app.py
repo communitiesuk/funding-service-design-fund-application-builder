@@ -11,6 +11,7 @@ from app.blueprints.self_serve.routes import self_serve_bp
 from app.blueprints.templates.routes import template_bp
 from app.db.models import Fund  # noqa:F401
 from app.db.models import Round  # noqa:F401
+from fsd_utils.logging import logging
 
 
 def create_app() -> Flask:
@@ -39,6 +40,9 @@ def create_app() -> Flask:
         compare_type=True,
         compare_server_default=True,
     )
+
+    # Initialise logging
+    logging.init_app(flask_app)
 
     # Bundle and compile assets
     assets = Environment()

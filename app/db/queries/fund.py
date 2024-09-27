@@ -3,6 +3,7 @@ from sqlalchemy import select
 from app.db import db
 from app.db.models.fund import Fund
 from app.db.models.fund import Organisation
+from flask import current_app
 
 
 def add_organisation(organisation: Organisation) -> Organisation:
@@ -14,11 +15,13 @@ def add_organisation(organisation: Organisation) -> Organisation:
 def add_fund(fund: Fund) -> Fund:
     db.session.add(fund)
     db.session.commit()
+    current_app.logger.info(f"Fund added with fund_id: '{fund.fund_id}.")
     return fund
 
 
 def update_fund(fund: Fund) -> Fund:
     db.session.commit()
+    current_app.logger.info(f"Fund updated with fund_id: '{fund.fund_id}.")
     return fund
 
 
