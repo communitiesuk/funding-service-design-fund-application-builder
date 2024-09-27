@@ -7,12 +7,14 @@ from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Lizt
 from app.db.models import Page
+from app.db.models.application_config import Form
 from app.export_config.generate_form import build_component
 from app.export_config.generate_form import build_conditions
 from app.export_config.generate_form import build_form_json
 from app.export_config.generate_form import build_lists
 from app.export_config.generate_form import build_navigation
 from app.export_config.generate_form import build_page
+from app.export_config.generate_form import build_start_page
 from app.export_config.generate_form import human_to_kebab_case
 from tests.unit_test_data import mock_c_1
 from tests.unit_test_data import mock_c_2
@@ -1169,3 +1171,60 @@ def test_build_form(input_form, exp_results):
                 assert exp_next["path"] in [next["path"] for next in result_page["next"]]
                 if "condition" in exp_next:
                     assert exp_next["condition"] in [next["condition"] for next in result_page["next"]]
+
+
+@pytest.mark.parametrize(
+    "input_content, input_form, expected_title, expected_path, expected_next, expected_content",
+    [
+        (
+            "2 pages",
+            Form(
+                name_in_apply_json={"en": "Test Form"},
+                pages=[
+                    Page(name_in_apply_json={"en": "Page 1"}, display_path="page-1"),
+                    Page(name_in_apply_json={"en": "Page 2"}, display_path="page-2"),
+                ],
+            ),
+            "Test Form",
+            "/intro-test-form",
+            [{"path": "/page-1"}],
+            (
+                '<p class="govuk-body">2 pages</p>'
+                '<p class="govuk-body">We will ask you about:</p> <ul>'
+                "<li>Page 1</li><li>Page 2</li></ul>"
+            ),
+        ),
+        (
+            "Single page",
+            Form(
+                name_in_apply_json={"en": "Another Form"},
+                pages=[Page(name_in_apply_json={"en": "Details Page"}, display_path="details-page")],
+            ),
+            "Another Form",
+            "/intro-another-form",
+            [{"path": "/details-page"}],
+            (
+                '<p class="govuk-body">Single page</p>'
+                '<p class="govuk-body">We will ask you about:</p> <ul>'
+                "<li>Details Page</li></ul>"
+            ),
+        ),
+        (
+            "Form with no pages",
+            Form(name_in_apply_json={"en": "Another Form"}, pages=[]),
+            "Another Form",
+            "/intro-another-form",
+            [],
+            ('<p class="govuk-body">Form with no pages</p>'),
+        ),
+    ],
+)
+def test_build_start_page(input_content, input_form, expected_title, expected_path, expected_next, expected_content):
+    result = build_start_page(input_content, input_form)
+
+    # Assert
+    assert result["title"] == expected_title
+    assert result["path"] == expected_path
+    assert result["controller"] == "./pages/start.js"
+    assert result["next"] == expected_next
+    assert result["components"][0]["content"] == expected_content
