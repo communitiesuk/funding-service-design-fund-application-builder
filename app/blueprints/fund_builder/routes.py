@@ -250,7 +250,7 @@ def fund(fund_id=None):
             flash(f"Created fund {form.name_en.data}")
         return redirect(url_for(BUILD_FUND_BP_INDEX))
 
-    return render_template("fund.html", form=form)
+    return render_template("fund.html", form=form, fund_id=fund_id)
 
 
 @build_fund_bp.route("/round", methods=["GET", "POST"])
@@ -280,6 +280,7 @@ def round(round_id=None):
         "round.html",
         form=form,
         all_funds=all_funds_as_govuk_select_items(all_funds),
+        round_id=round_id,
     )
 
 
