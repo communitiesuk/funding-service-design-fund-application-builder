@@ -300,7 +300,7 @@ def test_generate_config_for_round_valid_input(
     result = generate_form_jsons_for_round(round_id)
     # Simply writes the files to the output directory so no result is given directly
     assert result is None
-    # Assert: Check if the directory structure and files are created as expected
+
     try:
         # Check if the directory is created
         generated_json_form = output_base_path / round_short_name / "form_runner" / filename
