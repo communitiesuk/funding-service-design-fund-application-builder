@@ -880,6 +880,117 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
             [
                 {
                     "displayName": "organisation_other_names_yes",
+                    "name": "orgyes",
+                    "value": {
+                        "name": "organisation_other_names_yes",
+                        "conditions": [
+                            {
+                                "field": {
+                                    "name": "test_c_1",
+                                    "type": "TextField",
+                                    "display": "test_title_2",
+                                },
+                                "operator": "is",
+                                "value": {
+                                    "type": "Value",
+                                    "value": "yes",
+                                    "display": "yes",
+                                },
+                            }
+                        ],
+                    },
+                },
+            ],
+        ),
+        # One page, 2 possible nexts, based on a condition and a default
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-name",
+                    name_in_apply_json={"en": "Organisation Name"},
+                    form_index=1,
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="test_title_2",
+                            type=ComponentType.TEXT_FIELD,
+                            conditions=[
+                                {
+                                    "name": "organisation_other_names_yes",
+                                    "operator": "is",
+                                    "value": "yes",
+                                    "destination_page_path": "organisation-alternative-names",
+                                },
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                    default_next_page_id="summary-id",
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-alternative-names",
+                    name_in_apply_json={"en": "Organisation Alternative Names"},
+                    form_index=2,
+                ),
+                Page(
+                    page_id="summary-id",
+                    form_id=uuid4(),
+                    display_path="summary-page",
+                    name_in_apply_json={"en": "Summary Page"},
+                    form_index=1,
+                    controller="summary.js",
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-name",
+                        "title": "Organisation Name",
+                        "components": [
+                            {},  # don't care about these right now...
+                            {},
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/organisation-alternative-names",
+                        "title": "Organisation Alternative Names",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/summary-page",
+                        "title": "Summary Page",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                        "controller": "summary.js",
+                    },
+                ],
+            },
+            {
+                "/organisation-name": [
+                    {
+                        "path": "/summary-page",
+                    },
+                    {
+                        "path": "/organisation-alternative-names",
+                        "condition": "organisation_other_names_yes",
+                    },
+                ],
+                "/organisation-alternative-names": [{"path": "/summary"}],
+                "/summary-page": [],
+            },
+            [
+                {
+                    "displayName": "organisation_other_names_yes",
                     "name": "organisation_other_names_yes",
                     "value": {
                         "name": "organisation_other_names_yes",
