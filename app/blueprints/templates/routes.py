@@ -1,3 +1,4 @@
+import json
 import os
 
 from flask import Blueprint
@@ -21,10 +22,10 @@ template_bp = Blueprint(
 file_upload_path = os.path.join(os.path.dirname(__file__), "uplaoded_files")
 
 
-def json_import(file_path, template_name):
+def json_import(data, template_name):
     from app.import_config.load_form_json import load_json_from_file
 
-    load_json_from_file(file_path=file_path, template_name=template_name)
+    load_json_from_file(data=data, template_name=template_name)
 
 
 @template_bp.route("/view", methods=["GET", "POST"])
@@ -35,14 +36,13 @@ def view_templates():
     if form.validate_on_submit():
         template_name = form.template_name.data
         file = form.file.data
-        if not os.path.exists(file_upload_path):
-            os.makedirs(file_upload_path)
+
         if file:
-            uploaded_file = secure_filename(file.filename)
-            file_path = os.path.join(file_upload_path, uploaded_file)
-            file.save(file_path)
+            secure_filename(file.filename)
+            file_data = file.read().decode("utf-8")
+            form = json.loads(file_data)
             try:
-                json_import(file_path=file_path, template_name=template_name)
+                json_import(data=form, template_name=template_name)
             except Exception as e:
                 print(e)
         return redirect(url_for("template_bp.view_templates"))

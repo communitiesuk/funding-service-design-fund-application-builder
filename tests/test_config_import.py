@@ -45,13 +45,15 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename)
 
 
 def test_generate_config_for_round_valid_input_file(seed_dynamic_data, _db):
-    form_configs = []
     filename = "test-import-form.json"
     template_name = "test-template"
     script_dir = os.path.dirname(__file__)
     file_path = os.path.join(script_dir, filename)
+    with open(file_path, "r") as json_file:
+        form = json.load(json_file)
+        form["filename"] = filename
 
-    load_json_from_file(file_path, template_name)
+    load_json_from_file(form, template_name)
 
     expected_form_count = 1
     expected_page_count_for_form = 19
