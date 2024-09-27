@@ -226,20 +226,26 @@ def build_start_page(content: str, form: Form) -> dict:
             "title": form.name_in_apply_json["en"],
             "path": f"/intro-{human_to_kebab_case(form.name_in_apply_json['en'])}",
             "controller": "./pages/start.js",
-            "next": [{"path": f"/{form.pages[0].display_path}"}],
         }
     )
-    ask_about = "<p class='govuk-body'>We will ask you about:</p> <ul>"
-    for page in form.pages:
-        ask_about += f"<li>{page.name_in_apply_json['en']}</li>"
-    ask_about += "</ul>"
+    ask_about = None
+    if len(form.pages) > 0:
+        ask_about = '<p class="govuk-body">We will ask you about:</p> <ul>'
+        for page in form.pages:
+            ask_about += f"<li>{page.name_in_apply_json['en']}</li>"
+        ask_about += "</ul>"
+        start_page.update(
+            {
+                "next": [{"path": f"/{form.pages[0].display_path}"}],
+            }
+        )
 
     start_page["components"].append(
         {
             "name": "start-page-content",
             "options": {},
             "type": "Html",
-            "content": f"<p class='govuk-body'>{content}</p>{ask_about}",
+            "content": f'<p class="govuk-body">{content}</p>{ask_about or ""}',
             "schema": {},
         }
     )
