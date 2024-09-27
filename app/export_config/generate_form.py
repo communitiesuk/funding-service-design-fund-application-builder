@@ -248,7 +248,7 @@ def build_start_page(content: str, form: Form) -> dict:
             "next": [{"path": f"/{form.pages[0].display_path}"}],
         }
     )
-    ask_about = '<p class="govuk-body">We will ask you about:</p> <ul>'
+    ask_about = "<p class='govuk-body'>We will ask you about:</p> <ul>"
     for page in form.pages:
         ask_about += f"<li>{page.name_in_apply_json['en']}</li>"
     ask_about += "</ul>"
@@ -258,7 +258,7 @@ def build_start_page(content: str, form: Form) -> dict:
             "name": "start-page-content",
             "options": {},
             "type": "Html",
-            "content": f'<p class="govuk-body">{content}</p>{ask_about}',
+            "content": f"<p class='govuk-body'>{content}</p>{ask_about}",
             "schema": {},
         }
     )

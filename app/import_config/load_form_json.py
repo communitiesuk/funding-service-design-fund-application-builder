@@ -53,7 +53,7 @@ def add_conditions_to_components(db, page, conditions):
                         display_name=condition_display_name,
                         value=condition["value"],
                         coordinator=condition.get("coordinator", None),
-                        operator=condition["operator"],
+                        operator=condition.get("operator", None),
                         destination_page_path=path["path"],
                     )
 

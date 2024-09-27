@@ -148,26 +148,76 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
     expected_files = [
         {
             "path": output_base_path / round_short_name / "form_runner" / f"{form_publish_name}.json",
-            "expected_output": (
-                '{"metadata": {}, "startPage": "/intro-about-your-organisation", '
-                '"pages": [{"path": "/organisation-name", "title": '
-                '"Organisation Name", "components": [{"options": {"hideTitle": false, "classes": ""}, '
-                '"type": "TextField", "title": "What is your organisation\'s name?", "hint": "This '
-                'must match the regsitered legal organisation name", "schema": {}, "name": '
-                '"organisation_name"}, {"options": {"hideTitle": false, "classes": ""}, "type": '
-                '"RadiosField", "title": "How is your organisation classified?", "hint": "", "schema":'
-                ' {}, "name": "organisation_classification", "list": "classifications_list"}], "next":'
-                ' [{"path": "/summary"}]}, {"path": "/intro-about-your-organisation", "title": "About'
-                ' your organisation", "components": [{"name": "start-page-content", "options": {}, '
-                '"type": "Html", "content": "<p class=\\"govuk-body\\">None</p><p class=\\"govuk-body\\">'
-                'We will ask you about:</p> <ul><li>Organisation Name</li></ul>", "schema": {}}], "next":'
-                ' [{"path": "/organisation-name"}], "controller": "./pages/start.js"}, {"path": "/summary",'
-                ' "title": "Check your answers", "components": [], "next": [], "section": "uLwBuz", "controller":'
-                ' "./pages/summary.js"}], "lists": [{"type": "string", "items": [{"text": "Charity", "value":'
-                ' "charity"}, {"text": "Public Limited Company", "value": "plc"}], "name": "classifications_list",'
-                ' "title": null}], "conditions": [], "fees": [], "sections": [], "outputs": [], "skipSummary": false,'
-                ' "name": "About your organisation"}'
-            ),
+            "expected_output": {
+                "startPage": "/intro-about-your-organisation",
+                "pages": [
+                    {
+                        "path": "/organisation-name",
+                        "title": "Organisation Name",
+                        "components": [
+                            {
+                                "options": {"hideTitle": False, "classes": ""},
+                                "type": "TextField",
+                                "title": "What is your organisation's name?",
+                                "hint": "This must match the registered legal organisation name",
+                                "schema": {},
+                                "name": "organisation_name",
+                            },
+                            {
+                                "options": {"hideTitle": False, "classes": ""},
+                                "type": "RadiosField",
+                                "title": "How is your organisation classified?",
+                                "hint": "",
+                                "schema": {},
+                                "name": "organisation_classification",
+                                "list": "classifications_list",
+                                "values": {"type": "listRef"},
+                            },
+                        ],
+                        "next": [{"path": "/summary"}],
+                    },
+                    {
+                        "path": "/intro-about-your-organisation",
+                        "title": "About your organisation",
+                        "components": [
+                            {
+                                "name": "start-page-content",
+                                "options": {},
+                                "type": "Html",
+                                "content": "<p class='govuk-body'>None</p><p class='govuk-body'>"
+                                "We will ask you about:</p> <ul><li>Organisation Name</li></ul>",
+                                "schema": {},
+                            }
+                        ],
+                        "next": [{"path": "/organisation-name"}],
+                        "controller": "./pages/start.js",
+                    },
+                    {
+                        "path": "/summary",
+                        "title": "Check your answers",
+                        "components": [],
+                        "next": [],
+                        "section": "uLwBuz",
+                        "controller": "./pages/summary.js",
+                    },
+                ],
+                "lists": [
+                    {
+                        "type": "string",
+                        "items": [
+                            {"text": "Charity", "value": "charity"},
+                            {"text": "Public Limited Company", "value": "plc"},
+                        ],
+                        "name": "classifications_list",
+                        "title": None,
+                    }
+                ],
+                "conditions": [],
+                "sections": [],
+                "outputs": [],
+                "skipSummary": False,
+                "name": "About your organisation",
+            },
         }
     ]
     try:
@@ -180,8 +230,7 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
             for page in data["pages"]:
                 for component in page["components"]:
                     component.pop("metadata", None)
-            expected = json.loads(expected_file["expected_output"])
-            assert data == expected
+            assert data == expected_file["expected_output"]
     finally:
         # Cleanup step to remove the directory
         directory_path = output_base_path / round_short_name
@@ -208,7 +257,7 @@ def test_generate_fund_round_html(seed_dynamic_data):
     expected_files = [
         {
             "path": output_base_path / round_short_name / "html" / "full_application.html",
-            "expected_output": '<div class="govuk-!-margin-bottom-8">\n  <h2 class="govuk-heading-m ">\n    Table of contents\n  </h2>\n  <ol class="govuk-list govuk-list--number">\n    <li>\n      <a class="govuk-link" href="#organisation-information">\n        Organisation Information\n      </a>\n    </li>\n  </ol>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h2 class="govuk-heading-l" id="organisation-information">\n    1. Organisation Information\n  </h2>\n  <h3 class="govuk-heading-m">\n    1.1. About your organisation\n  </h3>\n  <h4 class="govuk-heading-s">\n    1.1.1. Organisation Name\n  </h4>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      What is your organisation\'s name?\n    </p>\n    <p class="govuk-body">\n      This must match the regsitered legal organisation name\n    </p>\n  </div>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      How is your organisation classified?\n    </p>\n    <ul class="govuk-list govuk-list--bullet">\n      <li class="">\n        Charity\n      </li>\n      <li class="">\n        Public Limited Company\n      </li>\n    </ul>\n  </div>\n</div>',  # noqa: E501
+            "expected_output": '<div class="govuk-!-margin-bottom-8">\n  <h2 class="govuk-heading-m ">\n    Table of contents\n  </h2>\n  <ol class="govuk-list govuk-list--number">\n    <li>\n      <a class="govuk-link" href="#organisation-information">\n        Organisation Information\n      </a>\n    </li>\n  </ol>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h2 class="govuk-heading-l" id="organisation-information">\n    1. Organisation Information\n  </h2>\n  <h3 class="govuk-heading-m">\n    1.1. About your organisation\n  </h3>\n  <h4 class="govuk-heading-s">\n    1.1.1. Organisation Name\n  </h4>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      What is your organisation\'s name?\n    </p>\n    <p class="govuk-body">\n      This must match the registered legal organisation name\n    </p>\n  </div>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      How is your organisation classified?\n    </p>\n    <ul class="govuk-list govuk-list--bullet">\n      <li class="">\n        Charity\n      </li>\n      <li class="">\n        Public Limited Company\n      </li>\n    </ul>\n  </div>\n</div>',  # noqa: E501
         }
     ]
     try:

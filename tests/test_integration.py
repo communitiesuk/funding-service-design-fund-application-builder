@@ -317,8 +317,14 @@ def test_generate_config_for_round_valid_input(
             input_form.keys()
         ), "Output form keys are not a subset of input form keys, ignoring 'name'"
 
+        # check conditions length is equal
+        input_condition_count = len(input_form.get("conditions", []))
+        output_condition_count = len(output_form.get("conditions", []))
+        assert output_condition_count <= input_condition_count  # sometime we remove specified but unused conditions
+
         # check that content of each page (including page[components] and page[next] within form[pages] is the same
         for input_page in input_form["pages"]:
+
             # find page in output pages
             output_page = next((p for p in output_form["pages"] if p["path"] == input_page["path"]), None)
             assert input_page["path"] == output_page["path"]
