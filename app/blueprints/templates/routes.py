@@ -1,14 +1,14 @@
+import os
+
 from flask import Blueprint
 from flask import redirect
-from flask import url_for
 from flask import render_template
-from wtforms import ValidationError
-from app.db.queries.application import get_all_template_forms
-from app.db.queries.application import get_all_template_sections
-from app.blueprints.fund_builder.forms.templates import TemplateUploadForm
-import os
+from flask import url_for
 from werkzeug.utils import secure_filename
 
+from app.blueprints.fund_builder.forms.templates import TemplateUploadForm
+from app.db.queries.application import get_all_template_forms
+from app.db.queries.application import get_all_template_sections
 
 # Blueprint for routes used by FAB PoC to manage templates
 template_bp = Blueprint(
@@ -19,6 +19,7 @@ template_bp = Blueprint(
 )
 
 file_upload_path = os.path.join(os.path.dirname(__file__), "uplaoded_files")
+
 
 def json_import(file_path, template_name):
     from app.import_config.load_form_json import load_json_from_file
