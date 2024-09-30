@@ -26,9 +26,17 @@
     </div>
     <div class="govuk-grid-row">
         <div class="govuk-form-group">
+                 <div>
+                    {% if uploadform.error %}
+                    <span class ="govuk-error-message">
+                        <span class="govuk-visually-hidden">Error:</span>{{ uploadform.error }}
+                    </span>
+                    {% endif %}
+                </div>
                 <fieldset class="govuk-fieldset">
                     <form method="POST" enctype="multipart/form-data">
                         {{ uploadform.hidden_tag()}}
+
                         {{ input(uploadform.template_name)}}
                         {{ govukFileUpload(uploadform.file) }}
                         {{ govukButton({"text": "Add"}) }}

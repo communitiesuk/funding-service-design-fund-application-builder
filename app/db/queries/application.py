@@ -47,6 +47,11 @@ def get_form_by_id(form_id: str) -> Form:
     return form
 
 
+def get_form_by_template_name(template_name: str) -> Form:
+    form = db.session.query(Form).where(Form.template_name == template_name).one_or_none()
+    return form
+
+
 def get_component_by_id(component_id: str) -> Component:
     component = db.session.query(Component).where(Component.component_id == component_id).one_or_none()
     return component
