@@ -3,6 +3,10 @@
 import json
 import os
 import sys
+from uuid import UUID
+
+from app.db.queries.application import get_list_by_name
+from app.db.queries.application import insert_list
 
 sys.path.insert(1, ".")
 from dataclasses import asdict  # noqa:E402
@@ -12,7 +16,6 @@ from app.db import db  # noqa:E402
 from app.db.models import Component  # noqa:E402
 from app.db.models import ComponentType  # noqa:E402
 from app.db.models import Form  # noqa:E402
-from app.db.models import Lizt  # noqa:E402
 from app.db.models import Page  # noqa:E402
 from app.shared.data_classes import Condition  # noqa:E402
 from app.shared.data_classes import ConditionValue  # noqa:E402
@@ -79,34 +82,27 @@ def add_conditions_to_components(db, page: dict, conditions: dict):
                         component_to_update.conditions = [asdict(new_condition)]
 
 
+def _find_list_and_create_if_not_existing(list_name: str, all_lists_in_form: list[dict]) -> UUID:
+    list_from_form = next(li for li in all_lists_in_form if li["name"] == list_name)
+
+    # Check if this list already exists in the database
+    existing_list = get_list_by_name(list_name=list_name)
+    if existing_list:
+        return existing_list.list_id
+
+    # If it doesn't, insert new list
+    new_list = insert_list(do_commit=False, list_config={"is_template": True, **list_from_form})
+    return new_list.list_id
+
+
 def insert_component_as_template(component, page_id, page_index, lizts):
     # if component has a list, insert the list into the database
     list_id = None
     component_list = component.get("list", None)
     if component_list:
-        for li in lizts:
-            if li["name"] == component_list:
-                # Check if the list already exists
-                existing_list = db.session.query(Lizt).filter_by(name=li.get("name")).first()
-                if existing_list is None:
-                    new_list = Lizt(
-                        is_template=True,
-                        name=li.get("name"),
-                        title=li.get("title"),
-                        type=li.get("type"),
-                        items=li.get("items"),
-                    )
-                    try:
-                        db.session.add(new_list)
-                    except Exception as e:
-                        print(e)
-                        raise e
-                    db.session.flush()  # flush to get the list id
-                    list_id = new_list.list_id
-                else:
-                    # If the list already exists, you can use its ID or handle it as needed
-                    list_id = existing_list.list_id
-                break
+        list_id = _find_list_and_create_if_not_existing(list_name=component_list, all_lists_in_form=lizts)
+
+    # establish component type
     component_type = component.get("type", None)
     if component_type is None or find_enum(ComponentType, component_type) is None:
         raise ValueError(f"Component type not found: {component_type}")
