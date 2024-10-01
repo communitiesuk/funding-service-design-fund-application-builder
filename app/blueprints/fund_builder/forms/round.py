@@ -19,9 +19,9 @@ def get_datetime(form_field):
     month = int(form_field.month.data)
     year = int(form_field.year.data)
     hour = int(form_field.hour.data)
-    minutes = int(form_field.minutes.data)
+    minute = int(form_field.minute.data)
     try:
-        form_field_datetime = datetime.datetime(year, month, day, hour=hour, minute=minutes).strftime("%m-%d-%Y %H:%M")
+        form_field_datetime = datetime.datetime(year, month, day, hour=hour, minute=minute).strftime("%m-%d-%Y %H:%M")
         return form_field_datetime
     except ValueError:
         raise ValidationError(f"Invalid date entered for {form_field}")
@@ -32,7 +32,7 @@ class DateInputForm(Form):
     month = StringField("Month", validators=[DataRequired(), Length(min=1, max=2)])
     year = StringField("Year", validators=[DataRequired(), Length(min=1, max=4)])
     hour = StringField("Hour", validators=[DataRequired(), Length(min=1, max=2)])
-    minutes = StringField("Minutes", validators=[DataRequired(), Length(min=1, max=2)])
+    minute = StringField("Minute", validators=[DataRequired(), Length(min=1, max=2)])
 
     def validate_day(self, field):
         try:
@@ -58,17 +58,17 @@ class DateInputForm(Form):
 
     def validate_hour(self, field):
         try:
-            day = int(field.data)
-            if day < 0 or day > 23:
+            hour = int(field.data)
+            if hour < 0 or hour > 23:
                 raise ValidationError("Hour must be between 0 and 23 inclusive.")
         except ValueError:
             raise ValidationError("Invalid Day")
 
-    def validate_minutes(self, field):
+    def validate_minute(self, field):
         try:
-            day = int(field.data)
-            if day < 0 or day >= 60:
-                raise ValidationError("Minutes must be between 0 and 59 inclusive.")
+            minute = int(field.data)
+            if minute < 0 or minute >= 60:
+                raise ValidationError("Minute must be between 0 and 59 inclusive.")
         except ValueError:
             raise ValidationError("Invalid Day")
 

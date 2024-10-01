@@ -240,6 +240,20 @@ def load_form_jsons(override_fund_config=None):
         raise e
 
 
+def load_json_from_file(data, template_name):
+    db = app.extensions["sqlalchemy"]
+    try:
+        data["filename"] = template_name
+        inserted_form = insert_form_as_template(data)
+        db.session.flush()  # flush to get the form id
+        insert_form_config(data, inserted_form.form_id)
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        raise e
+
+
 if __name__ == "__main__":
     with app.app_context():
         load_form_jsons()

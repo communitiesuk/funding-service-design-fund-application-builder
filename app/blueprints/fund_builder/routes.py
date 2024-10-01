@@ -38,8 +38,10 @@ from app.db.queries.application import update_section
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
+from app.db.queries.fund import update_fund
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
+from app.db.queries.round import update_round
 from app.export_config.generate_all_questions import print_html
 from app.export_config.generate_form import build_form_json
 from app.export_config.generate_fund_round_config import generate_config_for_round
@@ -48,6 +50,8 @@ from app.export_config.generate_fund_round_form_jsons import (
 )
 from app.export_config.generate_fund_round_html import generate_all_round_html
 from config import Config
+
+BUILD_FUND_BP_INDEX = "build_fund_bp.index"
 
 # Blueprint for routes used by v1 of FAB - using the DB
 build_fund_bp = Blueprint(
@@ -168,7 +172,7 @@ def view_fund():
         params["fund"] = fund
         params["selected_fund_id"] = fund_id
     params["breadcrumb_items"] = [
-        {"text": "Home", "href": url_for("build_fund_bp.index")},
+        {"text": "Home", "href": url_for(BUILD_FUND_BP_INDEX)},
         {"text": fund.title_json["en"] if fund else "Manage Application Configuration", "href": "#"},
     ]
 
@@ -201,14 +205,37 @@ def clone_round(round_id, fund_id):
 
 
 @build_fund_bp.route("/fund", methods=["GET", "POST"])
-def fund():
+@build_fund_bp.route("/fund/<fund_id>", methods=["GET", "POST"])
+def fund(fund_id=None):
     """
-    Renders a template to allow a user to add a fund, when saved validates the form data and saves to DB
+    Renders a template to allow a user to add or update a fund, when saved validates the form data and saves to DB
     """
-    form: FundForm = FundForm()
+    if fund_id:
+        fund = get_fund_by_id(fund_id)
+        fund_data = {
+            "fund_id": fund.fund_id,
+            "name_en": fund.name_json.get("en", ""),
+            "title_en": fund.title_json.get("en", ""),
+            "short_name": fund.short_name,
+            "description_en": fund.description_json.get("en", ""),
+            "welsh_available": "true" if fund.welsh_available else "false",
+        }
+        form = FundForm(data=fund_data)
+    else:
+        form = FundForm()
+
     if form.validate_on_submit():
-        add_fund(
-            Fund(
+        if fund_id:
+            fund.name_json["en"] = form.name_en.data
+            fund.title_json["en"] = form.title_en.data
+            fund.description_json["en"] = form.description_en.data
+            fund.welsh_available = form.welsh_available.data == "true"
+            fund.short_name = form.short_name.data
+            fund.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
+            update_fund(fund)
+            flash(f"Updated fund {form.title_en.data}")
+        else:
+            new_fund = Fund(
                 name_json={"en": form.name_en.data},
                 title_json={"en": form.title_en.data},
                 description_json={"en": form.description_en.data},
@@ -216,65 +243,170 @@ def fund():
                 short_name=form.short_name.data,
                 audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
             )
-        )
-        flash(f"Saved fund {form.name_en.data}")
-        return redirect(url_for("build_fund_bp.index"))
+            add_fund(new_fund)
+            flash(f"Created fund {form.name_en.data}")
+        return redirect(url_for(BUILD_FUND_BP_INDEX))
 
-    return render_template("fund.html", form=form)
+    return render_template("fund.html", form=form, fund_id=fund_id)
 
 
 @build_fund_bp.route("/round", methods=["GET", "POST"])
-def round():
+@build_fund_bp.route("/round/<round_id>", methods=["GET", "POST"])
+def round(round_id=None):
     """
-    Renders a template to select a fund and add a round to that fund. If saved, validates the round form data
+    Renders a template to select a fund and add or update a round to that fund. If saved, validates the round form data
     and saves to DB
     """
     all_funds = get_all_funds()
-    form: RoundForm = RoundForm()
-    if form.validate_on_submit():
-        add_round(
-            Round(
-                fund_id=form.fund_id.data,
-                audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-                title_json={"en": form.title_en.data},
-                short_name=form.short_name.data,
-                opens=get_datetime(form.opens),
-                deadline=get_datetime(form.deadline),
-                assessment_start=get_datetime(form.assessment_start),
-                reminder_date=get_datetime(form.reminder_date),
-                assessment_deadline=get_datetime(form.assessment_deadline),
-                prospectus_link=form.prospectus_link.data,
-                privacy_notice_link=form.privacy_notice_link.data,
-                contact_us_banner_json={"en": form.contact_us_banner_json.data, "cy": None},
-                reference_contact_page_over_email=form.reference_contact_page_over_email.data == "true",
-                contact_email=form.contact_email.data,
-                contact_phone=form.contact_phone.data,
-                contact_textphone=form.contact_textphone.data,
-                support_times=form.support_times.data,
-                support_days=form.support_days.data,
-                instructions_json={"en": form.instructions_json.data, "cy": None},
-                feedback_link=form.feedback_link.data,
-                project_name_field_id=form.project_name_field_id.data,
-                application_guidance_json={"en": form.application_guidance_json.data, "cy": None},
-                guidance_url=form.guidance_url.data,
-                all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data == "true",
-                application_fields_download_available=form.application_fields_download_available.data == "true",
-                display_logo_on_pdf_exports=form.display_logo_on_pdf_exports.data == "true",
-                mark_as_complete_enabled=form.mark_as_complete_enabled.data == "true",
-                is_expression_of_interest=form.is_expression_of_interest.data == "true",
-                feedback_survey_config=form.feedback_survey_config.data,
-                eoi_decision_schema=form.eoi_decision_schema.data,
-            )
-        )
+    form = RoundForm()
 
-        flash(f"Saved round {form.title_en.data}")
-        return redirect(url_for("build_fund_bp.index"))
+    if round_id:
+        round = get_round_by_id(round_id)
+        form = populate_form_with_round_data(round)
+
+    if form.validate_on_submit():
+        if round_id:
+            update_existing_round(round, form)
+            flash(f"Updated round {round.title_json['en']}")
+        else:
+            create_new_round(form)
+            flash(f"Created round {form.title_en.data}")
+        return redirect(url_for(BUILD_FUND_BP_INDEX))
 
     return render_template(
         "round.html",
         form=form,
         all_funds=all_funds_as_govuk_select_items(all_funds),
+        round_id=round_id,
     )
+
+
+def populate_form_with_round_data(round):
+    """
+    Populate a RoundForm with data from a Round object.
+
+    :param Round round: The round object to populate the form with
+    :return: A RoundForm populated with the round data
+    """
+    round_data = {
+        "fund_id": round.fund_id,
+        "title_en": round.title_json.get("en", ""),
+        "short_name": round.short_name,
+        "opens": round.opens,
+        "deadline": round.deadline,
+        "assessment_start": round.assessment_start,
+        "reminder_date": round.reminder_date,
+        "assessment_deadline": round.assessment_deadline,
+        "prospectus_link": round.prospectus_link,
+        "privacy_notice_link": round.privacy_notice_link,
+        "contact_us_banner_json": round.contact_us_banner_json.get("en", "") if round.contact_us_banner_json else "",
+        "reference_contact_page_over_email": "true" if round.reference_contact_page_over_email else "false",
+        "contact_email": round.contact_email,
+        "contact_phone": round.contact_phone,
+        "contact_textphone": round.contact_textphone,
+        "support_times": round.support_times,
+        "support_days": round.support_days,
+        "instructions_json": round.instructions_json.get("en", "") if round.instructions_json else "",
+        "feedback_link": round.feedback_link,
+        "project_name_field_id": round.project_name_field_id,
+        "application_guidance_json": (
+            round.application_guidance_json.get("en", "") if round.application_guidance_json else ""
+        ),
+        "guidance_url": round.guidance_url,
+        "all_uploaded_documents_section_available": (
+            "true" if round.all_uploaded_documents_section_available else "false"
+        ),
+        "application_fields_download_available": "true" if round.application_fields_download_available else "false",
+        "display_logo_on_pdf_exports": "true" if round.display_logo_on_pdf_exports else "false",
+        "mark_as_complete_enabled": "true" if round.mark_as_complete_enabled else "false",
+        "is_expression_of_interest": "true" if round.is_expression_of_interest else "false",
+        "feedback_survey_config": round.feedback_survey_config,
+        "eligibility_config": round.eligibility_config.get("has_eligibility", "false"),
+        "eoi_decision_schema": round.eoi_decision_schema.get("en", ""),
+    }
+    return RoundForm(data=round_data)
+
+
+def update_existing_round(round, form):
+    """
+    Update a Round object with the data from a RoundForm.
+
+    :param Round round: The round object to update
+    :param RoundForm form: The form with the new round data
+    """
+    round.title_json["en"] = form.title_en.data
+    round.short_name = form.short_name.data
+    round.contact_us_banner_json["en"] = form.contact_us_banner_json.data
+    round.instructions_json["en"] = form.instructions_json.data
+    round.application_guidance_json["en"] = form.application_guidance_json.data
+    round.feedback_survey_config = form.feedback_survey_config.data
+    round.eligibility_config["has_eligibility"] = form.eligibility_config.data
+    round.eoi_decision_schema["en"] = form.eoi_decision_schema.data
+    round.opens = get_datetime(form.opens)
+    round.deadline = get_datetime(form.deadline)
+    round.assessment_start = get_datetime(form.assessment_start)
+    round.reminder_date = get_datetime(form.reminder_date)
+    round.assessment_deadline = get_datetime(form.assessment_deadline)
+    round.prospectus_link = form.prospectus_link.data
+    round.privacy_notice_link = form.privacy_notice_link.data
+    round.reference_contact_page_over_email = form.reference_contact_page_over_email.data == "true"
+    round.contact_email = form.contact_email.data
+    round.contact_phone = form.contact_phone.data
+    round.contact_textphone = form.contact_textphone.data
+    round.support_times = form.support_times.data
+    round.support_days = form.support_days.data
+    round.feedback_link = form.feedback_link.data
+    round.project_name_field_id = form.project_name_field_id.data
+    round.guidance_url = form.guidance_url.data
+    round.all_uploaded_documents_section_available = form.all_uploaded_documents_section_available.data == "true"
+    round.application_fields_download_available = form.application_fields_download_available.data == "true"
+    round.display_logo_on_pdf_exports = form.display_logo_on_pdf_exports.data == "true"
+    round.mark_as_complete_enabled = form.mark_as_complete_enabled.data == "true"
+    round.is_expression_of_interest = form.is_expression_of_interest.data == "true"
+    round.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
+    update_round(round)
+
+
+def create_new_round(form):
+    """
+    Create a new Round object with the data from a RoundForm and save it to the database.
+
+    :param RoundForm form: The form with the new round data
+    """
+    new_round = Round(
+        fund_id=form.fund_id.data,
+        audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+        title_json={"en": form.title_en.data},
+        short_name=form.short_name.data,
+        opens=get_datetime(form.opens),
+        deadline=get_datetime(form.deadline),
+        assessment_start=get_datetime(form.assessment_start),
+        reminder_date=get_datetime(form.reminder_date),
+        assessment_deadline=get_datetime(form.assessment_deadline),
+        prospectus_link=form.prospectus_link.data,
+        privacy_notice_link=form.privacy_notice_link.data,
+        contact_us_banner_json={"en": form.contact_us_banner_json.data, "cy": None},
+        reference_contact_page_over_email=form.reference_contact_page_over_email.data == "true",
+        contact_email=form.contact_email.data,
+        contact_phone=form.contact_phone.data,
+        contact_textphone=form.contact_textphone.data,
+        support_times=form.support_times.data,
+        support_days=form.support_days.data,
+        instructions_json={"en": form.instructions_json.data, "cy": None},
+        feedback_link=form.feedback_link.data,
+        project_name_field_id=form.project_name_field_id.data,
+        application_guidance_json={"en": form.application_guidance_json.data, "cy": None},
+        guidance_url=form.guidance_url.data,
+        all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data == "true",
+        application_fields_download_available=form.application_fields_download_available.data == "true",
+        display_logo_on_pdf_exports=form.display_logo_on_pdf_exports.data == "true",
+        mark_as_complete_enabled=form.mark_as_complete_enabled.data == "true",
+        is_expression_of_interest=form.is_expression_of_interest.data == "true",
+        feedback_survey_config=form.feedback_survey_config.data,
+        eligibility_config={"has_eligibility": form.eligibility_config.data},
+        eoi_decision_schema={"en": form.eoi_decision_schema.data, "cy": None},
+    )
+    add_round(new_round)
 
 
 @build_fund_bp.route("/preview/<form_id>", methods=["GET"])

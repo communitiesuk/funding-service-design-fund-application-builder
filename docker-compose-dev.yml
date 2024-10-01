@@ -1,6 +1,7 @@
 services:
-  fab:
-    hostname: fab
+  fab-dc:
+    hostname: fab-dc
+    container_name: fab-dc
     build:
       context: ../funding-service-design-fund-application-builder
       dockerfile: Dockerfile
@@ -12,17 +13,17 @@ services:
       - 8080:8080
       - 5686:5601
     environment:
-      - FORM_RUNNER_INTERNAL_HOST=http://form-runner:3009
+      - FORM_RUNNER_INTERNAL_HOST=http://form-runner-dc:3009
       - FORM_RUNNER_EXTERNAL_HOST=http://localhost:3009
-      - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fund_builder   # pragma: allowlist secret
+      - DATABASE_URL=postgresql://postgres:password@fab-db-dc:5432/fund_builder   # pragma: allowlist secret
       - FLASK_DEBUG=0
       - FLASK_ENV=development
       - SECRET_KEY=local
-    depends_on: [fab-db, form-runner]
+    depends_on: [fab-db-dc, form-runner-dc]
 
-  fab-db:
+  fab-db-dc:
     image: postgres
-    container_name: fab-db
+    container_name: fab-db-dc
     ports:
       - 5432:5432
     volumes:
@@ -30,11 +31,9 @@ services:
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=fund_builder
-      - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fund_builder
-      - DATABASE_URL_UNIT_TEST=postgresql://postgres:password@fab-db:5432/fab_unit_test
 
-  form-runner:
-    container_name: form-runner
+  form-runner-dc:
+    container_name: form-runner-dc
     build:
       context: ../digital-form-builder-adapter
       dockerfile: ./runner/Dockerfile

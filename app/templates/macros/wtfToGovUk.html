@@ -81,13 +81,13 @@
           "classes": "govuk-input--width-2",
         },
 {
-          "name": "minutes",
-          "value": form_field.minutes.data,
+          "name": "minute",
+          "value": form_field.minute.data,
           "classes": "govuk-input--width-2",
         }
     ],
     "errorMessage": {"text": "Enter valid datetime" } if (form_field.day.errors or form_field.month.errors
-     or form_field.year.errors or form_field.hour.errors or form_field.minutes.errors| length > 0) else None,
+     or form_field.year.errors or form_field.hour.errors or form_field.minute.errors| length > 0) else None,
     "hint":{"text":form_field.description}
 })}}
 {%endmacro%}

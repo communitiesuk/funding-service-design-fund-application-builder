@@ -2,11 +2,19 @@ from sqlalchemy import select
 
 from app.db import db
 from app.db.models.round import Round
+from flask import current_app
 
 
 def add_round(round: Round) -> Round:
     db.session.add(round)
     db.session.commit()
+    current_app.logger.info(f"Round added with round_id: '{round.round_id}.")
+    return round
+
+
+def update_round(round: Round) -> Round:
+    db.session.commit()
+    current_app.logger.info(f"Round updated with round_id: '{round.round_id}.")
     return round
 
 

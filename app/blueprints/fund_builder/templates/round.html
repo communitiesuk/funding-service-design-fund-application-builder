@@ -8,18 +8,21 @@
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 class="govuk-heading-l">Create a Round</h1>
+        <h1 class="govuk-heading-l">{{ 'Update a Round' if round_id else 'Create a Round' }}</h1>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <form method="POST">
                     {{ form.hidden_tag()}}
-                    {{ govukSelect({
-                        "id": form.fund_id.id,
-                        "name": form.fund_id.name,
-                        "label": {
-                          "text": form.fund_id.label
-                        },
-                        "items": all_funds})}}
+                    {% if not round_id %}
+                        {{ govukSelect({
+                            "id": form.fund_id.id,
+                            "name": form.fund_id.name,
+                            "label": {
+                            "text": form.fund_id.label
+                            },
+                            "items": all_funds
+                        })}}
+                    {% endif %}
                     {{input(form.title_en)}}
                     {{input(form.short_name)}}
                     {{dateinput(form.opens)}}

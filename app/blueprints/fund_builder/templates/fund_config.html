@@ -68,6 +68,11 @@
                                 }
                                 ]
                                 }) }}
+                                {{ govukButton({
+                                    "text": "Edit Fund",
+                                    "href": url_for("build_fund_bp.fund", fund_id=fund.fund_id),
+                                    "classes": "govuk-button--secondary"
+                                }) }}
                 <h2 class="govuk-heading-m">Application Rounds</h2>
                 {% set rounds_content = [] %}
                 {% for round in fund.rounds %}
@@ -306,6 +311,10 @@
                                                 "text": "Clone this round",
                                                 "href": url_for("build_fund_bp.clone_round", round_id=round.round_id, fund_id=fund.fund_id),
                                                 "classes": "govuk-button--secondary"
+                                                }) + govukButton({
+                                                    "text": "Edit Round",
+                                                    "href": url_for("build_fund_bp.round", round_id=round.round_id),
+                                                    "classes": "govuk-button--secondary"
                                                 })
 
                     } }) %}
