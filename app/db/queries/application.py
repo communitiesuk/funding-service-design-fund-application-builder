@@ -47,6 +47,11 @@ def get_list_by_id(list_id: str) -> Lizt:
     return lizt
 
 
+def get_list_by_name(list_name: str) -> Lizt:
+    lizt = db.session.query(Lizt).filter_by(name=list_name).first()
+    return lizt
+
+
 def _initiate_cloned_component(to_clone: Component, new_page_id=None, new_theme_id=None):
     clone = Component(**to_clone.as_dict())
 
@@ -731,3 +736,22 @@ def move_form_up(section_id, form_index_to_move_up: int):
 
     section.forms = swap_elements_in_list(section.forms, list_index_to_move_up, list_index_to_move_up - 1)
     db.session.commit()
+
+
+def insert_list(list_config: dict, do_commit: bool = True) -> Lizt:
+    new_list = Lizt(
+        is_template=True,
+        name=list_config.get("name"),
+        title=list_config.get("title"),
+        type=list_config.get("type"),
+        items=list_config.get("items"),
+    )
+    try:
+        db.session.add(new_list)
+    except Exception as e:
+        print(e)
+        raise e
+    if do_commit:
+        db.session.commit()
+    db.session.flush()  # flush to get the list id
+    return new_list

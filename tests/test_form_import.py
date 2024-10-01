@@ -1,10 +1,13 @@
 from dataclasses import asdict
 from unittest import mock
+from uuid import uuid4
 
 import pytest
 
 from app.db.models.application_config import Component
+from app.db.models.application_config import Lizt
 from app.import_config.load_form_json import _build_condition
+from app.import_config.load_form_json import _find_list_and_create_if_not_existing
 from app.import_config.load_form_json import add_conditions_to_components
 from app.shared.data_classes import Condition
 from app.shared.data_classes import ConditionValue
@@ -150,3 +153,40 @@ def test_add_conditions_to_components(mocker, input_page, input_conditions, exp_
             assert mock_component.conditions
             assert len(mock_component.conditions) == exp_condition_count
         assert mock_build_condition.call_count == len(input_conditions)
+
+
+@pytest.mark.parametrize(
+    "input_list_name,input_all_lists, existing_list",
+    [
+        ("existing-list", [{"name": "existing-list"}], Lizt(list_id=uuid4())),
+    ],
+)
+def test_find_list_and_create_existing(mocker, input_list_name, input_all_lists, existing_list):
+    with (
+        mock.patch(
+            "app.import_config.load_form_json.get_list_by_name", return_value=existing_list
+        ) as get_list_by_name_mock,
+        mock.patch(
+            "app.import_config.load_form_json.insert_list", return_value=Lizt(list_id="new-list-id")
+        ) as insert_list_mock,
+    ):
+        result = _find_list_and_create_if_not_existing(list_name=input_list_name, all_lists_in_form=input_all_lists)
+        assert result == existing_list.list_id
+        assert get_list_by_name_mock.called_once_with(list_name=input_list_name)
+        insert_list_mock.assert_not_called()
+
+
+@pytest.mark.parametrize("input_list_name,input_all_lists, existing_list", [("new-list", [{"name": "new-list"}], None)])
+def test_find_list_and_create_not_existing(mocker, input_list_name, input_all_lists, existing_list):
+    with (
+        mock.patch(
+            "app.import_config.load_form_json.get_list_by_name", return_value=existing_list
+        ) as get_list_by_name_mock,
+        mock.patch(
+            "app.import_config.load_form_json.insert_list", return_value=Lizt(list_id="new-list-id")
+        ) as insert_list_mock,
+    ):
+        result = _find_list_and_create_if_not_existing(list_name=input_list_name, all_lists_in_form=input_all_lists)
+        assert result == "new-list-id"
+        assert get_list_by_name_mock.called_once_with(list_name=input_list_name)
+        insert_list_mock.called_once()
