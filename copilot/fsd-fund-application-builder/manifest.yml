@@ -51,7 +51,7 @@ variables:
   AUTHENTICATOR_HOST: "https://authenticator.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
   COOKIE_DOMAIN: ".test.levellingup.gov.uk"
   FLASK_ENV: ${COPILOT_ENVIRONMENT_NAME}
-  FORMS_SERVICE_PUBLIC_HOST: "https://forms.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
+  FORM_RUNNER_EXTERNAL_HOST: "https://forms.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
   FORM_RUNNER_INTERNAL_HOST: "http://fsd-form-runner-adapter:3009"
   FUND_STORE_API_HOST: "http://fsd-fund-store:8080"
   NOTIFICATION_SERVICE_HOST: http://fsd-notification:8080
