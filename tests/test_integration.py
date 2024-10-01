@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+from dataclasses import asdict
 from pathlib import Path
 from uuid import uuid4
 
@@ -22,6 +23,8 @@ from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
 from app.import_config.load_form_json import load_form_jsons
+from app.shared.data_classes import Condition
+from app.shared.data_classes import ConditionValue
 from tasks.test_data import BASIC_FUND_INFO
 from tasks.test_data import BASIC_ROUND_INFO
 
@@ -134,20 +137,50 @@ page_2_id = uuid4()
                 runner_component_name="does_your_organisation_use_other_names",
                 is_template=True,
                 conditions=[
-                    {
-                        "name": "organisation_other_names_no",
-                        "value": "false",  # this must be lowercaes or the navigation doesn't work
-                        "operator": "is",
-                        "destination_page_path": "CONTINUE",
-                        "display_name": "Other Name No",
-                    },
-                    {
-                        "name": "organisation_other_names_yes",
-                        "value": "true",  # this must be lowercaes or the navigation doesn't work
-                        "operator": "is",
-                        "destination_page_path": "organisation-alternative-names",
-                        "display_name": "Other Name Yes",
-                    },
+                    asdict(
+                        Condition(
+                            name="organisation_other_names_no",
+                            display_name="org other names no",
+                            destination_page_path="/summary",
+                            value=ConditionValue(
+                                name="org other names no",
+                                conditions=[
+                                    {
+                                        "field": {
+                                            "name": "org_other_names",
+                                            "type": "YesNoField",
+                                            "display": "org other names",
+                                        },
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "false", "display": "false"},
+                                        "coordinator": None,
+                                    },
+                                ],
+                            ),
+                        ),
+                    ),
+                    asdict(
+                        Condition(
+                            name="organisation_other_names_yes",
+                            display_name="org other names yes",
+                            destination_page_path="/organisation-alternative-names",
+                            value=ConditionValue(
+                                name="org other names yes",
+                                conditions=[
+                                    {
+                                        "field": {
+                                            "name": "org_other_names",
+                                            "type": "YesNoField",
+                                            "display": "org other names",
+                                        },
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "true", "display": "false"},
+                                        "coordinator": None,
+                                    },
+                                ],
+                            ),
+                        ),
+                    ),
                 ],
             ),
             Component(

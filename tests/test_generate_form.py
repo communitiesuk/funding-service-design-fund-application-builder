@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from unittest import mock
 from uuid import uuid4
 
@@ -16,6 +17,8 @@ from app.export_config.generate_form import build_navigation
 from app.export_config.generate_form import build_page
 from app.export_config.generate_form import build_start_page
 from app.export_config.generate_form import human_to_kebab_case
+from app.shared.data_classes import Condition
+from app.shared.data_classes import ConditionValue
 from tests.unit_test_data import mock_c_1
 from tests.unit_test_data import mock_c_2
 from tests.unit_test_data import mock_form_1
@@ -301,89 +304,177 @@ id2 = uuid4()
 @pytest.mark.parametrize(
     "input_component, exp_results",
     [
+        # single condition
         (
             Component(
                 component_id=id,
-                title="test_title",
+                title="org type",
                 type=ComponentType.TEXT_FIELD,
                 conditions=[
-                    {
-                        "name": "test_condition",
-                        "display_name": "display name",
-                        "operator": "is",
-                        "value": {"type": "Value", "value": "yes", "display": "yes"},
-                        "destination_page_path": "./who-knows",
-                        "coordinator": None,
-                    },
+                    asdict(
+                        Condition(
+                            name="org_type_a",
+                            display_name="org type a",
+                            destination_page_path="/page-1",
+                            value=ConditionValue(
+                                name="org type a",
+                                conditions=[
+                                    {
+                                        "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "A", "display": "A"},
+                                    }
+                                ],
+                            ),
+                        ),
+                    ),
                 ],
-                runner_component_name="test_name",
+                runner_component_name="org_type",
             ),
             [
                 {
-                    "displayName": "display name",
-                    "name": "test_condition",
+                    "displayName": "org type a",
+                    "name": "org_type_a",
                     "value": {
-                        "name": "display name",
+                        "name": "org type a",
                         "conditions": [
                             {
-                                "field": {"name": "test_name", "type": "TextField", "display": "test_title"},
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
                                 "operator": "is",
-                                "value": {"type": "Value", "value": "yes", "display": "yes"},
+                                "value": {"type": "Value", "value": "A", "display": "A"},
                             }
                         ],
                     },
                 }
             ],
         ),
+        # 2 conditions
         (
             Component(
                 component_id=id2,
                 title="test_title_2",
                 type=ComponentType.TEXT_FIELD,
                 conditions=[
-                    {
-                        "name": "test_condition",
-                        "display_name": "display name",
-                        "operator": "is",
-                        "value": {"type": "Value", "value": "yes", "display": "yes"},
-                        "destination_page_path": "./who-knows",
-                    },
-                    {
-                        "name": "test_condition2",
-                        "display_name": "display name",
-                        "operator": "is",
-                        "value": {"type": "Value", "value": "no", "display": "no"},
-                        "destination_page_path": "./who-knows2",
-                    },
+                    asdict(
+                        Condition(
+                            name="org_type_a",
+                            display_name="org type a",
+                            destination_page_path="/page-1",
+                            value=ConditionValue(
+                                name="org type a",
+                                conditions=[
+                                    {
+                                        "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "A", "display": "A"},
+                                    }
+                                ],
+                            ),
+                        ),
+                    ),
+                    asdict(
+                        Condition(
+                            name="org_type_b",
+                            display_name="org type b",
+                            destination_page_path="/page-1",
+                            value=ConditionValue(
+                                name="org type b",
+                                conditions=[
+                                    {
+                                        "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "B", "display": "B"},
+                                    }
+                                ],
+                            ),
+                        ),
+                    ),
                 ],
                 runner_component_name="test_name",
             ),
             [
                 {
-                    "displayName": "display name",
-                    "name": "test_condition",
+                    "displayName": "org type a",
+                    "name": "org_type_a",
                     "value": {
-                        "name": "display name",
+                        "name": "org type a",
                         "conditions": [
                             {
-                                "field": {"name": "test_name", "type": "TextField", "display": "test_title_2"},
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
                                 "operator": "is",
-                                "value": {"type": "Value", "value": "yes", "display": "yes"},
+                                "value": {"type": "Value", "value": "A", "display": "A"},
                             }
                         ],
                     },
                 },
                 {
-                    "displayName": "display name",
-                    "name": "test_condition2",
+                    "displayName": "org type b",
+                    "name": "org_type_b",
                     "value": {
-                        "name": "display name",
+                        "name": "org type b",
                         "conditions": [
                             {
-                                "field": {"name": "test_name", "type": "TextField", "display": "test_title_2"},
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
                                 "operator": "is",
-                                "value": {"type": "Value", "value": "no", "display": "no"},
+                                "value": {"type": "Value", "value": "B", "display": "B"},
                             }
+                        ],
+                    },
+                },
+            ],
+        ),
+        # single complex condition
+        (
+            Component(
+                component_id=id2,
+                title="test_title_2",
+                type=ComponentType.TEXT_FIELD,
+                conditions=[
+                    asdict(
+                        Condition(
+                            name="org_type_c",
+                            display_name="org type c",
+                            destination_page_path="/page-1",
+                            value=ConditionValue(
+                                name="org type c",
+                                conditions=[
+                                    {
+                                        "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "C1", "display": "C1"},
+                                        "coordinator": None,
+                                    },
+                                    {
+                                        "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "C2", "display": "C2"},
+                                        "coordinator": "or",
+                                    },
+                                ],
+                            ),
+                        ),
+                    )
+                ],
+                runner_component_name="test_name",
+            ),
+            [
+                {
+                    "displayName": "org type c",
+                    "name": "org_type_c",
+                    "value": {
+                        "name": "org type c",
+                        "conditions": [
+                            {
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "C1", "display": "C1"},
+                            },
+                            {
+                                "coordinator": "or",
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "C2", "display": "C2"},
+                            },
                         ],
                     },
                 },
@@ -391,7 +482,9 @@ id2 = uuid4()
         ),
     ],
 )
-def test_build_conditions(input_component, exp_results):
+def test_build_conditions(
+    input_component, exp_results, ids=["single condition", "2 conditions", "single condition with coordinator"]
+):
     results = build_conditions(input_component)
     assert results == exp_results
 
@@ -433,7 +526,7 @@ list_id = uuid4()
         (
             Component(
                 component_id=uuid4(),
-                type=ComponentType.TEXT_FIELD,
+                type=ComponentType.LIST_FIELD,
                 title="Test Title",
                 hint_text="This must be a hint",
                 page_id=None,
@@ -442,16 +535,18 @@ list_id = uuid4()
                 runner_component_name="test-name",
                 options={},
                 lizt=Lizt(name="test-list", list_id=list_id),
+                list_id=list_id,
             ),
             {
                 "name": "test-name",
                 "options": {},
-                "type": "TextField",
+                "type": "List",
                 "title": "Test Title",
                 "hint": "This must be a hint",
                 "schema": {},
                 "metadata": {"fund_builder_list_id": str(list_id)},
                 "list": "test-list",
+                "values": {"type": "listRef"},
             },
         ),
     ],
@@ -663,357 +758,9 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
 
 
 @pytest.mark.parametrize(
-    "input_pages,input_partial_json ,exp_next, exp_conditions",
+    "input_pages,input_partial_json ,exp_next",
     [
         # One page, 2 possible nexts, both based on defined conditions
-        (
-            [
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-name",
-                    name_in_apply_json={"en": "Organisation Name"},
-                    form_index=1,
-                    components=[
-                        Component(
-                            component_id=id2,
-                            title="test_title_2",
-                            type=ComponentType.TEXT_FIELD,
-                            conditions=[
-                                {
-                                    "name": "orgno",
-                                    "display_name": "organisation_other_names_no",
-                                    "value": {"type": "Value", "value": "no", "display": "no"},
-                                    "destination_page_path": "summary",
-                                    "operator": "is",
-                                    "coordinator": None,
-                                },
-                                {
-                                    "name": "orgyes",
-                                    "display_name": "organisation_other_names_yes",
-                                    "operator": "is",
-                                    "value": {"type": "Value", "value": "yes", "display": "yes"},
-                                    "destination_page_path": "organisation-alternative-names",
-                                    "coordinator": None,
-                                },
-                            ],
-                            runner_component_name="test_c_1",
-                        )
-                    ],
-                ),
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-alternative-names",
-                    name_in_apply_json={"en": "Organisation Alternative Names"},
-                    form_index=2,
-                ),
-            ],
-            {
-                "conditions": [],
-                "pages": [
-                    {
-                        "path": "/organisation-name",
-                        "title": "Organisation Name",
-                        "components": [
-                            {},  # don't care about these right now...
-                            {},
-                        ],
-                        "next": [],
-                        "options": {},
-                    },
-                    {
-                        "path": "/organisation-alternative-names",
-                        "title": "Organisation Alternative Names",
-                        "components": [],
-                        "next": [],
-                        "options": {},
-                    },
-                ],
-            },
-            {
-                "/organisation-name": [
-                    {
-                        "path": "/summary",
-                        "condition": "orgno",
-                    },
-                    {
-                        "path": "/organisation-alternative-names",
-                        "condition": "orgyes",
-                    },
-                ],
-                "/organisation-alternative-names": [{"path": "/summary"}],
-            },
-            [
-                {
-                    "displayName": "organisation_other_names_no",
-                    "name": "orgno",
-                    "value": {
-                        "name": "organisation_other_names_no",
-                        "conditions": [
-                            {
-                                "field": {
-                                    "name": "test_c_1",
-                                    "type": "TextField",
-                                    "display": "test_title_2",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "no",
-                                    "display": "no",
-                                },
-                            }
-                        ],
-                    },
-                },
-                {
-                    "displayName": "organisation_other_names_yes",
-                    "name": "orgyes",
-                    "value": {
-                        "name": "organisation_other_names_yes",
-                        "conditions": [
-                            {
-                                "field": {
-                                    "name": "test_c_1",
-                                    "type": "TextField",
-                                    "display": "test_title_2",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "yes",
-                                    "display": "yes",
-                                },
-                            }
-                        ],
-                    },
-                },
-            ],
-        ),
-        # One page, 2 possible nexts, based on a condition and a default
-        (
-            [
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-name",
-                    name_in_apply_json={"en": "Organisation Name"},
-                    form_index=1,
-                    components=[
-                        Component(
-                            component_id=id2,
-                            title="test_title_2",
-                            type=ComponentType.TEXT_FIELD,
-                            conditions=[
-                                {
-                                    "name": "organisation_other_names_yes",
-                                    "operator": "is",
-                                    "value": "yes",
-                                    "destination_page_path": "organisation-alternative-names",
-                                },
-                            ],
-                            runner_component_name="test_c_1",
-                        )
-                    ],
-                    default_next_page_id="summary-id",
-                ),
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-alternative-names",
-                    name_in_apply_json={"en": "Organisation Alternative Names"},
-                    form_index=2,
-                ),
-                Page(
-                    page_id="summary-id",
-                    form_id=uuid4(),
-                    display_path="summary-page",
-                    name_in_apply_json={"en": "Summary Page"},
-                    form_index=1,
-                    controller="summary.js",
-                ),
-            ],
-            {
-                "conditions": [],
-                "pages": [
-                    {
-                        "path": "/organisation-name",
-                        "title": "Organisation Name",
-                        "components": [
-                            {},  # don't care about these right now...
-                            {},
-                        ],
-                        "next": [],
-                        "options": {},
-                    },
-                    {
-                        "path": "/organisation-alternative-names",
-                        "title": "Organisation Alternative Names",
-                        "components": [],
-                        "next": [],
-                        "options": {},
-                    },
-                    {
-                        "path": "/summary-page",
-                        "title": "Summary Page",
-                        "components": [],
-                        "next": [],
-                        "options": {},
-                        "controller": "summary.js",
-                    },
-                ],
-            },
-            {
-                "/organisation-name": [
-                    {
-                        "path": "/summary-page",
-                    },
-                    {
-                        "path": "/organisation-alternative-names",
-                        "condition": "organisation_other_names_yes",
-                    },
-                ],
-                "/organisation-alternative-names": [{"path": "/summary"}],
-                "/summary-page": [],
-            },
-            [
-                {
-                    "displayName": "organisation_other_names_yes",
-                    "name": "orgyes",
-                    "value": {
-                        "name": "organisation_other_names_yes",
-                        "conditions": [
-                            {
-                                "field": {
-                                    "name": "test_c_1",
-                                    "type": "TextField",
-                                    "display": "test_title_2",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "yes",
-                                    "display": "yes",
-                                },
-                            }
-                        ],
-                    },
-                },
-            ],
-        ),
-        # One page, 2 possible nexts, based on a condition and a default
-        (
-            [
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-name",
-                    name_in_apply_json={"en": "Organisation Name"},
-                    form_index=1,
-                    components=[
-                        Component(
-                            component_id=id2,
-                            title="test_title_2",
-                            type=ComponentType.TEXT_FIELD,
-                            conditions=[
-                                {
-                                    "name": "organisation_other_names_yes",
-                                    "operator": "is",
-                                    "value": "yes",
-                                    "destination_page_path": "organisation-alternative-names",
-                                },
-                            ],
-                            runner_component_name="test_c_1",
-                        )
-                    ],
-                    default_next_page_id="summary-id",
-                ),
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-alternative-names",
-                    name_in_apply_json={"en": "Organisation Alternative Names"},
-                    form_index=2,
-                ),
-                Page(
-                    page_id="summary-id",
-                    form_id=uuid4(),
-                    display_path="summary-page",
-                    name_in_apply_json={"en": "Summary Page"},
-                    form_index=1,
-                    controller="summary.js",
-                ),
-            ],
-            {
-                "conditions": [],
-                "pages": [
-                    {
-                        "path": "/organisation-name",
-                        "title": "Organisation Name",
-                        "components": [
-                            {},  # don't care about these right now...
-                            {},
-                        ],
-                        "next": [],
-                        "options": {},
-                    },
-                    {
-                        "path": "/organisation-alternative-names",
-                        "title": "Organisation Alternative Names",
-                        "components": [],
-                        "next": [],
-                        "options": {},
-                    },
-                    {
-                        "path": "/summary-page",
-                        "title": "Summary Page",
-                        "components": [],
-                        "next": [],
-                        "options": {},
-                        "controller": "summary.js",
-                    },
-                ],
-            },
-            {
-                "/organisation-name": [
-                    {
-                        "path": "/summary-page",
-                    },
-                    {
-                        "path": "/organisation-alternative-names",
-                        "condition": "organisation_other_names_yes",
-                    },
-                ],
-                "/organisation-alternative-names": [{"path": "/summary"}],
-                "/summary-page": [],
-            },
-            [
-                {
-                    "displayName": "organisation_other_names_yes",
-                    "name": "organisation_other_names_yes",
-                    "value": {
-                        "name": "organisation_other_names_yes",
-                        "conditions": [
-                            {
-                                "field": {
-                                    "name": "test_c_1",
-                                    "type": "TextField",
-                                    "display": "test_title_2",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "yes",
-                                    "display": "yes",
-                                },
-                            }
-                        ],
-                    },
-                },
-            ],
-        ),
-        # TODO One page, 3 possible nexts based on complex conditions (coordinators)
         (
             [
                 Page(
@@ -1028,31 +775,405 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
                             title="org_type",
                             type=ComponentType.RADIOS_FIELD,
                             conditions=[
-                                {
-                                    "name": "org_type_a",
-                                    "operator": "is",
-                                    "value": "A1",
-                                    "destination_page_path": "org-type-a",
-                                },
-                                {
-                                    "name": "org_type_b",
-                                    "operator": "is",
-                                    "value": "B1",
-                                    "destination_page_path": "org-type-b",
-                                },
-                                # TODO combine these 2 using coordinators after Adam's change
-                                {
-                                    "name": "org_type_c",
-                                    "operator": "is",
-                                    "value": "C1",
-                                    "destination_page_path": "org-type-c",
-                                },
-                                {
-                                    "name": "org_type_c",
-                                    "operator": "is",
-                                    "value": "C2",
-                                    "destination_page_path": "org-type-c",
-                                },
+                                asdict(
+                                    Condition(
+                                        name="org_type_c",
+                                        display_name="org type c",
+                                        destination_page_path="/organisation-type-c",
+                                        value=ConditionValue(
+                                            name="org type c",
+                                            conditions=[
+                                                {
+                                                    "field": {
+                                                        "name": "org_type",
+                                                        "type": "RadiosField",
+                                                        "display": "org type",
+                                                    },
+                                                    "operator": "is",
+                                                    "value": {"type": "Value", "value": "C1", "display": "C1"},
+                                                    "coordinator": None,
+                                                },
+                                                {
+                                                    "field": {
+                                                        "name": "org_type",
+                                                        "type": "RadiosField",
+                                                        "display": "org type",
+                                                    },
+                                                    "operator": "is",
+                                                    "value": {"type": "Value", "value": "C2", "display": "C2"},
+                                                    "coordinator": "or",
+                                                },
+                                            ],
+                                        ),
+                                    ),
+                                ),
+                                asdict(
+                                    Condition(
+                                        name="org_type_b",
+                                        display_name="org type b",
+                                        destination_page_path="/organisation-type-b",
+                                        value=ConditionValue(
+                                            name="org type b",
+                                            conditions=[
+                                                {
+                                                    "field": {
+                                                        "name": "org_type",
+                                                        "type": "RadiosField",
+                                                        "display": "org type",
+                                                    },
+                                                    "operator": "is",
+                                                    "value": {"type": "Value", "value": "B", "display": "B"},
+                                                }
+                                            ],
+                                        ),
+                                    ),
+                                ),
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type-b",
+                    name_in_apply_json={"en": "Organisation Type B"},
+                    form_index=2,
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type-c",
+                    name_in_apply_json={"en": "Organisation Type C"},
+                    form_index=2,
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/organisation-type-b",
+                        "title": "Organisation Type B",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/organisation-type-c",
+                        "title": "Organisation Type C",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                ],
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/organisation-type-c",
+                        "condition": "org_type_c",
+                    },
+                    {
+                        "path": "/organisation-type-b",
+                        "condition": "org_type_b",
+                    },
+                ],
+                "/organisation-type-b": [{"path": "/summary"}],
+                "/organisation-type-c": [{"path": "/summary"}],
+            },
+        ),
+        # One page, 2 possible nexts, based on a condition and a default (summary)
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    default_next_page_id="summary-id",
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(
+                                    Condition(
+                                        name="org_type_b",
+                                        display_name="org type b",
+                                        destination_page_path="/organisation-type-b",
+                                        value=ConditionValue(
+                                            name="org type b",
+                                            conditions=[
+                                                {
+                                                    "field": {
+                                                        "name": "org_type",
+                                                        "type": "RadiosField",
+                                                        "display": "org type",
+                                                    },
+                                                    "operator": "is",
+                                                    "value": {"type": "Value", "value": "B", "display": "B"},
+                                                }
+                                            ],
+                                        ),
+                                    ),
+                                ),
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type-b",
+                    name_in_apply_json={"en": "Organisation Type B"},
+                    form_index=2,
+                ),
+                Page(
+                    page_id="summary-id",
+                    form_id=uuid4(),
+                    display_path="summary",
+                    name_in_apply_json={"en": "Summary"},
+                    form_index=2,
+                    controller="summary.js",
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/organisation-type-b",
+                        "title": "Organisation Type B",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/summary",
+                        "title": "Summary",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                        "controller": "summary.js",
+                    },
+                ],
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/summary",
+                    },
+                    {
+                        "path": "/organisation-type-b",
+                        "condition": "org_type_b",
+                    },
+                ],
+                "/organisation-type-b": [{"path": "/summary"}],
+                "/summary": [],
+            },
+        ),  # One page, 2 possible nexts, based on a condition and a default
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    default_next_page_id="page-2",
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(
+                                    Condition(
+                                        name="org_type_b",
+                                        display_name="org type b",
+                                        destination_page_path="/organisation-type-b",
+                                        value=ConditionValue(
+                                            name="org type b",
+                                            conditions=[
+                                                {
+                                                    "field": {
+                                                        "name": "org_type",
+                                                        "type": "RadiosField",
+                                                        "display": "org type",
+                                                    },
+                                                    "operator": "is",
+                                                    "value": {"type": "Value", "value": "B", "display": "B"},
+                                                }
+                                            ],
+                                        ),
+                                    ),
+                                ),
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                ),
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type-b",
+                    name_in_apply_json={"en": "Organisation Type B"},
+                    form_index=2,
+                ),
+                Page(
+                    page_id="page-2",
+                    form_id=uuid4(),
+                    display_path="page_2",
+                    name_in_apply_json={"en": "Page 2"},
+                    form_index=2,
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/organisation-type-b",
+                        "title": "Organisation Type B",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/page_2",
+                        "title": "Page 2",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                ],
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/page_2",
+                    },
+                    {
+                        "path": "/organisation-type-b",
+                        "condition": "org_type_b",
+                    },
+                ],
+                "/organisation-type-b": [{"path": "/summary"}],
+                "/page_2": [{"path": "/summary"}],
+                "/summary": [],
+            },
+        ),
+        # # One page, 3 possible nexts based on complex conditions (coordinators)
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(
+                                    Condition(
+                                        name="org_type_a",
+                                        display_name="org type a",
+                                        destination_page_path="/org-type-a",
+                                        value=ConditionValue(
+                                            name="org type a",
+                                            conditions=[
+                                                {
+                                                    "field": {
+                                                        "name": "org_type",
+                                                        "type": "RadiosField",
+                                                        "display": "org type",
+                                                    },
+                                                    "operator": "is",
+                                                    "value": {"type": "Value", "value": "A", "display": "A"},
+                                                }
+                                            ],
+                                        ),
+                                    ),
+                                ),
+                                asdict(
+                                    Condition(
+                                        name="org_type_b",
+                                        display_name="org type b",
+                                        destination_page_path="/org-type-b",
+                                        value=ConditionValue(
+                                            name="org type b",
+                                            conditions=[
+                                                {
+                                                    "field": {
+                                                        "name": "org_type",
+                                                        "type": "RadiosField",
+                                                        "display": "org type",
+                                                    },
+                                                    "operator": "is",
+                                                    "value": {"type": "Value", "value": "B", "display": "B"},
+                                                }
+                                            ],
+                                        ),
+                                    ),
+                                ),
+                                asdict(
+                                    Condition(
+                                        name="org_type_c",
+                                        display_name="org type c",
+                                        destination_page_path="/org-type-c",
+                                        value=ConditionValue(
+                                            name="org type c",
+                                            conditions=[
+                                                {
+                                                    "field": {
+                                                        "name": "org_type",
+                                                        "type": "RadiosField",
+                                                        "display": "org type",
+                                                    },
+                                                    "operator": "is",
+                                                    "value": {"type": "Value", "value": "C1", "display": "C1"},
+                                                    "coordinator": None,
+                                                },
+                                                {
+                                                    "field": {
+                                                        "name": "org_type",
+                                                        "type": "RadiosField",
+                                                        "display": "org type",
+                                                    },
+                                                    "operator": "is",
+                                                    "value": {"type": "Value", "value": "C2", "display": "C2"},
+                                                    "coordinator": "or",
+                                                },
+                                            ],
+                                        ),
+                                    ),
+                                ),
                             ],
                             runner_component_name="org_type_component",
                         )
@@ -1120,116 +1241,31 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
                 "/organisation-type": [
                     {
                         "path": "/org-type-a",
-                        "condition": "org-type-a",
+                        "condition": "org_type_a",
                     },
                     {
                         "path": "/org-type-b",
-                        "condition": "org-type-b",
+                        "condition": "org_type_b",
                     },
                     {
                         "path": "/org-type-c",
-                        "condition": "org-type-c",
+                        "condition": "org_type_c",
                     },
                 ],
                 "/org-type-a": [{"path": "/summary"}],
                 "/org-type-b": [{"path": "/summary"}],
                 "/org-type-c": [{"path": "/summary"}],
             },
-            [
-                {
-                    "displayName": "org-type-a",
-                    "name": "org-type-a",
-                    "value": {
-                        "name": "org-type-a",
-                        "conditions": [
-                            {
-                                "field": {
-                                    "name": "org_type_component",
-                                    "type": "RadiosField",
-                                    "display": "org_type",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "A",
-                                    "display": "A",
-                                },
-                            },
-                        ],
-                    },
-                },
-                {
-                    "displayName": "org-type-b",
-                    "name": "org-type-b",
-                    "value": {
-                        "name": "org-type-b",
-                        "conditions": [
-                            {
-                                "field": {
-                                    "name": "org_type_component",
-                                    "type": "RadiosField",
-                                    "display": "org_type",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "B",
-                                    "display": "B",
-                                },
-                            },
-                        ],
-                    },
-                },
-                {
-                    "displayName": "org-type-c",
-                    "name": "org-type-c",
-                    "value": {
-                        "name": "org-type-c",
-                        "conditions": [
-                            {
-                                "field": {
-                                    "name": "org_type_component",
-                                    "type": "RadiosField",
-                                    "display": "org_type",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "C1",
-                                    "display": "C1",
-                                },
-                            },
-                            {
-                                "coordinator": "or",
-                                "field": {
-                                    "name": "org_type_component",
-                                    "type": "RadiosField",
-                                    "display": "org_type",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "C2",
-                                    "display": "C2",
-                                },
-                            },
-                        ],
-                    },
-                },
-            ],
         ),
     ],
 )
-def test_build_navigation_with_conditions(mocker, input_pages, input_partial_json, exp_next, exp_conditions):
-    mocker.patch(
-        "app.export_config.generate_form.build_page",
-        return_value={"path": "/organisation-alternative-names", "next": []},
-    )
+def test_build_navigation_with_conditions(mocker, input_pages, input_partial_json, exp_next):
+    mocker.patch("app.export_config.generate_form.build_conditions", return_value=["mock list"])
     results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
     for page in results["pages"]:
         exp_next_this_page = exp_next[page["path"]]
-        assert page["next"] == exp_next_this_page
-    assert results["conditions"] == exp_conditions
+        assert page["next"] == exp_next_this_page, f"next for page {page['path']} does not match expected"
+    assert results["conditions"] == ["mock list"]
 
 
 @pytest.mark.parametrize(

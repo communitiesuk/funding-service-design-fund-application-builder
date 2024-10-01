@@ -15,47 +15,62 @@ from app.db.models import Form  # noqa:E402
 from app.db.models import Lizt  # noqa:E402
 from app.db.models import Page  # noqa:E402
 from app.shared.data_classes import Condition  # noqa:E402
+from app.shared.data_classes import ConditionValue  # noqa:E402
 from app.shared.helpers import find_enum  # noqa:E402
 
 
-def add_conditions_to_components(db, page, conditions):
+def _build_condition(condition_data, destination_page_path) -> Condition:
+    sub_conditions = []
+    for c in condition_data["value"]["conditions"]:
+        sc = {
+            "field": c["field"],
+            "value": c["value"],
+            "operator": c["operator"],
+        }
+        if "coordinator" in c and c.get("coordinator"):
+            sc["coordinator"] = c.get("coordinator")
+        sub_conditions.append(sc)
+    condition_value = ConditionValue(name=condition_data["displayName"], conditions=sub_conditions)
+    result = Condition(
+        name=condition_data["name"],
+        display_name=condition_data["displayName"],
+        value=condition_value,
+        destination_page_path=destination_page_path,
+    )
+    return result
+
+
+def _get_component_by_runner_name(db, runner_component_name):
+
+    return db.session.query(Component).filter(Component.runner_component_name == runner_component_name).first()
+
+
+def add_conditions_to_components(db, page: dict, conditions: dict):
     # Convert conditions list to a dictionary for faster lookup
     conditions_dict = {cond["name"]: cond for cond in conditions}
 
     # Initialize a cache for components to reduce database queries
     components_cache = {}
 
-    for path in page["next"]:
-        if "condition" in path:
-            target_condition_name = path["condition"]
-            # Use the conditions dictionary for faster lookup
-            if target_condition_name in conditions_dict:
-                condition_data = conditions_dict[target_condition_name]
-                for condition in condition_data["value"]["conditions"]:
-                    condition_name = condition_data["name"]
-                    condition_display_name = condition_data["displayName"]
-                    runner_component_name = condition["field"]["name"]
+    if "next" in page:
+        for path in page["next"]:
+            if "condition" in path:
+                target_condition_name = path["condition"]
+                # Use the conditions dictionary for faster lookup
+                if target_condition_name in conditions_dict:
+                    condition_data = conditions_dict[target_condition_name]
+                    # for condition in condition_data["value"]["conditions"]:
+                    runner_component_name = condition_data["value"]["conditions"][0]["field"]["name"]
 
                     # Use the cache to reduce database queries
                     if runner_component_name not in components_cache:
-                        component_to_update = (
-                            db.session.query(Component)
-                            .filter(Component.runner_component_name == runner_component_name)
-                            .first()
-                        )
+                        component_to_update = _get_component_by_runner_name(db, runner_component_name)
                         components_cache[runner_component_name] = component_to_update
                     else:
                         component_to_update = components_cache[runner_component_name]
 
                     # Create a new Condition instance with a different variable name
-                    new_condition = Condition(
-                        name=condition_name,
-                        display_name=condition_display_name,
-                        value=condition["value"],
-                        coordinator=condition.get("coordinator", None),
-                        operator=condition.get("operator", None),
-                        destination_page_path=path["path"],
-                    )
+                    new_condition = _build_condition(condition_data, destination_page_path=path["path"])
 
                     # Add the new condition to the conditions list of the component to update
                     if component_to_update.conditions:
@@ -184,9 +199,8 @@ def insert_form_config(form_config, form_id):
 
 
 def insert_form_as_template(form):
-    form_name = next(p for p in form["pages"] if p.get("controller") and p.get("controller").endswith("start.js"))[
-        "title"
-    ]
+    start_page_path = form.get("startPage")
+    form_name = next(p for p in form["pages"] if p["path"] == start_page_path)["title"]
     new_form = Form(
         section_id=None,
         name_in_apply_json={"en": form_name},
