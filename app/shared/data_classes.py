@@ -5,13 +5,25 @@ from typing import Optional
 
 
 @dataclass
+class SubCondition:
+    field: dict
+    operator: str
+    value: dict
+    coordinator: Optional[str]
+
+
+@dataclass
+class ConditionValue:
+    name: str
+    conditions: list[SubCondition]
+
+
+@dataclass
 class Condition:
     name: str
     display_name: str
-    value: str
-    operator: str
+    value: ConditionValue
     destination_page_path: str
-    coordinator: Optional[str] = None
 
 
 @dataclass

@@ -184,7 +184,7 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
                                 "name": "start-page-content",
                                 "options": {},
                                 "type": "Html",
-                                "content": "<p class='govuk-body'>None</p><p class='govuk-body'>"
+                                "content": '<p class="govuk-body"></p><p class="govuk-body">'
                                 "We will ask you about:</p> <ul><li>Organisation Name</li></ul>",
                                 "schema": {},
                             }
