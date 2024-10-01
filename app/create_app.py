@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_assets import Environment
+from fsd_utils.logging import logging
 from jinja2 import ChoiceLoader
 from jinja2 import PackageLoader
 from jinja2 import PrefixLoader
@@ -11,7 +12,6 @@ from app.blueprints.self_serve.routes import self_serve_bp
 from app.blueprints.templates.routes import template_bp
 from app.db.models import Fund  # noqa:F401
 from app.db.models import Round  # noqa:F401
-from fsd_utils.logging import logging
 
 
 def create_app() -> Flask:
