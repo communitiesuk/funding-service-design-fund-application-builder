@@ -368,17 +368,22 @@ def build_components_from_page(
                     condition_name = next_config["condition"]
                     condition_config = next(fc for fc in form_conditions if fc["name"] == condition_name)
                     destination = index_of_printed_headers[next_config["path"]]["heading_number"]
-                    condition_value = next(
+                    text_with_coordinators = ""
+                    for condition in [
                         cc for cc in condition_config["value"]["conditions"] if cc["field"]["name"] == c["name"]
-                    )["value"]["value"]
-                    condition_text = determine_display_value_for_condition(
-                        condition_value,
-                        list_name=c["list"] if "list" in c else None,
-                        form_lists=form_lists,
-                        lang=lang,
-                    )
+                    ]:
+                        condition_value = condition["value"]["value"]
+                        condition_text = determine_display_value_for_condition(
+                            condition_value,
+                            list_name=c["list"] if "list" in c else None,
+                            form_lists=form_lists,
+                            lang=lang,
+                        )
+                        if condition.get("coordinator"):
+                            text_with_coordinators += f" {condition.get('coordinator')} "
+                        text_with_coordinators += f"'{condition_text}'"
                     text.append(
-                        f"If '{condition_text}', go to <strong>{destination}</strong>"
+                        f"If {text_with_coordinators}, go to <strong>{destination}</strong>"
                         if lang == "en"
                         else (f"Os '{condition_text}', ewch i <strong>{destination}</strong>")
                     )
