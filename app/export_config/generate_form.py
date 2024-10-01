@@ -164,10 +164,7 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
             partial_form_json["conditions"].extend(form_json_conditions)
 
             for condition in component.conditions:
-                if condition["destination_page_path"] == "CONTINUE":
-                    destination_path = f"/{next_path}"
-                else:
-                    destination_path = f"/{condition['destination_page_path'].lstrip('/')}"
+                destination_path = f"/{condition['destination_page_path'].lstrip('/')}"
 
                 this_page_in_results["next"].append(
                     {
