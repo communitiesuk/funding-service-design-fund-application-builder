@@ -1,4 +1,5 @@
 import copy
+from dataclasses import asdict
 
 from app.db.models import Component
 from app.db.models import Form
@@ -6,6 +7,7 @@ from app.db.models import Page
 from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.models.application_config import ComponentType
 from app.db.queries.application import get_list_by_id
+from app.shared.data_classes import ConditionValue
 
 BASIC_FORM_STRUCTURE = {
     "startPage": None,
@@ -42,34 +44,26 @@ def build_conditions(component: Component) -> list:
     """
     results = []
     for condition in component.conditions:
-        condition_entry = {
-            "field": {
-                "name": component.runner_component_name,
-                "type": component.type.value,
-                "display": component.title,
-            },
-            "operator": condition["operator"],
-            "value": condition["value"],
-        }
-
-        # Add 'coordinator' only if it exists
-        if condition.get("coordinator"):
-            condition_entry["coordinator"] = condition.get("coordinator")
-
-        if condition["name"] in [c["name"] for c in results]:
-            # If this condition already exists, add it to the existing condition
-            existing_condition = next(c for c in results if c["name"] == condition["name"])
-            existing_condition["value"]["conditions"].append(condition_entry)
-            continue
-
         result = {
             "displayName": condition["display_name"],
             "name": condition["name"],
-            "value": {
-                "name": condition["display_name"],
-                "conditions": [condition_entry],
-            },
+            "value": asdict(
+                ConditionValue(
+                    name=condition["value"]["name"],
+                    conditions=[],
+                )
+            ),
         }
+        for sc in condition["value"]["conditions"]:
+            sub_condition = {
+                "field": sc["field"],
+                "operator": sc["operator"],
+                "value": sc["value"],
+            }
+            # only add coordinator if it exists
+            if "coordinator" in sc and sc.get("coordinator") is not None:
+                sub_condition["coordinator"] = sc.get("coordinator", None)
+            result["value"]["conditions"].append(sub_condition)
 
         results.append(result)
 
@@ -245,7 +239,7 @@ def build_start_page(content: str, form: Form) -> dict:
             "name": "start-page-content",
             "options": {},
             "type": "Html",
-            "content": f'<p class="govuk-body">{content}</p>{ask_about or ""}',
+            "content": f'<p class="govuk-body">{content or ""}</p>{ask_about or ""}',
             "schema": {},
         }
     )
