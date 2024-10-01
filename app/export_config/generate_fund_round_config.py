@@ -32,6 +32,8 @@ ROUND_BASE_PATHS = {
     "COF_R4_W2": 11,
 }
 
+TEMPLATE_FUND_ROUND_EXPORT = {"sections_config": [], "fund_config": {}, "round_config": [], "base_path": None}
+
 
 def generate_application_display_config(round_id):
 
@@ -39,6 +41,8 @@ def generate_application_display_config(round_id):
     # get round
     round = get_round_by_id(round_id)
     round_base_path = ROUND_BASE_PATHS.get(round.short_name, 0)  # so this works for dummy data
+    application_base_path = f"{round_base_path}.1"
+    TEMPLATE_FUND_ROUND_EXPORT["base_path"] = round_base_path
     "sort by Section.index"
     sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
     current_app.logger.info(f"Generating application display config for round {round_id}")
@@ -51,7 +55,9 @@ def generate_application_display_config(round_id):
             f"{section.index}. {section.name_in_apply_json['cy']}" if section.name_in_apply_json.get("cy") else ""
         )
         ordered_sections.append(
-            FundSectionSection(section_name=section.name_in_apply_json, tree_path=f"{round_base_path}.{section.index}")
+            FundSectionSection(
+                section_name=section.name_in_apply_json, tree_path=f"{application_base_path}.{section.index}"
+            ).as_dict()
         )
         forms = db.session.query(Form).filter(Form.section_id == section.section_id).order_by(Form.section_index).all()
         for original_form in forms:
@@ -72,9 +78,9 @@ def generate_application_display_config(round_id):
                     section_name=form.name_in_apply_json,
                     form_name_json=form.runner_publish_name,
                     tree_path=f"{round_base_path}.{section.index}.{form.section_index}",
-                )
+                ).as_dict()
             )
-    write_config(ordered_sections, "sections_config", round.short_name, "python_file")
+    return ordered_sections
 
 
 def generate_fund_config(round_id):
@@ -90,11 +96,11 @@ def generate_fund_config(round_id):
         short_name=fund.short_name,
         description_json=fund.description_json,
         welsh_available=fund.welsh_available,
-        owner_organisation_name=fund.owner_organisation.name,
-        owner_organisation_shortname=fund.owner_organisation.short_name,
-        owner_organisation_logo_uri=fund.owner_organisation.logo_uri,
+        owner_organisation_name=None,
+        owner_organisation_shortname=None,
+        owner_organisation_logo_uri=None,
     )
-    write_config(fund_export, "fund_config", round.short_name, "python_file")
+    return fund_export.as_dict()
 
 
 def generate_round_config(round_id):
@@ -134,7 +140,7 @@ def generate_round_config(round_id):
         feedback_survey_config=round.feedback_survey_config,
     )
 
-    write_config(round_export, "round_config", round.short_name, "python_file")
+    return round_export.as_dict()
 
 
 def generate_config_for_round(round_id):
@@ -155,6 +161,11 @@ def generate_config_for_round(round_id):
     """
     if round_id is None:
         raise ValueError("Valid round ID is required to generate configuration.")
-    generate_fund_config(round_id)
-    generate_round_config(round_id)
-    generate_application_display_config(round_id)
+    fund_config = generate_fund_config(round_id)
+    TEMPLATE_FUND_ROUND_EXPORT["fund_config"] = fund_config
+    round_config = generate_round_config(round_id)
+    TEMPLATE_FUND_ROUND_EXPORT["round_config"] = round_config
+    round_display_config = generate_application_display_config(round_id)
+    TEMPLATE_FUND_ROUND_EXPORT["sections_config"] = round_display_config
+    fund_round_export = TEMPLATE_FUND_ROUND_EXPORT
+    write_config(fund_round_export, "round_config", fund_round_export["round_config"]["short_name"], "python_file")

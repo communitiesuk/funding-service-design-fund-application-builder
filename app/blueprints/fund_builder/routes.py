@@ -42,10 +42,7 @@ from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_all_questions import print_html
 from app.export_config.generate_form import build_form_json
-from app.export_config.generate_fund_round_config import (
-    generate_application_display_config,
-)
-from app.export_config.generate_fund_round_config import generate_fund_config
+from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
@@ -373,8 +370,7 @@ def view_form_questions(round_id, form_id):
 def create_export_files(round_id):
     generate_form_jsons_for_round(round_id)
     generate_all_round_html(round_id)
-    generate_application_display_config(round_id)
-    generate_fund_config(round_id)
+    generate_config_for_round(round_id)
     round_short_name = get_round_by_id(round_id).short_name
 
     # Directory to zip

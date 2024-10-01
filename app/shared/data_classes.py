@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
@@ -30,6 +31,9 @@ class FormNameJson:
 class FundSectionBase:
     section_name: SectionName
     tree_path: str
+
+    def as_dict(self):
+        return asdict(self)
 
 
 @dataclass
@@ -69,7 +73,7 @@ class ContactUsBannerJson:
 @dataclass
 class FeedbackSurveyConfig:
     has_feedback_survey: Optional[bool] = None
-    has_section_feedback: Optional[bool] = None
+    has_section_feedback: Optional[bool] = False
     is_feedback_survey_optional: Optional[bool] = None
     is_section_feedback_optional: Optional[bool] = None
 
@@ -90,6 +94,9 @@ class FundExport:
     name_json: NameJson = field(default_factory=NameJson)
     title_json: TitleJson = field(default_factory=TitleJson)
     description_json: DescriptionJson = field(default_factory=DescriptionJson)
+
+    def as_dict(self):
+        return asdict(self)
 
 
 @dataclass
@@ -123,9 +130,19 @@ class RoundExport:
     is_expression_of_interest: Optional[bool] = None
     eoi_decision_schema: Optional[Dict[str, str]] = None
     # check to use FeedbackSurveyConfig
-    feedback_survey_config: Optional[Dict[str, str]] = None
+    feedback_survey_config: Optional[Dict[str, str]] = (
+        {
+            "has_feedback_survey": False,
+            "has_section_feedback": False,
+            "is_feedback_survey_optional": False,
+            "is_section_feedback_optional": False,
+        },
+    )
     # check to use EligibilityConfig
-    eligibility_config: Optional[Dict[str, str]] = None
+    eligibility_config: Optional[Dict[str, str]] = {"has_eligibility": False}
     title_json: TitleJson = field(default_factory=TitleJson)
     # check to use EligibilityConfig
     contact_us_banner_json: Optional[Dict[str, str]] = None
+
+    def as_dict(self):
+        return asdict(self)
