@@ -8,6 +8,7 @@ from app.db.models import ComponentType
 from app.db.models import Page
 from app.db.models.application_config import Form
 from app.db.models.application_config import Section
+from app.db.models.round import Round
 from app.db.queries.application import _fix_cloned_default_pages
 from app.db.queries.application import _initiate_cloned_component
 from app.db.queries.application import _initiate_cloned_form
@@ -842,3 +843,8 @@ def test_clone_round(seed_dynamic_data, _db):
     # assert cloned components are different (ids)
     cloned_components = _db.session.query(Component).filter(Component.page_id.in_(cloned_page_ids)).all()
     assert all([c.component_id != old_id for c, old_id in zip(cloned_components, old_component_ids)])
+
+    # Check cloned round has a different base path
+    old_round = _db.session.query(Round).where(Round.round_id == round_id).one()
+    assert old_round.section_base_path
+    assert cloned_round.section_base_path > old_round.section_base_path

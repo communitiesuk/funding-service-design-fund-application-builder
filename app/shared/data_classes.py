@@ -139,7 +139,8 @@ class RoundExport:
         },
     )
     # check to use EligibilityConfig
-    eligibility_config: Optional[Dict[str, str]] = {"has_eligibility": False}
+    # TODO running DB migrations doesn't like next line
+    # eligibility_config: Optional[Dict[str, str]] = {"has_eligibility": False}
     title_json: TitleJson = field(default_factory=TitleJson)
     # check to use EligibilityConfig
     contact_us_banner_json: Optional[Dict[str, str]] = None

@@ -24,7 +24,6 @@ BASIC_FUND_INFO = {
 }
 BASIC_ROUND_INFO = {
     "audit_info": {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-    "title_json": {"en": "round the first"},
     "opens": datetime.now(),
     "deadline": datetime.now(),
     "assessment_start": datetime.now(),
@@ -32,6 +31,9 @@ BASIC_ROUND_INFO = {
     "assessment_deadline": datetime.now(),
     "prospectus_link": "http://www.google.com",
     "privacy_notice_link": "http://www.google.com",
+    "support_times": "9am - 5pm",
+    "support_days": "Monday to Friday",
+    "project_name_field_id": 1,
 }
 
 page_one_id = uuid4()
@@ -67,30 +69,16 @@ def init_salmon_fishing_fund():
     r: Round = Round(
         round_id=uuid4(),
         fund_id=f.fund_id,
-        audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
         title_json={"en": "round the first"},
         short_name="TEST",
-        opens=datetime.now(),
-        deadline=datetime.now(),
-        assessment_start=datetime.now(),
-        reminder_date=datetime.now(),
-        assessment_deadline=datetime.now(),
-        prospectus_link="http://www.google.com",
-        privacy_notice_link="http://www.google.com",
+        **BASIC_ROUND_INFO,
     )
     r2: Round = Round(
         round_id=uuid4(),
         fund_id=f.fund_id,
-        audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
         title_json={"en": "round the second"},
-        short_name=f"R{randint(0,999)}",
-        opens=datetime.now(),
-        deadline=datetime.now(),
-        assessment_start=datetime.now(),
-        reminder_date=datetime.now(),
-        assessment_deadline=datetime.now(),
-        prospectus_link="http://www.google.com",
-        privacy_notice_link="http://www.google.com",
+        short_name="TEST2",
+        **BASIC_ROUND_INFO,
     )
 
     s1: Section = Section(

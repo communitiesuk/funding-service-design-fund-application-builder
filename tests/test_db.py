@@ -338,7 +338,9 @@ fund_id = uuid4()
 @pytest.mark.seed_config(
     {
         "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
-        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "rounds": [
+            Round(**BASIC_ROUND_INFO, title_json={"en": "round1"}, round_id=round_id, fund_id=fund_id, short_name="R1")
+        ],
         "sections": [
             Section(
                 name_in_apply_json={
@@ -383,7 +385,9 @@ fund_id = uuid4()
 @pytest.mark.seed_config(
     {
         "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
-        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "rounds": [
+            Round(**BASIC_ROUND_INFO, title_json={"en": "round1"}, round_id=round_id, fund_id=fund_id, short_name="R1")
+        ],
         "sections": [
             Section(
                 name_in_apply_json={
@@ -449,7 +453,9 @@ fund_id = uuid4()
 @pytest.mark.seed_config(
     {
         "funds": [Fund(**BASIC_FUND_INFO, fund_id=fund_id, short_name="UT1")],
-        "rounds": [Round(**BASIC_ROUND_INFO, round_id=round_id, fund_id=fund_id, short_name="R1")],
+        "rounds": [
+            Round(**BASIC_ROUND_INFO, title_json={"en": "round1"}, round_id=round_id, fund_id=fund_id, short_name="R1")
+        ],
         "sections": [
             Section(
                 name_in_apply_json={
@@ -588,3 +594,18 @@ def test_move_form_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
 def test_swap_elements(input_list, idx_a, idx_b, exp_result):
     result = swap_elements_in_list(input_list, idx_a, idx_b)
     assert result == exp_result
+
+
+def test_base_path_sequence_insert(seed_dynamic_data, _db):
+    fund = seed_dynamic_data["funds"][0]
+    new_round_1 = Round(
+        **BASIC_ROUND_INFO, title_json={"en": "round1"}, round_id=uuid4(), fund_id=fund.fund_id, short_name="R1"
+    )
+    added_round_1 = add_round(new_round_1)
+    assert added_round_1.section_base_path
+    new_round_2 = Round(
+        **BASIC_ROUND_INFO, title_json={"en": "round2"}, round_id=uuid4(), fund_id=fund.fund_id, short_name="R2"
+    )
+    added_round_2 = add_round(new_round_2)
+    assert added_round_2.section_base_path
+    assert added_round_2.section_base_path > added_round_1.section_base_path

@@ -5,6 +5,8 @@ from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import Sequence
 from sqlalchemy import String
 from sqlalchemy import UniqueConstraint
 from sqlalchemy import inspect
@@ -79,6 +81,11 @@ class Round(BaseModel):
     feedback_survey_config = Column(JSON(none_as_null=True), nullable=True, unique=False)
     eligibility_config = Column(MutableDict.as_mutable(JSON(none_as_null=True)), nullable=True, unique=False)
     eoi_decision_schema = Column(JSON(none_as_null=True), nullable=True, unique=False)
+    base_path_seq = Sequence("section_base_path_seq", start=1001, increment=1)
+    section_base_path = Column(
+        Integer,
+        server_default=base_path_seq.next_value(),
+    )
 
     def __repr__(self):
         return f"Round({self.short_name} - {self.title_json['en']}, Sections: {self.sections})"

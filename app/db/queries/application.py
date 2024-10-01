@@ -231,6 +231,7 @@ def clone_single_round(round_id, new_fund_id, new_short_name) -> Round:
     cloned_round.source_template_id = round_to_clone.round_id
     cloned_round.template_name = None
     cloned_round.sections = []
+    cloned_round.section_base_path = None
 
     db.session.add(cloned_round)
     db.session.commit()

@@ -40,7 +40,9 @@ def generate_application_display_config(round_id):
     ordered_sections = []
     # get round
     round = get_round_by_id(round_id)
-    round_base_path = ROUND_BASE_PATHS.get(round.short_name, 0)  # so this works for dummy data
+    round_base_path = (
+        round.section_base_path
+    )  # ROUND_BASE_PATHS.get(round.short_name, 0)  # so this works for dummy data
     application_base_path = f"{round_base_path}.1"
     TEMPLATE_FUND_ROUND_EXPORT["base_path"] = round_base_path
     "sort by Section.index"

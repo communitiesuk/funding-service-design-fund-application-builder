@@ -76,7 +76,11 @@ page_2_id = uuid4()
 @pytest.mark.seed_config(
     {
         "funds": [Fund(fund_id=fund_id, short_name="UTFWC", **BASIC_FUND_INFO)],
-        "rounds": [Round(round_id=round_id, fund_id=fund_id, short_name="UTRWC", **BASIC_ROUND_INFO)],
+        "rounds": [
+            Round(
+                round_id=round_id, title_json={"en": "UT RWC"}, fund_id=fund_id, short_name="UTRWC", **BASIC_ROUND_INFO
+            )
+        ],
         "sections": [
             Section(
                 section_id=section_id, index=1, round_id=round_id, name_in_apply_json={"en": "Organisation Information"}
