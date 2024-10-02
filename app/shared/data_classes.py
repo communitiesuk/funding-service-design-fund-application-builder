@@ -129,20 +129,16 @@ class RoundExport:
     mark_as_complete_enabled: Optional[bool] = None
     is_expression_of_interest: Optional[bool] = None
     eoi_decision_schema: Optional[Dict[str, str]] = None
-    # check to use FeedbackSurveyConfig
-    feedback_survey_config: Optional[Dict[str, str]] = (
-        {
+    feedback_survey_config: Optional[Dict[str, bool]] = field(
+        default_factory=lambda: {
             "has_feedback_survey": False,
             "has_section_feedback": False,
             "is_feedback_survey_optional": False,
             "is_section_feedback_optional": False,
-        },
+        }
     )
-    # check to use EligibilityConfig
-    # TODO running DB migrations doesn't like next line
-    # eligibility_config: Optional[Dict[str, str]] = {"has_eligibility": False}
+    eligibility_config: Optional[Dict[str, bool]] = field(default_factory=lambda: {"has_eligibility": False})
     title_json: TitleJson = field(default_factory=TitleJson)
-    # check to use EligibilityConfig
     contact_us_banner_json: Optional[Dict[str, str]] = None
 
     def as_dict(self):

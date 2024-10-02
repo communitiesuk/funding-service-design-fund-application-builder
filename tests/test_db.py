@@ -203,8 +203,8 @@ fund_id = uuid4()
                 display_logo_on_pdf_exports=False,
                 mark_as_complete_enabled=False,
                 is_expression_of_interest=False,
-                feedback_survey_config={},
-                eligibility_config={},
+                feedback_survey_config=None,
+                eligibility_config=None,
                 eoi_decision_schema={},
             )
         ],

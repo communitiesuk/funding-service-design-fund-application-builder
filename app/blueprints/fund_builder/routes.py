@@ -402,7 +402,12 @@ def create_new_round(form):
         display_logo_on_pdf_exports=form.display_logo_on_pdf_exports.data == "true",
         mark_as_complete_enabled=form.mark_as_complete_enabled.data == "true",
         is_expression_of_interest=form.is_expression_of_interest.data == "true",
-        feedback_survey_config=form.feedback_survey_config.data,
+        feedback_survey_config={
+            "has_feedback_survey": form.feedback_survey_config.data,
+            "has_section_feedback": False,
+            "is_feedback_survey_optional": False,
+            "is_section_feedback_optional": False,
+        },
         eligibility_config={"has_eligibility": form.eligibility_config.data},
         eoi_decision_schema={"en": form.eoi_decision_schema.data, "cy": None},
     )

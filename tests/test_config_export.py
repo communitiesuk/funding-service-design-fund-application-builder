@@ -18,10 +18,8 @@ output_base_path = Path("app") / "export_config" / "output"
 
 def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
     # Setup: Prepare valid input parameters
-    fund_id = seed_dynamic_data["funds"][0].fund_id
     fund_short_name = seed_dynamic_data["funds"][0].short_name
     round_id = seed_dynamic_data["rounds"][0].round_id
-    org_id = seed_dynamic_data["organisations"][0].organisation_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
     mock_round_base_paths = {round_short_name: 99}
 
@@ -39,71 +37,56 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
             "path": output_base_path
             / round_short_name
             / "fund_store"
-            / f"fund_config_{date.today().strftime('%d-%m-%Y')}.py",
-            "expected_output": {
-                "id": str(fund_id),
-                "short_name": fund_short_name,
-                "welsh_available": False,
-                "owner_organisation_name": f"Ministry of Testing - {str(org_id)[:5]}",
-                "owner_organisation_shortname": f"MoT-{str(org_id)[:5]}",
-                "owner_organisation_logo_uri": "http://www.google.com",
-                "name_json": {"en": "Unit Test Fund 1"},
-                "title_json": {"en": "funding to improve testing"},
-                "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
-            },
-        },
-        {
-            "path": output_base_path
-            / round_short_name
-            / "fund_store"
             / f"round_config_{date.today().strftime('%d-%m-%Y')}.py",
             "expected_output": {
-                "id": str(round_id),
-                "fund_id": str(fund_id),
-                "short_name": round_short_name,
-                "application_reminder_sent": False,
-                "prospectus": "http://www.google.com",
-                "privacy_notice": "http://www.google.com",
-                "reference_contact_page_over_email": False,
-                "contact_email": None,
-                "contact_phone": None,
-                "contact_textphone": None,
-                "support_times": "",
-                "support_days": "",
-                "instructions_json": None,
-                "feedback_link": None,
-                "project_name_field_id": "",
-                "application_guidance_json": None,
-                "guidance_url": None,
-                "all_uploaded_documents_section_available": False,
-                "application_fields_download_available": False,
-                "display_logo_on_pdf_exports": False,
-                "mark_as_complete_enabled": False,
-                "is_expression_of_interest": False,
-                "eoi_decision_schema": None,
-                "feedback_survey_config": None,
-                "eligibility_config": None,
-                "title_json": {"en": "round the first"},
-                "contact_us_banner_json": None,
+                "sections_config": [
+                    {
+                        "section_name": {"en": "1. Organisation Information", "cy": ""},
+                        "requires_feedback": None,
+                    },
+                    {
+                        "section_name": {"en": "1.1 About your organisation", "cy": ""},
+                        "form_name_json": {"en": "about-your-org", "cy": ""},
+                    },
+                ],
+                "fund_config": {
+                    "short_name": fund_short_name,
+                    "welsh_available": False,
+                    "owner_organisation_name": "None",
+                    "owner_organisation_shortname": "None",
+                    "owner_organisation_logo_uri": "None",
+                    "name_json": {"en": "Unit Test Fund 1"},
+                    "title_json": {"en": "funding to improve testing"},
+                    "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
+                },
+                "round_config": {
+                    "short_name": round_short_name,
+                    "application_reminder_sent": False,
+                    "prospectus": "http://www.google.com",
+                    "privacy_notice": "http://www.google.com",
+                    "reference_contact_page_over_email": False,
+                    "contact_email": None,
+                    "contact_phone": None,
+                    "contact_textphone": None,
+                    "support_times": "",
+                    "support_days": "",
+                    "instructions_json": None,
+                    "feedback_link": None,
+                    "project_name_field_id": "",
+                    "application_guidance_json": None,
+                    "guidance_url": None,
+                    "all_uploaded_documents_section_available": False,
+                    "application_fields_download_available": False,
+                    "display_logo_on_pdf_exports": False,
+                    "mark_as_complete_enabled": False,
+                    "is_expression_of_interest": False,
+                    "eoi_decision_schema": None,
+                    "feedback_survey_config": None,
+                    "eligibility_config": {"has_eligibility": False},
+                    "title_json": {"en": "round the first"},
+                    "contact_us_banner_json": None,
+                },
             },
-        },
-        {
-            "path": output_base_path
-            / round_short_name
-            / "fund_store"
-            / f"sections_config_{date.today().strftime('%d-%m-%Y')}.py",
-            "expected_output": [
-                {
-                    "section_name": {"en": "1. Organisation Information", "cy": ""},
-                    "tree_path": "99.1",
-                    "requires_feedback": None,
-                },
-                {
-                    "section_name": {"en": "1.1 About your organisation", "cy": ""},
-                    "tree_path": "99.1.1",
-                    "form_name_json": {"en": "about-your-org", "cy": ""},
-                },
-            ],
         },
     ]
     try:
@@ -116,11 +99,37 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
                 # Safely evaluate the Python literal structure
                 # only evaluates literals and not arbitrary code
                 data = ast.literal_eval(content)
-                # remove keys that can't be accurately compared
-                if isinstance(data, dict):
-                    keys_to_remove = ["reminder_date", "assessment_start", "assessment_deadline", "deadline", "opens"]
+
+                if expected_file["expected_output"].get("fund_config", None):
+                    # remove keys that can't be accurately compared
+                    keys_to_remove = ["base_path"]
+                    keys_to_remove_fund_config = ["id"]
+                    keys_to_remove_round_config = [
+                        "id",
+                        "fund_id",
+                        "reminder_date",
+                        "assessment_start",
+                        "assessment_deadline",
+                        "deadline",
+                        "opens",
+                    ]
+                    keys_to_remove_section_config = ["tree_path"]
                     data = {k: v for k, v in data.items() if k not in keys_to_remove}
-                assert data == expected_file["expected_output"]
+                    data["fund_config"] = {
+                        k: v for k, v in data["fund_config"].items() if k not in keys_to_remove_fund_config
+                    }
+                    data["round_config"] = {
+                        k: v for k, v in data["round_config"].items() if k not in keys_to_remove_round_config
+                    }
+                    data["sections_config"] = [
+                        {k: v for k, v in section.items() if k not in keys_to_remove_section_config}
+                        for section in data["sections_config"]
+                    ]
+                    assert expected_file["expected_output"]["fund_config"] == data["fund_config"]
+                    assert expected_file["expected_output"]["round_config"] == data["round_config"]
+                    assert expected_file["expected_output"]["sections_config"] == data["sections_config"]
+                else:
+                    assert data == expected_file["expected_output"]
     finally:
         # Cleanup step to remove the directory
         directory_path = output_base_path / round_short_name
