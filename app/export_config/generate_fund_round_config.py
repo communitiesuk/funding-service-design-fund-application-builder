@@ -79,7 +79,7 @@ def generate_application_display_config(round_id):
                 FundSectionForm(
                     section_name=form.name_in_apply_json,
                     form_name_json=form.runner_publish_name,
-                    tree_path=f"{round_base_path}.{section.index}.{form.section_index}",
+                    tree_path=f"{application_base_path}.{section.index}.{form.section_index}",
                 ).as_dict()
             )
     return ordered_sections
