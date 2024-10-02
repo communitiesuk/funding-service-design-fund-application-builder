@@ -9,6 +9,8 @@ from app.db.models import Page
 from app.db.models import Section
 from app.db.models import Subcriteria
 from app.db.models import Theme
+from app.shared.data_classes import Condition
+from app.shared.data_classes import ConditionValue
 
 form_1_id = uuid4()
 page_1_id = uuid4()
@@ -93,3 +95,188 @@ mock_p_2 = Page(
     components=[component_with_list],
     form_id=None,
 )
+
+
+test_condition_org_type_a = Condition(
+    name="org_type_a",
+    display_name="org type a",
+    destination_page_path="/org-type-a",
+    value=ConditionValue(
+        name="org type a",
+        conditions=[
+            {
+                "field": {
+                    "name": "org_type",
+                    "type": "RadiosField",
+                    "display": "org type",
+                },
+                "operator": "is",
+                "value": {"type": "Value", "value": "A", "display": "A"},
+            }
+        ],
+    ),
+)
+test_condition_org_type_b = Condition(
+    name="org_type_b",
+    display_name="org type b",
+    destination_page_path="/org-type-b",
+    value=ConditionValue(
+        name="org type b",
+        conditions=[
+            {
+                "field": {
+                    "name": "org_type",
+                    "type": "RadiosField",
+                    "display": "org type",
+                },
+                "operator": "is",
+                "value": {"type": "Value", "value": "B", "display": "B"},
+            }
+        ],
+    ),
+)
+
+
+test_condition_org_type_c = Condition(
+    name="org_type_c",
+    display_name="org type c",
+    destination_page_path="/org-type-c",
+    value=ConditionValue(
+        name="org type c",
+        conditions=[
+            {
+                "field": {
+                    "name": "org_type",
+                    "type": "RadiosField",
+                    "display": "org type",
+                },
+                "operator": "is",
+                "value": {"type": "Value", "value": "C1", "display": "C1"},
+            },
+            {
+                "field": {
+                    "name": "org_type",
+                    "type": "RadiosField",
+                    "display": "org type",
+                },
+                "operator": "is",
+                "value": {"type": "Value", "value": "C2", "display": "C2"},
+                "coordinator": "or",
+            },
+        ],
+    ),
+)
+
+
+test_page_object_org_type_a = Page(
+    page_id=uuid4(),
+    form_id=uuid4(),
+    display_path="org-type-a",
+    name_in_apply_json={"en": "Organisation Type A"},
+    form_index=2,
+)
+
+test_page_object_org_type_b = Page(
+    page_id=uuid4(),
+    form_id=uuid4(),
+    display_path="org-type-b",
+    name_in_apply_json={"en": "Organisation Type B"},
+    form_index=2,
+)
+test_page_object_org_type_c = Page(
+    page_id=uuid4(),
+    form_id=uuid4(),
+    display_path="org-type-c",
+    name_in_apply_json={"en": "Organisation Type C"},
+    form_index=2,
+)
+
+test_form_json_page_org_type_a = {
+    "path": "/org-type-a",
+    "title": "org-type-a",
+    "components": [],
+    "next": [],
+    "options": {},
+}
+test_form_json_page_org_type_b = {
+    "path": "/org-type-b",
+    "title": "org-type-b",
+    "components": [],
+    "next": [],
+    "options": {},
+}
+test_form_json_page_org_type_c = {
+    "path": "/org-type-c",
+    "title": "org-type-c",
+    "components": [],
+    "next": [],
+    "options": {},
+}
+test_form_json_condition_org_type_c = {
+    "displayName": "org type c",
+    "name": "org_type_c",
+    "value": {
+        "name": "org type c",
+        "conditions": [
+            {
+                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                "operator": "is",
+                "value": {"type": "Value", "value": "C1", "display": "C1"},
+            },
+            {
+                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                "operator": "is",
+                "value": {"type": "Value", "value": "C2", "display": "C2"},
+                "coordinator": "or",
+            },
+        ],
+    },
+}
+test_form_json_condition_org_type_a = {
+    "displayName": "org type a",
+    "name": "org_type_a",
+    "value": {
+        "name": "org type a",
+        "conditions": [
+            {
+                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                "operator": "is",
+                "value": {"type": "Value", "value": "A", "display": "A"},
+            }
+        ],
+    },
+}
+test_form_json_condition_org_type_b = {
+    "displayName": "org type b",
+    "name": "org_type_b",
+    "value": {
+        "name": "org type b",
+        "conditions": [
+            {
+                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                "operator": "is",
+                "value": {"type": "Value", "value": "B", "display": "B"},
+            }
+        ],
+    },
+}
+test_form_json_condition_org_type_c = {
+    "displayName": "org type c",
+    "name": "org_type_c",
+    "value": {
+        "name": "org type c",
+        "conditions": [
+            {
+                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                "operator": "is",
+                "value": {"type": "Value", "value": "C1", "display": "C1"},
+            },
+            {
+                "coordinator": "or",
+                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                "operator": "is",
+                "value": {"type": "Value", "value": "C2", "display": "C2"},
+            },
+        ],
+    },
+}

@@ -12,89 +12,27 @@ from app.import_config.load_form_json import add_conditions_to_components
 from app.shared.data_classes import Condition
 from app.shared.data_classes import ConditionValue
 from app.shared.data_classes import SubCondition
+from tests.unit_test_data import test_condition_org_type_a
+from tests.unit_test_data import test_condition_org_type_c
+from tests.unit_test_data import test_form_json_condition_org_type_a
+from tests.unit_test_data import test_form_json_condition_org_type_c
 
 
 @pytest.mark.parametrize(
     "input_condition,exp_result",
     [
         (
-            {
-                "displayName": "org type a",
-                "name": "org_type_a",
-                "value": {
-                    "name": "org type a",
-                    "conditions": [
-                        {
-                            "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
-                            "operator": "is",
-                            "value": {"type": "Value", "value": "A", "display": "A"},
-                        }
-                    ],
-                },
-            },
-            Condition(
-                name="org_type_a",
-                display_name="org type a",
-                destination_page_path="/page-1",
-                value=ConditionValue(
-                    name="org type a",
-                    conditions=[
-                        {
-                            "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
-                            "operator": "is",
-                            "value": {"type": "Value", "value": "A", "display": "A"},
-                        }
-                    ],
-                ),
-            ),
+            test_form_json_condition_org_type_a,
+            test_condition_org_type_a,
         ),
         (
-            {
-                "displayName": "org type c",
-                "name": "org_type_c",
-                "value": {
-                    "name": "org type c",
-                    "conditions": [
-                        {
-                            "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
-                            "operator": "is",
-                            "value": {"type": "Value", "value": "C1", "display": "C1"},
-                        },
-                        {
-                            "coordinator": "or",
-                            "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
-                            "operator": "is",
-                            "value": {"type": "Value", "value": "C2", "display": "C2"},
-                        },
-                    ],
-                },
-            },
-            Condition(
-                name="org_type_c",
-                display_name="org type c",
-                destination_page_path="/page-1",
-                value=ConditionValue(
-                    name="org type c",
-                    conditions=[
-                        {
-                            "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
-                            "operator": "is",
-                            "value": {"type": "Value", "value": "C1", "display": "C1"},
-                        },
-                        {
-                            "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
-                            "operator": "is",
-                            "value": {"type": "Value", "value": "C2", "display": "C2"},
-                            "coordinator": "or",
-                        },
-                    ],
-                ),
-            ),
+            test_form_json_condition_org_type_c,
+            test_condition_org_type_c,
         ),
     ],
 )
 def test_build_conditions(input_condition, exp_result):
-    result = _build_condition(condition_data=input_condition, destination_page_path="/page-1")
+    result = _build_condition(condition_data=input_condition, destination_page_path=exp_result.destination_page_path)
     assert result == exp_result
 
 
