@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% set pageHeading %}{{ 'Update a Round' if round_id else 'Create a Round' }}{% endset %}
+
 {% from "macros/wtfToGovUk.html" import input %}
 {% from "macros/wtfToGovUk.html" import dateinput %}
 {% from "macros/wtfToGovUk.html" import multilineinput %}
@@ -8,7 +10,7 @@
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 class="govuk-heading-l">{{ 'Update a Round' if round_id else 'Create a Round' }}</h1>
+        <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <form method="POST">

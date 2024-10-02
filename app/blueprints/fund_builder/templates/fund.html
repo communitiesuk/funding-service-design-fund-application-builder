@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% set pageHeading %}{{ 'Update a Fund' if fund_id else 'Create a Fund' }} {% endset %}
 {% from "macros/wtfToGovUk.html" import input %}
 {% from "macros/wtfToGovUk.html" import yes_no %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 class="govuk-heading-l">{{ 'Update a Fund' if fund_id else 'Create a Fund' }}</h1>
+        <h1 class="govuk-heading-l">{{pageHeading}}</h1>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <form method="POST">

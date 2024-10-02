@@ -1,8 +1,8 @@
+from flask import current_app
 from sqlalchemy import select
 
 from app.db import db
 from app.db.models.round import Round
-from flask import current_app
 
 
 def add_round(round: Round) -> Round:

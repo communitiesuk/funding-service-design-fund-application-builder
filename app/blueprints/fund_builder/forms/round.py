@@ -92,7 +92,7 @@ class RoundForm(FlaskForm):
     application_reminder_sent = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     contact_us_banner_json = TextAreaField("Contact Us Banner")
     reference_contact_page_over_email = RadioField(
-        "Reference contact page over emai", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Reference contact page over email", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
     contact_email = StringField("Contact Email", validators=[DataRequired()])
     contact_phone = StringField("Contact Phone", validators=[DataRequired()])
