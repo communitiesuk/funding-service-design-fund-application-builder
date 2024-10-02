@@ -205,9 +205,13 @@ def insert_form_config(form_config, form_id):
 
 def insert_form_as_template(form, template_name=None):
     start_page_path = form.get("startPage")
-    form_name = next(p for p in form["pages"] if p["path"] == start_page_path)["title"]
+    if "name" in form:
+        form_name = form.get("name")
+    else:
+        # If form doesn't have a name element, use the title of the start page
+        form_name = next(p for p in form["pages"] if p["path"] == start_page_path)["title"]
     if not template_name:
-        template_name = form["filename"]
+        template_name = form["filename"].split(".")[0]
     new_form = Form(
         section_id=None,
         name_in_apply_json={"en": form_name},
@@ -215,7 +219,7 @@ def insert_form_as_template(form, template_name=None):
         is_template=True,
         audit_info=None,
         section_index=None,
-        runner_publish_name=form["filename"].split(".")[0],
+        runner_publish_name=human_to_kebab_case(form_name),
         source_template_id=None,
     )
 

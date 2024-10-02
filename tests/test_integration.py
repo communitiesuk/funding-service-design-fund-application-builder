@@ -294,7 +294,8 @@ output_base_path = Path("app") / "export_config" / "output"
         ("optional-all-components.json", 8, 27),
         ("required-all-components.json", 8, 27),
         ("favourite-colours-sarah.json", 4, 1),
-        # TODO see why this fails("Organisation-and-local-authority-information-template.json", 16,1)
+        # TODO see why this fails
+        ("Organisation-and-local-authority-information-template.json", 16, 24),
     ],
 )
 def test_generate_config_for_round_valid_input(

@@ -1,10 +1,32 @@
 from flask import current_app
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
+from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_all_questions import print_html
 from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import write_config
+
+frontend_html_prefix = """
+{% extends "base.html" %}
+{%- from 'govuk_frontend_jinja/components/inset-text/macro.html' import govukInsetText -%}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+
+{% from "partials/file-formats.html" import file_formats %}
+{% set pageHeading %}{% trans %}Full list of application questions{% endtrans %}{% endset %}
+{% block content %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <span class="govuk-caption-l">{% trans %}{{ fund_title }}{% endtrans %}&nbsp;
+        {% trans %}{{ round_title }}{% endtrans %}
+        </span>
+        <h1 class="govuk-heading-xl">{{ pageHeading }}</h1>
+"""
+frontend_html_suffix = """
+    </div>
+</div>
+{% endblock content %}
+"""
 
 
 def generate_all_round_html(round_id):
@@ -34,6 +56,7 @@ def generate_all_round_html(round_id):
         raise ValueError("Round ID is required to generate HTML.")
     current_app.logger.info(f"Generating HTML for round {round_id}.")
     round = get_round_by_id(round_id)
+    fund = get_fund_by_id(round.fund_id)
     sections_in_round = round.sections
     section_data = []
     for section in sections_in_round:
@@ -44,5 +67,7 @@ def generate_all_round_html(round_id):
         section_data,
         lang="en",
     )
-    html_content = print_html(print_data)
-    write_config(html_content, "full_application", round.short_name, "html")
+    html_content = frontend_html_prefix
+    html_content += print_html(print_data)
+    html_content += frontend_html_suffix
+    write_config(html_content, f"{fund.short_name.casefold()}_{round.short_name.casefold()}", round.short_name, "html")

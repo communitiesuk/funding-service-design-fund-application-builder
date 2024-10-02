@@ -118,6 +118,7 @@ def section(round_id):
         ]
 
     params["breadcrumb_items"] = [
+        {"text": "Home", "href": url_for(BUILD_FUND_BP_INDEX)},
         {"text": fund_obj.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund_obj.fund_id)},
         {
             "text": round_obj.title_json["en"],
@@ -187,6 +188,7 @@ def build_application(round_id):
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     breadcrumb_items = [
+        {"text": "Home", "href": url_for(BUILD_FUND_BP_INDEX)},
         {"text": fund.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund.fund_id)},
         {"text": round.title_json["en"], "href": "#"},
     ]

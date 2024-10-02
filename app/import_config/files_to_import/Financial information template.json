@@ -1,0 +1,109 @@
+{
+    "metadata": {},
+    "startPage": "/what-is-your-organisations-annual-turnover",
+    "pages": [
+        {
+            "title": "What is your organisation's annual turnover?",
+            "path": "/what-is-your-organisations-annual-turnover",
+            "components": [
+                {
+                    "name": "GzXnjg",
+                    "options": {
+                        "prefix": "£"
+                    },
+                    "type": "NumberField",
+                    "title": "Turnover for 1 April 2022 to 31 March 2023"
+                },
+                {
+                    "name": "uMmsCR",
+                    "options": {
+                        "prefix": "£"
+                    },
+                    "type": "NumberField",
+                    "title": "Turnover for 1 April 2023 to 31 March 2024"
+                }
+            ],
+            "next": [
+                {
+                    "path": "/upload-your-organisations-annual-accounts-from-the-last-3-years"
+                }
+            ]
+        },
+        {
+            "path": "/upload-your-organisations-annual-accounts-from-the-last-3-years",
+            "title": "Upload your organisation's annual accounts from the last 3 years",
+            "components": [
+                {
+                    "name": "kAgOws",
+                    "options": {},
+                    "type": "FileUploadField",
+                    "title": "Upload your organisation's annual accounts from the last 3 years",
+                    "hint": "It should be a single file no bigger than 5MB in an accepted format (jpg, jpeg, png, pdf, txt, doc, docx, odt, rtf, csv, xls, xlsx, ods)."
+                }
+            ],
+            "next": [
+                {
+                    "path": "/upload-a-current-bank-statement-which-is-less-than-2-months-old"
+                }
+            ]
+        },
+        {
+            "title": "Summary",
+            "path": "/summary",
+            "controller": "./pages/summary.js",
+            "components": [],
+            "next": []
+        },
+        {
+            "path": "/upload-a-current-bank-statement-which-is-less-than-2-months-old",
+            "title": "Upload a current bank statement which is less than 2 months old",
+            "components": [
+                {
+                    "name": "OdQxuO",
+                    "options": {},
+                    "type": "FileUploadField",
+                    "title": "Upload a current bank statement which is less than 2 months old",
+                    "hint": "It should be a single file no bigger than 5MB in an accepted format (jpg, jpeg, png, pdf, txt, doc, docx, odt, rtf, csv, xls, xlsx, ods)."
+                }
+            ],
+            "next": [
+                {
+                    "path": "/upload-an-annual-budget-for-your-organisation"
+                }
+            ]
+        },
+        {
+            "path": "/upload-an-annual-budget-for-your-organisation",
+            "title": "Upload an annual budget for your organisation",
+            "components": [
+                {
+                    "name": "skqoWk",
+                    "options": {},
+                    "type": "FileUploadField",
+                    "title": "Upload an annual budget for your organisation",
+                    "hint": "It should be a single file no bigger than 5MB in an accepted format (jpg, jpeg, png, pdf, txt, doc, docx, odt, rtf, csv, xls, xlsx, ods)."
+                }
+            ],
+            "next": [
+                {
+                    "path": "/summary"
+                }
+            ]
+        }
+    ],
+    "lists": [],
+    "sections": [],
+    "conditions": [],
+    "fees": [],
+    "outputs": [],
+    "version": 2,
+    "skipSummary": false,
+    "feeOptions": {},
+    "markAsComplete": false,
+    "name": "Financial information",
+    "feedback": {
+        "feedbackForm": false,
+        "url": ""
+    },
+    "phaseBanner": {}
+}
