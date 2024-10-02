@@ -7,6 +7,7 @@ from uuid import UUID
 
 from app.db.queries.application import get_list_by_name
 from app.db.queries.application import insert_list
+from app.export_config.generate_form import human_to_kebab_case
 
 sys.path.insert(1, ".")
 from dataclasses import asdict  # noqa:E402
@@ -43,12 +44,17 @@ def _build_condition(condition_data, destination_page_path) -> Condition:
     return result
 
 
-def _get_component_by_runner_name(db, runner_component_name):
+def _get_component_by_runner_name(db, runner_component_name, page_id):
 
-    return db.session.query(Component).filter(Component.runner_component_name == runner_component_name).first()
+    return (
+        db.session.query(Component)
+        .filter(Component.runner_component_name == runner_component_name)
+        .filter(Component.page_id == page_id)
+        .first()
+    )
 
 
-def add_conditions_to_components(db, page: dict, conditions: dict):
+def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
     # Convert conditions list to a dictionary for faster lookup
     conditions_dict = {cond["name"]: cond for cond in conditions}
 
@@ -67,7 +73,7 @@ def add_conditions_to_components(db, page: dict, conditions: dict):
 
                     # Use the cache to reduce database queries
                     if runner_component_name not in components_cache:
-                        component_to_update = _get_component_by_runner_name(db, runner_component_name)
+                        component_to_update = _get_component_by_runner_name(db, runner_component_name, page_id)
                         components_cache[runner_component_name] = component_to_update
                     else:
                         component_to_update = components_cache[runner_component_name]
@@ -178,7 +184,10 @@ def insert_page_default_next_page(pages_config, db_pages):
 def insert_form_config(form_config, form_id):
     inserted_pages = []
     inserted_components = []
+    start_page_path = form_config["startPage"]
     for page in form_config.get("pages", []):
+        if page["path"] == start_page_path:
+            page["controller"] = "start.js"
         inserted_page = insert_page_as_template(page, form_id)
         inserted_pages.append(inserted_page)
         db.session.flush()  # flush to get the page id
@@ -188,19 +197,21 @@ def insert_form_config(form_config, form_id):
             )
             inserted_components.append(inserted_component)
         db.session.flush()  # flush to make components available for conditions
-        add_conditions_to_components(db, page, form_config["conditions"])
+        add_conditions_to_components(db, page, form_config["conditions"], inserted_page.page_id)
     insert_page_default_next_page(form_config.get("pages", None), inserted_pages)
     db.session.flush()
     return inserted_pages, inserted_components
 
 
-def insert_form_as_template(form):
+def insert_form_as_template(form, template_name=None):
     start_page_path = form.get("startPage")
     form_name = next(p for p in form["pages"] if p["path"] == start_page_path)["title"]
+    if not template_name:
+        template_name = form["filename"]
     new_form = Form(
         section_id=None,
         name_in_apply_json={"en": form_name},
-        template_name=form["filename"],
+        template_name=template_name,
         is_template=True,
         audit_info=None,
         section_index=None,
@@ -253,8 +264,8 @@ def load_form_jsons(override_fund_config=None):
 def load_json_from_file(data, template_name):
     db = app.extensions["sqlalchemy"]
     try:
-        data["filename"] = template_name
-        inserted_form = insert_form_as_template(data)
+        data["filename"] = human_to_kebab_case(template_name)
+        inserted_form = insert_form_as_template(data, template_name=template_name)
         db.session.flush()  # flush to get the form id
         insert_form_config(data, inserted_form.form_id)
         db.session.commit()

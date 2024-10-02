@@ -422,16 +422,17 @@ def preview_form(form_id):
     """
     form = get_form_by_id(form_id)
     form_json = build_form_json(form)
+    form_id = form.runner_publish_name
 
     try:
         publish_response = requests.post(
-            url=f"{Config.FORM_RUNNER_URL}/publish", json={"id": form.runner_publish_name, "configuration": form_json}
+            url=f"{Config.FORM_RUNNER_URL}/publish", json={"id": form_id, "configuration": form_json}
         )
         if not str(publish_response.status_code).startswith("2"):
             return "Error during form publish", 500
     except Exception as e:
         return f"unable to publish form: {str(e)}", 500
-    return redirect(f"{Config.FORM_RUNNER_URL_REDIRECT}/{form.runner_publish_name}")
+    return redirect(f"{Config.FORM_RUNNER_URL_REDIRECT}/{form_id}")
 
 
 @build_fund_bp.route("/download/<form_id>", methods=["GET"])
