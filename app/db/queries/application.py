@@ -32,16 +32,6 @@ def get_form_for_component(component: Component) -> Form:
     return form
 
 
-def get_template_page_by_display_path(display_path: str) -> Page:
-    page = (
-        db.session.query(Page)
-        .where(Page.display_path == display_path)
-        .where(Page.is_template == True)  # noqa:E712
-        .one_or_none()
-    )
-    return page
-
-
 def get_form_by_id(form_id: str) -> Form:
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     return form
@@ -59,6 +49,11 @@ def get_component_by_id(component_id: str) -> Component:
 
 def get_list_by_id(list_id: str) -> Lizt:
     lizt = db.session.query(Lizt).where(Lizt.list_id == list_id).one_or_none()
+    return lizt
+
+
+def get_list_by_name(list_name: str) -> Lizt:
+    lizt = db.session.query(Lizt).filter_by(name=list_name).first()
     return lizt
 
 
@@ -747,3 +742,22 @@ def move_form_up(section_id, form_index_to_move_up: int):
 
     section.forms = swap_elements_in_list(section.forms, list_index_to_move_up, list_index_to_move_up - 1)
     db.session.commit()
+
+
+def insert_list(list_config: dict, do_commit: bool = True) -> Lizt:
+    new_list = Lizt(
+        is_template=True,
+        name=list_config.get("name"),
+        title=list_config.get("title"),
+        type=list_config.get("type"),
+        items=list_config.get("items"),
+    )
+    try:
+        db.session.add(new_list)
+    except Exception as e:
+        print(e)
+        raise e
+    if do_commit:
+        db.session.commit()
+    db.session.flush()  # flush to get the list id
+    return new_list

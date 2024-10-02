@@ -1,3 +1,6 @@
+from copy import deepcopy
+from dataclasses import asdict
+from unittest import mock
 from uuid import uuid4
 
 import pytest
@@ -6,14 +9,30 @@ from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Lizt
 from app.db.models import Page
+from app.db.models.application_config import Form
+from app.export_config.generate_form import build_component
 from app.export_config.generate_form import build_conditions
 from app.export_config.generate_form import build_form_json
 from app.export_config.generate_form import build_lists
 from app.export_config.generate_form import build_navigation
 from app.export_config.generate_form import build_page
+from app.export_config.generate_form import build_start_page
 from app.export_config.generate_form import human_to_kebab_case
 from tests.unit_test_data import mock_c_1
+from tests.unit_test_data import mock_c_2
 from tests.unit_test_data import mock_form_1
+from tests.unit_test_data import test_condition_org_type_a
+from tests.unit_test_data import test_condition_org_type_b
+from tests.unit_test_data import test_condition_org_type_c
+from tests.unit_test_data import test_form_json_condition_org_type_a
+from tests.unit_test_data import test_form_json_condition_org_type_b
+from tests.unit_test_data import test_form_json_condition_org_type_c
+from tests.unit_test_data import test_form_json_page_org_type_a
+from tests.unit_test_data import test_form_json_page_org_type_b
+from tests.unit_test_data import test_form_json_page_org_type_c
+from tests.unit_test_data import test_page_object_org_type_a
+from tests.unit_test_data import test_page_object_org_type_b
+from tests.unit_test_data import test_page_object_org_type_c
 
 
 @pytest.mark.parametrize(
@@ -80,122 +99,6 @@ def test_build_lists(mocker, pages, exp_result):
     assert results[0]["name"] == "greetings_list"
 
 
-mock_lookups = {
-    "organisation-name": "Organisation Name",
-    "organisation-single-name": "Organisation Name",
-}
-mock_components = [
-    {
-        "id": "reuse-charitable-objects",
-        "json_snippet": {
-            "options": {"hideTitle": True, "maxWords": "500"},
-            "type": "FreeTextField",
-            "title": "What are your organisation’s charitable objects?",
-            "hint": "You can find this in your organisation's governing document.",
-        },
-    },
-    {
-        "id": "reuse-organisation-name",
-        "json_snippet": {
-            "options": {"hideTitle": False, "classes": "govuk-!-width-full"},
-            "type": "TextField",
-            "title": "Organisation name",
-            "hint": "This must match your registered legal organisation name",
-            "schema": {},
-        },
-    },
-    {
-        "id": "reuse_organisation_other_names_yes_no",
-        "json_snippet": {
-            "options": {},
-            "type": "YesNoField",
-            "title": "Does your organisation use any other names?",
-            "schema": {},
-        },
-        "conditions": [
-            {
-                "name": "organisation_other_names_no",
-                "value": "false",
-                "operator": "is",
-                "destination_page": "CONTINUE",
-            },
-            {
-                "name": "organisation_other_names_yes",
-                "value": "true",
-                "operator": "is",
-                "destination_page": "alternative-organisation-name",
-            },
-        ],
-    },
-    {
-        "id": "reuse-alt-org-name-1",
-        "json_snippet": {
-            "options": {"classes": "govuk-input"},
-            "type": "TextField",
-            "title": "Alternative name 1",
-            "schema": {},
-        },
-    },
-    {
-        "id": "reuse-alt-org-name-2",
-        "json_snippet": {
-            "options": {"required": False, "classes": "govuk-input"},
-            "type": "TextField",
-            "title": "Alternative name 2",
-            "schema": {},
-        },
-    },
-    {
-        "id": "reuse-alt-org-name-3",
-        "json_snippet": {
-            "options": {"required": False, "classes": "govuk-input"},
-            "type": "TextField",
-            "title": "Alternative name 3",
-            "schema": {},
-        },
-    },
-]
-mock_pages = [
-    {
-        "id": "organisation-single-name",
-        "builder_display_name": "Single Organisation Name",
-        "form_display_name": "Organisation Name",
-        "component_names": [
-            "reuse-organisation-name",
-        ],
-        "show_in_builder": True,
-    },
-    {
-        "id": "organisation-name",
-        "builder_display_name": "Organisation Name, with Alternatives",
-        "form_display_name": "Organisation Name",
-        "component_names": [
-            "reuse-organisation-name",
-            "reuse_organisation_other_names_yes_no",
-        ],
-        "show_in_builder": True,
-    },
-    {
-        "id": "organisation-charitable-objects",
-        "builder_display_name": "Organisation Charitable objects",
-        "form_display_name": "Organisation charitable objects",
-        "component_names": ["reuse-charitable-objects"],
-        "show_in_builder": True,
-    },
-    {
-        "id": "alternative-organisation-name",
-        "builder_display_name": "Alternative Organisation Names",
-        "form_display_name": "Alternative names of your organisation",
-        "component_names": [
-            "reuse-alt-org-name-1",
-            "reuse-alt-org-name-2",
-            "reuse-alt-org-name-3",
-        ],
-        "show_in_builder": False,
-    },
-]
-
-
 @pytest.mark.parametrize(
     "input_page, exp_result",
     [
@@ -227,9 +130,66 @@ mock_pages = [
         )
     ],
 )
-def test_build_page(mocker, input_page, exp_result):
+def test_build_page_and_components(input_page, exp_result):
     result = build_page(input_page)
     assert result == exp_result
+
+
+def test_build_page_controller_specified():
+    input_page: Page = Page(name_in_apply_json={"en": "Name in json"}, controller="startPageController")
+    result_page = build_page(page=input_page)
+    assert result_page
+    assert result_page["controller"] == "startPageController"
+
+
+def test_build_page_controller_not_specified():
+    input_page: Page = Page(name_in_apply_json={"en": "Name in json"}, controller=None)
+    result_page = build_page(page=input_page)
+    assert result_page
+    assert ("controller" in result_page) is False
+
+
+@pytest.mark.parametrize(
+    "input_page",
+    [
+        (
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[mock_c_1],
+            )
+        ),
+        (
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[mock_c_1, mock_c_2],
+            )
+        ),
+        (
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[],
+            )
+        ),
+    ],
+)
+def test_build_page(input_page):
+    with mock.patch("app.export_config.generate_form.build_component", new_value=lambda c: c) as mock_build_component:
+        result_page = build_page(input_page)
+        assert result_page
+        assert mock_build_component.call_count == len(input_page.components)
+        assert len(result_page["components"]) == len(input_page.components)
 
 
 id = uuid4()
@@ -239,104 +199,129 @@ id2 = uuid4()
 @pytest.mark.parametrize(
     "input_component, exp_results",
     [
+        # single condition
         (
             Component(
                 component_id=id,
-                title="test_title",
+                title="org type",
                 type=ComponentType.TEXT_FIELD,
                 conditions=[
-                    {
-                        "name": "test_condition",
-                        "display_name": "display name",
-                        "operator": "is",
-                        "value": {"type": "Value", "value": "yes", "display": "yes"},
-                        "destination_page_path": "./who-knows",
-                        "coordinator": None,
-                    },
+                    asdict(test_condition_org_type_a),
                 ],
-                runner_component_name="test_name",
+                runner_component_name="org_type",
             ),
-            [
-                {
-                    "displayName": "display name",
-                    "name": "test_condition",
-                    "value": {
-                        "name": "display name",
-                        "conditions": [
-                            {
-                                "field": {"name": "test_name", "type": "TextField", "display": "test_title"},
-                                "operator": "is",
-                                "value": {"type": "Value", "value": "yes", "display": "yes"},
-                            }
-                        ],
-                    },
-                }
-            ],
+            [test_form_json_condition_org_type_a],
         ),
+        # 2 conditions
         (
             Component(
                 component_id=id2,
                 title="test_title_2",
                 type=ComponentType.TEXT_FIELD,
                 conditions=[
-                    {
-                        "name": "test_condition",
-                        "display_name": "display name",
-                        "operator": "is",
-                        "value": {"type": "Value", "value": "yes", "display": "yes"},
-                        "destination_page_path": "./who-knows",
-                    },
-                    {
-                        "name": "test_condition2",
-                        "display_name": "display name",
-                        "operator": "is",
-                        "value": {"type": "Value", "value": "no", "display": "no"},
-                        "destination_page_path": "./who-knows2",
-                    },
+                    asdict(test_condition_org_type_a),
+                    asdict(test_condition_org_type_b),
                 ],
                 runner_component_name="test_name",
             ),
             [
-                {
-                    "displayName": "display name",
-                    "name": "test_condition",
-                    "value": {
-                        "name": "display name",
-                        "conditions": [
-                            {
-                                "field": {"name": "test_name", "type": "TextField", "display": "test_title_2"},
-                                "operator": "is",
-                                "value": {"type": "Value", "value": "yes", "display": "yes"},
-                            }
-                        ],
-                    },
-                },
-                {
-                    "displayName": "display name",
-                    "name": "test_condition2",
-                    "value": {
-                        "name": "display name",
-                        "conditions": [
-                            {
-                                "field": {"name": "test_name", "type": "TextField", "display": "test_title_2"},
-                                "operator": "is",
-                                "value": {"type": "Value", "value": "no", "display": "no"},
-                            }
-                        ],
-                    },
-                },
+                test_form_json_condition_org_type_a,
+                test_form_json_condition_org_type_b,
+            ],
+        ),
+        # single complex condition
+        (
+            Component(
+                component_id=id2,
+                title="test_title_2",
+                type=ComponentType.TEXT_FIELD,
+                conditions=[asdict(test_condition_org_type_c)],
+                runner_component_name="test_name",
+            ),
+            [
+                test_form_json_condition_org_type_c,
             ],
         ),
     ],
 )
-def test_build_conditions(input_component, exp_results):
+def test_build_conditions(
+    input_component, exp_results, ids=["single condition", "2 conditions", "single condition with coordinator"]
+):
     results = build_conditions(input_component)
     assert results == exp_results
+
+
+list_id = uuid4()
+
+
+@pytest.mark.parametrize(
+    "component_to_build, exp_result",
+    [
+        (
+            Component(
+                component_id=uuid4(),
+                type=ComponentType.TEXT_FIELD,
+                title="Test Title",
+                hint_text="This must be a hint",
+                page_id=None,
+                page_index=1,
+                theme_id=None,
+                runner_component_name="test-name",
+                options={
+                    "hideTitle": False,
+                    "classes": "govuk-!-width-full",
+                },
+            ),
+            {
+                "name": "test-name",
+                "options": {
+                    "hideTitle": False,
+                    "classes": "govuk-!-width-full",
+                },
+                "type": "TextField",
+                "title": "Test Title",
+                "hint": "This must be a hint",
+                "schema": {},
+                "metadata": {},
+            },
+        ),
+        (
+            Component(
+                component_id=uuid4(),
+                type=ComponentType.LIST_FIELD,
+                title="Test Title",
+                hint_text="This must be a hint",
+                page_id=None,
+                page_index=1,
+                theme_id=None,
+                runner_component_name="test-name",
+                options={},
+                lizt=Lizt(name="test-list", list_id=list_id),
+                list_id=list_id,
+            ),
+            {
+                "name": "test-name",
+                "options": {},
+                "type": "List",
+                "title": "Test Title",
+                "hint": "This must be a hint",
+                "schema": {},
+                "metadata": {"fund_builder_list_id": str(list_id)},
+                "list": "test-list",
+                "values": {"type": "listRef"},
+            },
+        ),
+    ],
+)
+def test_build_component(component_to_build, exp_result):
+    result = build_component(component=component_to_build)
+    assert result == exp_result
 
 
 @pytest.mark.parametrize(
     "input_pages,input_partial_json, exp_next",
     [
+        # Simple flow of 1 page then summary (summary not in input pages)
         (
             [
                 Page(
@@ -375,6 +360,64 @@ def test_build_conditions(input_component, exp_results):
                 "/organisation-single-name": [{"path": "/summary"}],
             },
         ),
+        # 1 page then summary (summary is in input pages)
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-single-name",
+                    name_in_apply_json={"en": "Organisation Name"},
+                    form_index=1,
+                    default_next_page_id="summary-id",
+                ),
+                Page(
+                    page_id="summary-id",
+                    form_id=uuid4(),
+                    display_path="summary-page",
+                    name_in_apply_json={"en": "Summary Page"},
+                    form_index=1,
+                    controller="summary.js",
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-single-name",
+                        "title": "Organisation Name",
+                        "components": [
+                            {
+                                "name": "reuse-organisation-name",
+                                "options": {
+                                    "hideTitle": False,
+                                    "classes": "govuk-!-width-full",
+                                },
+                                "type": "TextField",
+                                "title": "Organisation name",
+                                "hint": "This must match your registered legal organisation name",
+                                "schema": {},
+                            }
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/summary-page",
+                        "title": "Summary Page",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                        "controller": "summary.js",
+                    },
+                ],
+            },
+            {
+                "/organisation-single-name": [{"path": "/summary-page"}],
+                "/summary-page": [],
+            },
+        ),
+        # Simple flow of 2 pages then summary
         (
             [
                 Page(
@@ -437,9 +480,37 @@ def test_build_conditions(input_component, exp_results):
                 "/organisation-charitable-objects": [{"path": "/summary"}],
             },
         ),
+        # Just a summary page
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="summary",
+                    name_in_apply_json={"en": "Summary"},
+                    form_index=1,
+                    controller="summary.js",
+                )
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/summary",
+                        "title": "Summary",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                ],
+            },
+            {
+                "/summary": [],
+            },
+        ),
     ],
 )
-def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages, exp_next):
+def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_next):
 
     results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
     for page in results["pages"]:
@@ -449,48 +520,156 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
 
 
 @pytest.mark.parametrize(
-    "input_pages,input_partial_json ,exp_next, exp_conditions",
+    "input_pages,input_partial_json ,exp_next",
     [
+        # One page, 2 possible nexts, both based on defined conditions
         (
             [
                 Page(
                     page_id=uuid4(),
                     form_id=uuid4(),
-                    display_path="organisation-name",
-                    name_in_apply_json={"en": "Organisation Name"},
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
                     form_index=1,
                     components=[
                         Component(
                             component_id=id2,
-                            title="test_title_2",
-                            type=ComponentType.TEXT_FIELD,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
                             conditions=[
-                                {
-                                    "name": "orgno",
-                                    "display_name": "organisation_other_names_no",
-                                    "value": {"type": "Value", "value": "no", "display": "no"},
-                                    "destination_page_path": "summary",
-                                    "operator": "is",
-                                    "coordinator": None,
-                                },
-                                {
-                                    "name": "orgyes",
-                                    "display_name": "organisation_other_names_yes",
-                                    "operator": "is",
-                                    "value": {"type": "Value", "value": "yes", "display": "yes"},
-                                    "destination_page_path": "organisation-alternative-names",
-                                    "coordinator": None,
-                                },
+                                asdict(test_condition_org_type_c),
+                                asdict(test_condition_org_type_b),
                             ],
                             runner_component_name="test_c_1",
                         )
                     ],
                 ),
+                test_page_object_org_type_b,
+                test_page_object_org_type_c,
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    deepcopy(test_form_json_page_org_type_b),
+                    deepcopy(test_form_json_page_org_type_c),
+                ],
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/org-type-c",
+                        "condition": "org_type_c",
+                    },
+                    {
+                        "path": "/org-type-b",
+                        "condition": "org_type_b",
+                    },
+                ],
+                "/org-type-b": [{"path": "/summary"}],
+                "/org-type-c": [{"path": "/summary"}],
+            },
+        ),
+        # One page, 2 possible nexts, based on a condition and a default (summary)
+        (
+            [
                 Page(
                     page_id=uuid4(),
                     form_id=uuid4(),
-                    display_path="organisation-alternative-names",
-                    name_in_apply_json={"en": "Organisation Alternative Names"},
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    default_next_page_id="summary-id",
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(test_condition_org_type_b),
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                ),
+                test_page_object_org_type_b,
+                Page(
+                    page_id="summary-id",
+                    form_id=uuid4(),
+                    display_path="summary",
+                    name_in_apply_json={"en": "Summary"},
+                    form_index=2,
+                    controller="summary.js",
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    deepcopy(test_form_json_page_org_type_b),
+                    {
+                        "path": "/summary",
+                        "title": "Summary",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                        "controller": "summary.js",
+                    },
+                ],
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/summary",
+                    },
+                    {
+                        "path": "/org-type-b",
+                        "condition": "org_type_b",
+                    },
+                ],
+                "/org-type-b": [{"path": "/summary"}],
+                "/summary": [],
+            },
+        ),  # One page, 2 possible nexts, based on a condition and a default
+        (
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    default_next_page_id="page-2",
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(test_condition_org_type_b),
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                ),
+                test_page_object_org_type_b,
+                Page(
+                    page_id="page-2",
+                    form_id=uuid4(),
+                    display_path="page_2",
+                    name_in_apply_json={"en": "Page 2"},
                     form_index=2,
                 ),
             ],
@@ -498,34 +677,16 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                 "conditions": [],
                 "pages": [
                     {
-                        "path": "/organisation-name",
-                        "title": "Organisation Name",
-                        "components": [
-                            {
-                                # "name": "reuse-organisation-name",
-                                # "options": {
-                                #     "hideTitle": False,
-                                #     "classes": "govuk-!-width-full",
-                                # },
-                                # "type": "TextField",
-                                # "title": "Organisation name",
-                                # "hint": "This must match your registered legal organisation name",
-                                # "schema": {},
-                            },
-                            {
-                                # "name": "reuse_organisation_other_names_yes_no",
-                                # "options": {},
-                                # "type": "YesNoField",
-                                # "title": "Does your organisation use any other names?",
-                                # "schema": {},
-                            },
-                        ],
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [],
                         "next": [],
                         "options": {},
                     },
+                    deepcopy(test_form_json_page_org_type_b),
                     {
-                        "path": "/organisation-alternative-names",
-                        "title": "Organisation Alternative Names",
+                        "path": "/page_2",
+                        "title": "Page 2",
                         "components": [],
                         "next": [],
                         "options": {},
@@ -533,77 +694,94 @@ def test_build_navigation_no_conditions(mocker, input_partial_json, input_pages,
                 ],
             },
             {
-                "/organisation-name": [
+                "/organisation-type": [
                     {
-                        "path": "/summary",
-                        "condition": "orgno",
+                        "path": "/page_2",
                     },
                     {
-                        "path": "/organisation-alternative-names",
-                        "condition": "orgyes",
+                        "path": "/org-type-b",
+                        "condition": "org_type_b",
                     },
                 ],
-                "/organisation-alternative-names": [{"path": "/summary"}],
+                "/org-type-b": [{"path": "/summary"}],
+                "/page_2": [{"path": "/summary"}],
+                "/summary": [],
             },
+        ),
+        # # One page, 3 possible nexts based on complex conditions (coordinators)
+        (
             [
-                {
-                    "displayName": "organisation_other_names_no",
-                    "name": "orgno",
-                    "value": {
-                        "name": "organisation_other_names_no",
-                        "conditions": [
-                            {
-                                "field": {
-                                    "name": "test_c_1",
-                                    "type": "TextField",
-                                    "display": "test_title_2",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "no",
-                                    "display": "no",
-                                },
-                            }
-                        ],
-                    },
-                },
-                {
-                    "displayName": "organisation_other_names_yes",
-                    "name": "orgyes",
-                    "value": {
-                        "name": "organisation_other_names_yes",
-                        "conditions": [
-                            {
-                                "field": {
-                                    "name": "test_c_1",
-                                    "type": "TextField",
-                                    "display": "test_title_2",
-                                },
-                                "operator": "is",
-                                "value": {
-                                    "type": "Value",
-                                    "value": "yes",
-                                    "display": "yes",
-                                },
-                            }
-                        ],
-                    },
-                },
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(test_condition_org_type_a),
+                                asdict(test_condition_org_type_b),
+                                asdict(test_condition_org_type_c),
+                            ],
+                            runner_component_name="org_type_component",
+                        )
+                    ],
+                ),
+                test_page_object_org_type_a,
+                test_page_object_org_type_b,
+                test_page_object_org_type_c,
             ],
-        )
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [
+                            {},  # don't care about these right now...
+                            {},
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
+                    deepcopy(test_form_json_page_org_type_a),
+                    deepcopy(test_form_json_page_org_type_b),
+                    deepcopy(test_form_json_page_org_type_c),
+                ],
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/org-type-a",
+                        "condition": "org_type_a",
+                    },
+                    {
+                        "path": "/org-type-b",
+                        "condition": "org_type_b",
+                    },
+                    {
+                        "path": "/org-type-c",
+                        "condition": "org_type_c",
+                    },
+                ],
+                "/org-type-a": [{"path": "/summary"}],
+                "/org-type-b": [{"path": "/summary"}],
+                "/org-type-c": [{"path": "/summary"}],
+            },
+        ),
     ],
 )
-def test_build_navigation_with_conditions(mocker, input_pages, input_partial_json, exp_next, exp_conditions):
-    mocker.patch(
-        "app.export_config.generate_form.build_page",
-        return_value={"path": "/organisation-alternative-names", "next": []},
-    )
+def test_build_navigation_with_conditions(mocker, input_pages, input_partial_json, exp_next):
+    mocker.patch("app.export_config.generate_form.build_conditions", return_value=["mock list"])
     results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
     for page in results["pages"]:
         exp_next_this_page = exp_next[page["path"]]
-        assert page["next"] == exp_next_this_page
-    assert results["conditions"] == exp_conditions
+        assert page["next"] == exp_next_this_page, f"next for page {page['path']} does not match expected"
+    assert results["conditions"] == ["mock list"]
 
 
 @pytest.mark.parametrize(
@@ -656,3 +834,60 @@ def test_build_form(input_form, exp_results):
                 assert exp_next["path"] in [next["path"] for next in result_page["next"]]
                 if "condition" in exp_next:
                     assert exp_next["condition"] in [next["condition"] for next in result_page["next"]]
+
+
+@pytest.mark.parametrize(
+    "input_content, input_form, expected_title, expected_path, expected_next, expected_content",
+    [
+        (
+            "2 pages",
+            Form(
+                name_in_apply_json={"en": "Test Form"},
+                pages=[
+                    Page(name_in_apply_json={"en": "Page 1"}, display_path="page-1"),
+                    Page(name_in_apply_json={"en": "Page 2"}, display_path="page-2"),
+                ],
+            ),
+            "Test Form",
+            "/intro-test-form",
+            [{"path": "/page-1"}],
+            (
+                '<p class="govuk-body">2 pages</p>'
+                '<p class="govuk-body">We will ask you about:</p> <ul>'
+                "<li>Page 1</li><li>Page 2</li></ul>"
+            ),
+        ),
+        (
+            "Single page",
+            Form(
+                name_in_apply_json={"en": "Another Form"},
+                pages=[Page(name_in_apply_json={"en": "Details Page"}, display_path="details-page")],
+            ),
+            "Another Form",
+            "/intro-another-form",
+            [{"path": "/details-page"}],
+            (
+                '<p class="govuk-body">Single page</p>'
+                '<p class="govuk-body">We will ask you about:</p> <ul>'
+                "<li>Details Page</li></ul>"
+            ),
+        ),
+        (
+            "Form with no pages",
+            Form(name_in_apply_json={"en": "Another Form"}, pages=[]),
+            "Another Form",
+            "/intro-another-form",
+            [],
+            ('<p class="govuk-body">Form with no pages</p>'),
+        ),
+    ],
+)
+def test_build_start_page(input_content, input_form, expected_title, expected_path, expected_next, expected_content):
+    result = build_start_page(input_content, input_form)
+
+    # Assert
+    assert result["title"] == expected_title
+    assert result["path"] == expected_path
+    assert result["controller"] == "./pages/start.js"
+    assert result["next"] == expected_next
+    assert result["components"][0]["content"] == expected_content

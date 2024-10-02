@@ -1,4 +1,5 @@
 import copy
+from dataclasses import asdict
 
 from app.db.models import Component
 from app.db.models import Form
@@ -6,7 +7,7 @@ from app.db.models import Page
 from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.models.application_config import ComponentType
 from app.db.queries.application import get_list_by_id
-from app.db.queries.application import get_template_page_by_display_path
+from app.shared.data_classes import ConditionValue
 
 BASIC_FORM_STRUCTURE = {
     "startPage": None,
@@ -43,34 +44,26 @@ def build_conditions(component: Component) -> list:
     """
     results = []
     for condition in component.conditions:
-        condition_entry = {
-            "field": {
-                "name": component.runner_component_name,
-                "type": component.type.value,
-                "display": component.title,
-            },
-            "operator": condition["operator"],
-            "value": condition["value"],
-        }
-
-        # Add 'coordinator' only if it exists
-        if condition.get("coordinator"):
-            condition_entry["coordinator"] = condition.get("coordinator")
-
-        if condition["name"] in [c["name"] for c in results]:
-            # If this condition already exists, add it to the existing condition
-            existing_condition = next(c for c in results if c["name"] == condition["name"])
-            existing_condition["value"]["conditions"].append(condition_entry)
-            continue
-
         result = {
             "displayName": condition["display_name"],
             "name": condition["name"],
-            "value": {
-                "name": condition["display_name"],
-                "conditions": [condition_entry],
-            },
+            "value": asdict(
+                ConditionValue(
+                    name=condition["value"]["name"],
+                    conditions=[],
+                )
+            ),
         }
+        for sc in condition["value"]["conditions"]:
+            sub_condition = {
+                "field": sc["field"],
+                "operator": sc["operator"],
+                "value": sc["value"],
+            }
+            # only add coordinator if it exists
+            if "coordinator" in sc and sc.get("coordinator") is not None:
+                sub_condition["coordinator"] = sc.get("coordinator", None)
+            result["value"]["conditions"].append(sub_condition)
 
         results.append(result)
 
@@ -118,19 +111,12 @@ def build_component(component: Component) -> dict:
     return built_component
 
 
-def build_page(page: Page = None, page_display_path: str = None) -> dict:
+def build_page(page: Page = None) -> dict:
     """
-    Builds the form runner JSON structure for the supplied page. If that page is None, retrieves a template
-    page with the display_path matching page_display_path.
-
-    This accounts for conditional logic where the destination target will be the display path of a template
-    page, but that page does not actually live in the main hierarchy as branching logic uses a fixed set of
-    conditions at this stage.
+    Builds the form runner JSON structure for the supplied page.
 
     Then builds all the components on this page and adds them to the page json structure
     """
-    if not page:
-        page = get_template_page_by_display_path(page_display_path)
     built_page = copy.deepcopy(BASIC_PAGE_STRUCTURE)
     built_page.update(
         {
@@ -173,26 +159,12 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
         for component in page.components:
             if not component.conditions:
                 continue
-            form_json_conditions = build_conditions(component)
             has_conditions = True
+            form_json_conditions = build_conditions(component)
             partial_form_json["conditions"].extend(form_json_conditions)
 
             for condition in component.conditions:
-                if condition["destination_page_path"] == "CONTINUE":
-                    destination_path = f"/{next_path}"
-                else:
-                    destination_path = f"/{condition['destination_page_path'].lstrip('/')}"
-                # TODO No longer needed since db schema change?
-                # If this points to a pre-built page flow, add that in now (it won't be in the input)
-                # if (
-                #     destination_path not in [page["path"] for page in partial_form_json["pages"]]
-                #     and not destination_path == "/summary"
-                # ):
-                #     sub_page = build_page(page_display_path=destination_path[1:])
-                #     if not sub_page.get("next", None):
-                #         sub_page["next"] = [{"path": f"/{next_path}"}]
-
-                #     partial_form_json["pages"].append(sub_page)
+                destination_path = f"/{condition['destination_page_path'].lstrip('/')}"
 
                 this_page_in_results["next"].append(
                     {
@@ -245,20 +217,26 @@ def build_start_page(content: str, form: Form) -> dict:
             "title": form.name_in_apply_json["en"],
             "path": f"/intro-{human_to_kebab_case(form.name_in_apply_json['en'])}",
             "controller": "./pages/start.js",
-            "next": [{"path": f"/{form.pages[0].display_path}"}],
         }
     )
-    ask_about = "<p class='govuk-body'>We will ask you about:</p> <ul>"
-    for page in form.pages:
-        ask_about += f"<li>{page.name_in_apply_json['en']}</li>"
-    ask_about += "</ul>"
+    ask_about = None
+    if len(form.pages) > 0:
+        ask_about = '<p class="govuk-body">We will ask you about:</p> <ul>'
+        for page in form.pages:
+            ask_about += f"<li>{page.name_in_apply_json['en']}</li>"
+        ask_about += "</ul>"
+        start_page.update(
+            {
+                "next": [{"path": f"/{form.pages[0].display_path}"}],
+            }
+        )
 
     start_page["components"].append(
         {
             "name": "start-page-content",
             "options": {},
             "type": "Html",
-            "content": f"<p class='govuk-body'>{content}</p>{ask_about}",
+            "content": f'<p class="govuk-body">{content or ""}</p>{ask_about or ""}',
             "schema": {},
         }
     )
