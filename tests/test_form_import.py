@@ -86,7 +86,7 @@ def test_add_conditions_to_components(mocker, input_page, input_conditions, exp_
         "app.import_config.load_form_json._build_condition",
         return_value=Condition(name=None, display_name=None, destination_page_path=None, value=None),
     ) as mock_build_condition:
-        add_conditions_to_components(None, input_page, input_conditions)
+        add_conditions_to_components(None, input_page, input_conditions, page_id=None)
         if exp_condition_count > 0:
             assert mock_component.conditions
             assert len(mock_component.conditions) == exp_condition_count

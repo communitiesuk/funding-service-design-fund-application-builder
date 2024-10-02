@@ -11,10 +11,10 @@ services:
     command: ["sh", "-c", "python -m flask db upgrade && python -m debugpy --listen 0.0.0.0:5601 -m flask run --no-debugger --host 0.0.0.0 --port 8080"]
     ports:
       - 8080:8080
-      - 5686:5601
+      - 5696:5601
     environment:
       - FORM_RUNNER_INTERNAL_HOST=http://form-runner-dc:3009
-      - FORM_RUNNER_EXTERNAL_HOST=http://localhost:3009
+      - FORM_RUNNER_EXTERNAL_HOST=http://localhost:3019
       - DATABASE_URL=postgresql://postgres:password@fab-db-dc:5432/fund_builder   # pragma: allowlist secret
       - FLASK_DEBUG=0
       - FLASK_ENV=development
@@ -27,7 +27,7 @@ services:
     ports:
       - 5435:5432
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - ~/apps/postgres:/var/lib/postgresql/data-fab
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=fund_builder
@@ -38,8 +38,8 @@ services:
       context: ../digital-form-builder-adapter
       dockerfile: ./runner/Dockerfile
     ports:
-      - "3009:3009"
-      - 9228:9228
+      - "3019:3009"
+      - 9238:9228
     command: yarn runner dev
     environment:
       - CHOKIDAR_USEPOLLING=true
