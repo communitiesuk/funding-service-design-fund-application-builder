@@ -33,8 +33,9 @@ BASIC_ROUND_INFO = {
     "reminder_date": "2024-10-20T11:59:00",
     "assessment_deadline": "2024-11-30T11:59:00",
     "project_name_field_id": 1,
-    "prospectus_link": "http://www.google.com",
-    "privacy_notice_link": "http://www.google.com",
+    "prospectus_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
+    "privacy_notice_link": "https://www.gov.uk/government/organisations/"
+    "ministry-of-housing-communities-local-government",
     "reference_contact_page_over_email": False,
     "contact_email": "help@fab.gov.uk",
     "contact_phone": "01234 123123",
@@ -42,11 +43,11 @@ BASIC_ROUND_INFO = {
     "support_times": "12-2",
     "support_days": "Just Mondays",
     "instructions_json": {},
-    "feedback_link": None,
+    "feedback_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
     "application_guidance_json": {
         "en": "You can view <a href='{all_questions_url}'>all the questions we will ask you</a> if you want to."
     },
-    "guidance_url": None,
+    "guidance_url": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
     "all_uploaded_documents_section_available": False,
     "application_fields_download_available": False,
     "display_logo_on_pdf_exports": False,
