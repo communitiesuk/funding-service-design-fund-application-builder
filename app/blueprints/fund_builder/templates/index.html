@@ -1,43 +1,58 @@
 {% extends "base.html" %}
 {% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
-
 {% block content %}
-<div class="govuk-width-container">
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    {% set html %}
-    <p class="govuk-notification-banner__body">
-        {{messages[0]}}
-    </p>
-    {% endset %}
-
-    {{ govukNotificationBanner({
-    "html": html
-    }) }}
-    {% endif %}
-    {% endwith %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-m">What do you want to do?</h1>
-            <h2 class="govuk-heading-s">Fund Configuration (PoC)</h2>
-            <ul class="govuk-body">
-                <li class="govuk-body"><a class="govuk-link" href="{{url_for('build_fund_bp.fund')}}">Add a Fund</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="{{url_for('build_fund_bp.round')}}">Add a Round</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="{{url_for('build_fund_bp.view_fund')}}">Manage Application Configuration</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="{{url_for('template_bp.view_templates')}}">View Templates</a></li>
-
-            </ul>
-            <h2 class="govuk-heading-s">Template Management (post PoC)</h2>
-            <ul class="govuk-body">
-                <li class="govuk-body"><a class="govuk-link" href="/">Edit a template Question (text only)</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="/">Edit a template Page (text only)</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="/">Edit a template Form (text only)</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="{{ url_for('self_serve_bp.section')}}">Create a
-                        template Section (Form group)</a></li>
-                <li class="govuk-body"><a class="govuk-link" href="/">Edit or Delete a
-                    template Section</a></li>
-            </ul>
+    <div class="govuk-width-container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% set html %}
+                    <p class="govuk-notification-banner__body">{{ messages[0] }}</p>
+                {% endset %}
+                {{ govukNotificationBanner({
+                                "html": html
+                                }) }}
+            {% endif %}
+        {% endwith %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-m">What do you want to do?</h1>
+                <h2 class="govuk-heading-s">Fund Configuration (PoC)</h2>
+                <ul class="govuk-body">
+                    <li class="govuk-body">
+                        <a class="govuk-link" href="{{ url_for("build_fund_bp.fund") }}">Add a Fund</a>
+                    </li>
+                    <li class="govuk-body">
+                        <a class="govuk-link" href="{{ url_for("build_fund_bp.round") }}">Add a Round</a>
+                    </li>
+                    <li class="govuk-body">
+                        <a class="govuk-link" href="{{ url_for("build_fund_bp.view_fund") }}">Manage Application Configuration</a>
+                    </li>
+                    <li class="govuk-body">
+                        <a class="govuk-link" href="{{ url_for("template_bp.view_templates") }}">Manage Templates</a>
+                    </li>
+                </ul>
+                <div class="govuk-!-display-none">
+                    <h2 class="govuk-heading-s">Template Management (post PoC)</h2>
+                    <ul class="govuk-body">
+                        <li class="govuk-body">
+                            <a class="govuk-link" href="/">Edit a template Question (text only)</a>
+                        </li>
+                        <li class="govuk-body">
+                            <a class="govuk-link" href="/">Edit a template Page (text only)</a>
+                        </li>
+                        <li class="govuk-body">
+                            <a class="govuk-link" href="/">Edit a template Form (text only)</a>
+                        </li>
+                        <li class="govuk-body">
+                            <a class="govuk-link" href="{{ url_for("self_serve_bp.section") }}">Create a
+                            template Section (Form group)</a>
+                        </li>
+                        <li class="govuk-body">
+                            <a class="govuk-link" href="/">Edit or Delete a
+                            template Section</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}

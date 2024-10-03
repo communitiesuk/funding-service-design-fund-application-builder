@@ -183,7 +183,7 @@
             "next": [
                 {
                     "path": "/type-of-organisation",
-                    "condition": "JbdMiD"
+                    "condition": "KEoMvy"
                 },
                 {
                     "path": "/local-authority-name",
@@ -576,28 +576,6 @@
             }
         },
         {
-            "displayName": "Other organisation type",
-            "name": "JbdMiD",
-            "value": {
-                "name": "Other organisation type",
-                "conditions": [
-                    {
-                        "field": {
-                            "name": "TiKRCy",
-                            "type": "RadiosField",
-                            "display": "How is your organisation classified?"
-                        },
-                        "operator": "is",
-                        "value": {
-                            "type": "Value",
-                            "value": "Other",
-                            "display": "Other"
-                        }
-                    }
-                ]
-            }
-        },
-        {
             "displayName": "Local authority applicant",
             "name": "pIwtOx",
             "value": {
@@ -658,6 +636,28 @@
                             "type": "Value",
                             "value": "Charity",
                             "display": "Charity"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "Other organisation",
+            "name": "KEoMvy",
+            "value": {
+                "name": "Other organisation",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "TiKRCy",
+                            "type": "RadiosField",
+                            "display": "How is your organisation classified?"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "Other",
+                            "display": "Other"
                         }
                     }
                 ]

@@ -1,5 +1,4 @@
 import os
-from datetime import date
 
 import jsonschema
 from flask import current_app
@@ -24,12 +23,13 @@ def write_config(config, filename, round_short_name, config_type):
     elif config_type == "python_file":
         output_dir = os.path.join(base_output_dir, "fund_store/")
         config_dict = convert_to_dict(config)  # Convert config to dict for non-JSON types
-        content_to_write = str(config_dict)
-        file_path = os.path.join(output_dir, f"{human_to_snake_case(filename)}_{date.today().strftime('%d-%m-%Y')}.py")
+        content_to_write = "LOADER_CONFIG="
+        content_to_write += str(config_dict)
+        file_path = os.path.join(output_dir, f"{human_to_snake_case(filename)}.py")
     elif config_type == "html":
         output_dir = os.path.join(base_output_dir, "html/")
         content_to_write = config
-        file_path = os.path.join(output_dir, f"{filename}.html")
+        file_path = os.path.join(output_dir, f"{filename}_all_questions_en.html")
 
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)

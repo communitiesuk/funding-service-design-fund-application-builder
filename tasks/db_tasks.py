@@ -6,6 +6,7 @@ from flask_migrate import upgrade
 from invoke import task  # noqa:E402
 
 from app import app
+from app.import_config.load_form_json import load_form_jsons
 
 sys.path.insert(1, ".")
 os.environ.update({"FLASK_ENV": "tasks"})
@@ -68,7 +69,7 @@ def create_test_data(c):
         )
         db.session.commit()
         insert_test_data(db=db, test_data=init_salmon_fishing_fund())
-    #   load_form_jsons()
+        load_form_jsons()
 
 
 @task

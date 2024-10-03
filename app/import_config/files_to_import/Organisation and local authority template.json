@@ -17,10 +17,9 @@
             ],
             "next": [
                 {
-                    "path": "/organisation-name"
+                    "path": "/how-is-your-organisation-classified"
                 }
-            ],
-            "controller": "./pages/start.js"
+            ]
         },
         {
             "path": "/organisation-name",
@@ -50,7 +49,7 @@
                     "condition": "lgQzEs"
                 },
                 {
-                    "path": "/registered-organisation-address"
+                    "path": "/how-long-has-your-organisation-been-operating"
                 }
             ]
         },
@@ -86,7 +85,7 @@
             ],
             "next": [
                 {
-                    "path": "/registered-organisation-address"
+                    "path": "/how-long-has-your-organisation-been-operating"
                 }
             ]
         },
@@ -117,11 +116,11 @@
             ],
             "next": [
                 {
-                    "path": "/how-long-has-your-organisation-been-operating"
-                },
-                {
                     "path": "/alternative-organisation-address",
                     "condition": "IDVkcD"
+                },
+                {
+                    "path": "/check-your-answers-JhIdAf"
                 }
             ]
         },
@@ -139,7 +138,7 @@
             ],
             "next": [
                 {
-                    "path": "/how-long-has-your-organisation-been-operating"
+                    "path": "/check-your-answers-JhIdAf"
                 }
             ]
         },
@@ -159,7 +158,7 @@
             ],
             "next": [
                 {
-                    "path": "/how-is-your-organisation-classified"
+                    "path": "/what-is-your-organisations-main-purpose"
                 }
             ]
         },
@@ -184,10 +183,19 @@
             "next": [
                 {
                     "path": "/type-of-organisation",
-                    "condition": "JbdMiD"
+                    "condition": "KEoMvy"
                 },
                 {
-                    "path": "/what-is-your-organisations-main-purpose"
+                    "path": "/local-authority-name",
+                    "condition": "pIwtOx"
+                },
+                {
+                    "path": "/company-registration-number",
+                    "condition": "ctxplh"
+                },
+                {
+                    "path": "/charity-commission-number",
+                    "condition": "TTEzEL"
                 }
             ]
         },
@@ -205,7 +213,7 @@
             ],
             "next": [
                 {
-                    "path": "/what-is-your-organisations-main-purpose"
+                    "path": "/organisation-name"
                 }
             ]
         },
@@ -316,7 +324,9 @@
                 },
                 {
                     "name": "GUdRfh",
-                    "options": {},
+                    "options": {
+                        "required": false
+                    },
                     "type": "WebsiteField",
                     "hint": "For example, your company's Facebook, Instagram or Twitter accounts (if applicable)",
                     "title": "Social media link 3",
@@ -325,7 +335,7 @@
             ],
             "next": [
                 {
-                    "path": "/check-your-answers-JhIdAf"
+                    "path": "/registered-organisation-address"
                 }
             ]
         },
@@ -335,6 +345,65 @@
             "components": [],
             "next": [],
             "controller": "./pages/summary.js"
+        },
+        {
+            "path": "/local-authority-name",
+            "title": "Local authority name",
+            "components": [
+                {
+                    "name": "RoLhhf",
+                    "options": {},
+                    "type": "AutocompleteField",
+                    "title": "Local authority name",
+                    "list": "vlTWym",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/registered-organisation-address"
+                }
+            ]
+        },
+        {
+            "path": "/company-registration-number",
+            "title": "Company registration number",
+            "components": [
+                {
+                    "name": "qZbLJD",
+                    "options": {},
+                    "type": "NumberField",
+                    "title": "Company registration number",
+                    "hint": "Your company's number. You can find this on Companies House",
+                    "schema": {
+                        "max": 8
+                    }
+                }
+            ],
+            "next": [
+                {
+                    "path": "/organisation-name"
+                }
+            ]
+        },
+        {
+            "path": "/charity-commission-number",
+            "title": "Charity commission number",
+            "components": [
+                {
+                    "name": "DMGniP",
+                    "options": {},
+                    "type": "NumberField",
+                    "title": "Charity commission number",
+                    "hint": "Your charity's number. You can find this on Charity Commission",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/organisation-name"
+                }
+            ]
         }
     ],
     "lists": [
@@ -391,25 +460,71 @@
             "type": "string",
             "items": [
                 {
-                    "text": "Charitable incorporated organisation (CIO)",
-                    "value": "Charitable incorporated organisation (CIO)"
+                    "text": "Local authority",
+                    "value": "Local authority"
                 },
                 {
-                    "text": "Co-operative",
-                    "description": "For example, a community benefit society",
-                    "value": "Co-operative"
+                    "text": "Charity",
+                    "value": "Charity"
                 },
                 {
-                    "text": "Community interest company (CIC)",
-                    "value": "Community interest company (CIC)"
+                    "text": "Limited company",
+                    "value": "Limited company"
                 },
                 {
-                    "text": "Company limited by guarantee",
-                    "value": "Company limited by guarantee"
+                    "text": "Other",
+                    "value": "Other"
+                }
+            ]
+        },
+        {
+            "title": "Local authorities",
+            "name": "vlTWym",
+            "type": "string",
+            "items": [
+                {
+                    "text": "Cambridgeshire County Council",
+                    "value": "Cambridgeshire County Council"
                 },
                 {
-                    "text": "None of these",
-                    "value": "None of these"
+                    "text": "Derbyshire County Council",
+                    "value": "Derbyshire County Council"
+                },
+                {
+                    "text": "Devon County Council",
+                    "value": "Devon County Council"
+                },
+                {
+                    "text": "East Sussex County Council",
+                    "value": "East Sussex County Council"
+                },
+                {
+                    "text": "Essex County Council",
+                    "value": "Essex County Council"
+                },
+                {
+                    "text": "Gloucestershire County Council",
+                    "value": "Gloucestershire County Council"
+                },
+                {
+                    "text": "Hampshire County Council",
+                    "value": "Hampshire County Council"
+                },
+                {
+                    "text": "Hertfordshire County Council",
+                    "value": "Hertfordshire County Council"
+                },
+                {
+                    "text": "Kent County Council",
+                    "value": "Kent County Council"
+                },
+                {
+                    "text": "Lancashire County Council",
+                    "value": "Lancashire County Council"
+                },
+                {
+                    "text": "Leicestershire County Council",
+                    "value": "Leicestershire County Council"
                 }
             ]
         }
@@ -461,10 +576,10 @@
             }
         },
         {
-            "displayName": "Other organisation type",
-            "name": "JbdMiD",
+            "displayName": "Local authority applicant",
+            "name": "pIwtOx",
             "value": {
-                "name": "Other organisation type",
+                "name": "Local authority applicant",
                 "conditions": [
                     {
                         "field": {
@@ -475,8 +590,74 @@
                         "operator": "is",
                         "value": {
                             "type": "Value",
-                            "value": "None of these",
-                            "display": "None of these"
+                            "value": "Local authority",
+                            "display": "Local authority"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "Limited company",
+            "name": "ctxplh",
+            "value": {
+                "name": "Limited company",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "TiKRCy",
+                            "type": "RadiosField",
+                            "display": "How is your organisation classified?"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "Limited company",
+                            "display": "Limited company"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "Charity",
+            "name": "TTEzEL",
+            "value": {
+                "name": "Charity",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "TiKRCy",
+                            "type": "RadiosField",
+                            "display": "How is your organisation classified?"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "Charity",
+                            "display": "Charity"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "Other organisation",
+            "name": "KEoMvy",
+            "value": {
+                "name": "Other organisation",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "TiKRCy",
+                            "type": "RadiosField",
+                            "display": "How is your organisation classified?"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "Other",
+                            "display": "Other"
                         }
                     }
                 ]
@@ -493,7 +674,7 @@
         "showPaymentSkippedWarningPage": false
     },
     "markAsComplete": false,
-    "name": "Organisation information template (September 2024)",
+    "name": "Organisation information",
     "feedback": {
         "feedbackForm": false,
         "url": ""
