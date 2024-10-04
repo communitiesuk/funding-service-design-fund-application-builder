@@ -383,6 +383,9 @@ def init_unit_test_data() -> dict:
         assessment_deadline=datetime.now(),
         prospectus_link="http://www.google.com",
         privacy_notice_link="http://www.google.com",
+        support_times="12-2",
+        support_days="Just Mondays",
+        project_name_field_id=1,
     )
     # r2: Round = Round(
     #     round_id=uuid4(),

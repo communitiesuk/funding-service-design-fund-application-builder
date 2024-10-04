@@ -24,6 +24,7 @@ class Condition:
     name: str
     display_name: str
     value: ConditionValue
+    source_page_path: str
     destination_page_path: str
 
 
@@ -152,6 +153,16 @@ class RoundExport:
     eligibility_config: Optional[Dict[str, bool]] = field(default_factory=lambda: {"has_eligibility": False})
     title_json: TitleJson = field(default_factory=TitleJson)
     contact_us_banner_json: Optional[Dict[str, str]] = None
+
+    def as_dict(self):
+        return asdict(self)
+
+
+@dataclass
+class FormSection:
+    name: str
+    title: str
+    hideTitle: Optional[bool] = None
 
     def as_dict(self):
         return asdict(self)

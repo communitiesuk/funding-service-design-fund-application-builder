@@ -164,6 +164,7 @@ class Page(BaseModel):
     )
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     controller = Column(String(), nullable=True)
+    section = Column(JSON(none_as_null=True))
 
     def __repr__(self):
         return f"Page(/{self.display_path} - {self.name_in_apply_json['en']}, Components: {self.components})"
@@ -236,6 +237,7 @@ class Component(BaseModel):
         ForeignKey("list.list_id"),
         nullable=True,
     )
+    schema = Column(JSON(none_as_null=True))
     list_id: Mapped[int | None] = mapped_column(ForeignKey("lizt.list_id"))
     lizt: Mapped[Lizt | None] = relationship()  # back_populates="used_by")
 

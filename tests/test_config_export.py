@@ -1,7 +1,6 @@
 import ast
 import json
 import shutil
-from datetime import date
 from pathlib import Path
 
 import pytest
@@ -34,10 +33,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {
-            "path": output_base_path
-            / round_short_name
-            / "fund_store"
-            / f"round_config_{date.today().strftime('%d-%m-%Y')}.py",
+            "path": output_base_path / round_short_name / "fund_store" / "round_config.py",
             "expected_output": {
                 "sections_config": [
                     {
@@ -68,11 +64,11 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
                     "contact_email": None,
                     "contact_phone": None,
                     "contact_textphone": None,
-                    "support_times": "",
-                    "support_days": "",
+                    "support_times": "12-2",
+                    "support_days": "Just Mondays",
                     "instructions_json": None,
                     "feedback_link": None,
-                    "project_name_field_id": "",
+                    "project_name_field_id": "1",
                     "application_guidance_json": None,
                     "guidance_url": None,
                     "all_uploaded_documents_section_available": False,
@@ -96,6 +92,9 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
 
             with open(expected_file["path"], "r") as file:
                 content = file.read()
+                # Remove the prefix "LOADER_CONFIG=" if it exists at the beginning
+                if content.startswith("LOADER_CONFIG="):
+                    content = content[len("LOADER_CONFIG=") :]
                 # Safely evaluate the Python literal structure
                 # only evaluates literals and not arbitrary code
                 data = ast.literal_eval(content)
@@ -184,6 +183,7 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
                             },
                         ],
                         "next": [{"path": "/summary"}],
+                        "section": None,
                     },
                     {
                         "path": "/intro-about-your-organisation",
@@ -200,6 +200,7 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
                         ],
                         "next": [{"path": "/organisation-name"}],
                         "controller": "./pages/start.js",
+                        "section": None,
                     },
                     {
                         "path": "/summary",
@@ -208,6 +209,7 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
                         "next": [],
                         "section": "uLwBuz",
                         "controller": "./pages/summary.js",
+                        "section": "uLwBuz",
                     },
                 ],
                 "lists": [
@@ -258,6 +260,7 @@ def test_generate_form_jsons_for_round_invalid_input(seed_dynamic_data):
 def test_generate_fund_round_html(seed_dynamic_data):
 
     # Setup: Prepare valid input parameters
+    fund_short_name = seed_dynamic_data["funds"][0].short_name
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
     # Execute: Call the function with valid inputs
@@ -265,8 +268,11 @@ def test_generate_fund_round_html(seed_dynamic_data):
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {
-            "path": output_base_path / round_short_name / "html" / "full_application.html",
-            "expected_output": '<div class="govuk-!-margin-bottom-8">\n  <h2 class="govuk-heading-m ">\n    Table of contents\n  </h2>\n  <ol class="govuk-list govuk-list--number">\n    <li>\n      <a class="govuk-link" href="#organisation-information">\n        Organisation Information\n      </a>\n    </li>\n  </ol>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h2 class="govuk-heading-l" id="organisation-information">\n    1. Organisation Information\n  </h2>\n  <h3 class="govuk-heading-m">\n    1.1. About your organisation\n  </h3>\n  <h4 class="govuk-heading-s">\n    1.1.1. Organisation Name\n  </h4>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      What is your organisation\'s name?\n    </p>\n    <p class="govuk-body">\n      This must match the registered legal organisation name\n    </p>\n  </div>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      How is your organisation classified?\n    </p>\n    <ul class="govuk-list govuk-list--bullet">\n      <li class="">\n        Charity\n      </li>\n      <li class="">\n        Public Limited Company\n      </li>\n    </ul>\n  </div>\n</div>',  # noqa: E501
+            "path": output_base_path
+            / round_short_name
+            / "html"
+            / f"{fund_short_name.lower()}_{round_short_name.lower()}_all_questions_en.html",
+            "expected_output": '\n{% extends "base.html" %}\n{%- from \'govuk_frontend_jinja/components/inset-text/macro.html\' import govukInsetText -%}\n{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}\n\n{% from "partials/file-formats.html" import file_formats %}\n{% set pageHeading %}{% trans %}Full list of application questions{% endtrans %}{% endset %}\n{% block content %}\n<div class="govuk-grid-row">\n    <div class="govuk-grid-column-two-thirds">\n        <span class="govuk-caption-l">{% trans %}{{ fund_title }}{% endtrans %}&nbsp;\n        {% trans %}{{ round_title }}{% endtrans %}\n        </span>\n        <h1 class="govuk-heading-xl">{{ pageHeading }}</h1>\n<div class="govuk-!-margin-bottom-8">\n  <h2 class="govuk-heading-m ">\n    Table of contents\n  </h2>\n  <ol class="govuk-list govuk-list--number">\n    <li>\n      <a class="govuk-link" href="#organisation-information">\n        Organisation Information\n      </a>\n    </li>\n  </ol>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h2 class="govuk-heading-l" id="organisation-information">\n    1. Organisation Information\n  </h2>\n  <h3 class="govuk-heading-m">\n    1.1. About your organisation\n  </h3>\n  <h4 class="govuk-heading-s">\n    1.1.1. Organisation Name\n  </h4>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      What is your organisation\'s name?\n    </p>\n    <p class="govuk-body">\n      This must match the registered legal organisation name\n    </p>\n  </div>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      How is your organisation classified?\n    </p>\n    <ul class="govuk-list govuk-list--bullet">\n      <li class="">\n        Charity\n      </li>\n      <li class="">\n        Public Limited Company\n      </li>\n    </ul>\n  </div>\n</div>\n    </div>\n</div>\n{% endblock content %}\n',  # noqa: E501
         }
     ]
     try:

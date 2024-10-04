@@ -33,7 +33,8 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename)
     expected_page_count_for_form = 8
     expected_component_count_for_form = 27
     # check form config is in the database
-    forms = _db.session.query(Form).filter(Form.template_name == filename)
+    filename_without_extension, _ = os.path.splitext(filename)
+    forms = _db.session.query(Form).filter(Form.runner_publish_name == filename_without_extension)
     assert forms.count() == expected_form_count
     form = forms.first()
     pages = _db.session.query(Page).filter(Page.form_id == form.form_id)
@@ -53,7 +54,7 @@ def test_generate_config_for_round_valid_input_file(seed_dynamic_data, _db):
         form = json.load(json_file)
         form["filename"] = filename
 
-    load_json_from_file(form, template_name)
+    load_json_from_file(form, template_name, filename)
 
     expected_form_count = 1
     expected_page_count_for_form = 19

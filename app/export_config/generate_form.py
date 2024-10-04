@@ -81,7 +81,7 @@ def build_component(component: Component) -> dict:
             "type": component.type.value if component.type else None,
             "content": component.content,
             "options": component.options or {},
-            "schema": {},
+            "schema": component.schema or {},
             "title": component.title,
             "name": component.runner_component_name,
         }
@@ -93,7 +93,7 @@ def build_component(component: Component) -> dict:
             "type": component.type.value,
             "title": component.title,
             "hint": component.hint_text or "",
-            "schema": {},
+            "schema": component.schema or {},
             "name": component.runner_component_name,
             "metadata": {
                 # "fund_builder_id": str(component.component_id) TODO why do we need this?
@@ -264,6 +264,8 @@ def build_form_json(form: Form) -> dict:
     # Build the basic page structure
     for page in form.pages:
         results["pages"].append(build_page(page=page))
+        if page.section:
+            results["sections"].append(page.section)
 
     # start page is the page with the controller ending start.js
     start_page = _find_page_by_controller(form.pages, "start.js")

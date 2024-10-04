@@ -66,13 +66,6 @@ def get_list_by_id(id: str) -> dict:
     return LISTS.get(id, None)
 
 
-# TODO Implement front end journey that can use the section/form/page/component CRUD operations
-# from app.db.queries.application import insert_new_section
-# from app.db.queries.application import insert_new_form
-# from app.db.queries.application import insert_new_page
-# from app.db.queries.application import insert_new_component
-
-
 def save_template_component(component: dict):
     """
     TODO:

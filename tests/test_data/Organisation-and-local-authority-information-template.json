@@ -375,7 +375,7 @@
                     "type": "NumberField",
                     "title": "Company registration number",
                     "hint": "Your company's number. You can find this on Companies House",
-                    "schema": {
+                    "schema":{
                         "max": 8
                     }
                 }

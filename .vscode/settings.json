@@ -14,7 +14,4 @@
         "strings": false
     },
     "editor.quickSuggestionsDelay": 10,
-    "black-formatter.interpreter": [
-        "/usr/local/bin/python",
-    ],
 }
