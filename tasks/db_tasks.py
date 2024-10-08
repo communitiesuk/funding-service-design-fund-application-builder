@@ -2,14 +2,15 @@ import os
 import sys
 from os import getenv
 
-from flask_migrate import upgrade
+sys.path.insert(1, ".")
+
+os.environ.update({"FLASK_ENV": "development"})
+
+from flask_migrate import upgrade  # noqa: E402
 from invoke import task  # noqa:E402
 
-from app import app
-from app.import_config.load_form_json import load_form_jsons
-
-sys.path.insert(1, ".")
-os.environ.update({"FLASK_ENV": "tasks"})
+from app import app  # noqa: E402
+from app.import_config.load_form_json import load_form_jsons  # noqa: E402
 
 from .test_data import init_salmon_fishing_fund  # noqa:E402
 from .test_data import insert_test_data  # noqa:E402

@@ -110,5 +110,7 @@ class RoundForm(FlaskForm):
     mark_as_complete_enabled = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     is_expression_of_interest = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     feedback_survey_config = TextAreaField("Feedback Survey")
-    eligibility_config = TextAreaField("Eligibility config")
+    eligibility_config = RadioField(
+        "Has eligibility config", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
     eoi_decision_schema = TextAreaField("EOI Decision schema")

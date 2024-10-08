@@ -157,7 +157,7 @@
                             "text": "Contact us banner json"
                             },
                             "value": {
-                            "text": round.contact_us_banner_json
+                            "text": round.contact_us_banner_json["en"]
                             },
                             },
                             {
@@ -213,7 +213,7 @@
                             "text": "Instructions json"
                             },
                             "value": {
-                            "text": round.instructions_json
+                            "text": round.instructions_json["en"]
                             },
                             },
                             {
@@ -237,7 +237,7 @@
                             "text": "Application Guidance json"
                             },
                             "value": {
-                            "text": round.application_guidance_json
+                            "text": round.application_guidance_json["en"]
                             },
                             },
                             {
@@ -293,7 +293,7 @@
                             "text": "Eligibility config"
                             },
                             "value": {
-                            "text": round.eligibility_config
+                            "text": True if round.eligibility_config["has_eligibility"] == "true" else False
                             },
                             },
                             {
@@ -301,7 +301,7 @@
                             "text": "EOI decision schema"
                             },
                             "value": {
-                            "text": round.eoi_decision_schema
+                            "text": round.eoi_decision_schema["en"]
                             },
                             },
 

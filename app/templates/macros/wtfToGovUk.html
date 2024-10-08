@@ -26,7 +26,7 @@
 },
 "id": form_field.id,
 "name": form_field.name ,
-"value": form_field.data,
+"value": form_field.data if form_field.data else "",
 "errorMessage": {"text": form_field.errors[0]} if (form_field.errors | length > 0) else None,
 "hint":{"text":form_field.description}
 }) }}
