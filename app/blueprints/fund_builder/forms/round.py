@@ -100,7 +100,7 @@ class RoundForm(FlaskForm):
     support_times = StringField("Support times", validators=[DataRequired()])
     support_days = StringField("Support Days", validators=[DataRequired()])
     instructions_json = TextAreaField("Instructions")
-    feedback_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
+    feedback_link = URLField("Feedback Link", validators=[DataRequired(), URL()])
     project_name_field_id = StringField("Project name", validators=[DataRequired()])
     application_guidance_json = TextAreaField("Application Guidance")
     guidance_url = URLField("Guidance link", validators=[DataRequired(), URL()])
