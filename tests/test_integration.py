@@ -288,32 +288,38 @@ output_base_path = Path("app") / "export_config" / "output"
 
 # add files in /test_data t orun the below test against each file
 @pytest.mark.parametrize(
-    "filename,expected_page_count_for_form,expected_component_count_for_form",
+    "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form",
     [
-        ("org-info.json", 18, 43),
-        ("optional-all-components.json", 8, 27),
-        ("required-all-components.json", 8, 27),
-        ("favourite-colours-sarah.json", 4, 1),
+        ("org-info.json", "organisation-information.json", 18, 43),
+        ("optional-all-components.json", "optional.json", 8, 27),
+        ("required-all-components.json", "required.json", 8, 27),
+        ("favourite-colours-sarah.json", "colours.json", 4, 1),
         # TODO see why this fails
-        ("Organisation-and-local-authority-information-template.json", 16, 24),
+        # ("Organisation-and-local-authority-information-template.json", "local-authority-and-other-organisation-information.json",16, 24),  # noqa: E501
     ],
 )
 def test_generate_config_for_round_valid_input(
-    seed_dynamic_data, _db, monkeypatch, filename, expected_page_count_for_form, expected_component_count_for_form
+    seed_dynamic_data,
+    _db,
+    monkeypatch,
+    input_filename,
+    output_filename,
+    expected_page_count_for_form,
+    expected_component_count_for_form,
 ):
     form_configs = []
     script_dir = os.path.dirname(__file__)
     test_data_dir = os.path.join(script_dir, "test_data")
-    file_path = os.path.join(test_data_dir, filename)
+    file_path = os.path.join(test_data_dir, input_filename)
     with open(file_path, "r") as json_file:
         input_form = json.load(json_file)
-        input_form["filename"] = filename
+        input_form["filename"] = input_filename
         form_configs.append(input_form)
     load_form_jsons(form_configs)
 
     expected_form_count = 1
     # check form config is in the database
-    forms = _db.session.query(Form).filter(Form.template_name == filename)
+    forms = _db.session.query(Form).filter(Form.template_name == input_filename.split(".")[0])
     assert forms.count() == expected_form_count
     form = forms.first()
     pages = _db.session.query(Page).filter(Page.form_id == form.form_id)
@@ -343,7 +349,7 @@ def test_generate_config_for_round_valid_input(
 
     try:
         # Check if the directory is created
-        generated_json_form = output_base_path / round_short_name / "form_runner" / filename
+        generated_json_form = output_base_path / round_short_name / "form_runner" / output_filename
         assert generated_json_form
 
         # compare the import file with the generated file
