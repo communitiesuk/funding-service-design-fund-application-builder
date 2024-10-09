@@ -1,5 +1,5 @@
 import os
-from datetime import date
+
 import jsonschema
 from flask import current_app
 from jsonschema import validate
@@ -25,7 +25,7 @@ def write_config(config, filename, round_short_name, config_type):
         config_dict = convert_to_dict(config)  # Convert config to dict for non-JSON types
         content_to_write = "LOADER_CONFIG="
         content_to_write += str(config_dict)
-        file_path = os.path.join(output_dir, f"{human_to_snake_case(filename)}_{date.today().strftime('%d-%m-%Y')}.py")
+        file_path = os.path.join(output_dir, f"{human_to_snake_case(filename)}.py")
     elif config_type == "html":
         output_dir = os.path.join(base_output_dir, "html/")
         content_to_write = config
