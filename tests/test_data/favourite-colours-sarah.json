@@ -154,5 +154,6 @@
     "version": 2,
     "skipSummary": false,
     "feeOptions": {},
-    "markAsComplete": false
+    "markAsComplete": false,
+    "name":"colours"
 }

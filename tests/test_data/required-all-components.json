@@ -1288,5 +1288,6 @@
         "showPaymentSkippedWarningPage": false
     },
     "markAsComplete": false,
-    "outputs": []
+    "outputs": [],
+    "name":"required"
 }
