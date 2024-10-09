@@ -51,7 +51,7 @@
                     {{ yes_no(form.mark_as_complete_enabled) }}
                     {{ yes_no(form.is_expression_of_interest) }}
                     {{ multilineinput(form.feedback_survey_config) }}
-                    {{ multilineinput(form.eligibility_config) }}
+                    {{ yes_no(form.eligibility_config) }}
                     {{ multilineinput(form.eoi_decision_schema) }}
                     {{ govukButton({
                     "text": "Save"

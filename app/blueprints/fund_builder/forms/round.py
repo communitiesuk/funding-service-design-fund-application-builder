@@ -100,7 +100,7 @@ class RoundForm(FlaskForm):
     support_times = StringField("Support times", validators=[DataRequired()])
     support_days = StringField("Support Days", validators=[DataRequired()])
     instructions_json = TextAreaField("Instructions")
-    feedback_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
+    feedback_link = URLField("Feedback Link", validators=[DataRequired(), URL()])
     project_name_field_id = StringField("Project name", validators=[DataRequired()])
     application_guidance_json = TextAreaField("Application Guidance")
     guidance_url = URLField("Guidance link", validators=[DataRequired(), URL()])
@@ -110,5 +110,7 @@ class RoundForm(FlaskForm):
     mark_as_complete_enabled = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     is_expression_of_interest = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     feedback_survey_config = TextAreaField("Feedback Survey")
-    eligibility_config = TextAreaField("Eligibility config")
+    eligibility_config = RadioField(
+        "Has eligibility config", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
     eoi_decision_schema = TextAreaField("EOI Decision schema")

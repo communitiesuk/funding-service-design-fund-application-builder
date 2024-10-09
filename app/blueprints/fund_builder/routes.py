@@ -311,9 +311,7 @@ def populate_form_with_round_data(round):
         "instructions_json": round.instructions_json.get("en", "") if round.instructions_json else "",
         "feedback_link": round.feedback_link,
         "project_name_field_id": round.project_name_field_id,
-        "application_guidance_json": (
-            round.application_guidance_json.get("en", "") if round.application_guidance_json else ""
-        ),
+        "application_guidance_json": round.application_guidance_json.get("en", "") if round.application_guidance_json else "",
         "guidance_url": round.guidance_url,
         "all_uploaded_documents_section_available": (
             "true" if round.all_uploaded_documents_section_available else "false"
@@ -323,8 +321,9 @@ def populate_form_with_round_data(round):
         "mark_as_complete_enabled": "true" if round.mark_as_complete_enabled else "false",
         "is_expression_of_interest": "true" if round.is_expression_of_interest else "false",
         "feedback_survey_config": round.feedback_survey_config,
-        "eligibility_config": round.eligibility_config.get("has_eligibility", "false"),
-        "eoi_decision_schema": round.eoi_decision_schema.get("en", ""),
+        "eligibility_config": "true" if round.eligibility_config and
+                                        round.eligibility_config.get("has_eligibility", "") == "true" else "false",
+        "eoi_decision_schema": round.eoi_decision_schema.get("en", "") if round.eoi_decision_schema else "",
     }
     return RoundForm(data=round_data)
 
@@ -336,14 +335,9 @@ def update_existing_round(round, form):
     :param Round round: The round object to update
     :param RoundForm form: The form with the new round data
     """
-    round.title_json["en"] = form.title_en.data
+    round.title_json = {"en" : form.title_en.data if form.title_en.data else ""}
     round.short_name = form.short_name.data
-    round.contact_us_banner_json["en"] = form.contact_us_banner_json.data
-    round.instructions_json["en"] = form.instructions_json.data
-    round.application_guidance_json["en"] = form.application_guidance_json.data
     round.feedback_survey_config = form.feedback_survey_config.data
-    round.eligibility_config["has_eligibility"] = form.eligibility_config.data
-    round.eoi_decision_schema["en"] = form.eoi_decision_schema.data
     round.opens = get_datetime(form.opens)
     round.deadline = get_datetime(form.deadline)
     round.assessment_start = get_datetime(form.assessment_start)
@@ -365,6 +359,18 @@ def update_existing_round(round, form):
     round.display_logo_on_pdf_exports = form.display_logo_on_pdf_exports.data == "true"
     round.mark_as_complete_enabled = form.mark_as_complete_enabled.data == "true"
     round.is_expression_of_interest = form.is_expression_of_interest.data == "true"
+    round.short_name = form.short_name.data
+    round.contact_us_banner_json= {"en": form.contact_us_banner_json.data if form.contact_us_banner_json.data else "", "cy": ""}
+    round.instructions_json = {"en": form.instructions_json.data if form.instructions_json.data else "", "cy": ""}
+    round.application_guidance_json = {"en": form.application_guidance_json.data if form.application_guidance_json.data else "", "cy": ""}
+    round.guidance_url = form.guidance_url.data
+    round.all_uploaded_documents_section_available = form.all_uploaded_documents_section_available.data == "true"
+    round.application_fields_download_available = form.application_fields_download_available.data == "true"
+    round.display_logo_on_pdf_exports = form.display_logo_on_pdf_exports.data == "true"
+    round.mark_as_complete_enabled = form.mark_as_complete_enabled.data == "true"
+    round.is_expression_of_interest = form.is_expression_of_interest.data == "true"
+    round.eligibility_config = {"has_eligibility": form.eligibility_config.data}
+    round.eoi_decision_schema = {"en": form.eoi_decision_schema.data, "cy": ""}
     round.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
     update_round(round)
 
