@@ -273,7 +273,7 @@ def test_generate_fund_round_html(seed_dynamic_data):
             "path": output_base_path
             / round_short_name
             / "html"
-            / f"{fund_short_name}_{round_short_name}_all_questions_en.html",
+            / f"{fund_short_name.casefold()}_{round_short_name.casefold()}_all_questions_en.html",
             "expected_output": frontend_html_prefix
             + '<div class="govuk-!-margin-bottom-8">\n  <h2 class="govuk-heading-m ">\n    Table of contents\n  </h2>\n  <ol class="govuk-list govuk-list--number">\n    <li>\n      <a class="govuk-link" href="#organisation-information">\n        Organisation Information\n      </a>\n    </li>\n  </ol>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h2 class="govuk-heading-l" id="organisation-information">\n    1. Organisation Information\n  </h2>\n  <h3 class="govuk-heading-m">\n    1.1. About your organisation\n  </h3>\n  <h4 class="govuk-heading-s">\n    1.1.1. Organisation Name\n  </h4>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      What is your organisation\'s name?\n    </p>\n    <p class="govuk-body">\n      This must match the registered legal organisation name\n    </p>\n  </div>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      How is your organisation classified?\n    </p>\n    <ul class="govuk-list govuk-list--bullet">\n      <li class="">\n        Charity\n      </li>\n      <li class="">\n        Public Limited Company\n      </li>\n    </ul>\n  </div>\n</div>'  # noqa: E501
             + frontend_html_suffix,
