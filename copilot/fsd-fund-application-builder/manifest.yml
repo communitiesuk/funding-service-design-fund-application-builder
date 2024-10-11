@@ -73,16 +73,16 @@ environments:
       spot: 2
   uat:
     count:
-     range: 2-4
-     cooldown:
-       in: 60s
-       out: 30s
-     cpu_percentage:
-       value: 70
-     memory_percentage:
-       value: 80
-     requests: 30
-     response_time: 2s
+      range: 2-4
+      cooldown:
+        in: 60s
+        out: 30s
+      cpu_percentage:
+        value: 70
+      memory_percentage:
+        value: 80
+      requests: 30
+      response_time: 2s
 #   prod:
 #     http:
 #       alias: ["fund-application-builder.prod.access-funding.levellingup.gov.uk", "fund-application-builder.access-funding.levellingup.gov.uk"]
