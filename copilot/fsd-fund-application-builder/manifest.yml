@@ -71,20 +71,18 @@ environments:
       rolling: 'recreate'
     count:
       spot: 2
-#   uat:
-#     http:
-#       alias: "fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
-#     count:
-#       range: 2-4
-#       cooldown:
-#         in: 60s
-#         out: 30s
-#       cpu_percentage:
-#         value: 70
-#       memory_percentage:
-#         value: 80
-#       requests: 30
-#       response_time: 2s
+  uat:
+    count:
+     range: 2-4
+     cooldown:
+       in: 60s
+       out: 30s
+     cpu_percentage:
+       value: 70
+     memory_percentage:
+       value: 80
+     requests: 30
+     response_time: 2s
 #   prod:
 #     http:
 #       alias: ["fund-application-builder.prod.access-funding.levellingup.gov.uk", "fund-application-builder.access-funding.levellingup.gov.uk"]
