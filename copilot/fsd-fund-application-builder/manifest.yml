@@ -18,7 +18,7 @@ http:
 # Configuration for your containers and service.
 image:
   # Docker build arguments. For additional overrides: https://aws.github.io/copilot-cli/docs/manifest/lb-web-service/#image-location
-  location: ghcr.io/communitiesuk/funding-service-design-fund-application-builder:sha-80b62bc90e84c96ec5cf8a4ca139b245391caca2
+  location: ghcr.io/communitiesuk/funding-service-design-fund-application-builder:sha-9028e0fc06fffb656dd3f4d32f39f861c93ecd5a
   # Port exposed through your container to route traffic to it.
   port: 8080
 
@@ -71,20 +71,18 @@ environments:
       rolling: 'recreate'
     count:
       spot: 2
-#   uat:
-#     http:
-#       alias: "fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
-#     count:
-#       range: 2-4
-#       cooldown:
-#         in: 60s
-#         out: 30s
-#       cpu_percentage:
-#         value: 70
-#       memory_percentage:
-#         value: 80
-#       requests: 30
-#       response_time: 2s
+  uat:
+    count:
+      range: 2-4
+      cooldown:
+        in: 60s
+        out: 30s
+      cpu_percentage:
+        value: 70
+      memory_percentage:
+        value: 80
+      requests: 30
+      response_time: 2s
 #   prod:
 #     http:
 #       alias: ["fund-application-builder.prod.access-funding.levellingup.gov.uk", "fund-application-builder.access-funding.levellingup.gov.uk"]
