@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import pytest
 
@@ -70,3 +71,20 @@ def test_generate_config_for_round_valid_input_file(seed_dynamic_data, _db):
         _db.session.query(Component).filter(Component.page_id == page.page_id).count() for page in pages
     )
     assert total_components_count == expected_component_count_for_form
+
+
+def test_import_multi_input_field(seed_dynamic_data, _db):
+    with open(Path("tests") / "test_data" / "multi_input.json", "r") as json_file:
+        form = json.load(json_file)
+        form["filename"] = "test_mult_input"
+
+    load_json_from_file(form, template_name="test_input_multi_input")
+    forms = _db.session.query(Form).filter(Form.template_name == "test_input_multi_input")
+    assert forms.count() == 1
+    pages = _db.session.query(Page).filter(Page.form_id == forms.first().form_id)
+    assert pages.count() == 3
+    page_with_multi_input = pages[1]
+    assert page_with_multi_input
+    multi_input_component = page_with_multi_input.components[1]
+    assert multi_input_component.children
+
