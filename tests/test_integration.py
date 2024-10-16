@@ -28,6 +28,8 @@ from app.shared.data_classes import ConditionValue
 from tasks.test_data import BASIC_FUND_INFO
 from tasks.test_data import BASIC_ROUND_INFO
 
+from config import Config
+
 
 def test_build_form_json_no_conditions(seed_dynamic_data):
 
@@ -283,7 +285,7 @@ def test_list_relationship(seed_dynamic_data):
     assert result.lizt.name == "classifications_list"
 
 
-output_base_path = Path("app") / "export_config" / "output"
+output_base_path = Config.TEMP_FILE_PATH
 
 
 # add files in /test_data t orun the below test against each file

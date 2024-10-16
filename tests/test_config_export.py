@@ -13,8 +13,9 @@ from app.export_config.generate_fund_round_html import frontend_html_prefix
 from app.export_config.generate_fund_round_html import frontend_html_suffix
 from app.export_config.generate_fund_round_html import generate_all_round_html
 from app.export_config.helpers import validate_json
+from config import Config
 
-output_base_path = Path("app") / "export_config" / "output"
+output_base_path = Config.TEMP_FILE_PATH
 
 
 def read_data_from_output_file(file):
