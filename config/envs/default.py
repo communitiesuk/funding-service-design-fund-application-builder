@@ -1,6 +1,7 @@
 import logging
 from os import environ
 from os import getenv
+from pathlib import Path
 
 from fsd_utils import CommonConfig
 from fsd_utils import configclass
@@ -19,4 +20,4 @@ class DefaultConfig(object):
     FORM_RUNNER_URL_REDIRECT = getenv("FORM_RUNNER_EXTERNAL_HOST", "http://localhost:3009")
     SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URL")
 
-    TEMP_FILE_PATH="/tmp"
+    TEMP_FILE_PATH=Path("/tmp")

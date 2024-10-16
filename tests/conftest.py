@@ -8,9 +8,18 @@ from tasks.test_data import insert_test_data
 from tests.helpers import create_test_fund
 from tests.helpers import create_test_organisation
 from tests.helpers import create_test_round
+from config import Config
+import shutil
 
 pytest_plugins = ["fsd_test_utils.fixtures.db_fixtures"]
 
+
+@pytest.fixture(scope="session")
+def temp_output_dir():
+    temp_dir = Config.TEMP_FILE_PATH
+    yield temp_dir
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
 
 @pytest.fixture
 def test_fund(flask_test_client, _db, clear_test_data):

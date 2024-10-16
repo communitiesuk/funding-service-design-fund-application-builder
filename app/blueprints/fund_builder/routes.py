@@ -522,6 +522,14 @@ def view_form_questions(round_id, form_id):
         "view_questions.html", round=round, fund=fund, question_html=html, title=form.name_in_apply_json["en"]
     )
 
+def create_export_zip(directory_to_zip, zip_file_name) -> str:
+    # Output zip file path (temporary)
+    output_zip_path = Config.TEMP_FILE_PATH / zip_file_name
+
+    # Create a zip archive of the directory
+    shutil.make_archive(base_name=output_zip_path, format="zip", root_dir=directory_to_zip)
+    return f"{output_zip_path}.zip"
+
 
 @build_fund_bp.route("/create_export_files/<round_id>", methods=["GET"])
 def create_export_files(round_id):
@@ -530,13 +538,7 @@ def create_export_files(round_id):
     generate_config_for_round(round_id)
     round_short_name = get_round_by_id(round_id).short_name
 
-    # Directory to zip
-    directory_to_zip = Config.TEMP_FILE_PATH / "round_short_name"
-    # Output zip file path (temporary)
-    output_zip_path = Config.TEMP_FILE_PATH / f"{round_short_name}.zip"
-
-    # Create a zip archive of the directory
-    shutil.make_archive(output_zip_path.replace(".zip", ""), "zip", directory_to_zip)
+    output_zip_path = create_export_zip(directory_to_zip=Config.TEMP_FILE_PATH / round_short_name, zip_file_name=round_short_name)
 
     # Ensure the file is removed after sending it
     @after_this_request

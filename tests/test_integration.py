@@ -285,9 +285,6 @@ def test_list_relationship(seed_dynamic_data):
     assert result.lizt.name == "classifications_list"
 
 
-output_base_path = Config.TEMP_FILE_PATH
-
-
 # add files in /test_data t orun the below test against each file
 @pytest.mark.parametrize(
     "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form",
@@ -307,7 +304,7 @@ def test_generate_config_for_round_valid_input(
     input_filename,
     output_filename,
     expected_page_count_for_form,
-    expected_component_count_for_form,
+    expected_component_count_for_form,temp_output_dir
 ):
     form_configs = []
     script_dir = os.path.dirname(__file__)
@@ -349,60 +346,54 @@ def test_generate_config_for_round_valid_input(
     # Simply writes the files to the output directory so no result is given directly
     assert result is None
 
-    try:
-        # Check if the directory is created
-        generated_json_form = output_base_path / round_short_name / "form_runner" / output_filename
-        assert generated_json_form
+    # Check if the directory is created
+    generated_json_form = temp_output_dir / round_short_name / "form_runner" / output_filename
+    assert generated_json_form
 
-        # compare the import file with the generated file
-        with open(generated_json_form, "r") as file:
-            output_form = json.load(file)
+    # compare the import file with the generated file
+    with open(generated_json_form, "r") as file:
+        output_form = json.load(file)
 
-        # Compare the contents of the files
+    # Compare the contents of the files
 
-        # ensure the keys of the output form are in the input form keys
-        assert set(output_form.keys()) - {"name"} <= set(
-            input_form.keys()
-        ), "Output form keys are not a subset of input form keys, ignoring 'name'"
+    # ensure the keys of the output form are in the input form keys
+    assert set(output_form.keys()) - {"name"} <= set(
+        input_form.keys()
+    ), "Output form keys are not a subset of input form keys, ignoring 'name'"
 
-        # check conditions length is equal
-        input_condition_count = len(input_form.get("conditions", []))
-        output_condition_count = len(output_form.get("conditions", []))
-        assert output_condition_count <= input_condition_count  # sometime we remove specified but unused conditions
+    # check conditions length is equal
+    input_condition_count = len(input_form.get("conditions", []))
+    output_condition_count = len(output_form.get("conditions", []))
+    assert output_condition_count <= input_condition_count  # sometime we remove specified but unused conditions
 
-        # check that content of each page (including page[components] and page[next] within form[pages] is the same
-        for input_page in input_form["pages"]:
+    # check that content of each page (including page[components] and page[next] within form[pages] is the same
+    for input_page in input_form["pages"]:
 
-            # find page in output pages
-            output_page = next((p for p in output_form["pages"] if p["path"] == input_page["path"]), None)
-            assert input_page["path"] == output_page["path"]
-            assert input_page["title"] == output_page["title"]
-            for next_dict in input_page["next"]:
-                # find next in output page
-                output_next = next((n for n in output_page["next"] if n["path"] == next_dict["path"]), None)
-                assert next_dict["path"] == output_next["path"]
-                assert next_dict.get("condition", None) == output_next.get("condition", None)
+        # find page in output pages
+        output_page = next((p for p in output_form["pages"] if p["path"] == input_page["path"]), None)
+        assert input_page["path"] == output_page["path"]
+        assert input_page["title"] == output_page["title"]
+        for next_dict in input_page["next"]:
+            # find next in output page
+            output_next = next((n for n in output_page["next"] if n["path"] == next_dict["path"]), None)
+            assert next_dict["path"] == output_next["path"]
+            assert next_dict.get("condition", None) == output_next.get("condition", None)
 
-            # compare components
-            for input_component in input_page["components"]:
-                # find component in output page
-                output_component = None
-                for c in output_page.get("components", []):
-                    # Get name or content for both components safely
-                    output_name_or_content = c.get("name") or c.get("content")
-                    input_name_or_content = input_component.get("name") or input_component.get("content")
-                    print(f"Checking output: {output_name_or_content} vs input: {input_name_or_content}")
-                    if output_name_or_content == input_name_or_content:
-                        output_component = c
-                        break
+        # compare components
+        for input_component in input_page["components"]:
+            # find component in output page
+            output_component = None
+            for c in output_page.get("components", []):
+                # Get name or content for both components safely
+                output_name_or_content = c.get("name") or c.get("content")
+                input_name_or_content = input_component.get("name") or input_component.get("content")
+                print(f"Checking output: {output_name_or_content} vs input: {input_name_or_content}")
+                if output_name_or_content == input_name_or_content:
+                    output_component = c
+                    break
 
-                for key in input_component:
-                    assert input_component[key] == output_component[key]
-    finally:
-        # Cleanup step to remove the directory
-        directory_path = output_base_path / round_short_name
-        if directory_path.exists():
-            shutil.rmtree(directory_path)
+            for key in input_component:
+                assert input_component[key] == output_component[key]
 
 
 # colour_json={
