@@ -79,7 +79,7 @@ jobs:
   #     environment: dev
 
   test_deploy:
-    needs: [ dev_deploy, post_dev_deploy_tests, paketo_build, setup ]
+    needs: [ dev_deploy, paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'test') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
@@ -108,7 +108,7 @@ jobs:
   #     environment: test
 
   uat_deploy:
-    needs: [ dev_deploy, post_dev_deploy_tests, test_deploy, post_test_deploy_tests, paketo_build, setup ]
+    needs: [ dev_deploy, test_deploy, paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'uat') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
