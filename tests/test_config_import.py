@@ -7,6 +7,7 @@ import pytest
 from app.db.models import Component
 from app.db.models import Form
 from app.db.models import Page
+from app.db.models.application_config import ComponentType
 from app.import_config.load_form_json import load_form_jsons
 from app.import_config.load_form_json import load_json_from_file
 
@@ -46,7 +47,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename)
 
 
 # TODO see why this fails
-@pytest.mark.skip
+# @pytest.mark.skip
 def test_generate_config_for_round_valid_input_file(seed_dynamic_data, _db):
     filename = "test-import-form.json"
     template_name = "test-template"
@@ -83,8 +84,10 @@ def test_import_multi_input_field(seed_dynamic_data, _db):
     assert forms.count() == 1
     pages = _db.session.query(Page).filter(Page.form_id == forms.first().form_id)
     assert pages.count() == 3
-    page_with_multi_input = pages[1]
+    page_with_multi_input = next(p for p in pages if p.display_path=='capital-costs-for-your-project')
     assert page_with_multi_input
-    multi_input_component = page_with_multi_input.components[1]
-    assert multi_input_component.children
+    multi_input_component = next(c for c in page_with_multi_input.components if c.title=='Capital costs')
+    assert multi_input_component
+    assert multi_input_component.type == ComponentType.MULTI_INPUT_FIELD
+    assert len(multi_input_component.children) == 4
 

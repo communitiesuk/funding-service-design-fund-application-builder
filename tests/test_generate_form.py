@@ -311,6 +311,58 @@ list_id = uuid4()
                 "values": {"type": "listRef"},
             },
         ),
+        (
+            Component(
+                component_id=uuid4(),
+                type=ComponentType.MULTI_INPUT_FIELD,
+                title="Test Title",
+                hint_text="This must be a hint",
+                page_id=None,
+                page_index=1,
+                theme_id=None,
+                runner_component_name="test-name",
+                options={},
+                lizt=None,
+                list_id=None,
+                children=[
+                    {"name": "GLQlOh", "options": {}, "type": "TextField", "title": "Describe the cost"},
+                    {
+                        "name": "JtwkMy",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "Amount",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "LeTLDo",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much money from the COF25 grant will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "pHZDWT",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much of the match funding will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                ],
+            ),
+            {
+                "name": "test-name",
+                "options": {},
+                "type": "MultiInputField",
+                "title": "Test Title",
+                "hint": "This must be a hint",
+                "schema": {},
+                "metadata": {},
+                "children":[{'name': 'GLQlOh', 'options': {}, 'type': 'TextField', 'title': 'Describe the cost'}, {'name': 'JtwkMy', 'options': {'prefix': '£', 'classes': 'govuk-!-width-one-half'}, 'type': 'NumberField', 'title': 'Amount', 'hint': '', 'schema': {}}, {'name': 'LeTLDo', 'options': {'prefix': '£', 'classes': 'govuk-!-width-one-half'}, 'type': 'NumberField', 'title': 'How much money from the COF25 grant will you use to pay for this cost?', 'hint': '', 'schema': {}}, {'name': 'pHZDWT', 'options': {'prefix': '£', 'classes': 'govuk-!-width-one-half'}, 'type': 'NumberField', 'title': 'How much of the match funding will you use to pay for this cost?', 'hint': '', 'schema': {}}]
+            },
+        ),
     ],
 )
 def test_build_component(component_to_build, exp_result):

@@ -286,7 +286,7 @@ def test_list_relationship(seed_dynamic_data):
 output_base_path = Path("app") / "export_config" / "output"
 
 
-# add files in /test_data t orun the below test against each file
+# add files in /test_data to run the below test against each file
 @pytest.mark.parametrize(
     "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form",
     [
@@ -294,8 +294,8 @@ output_base_path = Path("app") / "export_config" / "output"
         ("optional-all-components.json", "optional.json", 8, 27),
         ("required-all-components.json", "required.json", 8, 27),
         ("favourite-colours-sarah.json", "colours.json", 4, 1),
-        # TODO see why this fails
-        # ("Organisation-and-local-authority-information-template.json", "local-authority-and-other-organisation-information.json",16, 24),  # noqa: E501
+        ("funding-required-cof-25.json", "funding-required.json", 12, 21),
+        ("Organisation-and-local-authority-information-template.json", "local-authority-and-other-organisation-information.json",16, 24),  # noqa: E501
     ],
 )
 def test_generate_config_for_round_valid_input(

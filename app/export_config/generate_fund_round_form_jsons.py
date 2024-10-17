@@ -34,11 +34,14 @@ form_schema = {
                                 "title": {"type": ["string", "null"]},
                                 "content": {"type": ["string", "null"]},
                                 "hint": {"type": "string"},
-                                "schema": {"type": "object"},
+                                "schema": {
+                                    "type": "object",
+                                },
                                 "name": {"type": "string"},
                                 "metadata": {
                                     "type": "object",
                                 },
+                                "children": {"type": "array"}
                             },
                         },
                     },

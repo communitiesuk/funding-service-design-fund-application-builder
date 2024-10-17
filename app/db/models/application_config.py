@@ -221,6 +221,7 @@ class Component(BaseModel):
     content = Column(String(), nullable=True)
     hint_text = Column(String(), nullable=True)
     options = Column(JSON(none_as_null=False))
+    schema = Column(JSON(none_as_null=False))
     type = Column(ENUM(ComponentType))
     template_name = Column(String(), nullable=True)
     is_template = Column(Boolean, default=False, nullable=False)
