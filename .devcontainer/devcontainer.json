@@ -1,0 +1,18 @@
+{
+    "dockerComposeFile": [
+        "../docker-compose.yml",
+        "../compose.override.yml"
+    ],
+    "service": "fab",
+    "shutdownAction": "none",
+    "workspaceFolder": "/fab",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.debugpy",
+                "ms-python.vscode-pylance",
+                "mikoz.black-py"
+            ]
+        }
+    },
+}
