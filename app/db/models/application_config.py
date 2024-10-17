@@ -53,6 +53,7 @@ class ComponentType(Enum):
     FILE_UPLOAD_FIELD = "FileUploadField"
     MONTH_YEAR_FIELD = "MonthYearField"
     TIME_FIELD = "TimeField"
+    MULTI_INPUT_FIELD="MultiInputField"
 
 
 READ_ONLY_COMPONENTS = [
@@ -164,6 +165,7 @@ class Page(BaseModel):
     )
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     controller = Column(String(), nullable=True)
+    options=Column(JSON(none_as_null=True))
 
     def __repr__(self):
         return f"Page(/{self.display_path} - {self.name_in_apply_json['en']}, Components: {self.components})"
@@ -220,10 +222,12 @@ class Component(BaseModel):
     content = Column(String(), nullable=True)
     hint_text = Column(String(), nullable=True)
     options = Column(JSON(none_as_null=False))
+    schema = Column(JSON(none_as_null=False))
     type = Column(ENUM(ComponentType))
     template_name = Column(String(), nullable=True)
     is_template = Column(Boolean, default=False, nullable=False)
     audit_info = Column(JSON(none_as_null=True))
+    children = Column(JSON(none_as_null=True))  # TODO model this as a proper hierarchy
     page_index = Column(Integer())
     theme_index = Column(Integer())
     conditions = Column(JSON(none_as_null=True))

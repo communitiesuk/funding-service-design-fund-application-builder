@@ -21,6 +21,7 @@ form_schema = {
                 "properties": {
                     "path": {"type": "string"},
                     "title": {"type": "string"},
+                    "options":{"type":"object"},
                     "components": {
                         "type": "array",
                         "items": {
@@ -34,11 +35,14 @@ form_schema = {
                                 "title": {"type": ["string", "null"]},
                                 "content": {"type": ["string", "null"]},
                                 "hint": {"type": "string"},
-                                "schema": {"type": "object"},
+                                "schema": {
+                                    "type": "object",
+                                },
                                 "name": {"type": "string"},
                                 "metadata": {
                                     "type": "object",
                                 },
+                                "children": {"type": "array"}
                             },
                         },
                     },

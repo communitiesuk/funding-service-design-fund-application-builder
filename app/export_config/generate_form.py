@@ -93,7 +93,7 @@ def build_component(component: Component) -> dict:
             "type": component.type.value,
             "title": component.title,
             "hint": component.hint_text or "",
-            "schema": {},
+            "schema": component.schema or {},
             "name": component.runner_component_name,
             "metadata": {
                 # "fund_builder_id": str(component.component_id) TODO why do we need this?
@@ -107,6 +107,9 @@ def build_component(component: Component) -> dict:
         built_component.update({"list": component.lizt.name})
         built_component["metadata"].update({"fund_builder_list_id": str(component.list_id)})
         built_component.update({"values": {"type": "listRef"}})
+
+    if component.type is ComponentType.MULTI_INPUT_FIELD:
+        built_component.update({"children":component.children})
 
     return built_component
 
@@ -124,6 +127,8 @@ def build_page(page: Page = None) -> dict:
             "title": page.name_in_apply_json["en"],
         }
     )
+    if page.options:
+        built_page.update({"options": page.options})
     # Having a 'null' controller element breaks the form-json, needs to not be there if blank
     if page.controller:
         built_page["controller"] = page.controller
