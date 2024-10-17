@@ -1,4 +1,4 @@
-"""Add MultiInputField to ComponentType Enum and columns children and schema to Component
+"""Add MultiInputField to ComponentType Enum and columns children and schema to Component. Add column options to Page
 
 Revision ID: da30746cec39
 Revises: ca61d3b746f6
@@ -24,6 +24,8 @@ def upgrade():
     with op.batch_alter_table('component', schema=None) as batch_op:
         batch_op.add_column(sa.Column('children', postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True))
         batch_op.add_column(sa.Column('schema', postgresql.JSON(astext_type=sa.Text()), nullable=True))
+    with op.batch_alter_table('page', schema=None) as batch_op:
+        batch_op.add_column(sa.Column('options', postgresql.JSON(none_as_null=True, astext_type=sa.Text()), nullable=True))
 
     # ### end Alembic commands ###
 
@@ -33,4 +35,6 @@ def downgrade():
     with op.batch_alter_table('component', schema=None) as batch_op:
         batch_op.drop_column('children')
         batch_op.drop_column('schema')
+    with op.batch_alter_table('page', schema=None) as batch_op:
+        batch_op.drop_column('options')
     # ### end Alembic commands ###

@@ -21,6 +21,7 @@ form_schema = {
                 "properties": {
                     "path": {"type": "string"},
                     "title": {"type": "string"},
+                    "options":{"type":"object"},
                     "components": {
                         "type": "array",
                         "items": {

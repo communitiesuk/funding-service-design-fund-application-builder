@@ -149,6 +149,7 @@ def insert_page_as_template(page, form_id):
         controller=page.get("controller", None),
         is_template=True,
         template_name=page.get("title", None),
+        options = page.get("options", None),
     )
     try:
         db.session.add(new_page)

@@ -182,6 +182,17 @@ def test_build_page_controller_not_specified():
                 components=[],
             )
         ),
+        (
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="page-with-options",
+                name_in_apply_json={"en": "Page with Options Name"},
+                form_index=1,
+                components=[],
+                options = {"first": "option"}
+            )
+        ),
     ],
 )
 def test_build_page(input_page):
@@ -190,6 +201,8 @@ def test_build_page(input_page):
         assert result_page
         assert mock_build_component.call_count == len(input_page.components)
         assert len(result_page["components"]) == len(input_page.components)
+        if input_page.options:
+            assert result_page["options"] == input_page.options
 
 
 id = uuid4()
