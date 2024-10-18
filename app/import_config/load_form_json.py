@@ -47,7 +47,6 @@ def _build_condition(condition_data, destination_page_path) -> Condition:
 def _get_component_by_runner_name(db, runner_component_name, page_id):
 
     return db.session.query(Component).filter(Component.runner_component_name == runner_component_name).filter()
- db.session.quer()
 
 
 def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
