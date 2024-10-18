@@ -166,6 +166,7 @@ class Page(BaseModel):
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     controller = Column(String(), nullable=True)
     options = Column(JSON(none_as_null=True))
+    section = Column(JSON(none_as_null=True))
 
     def __repr__(self):
         return f"Page(/{self.display_path} - {self.name_in_apply_json['en']}, Components: {self.components})"
