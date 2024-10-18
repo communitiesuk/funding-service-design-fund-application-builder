@@ -1,10 +1,12 @@
 import uuid
 from dataclasses import dataclass
+from enum import Enum
 from typing import List
 
 from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.mutable import MutableDict
@@ -17,6 +19,23 @@ from app.db import db
 from .round import Round
 
 BaseModel: DefaultMeta = db.Model
+
+
+class FundingType(Enum):
+    COMPETITIVE = "COMPETITIVE"
+    UNCOMPETED = "UNCOMPETED"
+    EOI = "EOI"
+
+    def get_text_for_display(self):
+        match self:
+            case FundingType.COMPETITIVE:
+                return "Competitive"
+            case FundingType.EOI:
+                return "EOI"
+            case FundingType.UNCOMPETED:
+                return "Uncompeted"
+            case _:
+                return self.value
 
 
 @dataclass
@@ -57,3 +76,4 @@ class Fund(BaseModel):
     owner_organisation_id = Column(UUID(as_uuid=True), ForeignKey("organisation.organisation_id"), nullable=True)
     # Define the relationship to access the owning Organisation directly
     owner_organisation: Mapped["Organisation"] = relationship("Organisation", back_populates="funds")
+    funding_type = Column(ENUM(FundingType), nullable=False, unique=False)

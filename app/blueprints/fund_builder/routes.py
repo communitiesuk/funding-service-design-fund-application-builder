@@ -21,6 +21,7 @@ from app.blueprints.fund_builder.forms.round import RoundForm
 from app.blueprints.fund_builder.forms.round import get_datetime
 from app.blueprints.fund_builder.forms.section import SectionForm
 from app.db.models.fund import Fund
+from app.db.models.fund import FundingType
 from app.db.models.round import Round
 from app.db.queries.application import clone_single_form
 from app.db.queries.application import clone_single_round
@@ -221,6 +222,7 @@ def fund(fund_id=None):
             "short_name": fund.short_name,
             "description_en": fund.description_json.get("en", ""),
             "welsh_available": "true" if fund.welsh_available else "false",
+            "funding_type": fund.funding_type.value,
         }
         form = FundForm(data=fund_data)
     else:
@@ -234,6 +236,7 @@ def fund(fund_id=None):
             fund.welsh_available = form.welsh_available.data == "true"
             fund.short_name = form.short_name.data
             fund.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
+            fund.funding_type = form.funding_type.data
             update_fund(fund)
             flash(f"Updated fund {form.title_en.data}")
         else:
@@ -244,6 +247,7 @@ def fund(fund_id=None):
                 welsh_available=form.welsh_available.data == "true",
                 short_name=form.short_name.data,
                 audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+                funding_type=FundingType(form.funding_type.data),
             )
             add_fund(new_fund)
             flash(f"Created fund {form.name_en.data}")
@@ -522,6 +526,7 @@ def view_form_questions(round_id, form_id):
         "view_questions.html", round=round, fund=fund, question_html=html, title=form.name_in_apply_json["en"]
     )
 
+
 def create_export_zip(directory_to_zip, zip_file_name) -> str:
     # Output zip file path (temporary)
     output_zip_path = Config.TEMP_FILE_PATH / zip_file_name
@@ -538,7 +543,9 @@ def create_export_files(round_id):
     generate_config_for_round(round_id)
     round_short_name = get_round_by_id(round_id).short_name
 
-    output_zip_path = create_export_zip(directory_to_zip=Config.TEMP_FILE_PATH / round_short_name, zip_file_name=round_short_name)
+    output_zip_path = create_export_zip(
+        directory_to_zip=Config.TEMP_FILE_PATH / round_short_name, zip_file_name=round_short_name
+    )
 
     # Ensure the file is removed after sending it
     @after_this_request

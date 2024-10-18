@@ -91,3 +91,21 @@
     "hint":{"text":form_field.description}
 })}}
 {%endmacro%}
+
+
+{% macro radios_from_enum(form_field) %}
+{{ govukRadios({
+"name": form_field.name,
+"classes": "govuk-radios--inline",
+"fieldset": {
+"legend": {
+    "text": form_field.label,
+    "isPageHeading": false,
+    }
+},
+"items": form_field.gov_uk_choices,
+"value": form_field.data
+})}}
+
+{{items}}
+{%endmacro%}
