@@ -158,3 +158,13 @@ class RoundExport:
 
     def as_dict(self):
         return asdict(self)
+
+
+@dataclass
+class FormSection:
+    name: str
+    title: str
+    hideTitle: Optional[bool] = None
+
+    def as_dict(self):
+        return asdict(self)

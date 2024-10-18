@@ -295,6 +295,7 @@ def test_list_relationship(seed_dynamic_data):
             16,
             24,
         ),  # noqa: E501
+        ("test-section.json", "section.json", 3, 1),
     ],
 )
 def test_generate_config_for_round_valid_input(

@@ -1,0 +1,62 @@
+ {
+    "metadata": {},
+    "startPage": "/first-page",
+    "pages": [
+        {
+            "title": "First page",
+            "path": "/first-page",
+            "components": [],
+            "next": [
+                {
+                    "path": "/second-page"
+                }
+            ],
+            "section": "aucbfI"
+        },
+        {
+            "path": "/second-page",
+            "title": "Second page",
+            "components": [
+                {
+                    "name": "sBMuNR",
+                    "options": {},
+                    "type": "TextField",
+                    "title": "Your name"
+                }
+            ],
+            "next": [
+                {
+                    "path": "/summary"
+                }
+            ],
+            "section": "vJLJeJ"
+        },
+        {
+            "title": "Summary",
+            "path": "/summary",
+            "controller": "./pages/summary.js",
+            "components": []
+        }
+    ],
+    "lists": [],
+    "sections": [
+        {
+            "name": "aucbfI",
+            "title": "Section 1",
+            "hideTitle": false
+        },
+        {
+            "name": "vJLJeJ",
+            "title": "Section 2",
+            "hideTitle": false
+        }
+    ],
+    "conditions": [],
+    "fees": [],
+    "outputs": [],
+    "version": 2,
+    "skipSummary": false,
+    "feeOptions": {},
+    "markAsComplete": false,
+    "name":"section"
+}
