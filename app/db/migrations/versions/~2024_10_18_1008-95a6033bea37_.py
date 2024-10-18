@@ -35,6 +35,6 @@ def downgrade():
 
     with op.batch_alter_table("fund", schema=None) as batch_op:
         batch_op.drop_column("funding_type")
-    op.execute(sa.text("DROP TYPE fundingtype;"))
+    funding_type_enum.drop(op.get_bind())
 
     # ### end Alembic commands ###
