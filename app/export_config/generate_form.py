@@ -81,7 +81,7 @@ def build_component(component: Component) -> dict:
             "type": component.type.value if component.type else None,
             "content": component.content,
             "options": component.options or {},
-            "schema": {},
+            "schema": component.schema or {},
             "title": component.title,
             "name": component.runner_component_name,
         }
@@ -109,7 +109,7 @@ def build_component(component: Component) -> dict:
         built_component.update({"values": {"type": "listRef"}})
 
     if component.type is ComponentType.MULTI_INPUT_FIELD:
-        built_component.update({"children":component.children})
+        built_component.update({"children": component.children})
 
     return built_component
 
@@ -127,6 +127,8 @@ def build_page(page: Page = None) -> dict:
             "title": page.name_in_apply_json["en"],
         }
     )
+    if page.section:
+        built_page.update({"section": page.section})
     if page.options:
         built_page.update({"options": page.options})
     # Having a 'null' controller element breaks the form-json, needs to not be there if blank
@@ -269,6 +271,8 @@ def build_form_json(form: Form) -> dict:
     # Build the basic page structure
     for page in form.pages:
         results["pages"].append(build_page(page=page))
+        if page.section:
+            results["sections"].append(page.section)
 
     # start page is the page with the controller ending start.js
     start_page = _find_page_by_controller(form.pages, "start.js")
