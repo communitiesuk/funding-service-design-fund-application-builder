@@ -19,4 +19,4 @@ class UnitTestConfig(Config):
         "DATABASE_URL_UNIT_TEST",
         "postgresql://postgres:postgres@127.0.0.1:5432/fab_unit_test",  # pragma: allowlist secret
     )
-    TEMP_FILE_PATH=Path("app") / "export_config" / "output"
+    TEMP_FILE_PATH = Path("app") / "export_config" / "output"

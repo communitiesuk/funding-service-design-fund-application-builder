@@ -83,11 +83,10 @@ def test_import_multi_input_field(seed_dynamic_data, _db):
     assert forms.count() == 1
     pages = _db.session.query(Page).filter(Page.form_id == forms.first().form_id)
     assert pages.count() == 3
-    page_with_multi_input = next(p for p in pages if p.display_path=='capital-costs-for-your-project')
+    page_with_multi_input = next(p for p in pages if p.display_path == "capital-costs-for-your-project")
     assert page_with_multi_input
     assert page_with_multi_input.options
-    multi_input_component = next(c for c in page_with_multi_input.components if c.title=='Capital costs')
+    multi_input_component = next(c for c in page_with_multi_input.components if c.title == "Capital costs")
     assert multi_input_component
     assert multi_input_component.type == ComponentType.MULTI_INPUT_FIELD
     assert len(multi_input_component.children) == 4
-

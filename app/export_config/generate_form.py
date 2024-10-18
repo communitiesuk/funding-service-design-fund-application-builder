@@ -109,7 +109,7 @@ def build_component(component: Component) -> dict:
         built_component.update({"values": {"type": "listRef"}})
 
     if component.type is ComponentType.MULTI_INPUT_FIELD:
-        built_component.update({"children":component.children})
+        built_component.update({"children": component.children})
 
     return built_component
 
