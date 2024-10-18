@@ -25,7 +25,6 @@ BASIC_PAGE_STRUCTURE = {
     "title": None,
     "components": [],
     "next": [],
-    "section": None,
 }
 
 
@@ -128,6 +127,8 @@ def build_page(page: Page = None) -> dict:
             "title": page.name_in_apply_json["en"],
         }
     )
+    if page.section:
+        built_page.update({"section": page.section})
     if page.options:
         built_page.update({"options": page.options})
     # Having a 'null' controller element breaks the form-json, needs to not be there if blank

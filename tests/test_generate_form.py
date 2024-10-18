@@ -110,7 +110,7 @@ def test_build_lists(mocker, pages, exp_result):
                 name_in_apply_json={"en": "Organisation Name"},
                 form_index=1,
                 components=[mock_c_1],
-                section={"name": "abc", "title": "Section", "hideTitle": False},
+                section="test_section",
             ),
             {
                 "path": "/organisation-single-name",
@@ -127,7 +127,7 @@ def test_build_lists(mocker, pages, exp_result):
                     }
                 ],
                 "next": [],
-                "section": "abc",
+                "section": "test_section",
             },
         )
     ],
