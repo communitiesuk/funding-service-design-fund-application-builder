@@ -1,8 +1,6 @@
 import json
 import os
-import shutil
 from dataclasses import asdict
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -27,8 +25,6 @@ from app.shared.data_classes import Condition
 from app.shared.data_classes import ConditionValue
 from tasks.test_data import BASIC_FUND_INFO
 from tasks.test_data import BASIC_ROUND_INFO
-
-from config import Config
 
 
 def test_build_form_json_no_conditions(seed_dynamic_data):
@@ -284,6 +280,7 @@ def test_list_relationship(seed_dynamic_data):
     assert result.lizt
     assert result.lizt.name == "classifications_list"
 
+
 @pytest.mark.parametrize(
     "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form",
     [
@@ -292,7 +289,12 @@ def test_list_relationship(seed_dynamic_data):
         ("required-all-components.json", "required.json", 8, 27),
         ("favourite-colours-sarah.json", "colours.json", 4, 1),
         ("funding-required-cof-25.json", "funding-required.json", 12, 21),
-        ("Organisation-and-local-authority-information-template.json", "local-authority-and-other-organisation-information.json",16, 24),  # noqa: E501
+        (
+            "Organisation-and-local-authority-information-template.json",
+            "local-authority-and-other-organisation-information.json",
+            16,
+            24,
+        ),  # noqa: E501
     ],
 )
 def test_generate_config_for_round_valid_input(
@@ -302,7 +304,8 @@ def test_generate_config_for_round_valid_input(
     input_filename,
     output_filename,
     expected_page_count_for_form,
-    expected_component_count_for_form,temp_output_dir
+    expected_component_count_for_form,
+    temp_output_dir,
 ):
     form_configs = []
     script_dir = os.path.dirname(__file__)

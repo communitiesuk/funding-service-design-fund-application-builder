@@ -46,11 +46,7 @@ def _build_condition(condition_data, destination_page_path) -> Condition:
 
 def _get_component_by_runner_name(db, runner_component_name, page_id):
 
-    return (
-        db.session.query(Component)
-        .filter(Component.runner_component_name == runner_component_name)
-        .first()
-    )
+    return db.session.query(Component).filter(Component.runner_component_name == runner_component_name).first()
 
 
 def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
@@ -129,7 +125,7 @@ def insert_component_as_template(component, page_id, page_index, lizts):
         runner_component_name=component.get("name", None),
         list_id=list_id,
         children=component.get("children", None),
-        schema=component.get("schema", None)
+        schema=component.get("schema", None),
     )
     try:
         db.session.add(new_component)
@@ -148,7 +144,7 @@ def insert_page_as_template(page, form_id):
         controller=page.get("controller", None),
         is_template=True,
         template_name=page.get("title", None),
-        options = page.get("options", None),
+        options=page.get("options", None),
     )
     try:
         db.session.add(new_page)
