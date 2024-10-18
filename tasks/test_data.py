@@ -15,6 +15,7 @@ from app.db.models import Round
 from app.db.models import Section
 from app.db.models import Subcriteria
 from app.db.models import Theme
+from app.db.models.fund import FundingType
 from app.shared.data_classes import Condition
 from app.shared.data_classes import ConditionValue
 
@@ -24,6 +25,7 @@ BASIC_FUND_INFO = {
     "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
     "welsh_available": False,
     "owner_organisation_id": None,
+    "funding_type": FundingType.COMPETITIVE,
 }
 BASIC_ROUND_INFO = {
     "audit_info": {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
@@ -80,6 +82,7 @@ def init_salmon_fishing_fund():
         short_name="DF",
         logo_uri="http://www.google.com",
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+        funding_type=FundingType.COMPETITIVE,
     )
 
     f: Fund = Fund(
@@ -92,6 +95,7 @@ def init_salmon_fishing_fund():
         welsh_available=False,
         short_name=f"SFF{randint(0,999)}",
         owner_organisation_id=o.organisation_id,
+        funding_type=FundingType.COMPETITIVE,
     )
 
     r: Round = Round(
@@ -322,6 +326,7 @@ def init_salmon_fishing_fund():
         welsh_available=False,
         short_name="CTF",
         owner_organisation_id=o.organisation_id,
+        funding_type=FundingType.COMPETITIVE,
     )
 
     rd: Round = Round(
@@ -368,6 +373,7 @@ def init_unit_test_data() -> dict:
         welsh_available=False,
         short_name=f"UTF{randint(0,999)}",
         owner_organisation_id=o.organisation_id,
+        funding_type=FundingType.COMPETITIVE,
     )
 
     r: Round = Round(

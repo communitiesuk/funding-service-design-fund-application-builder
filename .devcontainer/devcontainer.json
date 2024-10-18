@@ -11,7 +11,8 @@
             "extensions": [
                 "ms-python.debugpy",
                 "ms-python.vscode-pylance",
-                "mikoz.black-py"
+                "mikoz.black-py",
+                "eamodio.gitlens"
             ]
         }
     },

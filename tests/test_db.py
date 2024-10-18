@@ -9,6 +9,7 @@ from app.db.models import Fund
 from app.db.models import Organisation
 from app.db.models import Round
 from app.db.models import Section
+from app.db.models.fund import FundingType
 from app.db.queries.application import delete_form_from_section
 from app.db.queries.application import delete_section_from_round
 from app.db.queries.application import get_section_by_id
@@ -55,6 +56,7 @@ def test_add_fund(flask_test_client, _db, clear_test_data):
         welsh_available=False,
         short_name=f"X{randint(0,99999)}",
         owner_organisation_id=o.organisation_id,
+        funding_type=FundingType.COMPETITIVE,
     )
     result = add_fund(f)
     assert result
@@ -71,6 +73,7 @@ def test_add_fund(flask_test_client, _db, clear_test_data):
                 description_json={"en": "A £10m fund to improve stuff across the devolved nations."},
                 welsh_available=False,
                 short_name="TFCR1",
+                funding_type=FundingType.COMPETITIVE,
             )
         ]
     }
@@ -132,6 +135,7 @@ def test_get_all_funds(flask_test_client, _db, seed_dynamic_data):
                 description_json={"en": "A £10m fund to improve stuff across the devolved nations."},
                 welsh_available=False,
                 short_name="TF1",
+                funding_type=FundingType.COMPETITIVE,
             )
         ]
     }
@@ -167,6 +171,7 @@ fund_id = uuid4()
                 description_json={"en": "A £10m fund to improve stuff across the devolved nations."},
                 welsh_available=False,
                 short_name="TFR1",
+                funding_type=FundingType.COMPETITIVE,
             )
         ],
         "rounds": [

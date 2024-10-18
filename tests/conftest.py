@@ -1,15 +1,13 @@
+import shutil
+
 import pytest
 from flask_migrate import upgrade
 from sqlalchemy import text
 
 from app.create_app import create_app
+from config import Config
 from tasks.test_data import init_unit_test_data
 from tasks.test_data import insert_test_data
-from tests.helpers import create_test_fund
-from tests.helpers import create_test_organisation
-from tests.helpers import create_test_round
-from config import Config
-import shutil
 
 pytest_plugins = ["fsd_test_utils.fixtures.db_fixtures"]
 
@@ -20,28 +18,6 @@ def temp_output_dir():
     yield temp_dir
     if temp_dir.exists():
         shutil.rmtree(temp_dir)
-
-@pytest.fixture
-def test_fund(flask_test_client, _db, clear_test_data):
-    """
-    Create a test fund using the test client and add it to the db.
-
-    Yields:
-        Fund: The created fund.
-    """
-    org = create_test_organisation(flask_test_client)
-    return create_test_fund(flask_test_client, org)
-
-
-@pytest.fixture
-def test_round(flask_test_client, test_fund):
-    """
-    Create a test round using the test client and add it to the db.
-
-    Yields:
-        Round: The created round.
-    """
-    return create_test_round(flask_test_client, test_fund)
 
 
 @pytest.fixture(scope="function")

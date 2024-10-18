@@ -2,6 +2,7 @@
 {% set pageHeading %}{{ 'Update a Fund' if fund_id else 'Create a Fund' }} {% endset %}
 {% from "macros/wtfToGovUk.html" import input %}
 {% from "macros/wtfToGovUk.html" import yes_no %}
+{% from "macros/wtfToGovUk.html" import radios_from_enum %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {% block content %}
 <div class="govuk-grid-row">
@@ -18,6 +19,7 @@
                     {{input(form.short_name)}}
                     {{input(form.description_en)}}
                     {{yes_no(form.welsh_available)}}
+                    {{radios_from_enum(form.funding_type)}}
                     {{ govukButton({
                     "text": "Save"
                     }) }}
