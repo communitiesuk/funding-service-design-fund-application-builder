@@ -1,16 +1,21 @@
 import json
 
-from flask import Blueprint, request
+from flask import Blueprint
 from flask import redirect
 from flask import render_template
+from flask import request
 from flask import url_for
 from werkzeug.utils import secure_filename
 
-from app.blueprints.fund_builder.forms.templates import TemplateFormForm, TemplateUploadForm
+from app.blueprints.fund_builder.forms.templates import TemplateFormForm
+from app.blueprints.fund_builder.forms.templates import TemplateUploadForm
 from app.db.models.application_config import Form
-from app.db.queries.application import delete_form, get_all_template_forms, get_form_by_id, update_form
+from app.db.queries.application import delete_form
+from app.db.queries.application import get_all_template_forms
 from app.db.queries.application import get_all_template_sections
+from app.db.queries.application import get_form_by_id
 from app.db.queries.application import get_form_by_template_name
+from app.db.queries.application import update_form
 
 # Blueprint for routes used by FAB PoC to manage templates
 template_bp = Blueprint(
@@ -90,19 +95,23 @@ def view_templates():
 def edit_form_template(form_id):
     template_form = TemplateFormForm()
     params = {
-    "breadcrumb_items": [
-        {"text": "Home", "href": url_for("build_fund_bp.index")},
-        {"text": "Manage Templates", "href": url_for("template_bp.view_templates")},
-        {"text": "Rename Template", "href": "#"}
-    ],}
+        "breadcrumb_items": [
+            {"text": "Home", "href": url_for("build_fund_bp.index")},
+            {"text": "Manage Templates", "href": url_for("template_bp.view_templates")},
+            {"text": "Rename Template", "href": "#"},
+        ],
+    }
 
     if request.method == "POST":
         if template_form.validate_on_submit():
-            update_form(form_id=form_id, new_form_config={
-                "runner_publish_name":template_form.url_path.data,
-                "name_in_apply_json":{"en": template_form.tasklist_name.data},
-                "template_name":template_form.template_name.data
-            })
+            update_form(
+                form_id=form_id,
+                new_form_config={
+                    "runner_publish_name": template_form.url_path.data,
+                    "name_in_apply_json": {"en": template_form.tasklist_name.data},
+                    "template_name": template_form.template_name.data,
+                },
+            )
             return redirect(url_for("template_bp.view_templates"))
         params["template_form"] = template_form
         return render_template("edit_form_template.html", **params)
@@ -118,5 +127,5 @@ def edit_form_template(form_id):
         template_form.url_path.data = existing_form.runner_publish_name
         params["template_form"] = template_form
         return render_template("edit_form_template.html", **params)
-    
+
     return redirect(url_for("template_bp.view_templates"))

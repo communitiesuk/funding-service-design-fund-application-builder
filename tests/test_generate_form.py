@@ -190,7 +190,7 @@ def test_build_page_controller_not_specified():
                 name_in_apply_json={"en": "Page with Options Name"},
                 form_index=1,
                 components=[],
-                options = {"first": "option"}
+                options={"first": "option"},
             )
         ),
     ],
@@ -373,7 +373,33 @@ list_id = uuid4()
                 "hint": "This must be a hint",
                 "schema": {},
                 "metadata": {},
-                "children":[{'name': 'GLQlOh', 'options': {}, 'type': 'TextField', 'title': 'Describe the cost'}, {'name': 'JtwkMy', 'options': {'prefix': '£', 'classes': 'govuk-!-width-one-half'}, 'type': 'NumberField', 'title': 'Amount', 'hint': '', 'schema': {}}, {'name': 'LeTLDo', 'options': {'prefix': '£', 'classes': 'govuk-!-width-one-half'}, 'type': 'NumberField', 'title': 'How much money from the COF25 grant will you use to pay for this cost?', 'hint': '', 'schema': {}}, {'name': 'pHZDWT', 'options': {'prefix': '£', 'classes': 'govuk-!-width-one-half'}, 'type': 'NumberField', 'title': 'How much of the match funding will you use to pay for this cost?', 'hint': '', 'schema': {}}]
+                "children": [
+                    {"name": "GLQlOh", "options": {}, "type": "TextField", "title": "Describe the cost"},
+                    {
+                        "name": "JtwkMy",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "Amount",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "LeTLDo",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much money from the COF25 grant will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "pHZDWT",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much of the match funding will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                ],
             },
         ),
     ],

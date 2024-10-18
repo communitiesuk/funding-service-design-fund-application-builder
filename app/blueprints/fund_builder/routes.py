@@ -522,6 +522,7 @@ def view_form_questions(round_id, form_id):
         "view_questions.html", round=round, fund=fund, question_html=html, title=form.name_in_apply_json["en"]
     )
 
+
 def create_export_zip(directory_to_zip, zip_file_name) -> str:
     # Output zip file path (temporary)
     output_zip_path = Config.TEMP_FILE_PATH / zip_file_name
@@ -538,7 +539,9 @@ def create_export_files(round_id):
     generate_config_for_round(round_id)
     round_short_name = get_round_by_id(round_id).short_name
 
-    output_zip_path = create_export_zip(directory_to_zip=Config.TEMP_FILE_PATH / round_short_name, zip_file_name=round_short_name)
+    output_zip_path = create_export_zip(
+        directory_to_zip=Config.TEMP_FILE_PATH / round_short_name, zip_file_name=round_short_name
+    )
 
     # Ensure the file is removed after sending it
     @after_this_request
