@@ -1,6 +1,5 @@
 import ast
 import json
-import shutil
 from pathlib import Path
 
 import pytest
@@ -64,6 +63,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                     "name_json": {"en": "Unit Test Fund 1"},
                     "title_json": {"en": "funding to improve testing"},
                     "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
+                    "funding_type": "COMPETITIVE",
                 },
                 "round_config": {
                     "short_name": round_short_name,
@@ -142,7 +142,7 @@ def test_generate_config_for_round_invalid_input(seed_dynamic_data):
         generate_config_for_round(round_id)
 
 
-def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data,temp_output_dir):
+def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data, temp_output_dir):
     # Setup: Prepare valid input parameters
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
