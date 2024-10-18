@@ -49,7 +49,6 @@ def _get_component_by_runner_name(db, runner_component_name, page_id):
     return (
         db.session.query(Component)
         .filter(Component.runner_component_name == runner_component_name)
-        .filter(Component.page_id == page_id)
         .first()
     )
 
