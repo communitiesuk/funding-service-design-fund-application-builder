@@ -23,7 +23,7 @@ form_schema = {
                     "path": {"type": "string"},
                     "title": {"type": "string"},
                     "options": {"type": "object"},
-                    "section": {"type": "object"},
+                    "section": {"type": "string"},
                     "components": {
                         "type": "array",
                         "items": {
