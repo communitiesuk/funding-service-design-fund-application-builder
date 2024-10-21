@@ -101,6 +101,7 @@ def generate_fund_config(round_id):
         owner_organisation_name="None",
         owner_organisation_shortname="None",
         owner_organisation_logo_uri="None",
+        funding_type=fund.funding_type.value,
     )
     return fund_export.as_dict()
 

@@ -68,7 +68,15 @@
                                 "value": {
                                 "text": fund.welsh_available
                                 },
-                                }
+                                },
+                                {
+                                    "key": {
+                                    "text": "Funding Type"
+                                    },
+                                    "value": {
+                                    "text": fund.funding_type.get_text_for_display()
+                                    },
+                                    }
                                 ]
                                 }) }}
                                 {{ govukButton({
