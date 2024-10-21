@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% set pageHeading %}{{ 'Update a Fund' if fund_id else 'Create a Fund' }} {% endset %}
 {% from "macros/wtfToGovUk.html" import input %}
+{% from "macros/wtfToGovUk.html" import multilineinput %}
 {% from "macros/wtfToGovUk.html" import yes_no %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {% block content %}
@@ -16,7 +17,7 @@
                     {{input(form.name_en)}}
                     {{input(form.title_en)}}
                     {{input(form.short_name)}}
-                    {{input(form.description_en)}}
+                    {{multilineinput(form.description_en)}}
                     {{yes_no(form.welsh_available)}}
                     {{ govukButton({
                     "text": "Save"
