@@ -76,7 +76,7 @@ class DateInputForm(Form):
 class RoundForm(FlaskForm):
     round_id = HiddenField("Round ID")
     fund_id = StringField("Fund", validators=[DataRequired()])
-    title_en = StringField("Title", validators=[DataRequired()])
+    title_en = StringField("Title (en)", validators=[DataRequired()])
     short_name = StringField(
         "Short Name",
         description="Choose a unique short name with 6 or fewer characters",
@@ -90,19 +90,19 @@ class RoundForm(FlaskForm):
     prospectus_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
     privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), URL()])
     application_reminder_sent = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    contact_us_banner_json = TextAreaField("Contact Us Banner")
+    contact_us_banner_json = TextAreaField("Contact Us Banner (en)")
     reference_contact_page_over_email = RadioField(
         "Reference contact page over email", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
-    contact_email = StringField("Contact Email", validators=[DataRequired()])
-    contact_phone = StringField("Contact Phone", validators=[DataRequired()])
-    contact_textphone = StringField("Contact Textphone", validators=[DataRequired()])
+    contact_email = StringField("Contact Email")
+    contact_phone = StringField("Contact Phone")
+    contact_textphone = StringField("Contact Textphone")
     support_times = StringField("Support times", validators=[DataRequired()])
     support_days = StringField("Support Days", validators=[DataRequired()])
-    instructions_json = TextAreaField("Instructions")
+    instructions_json = TextAreaField("Instructions (en)")
     feedback_link = URLField("Feedback Link", validators=[DataRequired(), URL()])
-    project_name_field_id = StringField("Project name", validators=[DataRequired()])
-    application_guidance_json = TextAreaField("Application Guidance")
+    project_name_field_id = StringField("Project name field ID", validators=[DataRequired()])
+    application_guidance_json = TextAreaField("Application Guidance (en)")
     guidance_url = URLField("Guidance link", validators=[DataRequired(), URL()])
     all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     application_fields_download_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
