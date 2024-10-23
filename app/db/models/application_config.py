@@ -53,7 +53,7 @@ class ComponentType(Enum):
     FILE_UPLOAD_FIELD = "FileUploadField"
     MONTH_YEAR_FIELD = "MonthYearField"
     TIME_FIELD = "TimeField"
-    MULTI_INPUT_FIELD="MultiInputField"
+    MULTI_INPUT_FIELD = "MultiInputField"
 
 
 READ_ONLY_COMPONENTS = [
@@ -113,6 +113,7 @@ class Form(BaseModel):
         primary_key=True,
         default=uuid.uuid4,
     )
+    # TODO rename this to 'name in tasklist' as no longer us as the name in the apply json
     name_in_apply_json = Column(JSON(none_as_null=True), nullable=False, unique=False)
     template_name = Column(String(), nullable=True)
     is_template = Column(Boolean, default=False, nullable=False)
@@ -165,7 +166,7 @@ class Page(BaseModel):
     )
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     controller = Column(String(), nullable=True)
-    options=Column(JSON(none_as_null=True))
+    options = Column(JSON(none_as_null=True))
 
     def __repr__(self):
         return f"Page(/{self.display_path} - {self.name_in_apply_json['en']}, Components: {self.components})"
