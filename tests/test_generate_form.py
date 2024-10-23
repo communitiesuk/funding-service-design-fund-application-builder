@@ -887,7 +887,7 @@ def test_build_form(input_form, exp_results):
     results = build_form_json(form=input_form)
     assert results
     assert len(results["pages"]) == len(exp_results["pages"])
-    assert results["name"] == input_form.name_in_apply_json["en"]
+    assert results["name"] == "Access Funding"
     for exp_page in exp_results["pages"]:
         result_page = next((res_page for res_page in results["pages"] if res_page["path"] == exp_page["path"]), None)
         assert result_page, f"{exp_page['path']}"

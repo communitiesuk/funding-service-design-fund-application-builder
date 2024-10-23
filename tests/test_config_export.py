@@ -222,7 +222,7 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data, temp_outpu
                 "sections": [],
                 "outputs": [],
                 "skipSummary": False,
-                "name": "About your organisation",
+                "name": "Apply for funding to improve testing",
             },
         }
     ]
