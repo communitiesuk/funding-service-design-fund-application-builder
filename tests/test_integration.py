@@ -283,6 +283,59 @@ def test_list_relationship(seed_dynamic_data):
 
 
 @pytest.mark.parametrize(
+    "input_filename, output_filename",
+    [
+        ("test-section.json", "section.json"),
+    ],
+)
+def test_generate_config_to_verify_form_sections(
+    seed_dynamic_data,
+    _db,
+    monkeypatch,
+    input_filename,
+    output_filename,
+    temp_output_dir,
+
+):
+    form_configs = []
+    script_dir = os.path.dirname(__file__)
+    test_data_dir = os.path.join(script_dir, "test_data")
+    file_path = os.path.join(test_data_dir, input_filename)
+    with open(file_path, "r") as json_file:
+        input_form = json.load(json_file)
+        input_form["filename"] = input_filename
+        form_configs.append(input_form)
+    load_form_jsons(form_configs)
+
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round_short_name = seed_dynamic_data["rounds"][0].short_name
+    mock_round_base_paths = {round_short_name: 99}
+    # find a random section belonging to the round id and assign each form to that section
+    forms = _db.session.query(Form).filter(Form.template_name == input_filename.split(".")[0])
+    section = _db.session.query(Section).filter(Section.round_id == round_id).first()
+    for form in forms:
+        form.section_id = section.section_id
+    _db.session.commit()
+
+    # Use monkeypatch to temporarily replace ROUND_BASE_PATHS
+    import app.export_config.generate_fund_round_config as generate_fund_round_config
+
+    monkeypatch.setattr(generate_fund_round_config, "ROUND_BASE_PATHS", mock_round_base_paths)
+    result = generate_form_jsons_for_round(round_id)
+    # Simply writes the files to the output directory so no result is given directly
+    assert result is None
+
+    # Check if the directory is created
+    generated_json_form = temp_output_dir / round_short_name / "form_runner" / output_filename
+    assert generated_json_form
+
+    # compare the import file with the generated file
+    with open(generated_json_form, "r") as file:
+        output_form = json.load(file)
+
+    assert len(output_form["sections"]) == len(form_configs[0]["sections"])
+
+@pytest.mark.parametrize(
     "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form, "
     "expected_form_section_count",
     [
