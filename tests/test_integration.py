@@ -8,6 +8,7 @@ import pytest
 from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Form
+from app.db.models import FormSection
 from app.db.models import Fund
 from app.db.models import Lizt
 from app.db.models import Page
@@ -282,20 +283,22 @@ def test_list_relationship(seed_dynamic_data):
 
 
 @pytest.mark.parametrize(
-    "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form",
+    "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form, "
+    "expected_form_section_count",
     [
-        ("org-info.json", "organisation-information.json", 18, 43),
-        ("optional-all-components.json", "optional.json", 8, 27),
-        ("required-all-components.json", "required.json", 8, 27),
-        ("favourite-colours-sarah.json", "colours.json", 4, 1),
-        ("funding-required-cof-25.json", "funding-required.json", 12, 21),
+        ("org-info.json", "organisation-information.json", 18, 43, 2),
+        ("optional-all-components.json", "optional.json", 8, 27, 4),
+        ("required-all-components.json", "required.json", 8, 27, 1),
+        ("favourite-colours-sarah.json", "colours.json", 4, 1, 1),
+        ("funding-required-cof-25.json", "funding-required.json", 12, 21, 2),
         (
             "Organisation-and-local-authority-information-template.json",
             "local-authority-and-other-organisation-information.json",
             16,
             24,
+            1,
         ),  # noqa: E501
-        ("test-section.json", "section.json", 3, 1),
+        ("test-section.json", "section.json", 3, 1, 2),
     ],
 )
 def test_generate_config_for_round_valid_input(
@@ -306,6 +309,7 @@ def test_generate_config_for_round_valid_input(
     output_filename,
     expected_page_count_for_form,
     expected_component_count_for_form,
+    expected_form_section_count,
     temp_output_dir,
 ):
     form_configs = []
@@ -324,7 +328,10 @@ def test_generate_config_for_round_valid_input(
     assert forms.count() == expected_form_count
     form = forms.first()
     pages = _db.session.query(Page).filter(Page.form_id == form.form_id)
+
     assert pages.count() == expected_page_count_for_form
+    form_sections = _db.session.query(FormSection)
+    assert form_sections.count() == expected_form_section_count
     total_components_count = sum(
         _db.session.query(Component).filter(Component.page_id == page.page_id).count() for page in pages
     )

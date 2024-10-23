@@ -82,7 +82,6 @@ def init_salmon_fishing_fund():
         short_name="DF",
         logo_uri="http://www.google.com",
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-        funding_type=FundingType.COMPETITIVE,
     )
 
     f: Fund = Fund(

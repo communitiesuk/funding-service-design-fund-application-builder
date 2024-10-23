@@ -7,12 +7,14 @@ import pytest
 
 from app.db.models import Component
 from app.db.models import ComponentType
+from app.db.models import FormSection
 from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models.application_config import Form
 from app.export_config.generate_form import build_component
 from app.export_config.generate_form import build_conditions
 from app.export_config.generate_form import build_form_json
+from app.export_config.generate_form import build_form_section
 from app.export_config.generate_form import build_lists
 from app.export_config.generate_form import build_navigation
 from app.export_config.generate_form import build_page
@@ -982,3 +984,15 @@ def test_build_start_page(input_content, input_form, expected_title, expected_pa
     assert result["controller"] == "./pages/start.js"
     assert result["next"] == expected_next
     assert result["components"][0]["content"] == expected_content
+
+
+@pytest.mark.parametrize(
+    "input_form, sections_count",
+    [(FormSection(name="test", title="Test section", hide_title=False), 1)],
+)
+def test_build_form_sections(input_form, sections_count):
+    sections = []
+    build_form_section(sections, input_form)
+    assert len(sections) == sections_count
+    assert sections[0]["title"] == "Test section"
+    assert sections[0]["name"] == "test"

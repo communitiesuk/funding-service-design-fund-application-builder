@@ -6,6 +6,7 @@ import pytest
 
 from app.db.models import Component
 from app.db.models import Form
+from app.db.models import FormSection
 from app.db.models import Page
 from app.db.models.application_config import ComponentType
 from app.import_config.load_form_json import load_form_jsons
@@ -14,13 +15,13 @@ from app.import_config.load_form_json import load_json_from_file
 
 # add files in /test_data t orun the below test against each file
 @pytest.mark.parametrize(
-    "filename",
+    "filename,form_section_count",
     [
-        "optional-all-components.json",
-        "required-all-components.json",
+        ("optional-all-components.json", 4),
+        ("required-all-components.json", 1),
     ],
 )
-def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename):
+def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename, form_section_count):
     form_configs = []
     script_dir = os.path.dirname(__file__)
     test_data_dir = os.path.join(script_dir, "test_data")
@@ -44,6 +45,8 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename)
         _db.session.query(Component).filter(Component.page_id == page.page_id).count() for page in pages
     )
     assert total_components_count == expected_component_count_for_form
+    form_sections = _db.session.query(FormSection)
+    assert form_sections.count() == form_section_count
 
 
 # TODO see why this fails
