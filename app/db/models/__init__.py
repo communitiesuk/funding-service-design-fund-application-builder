@@ -1,6 +1,7 @@
 from .application_config import Component
 from .application_config import ComponentType
 from .application_config import Form
+from .application_config import FormSection
 from .application_config import Lizt
 from .application_config import Page
 from .application_config import Section

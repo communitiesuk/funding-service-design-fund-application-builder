@@ -5,6 +5,7 @@ from sqlalchemy import delete
 from app.db import db
 from app.db.models import Component
 from app.db.models import Form
+from app.db.models import FormSection
 from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models import Section
@@ -761,3 +762,30 @@ def insert_list(list_config: dict, do_commit: bool = True) -> Lizt:
         db.session.commit()
     db.session.flush()  # flush to get the list id
     return new_list
+
+
+def insert_form_section(form_section_config: dict, do_commit: bool = True) -> FormSection:
+    new_form_section = FormSection(
+        is_template=True,
+        name=form_section_config.get("name"),
+        title=form_section_config.get("title"),
+        hide_title=form_section_config.get("hideTitle", False),
+    )
+    try:
+        db.session.add(new_form_section)
+    except Exception as e:
+        print(e)
+        raise e
+    if do_commit:
+        db.session.commit()
+    db.session.flush()  # flush to get the list id
+    return new_form_section
+
+
+def get_form_section_by_name(form_section_name: str, form_id) -> FormSection:
+    form_section = db.session.query(FormSection).filter_by(name=form_section_name, form_id=form_id).first()
+    return form_section
+
+def get_form_section_by_id(form_section_id: str) -> FormSection:
+    from_section = db.session.query(FormSection).where(FormSection.form_section_id == form_section_id).one_or_none()
+    return from_section
