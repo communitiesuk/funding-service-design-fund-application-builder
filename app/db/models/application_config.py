@@ -291,5 +291,3 @@ class Component(BaseModel):
             "telephonenumberfield": "text",
             "ukaddressfield": "address",
         }.get(self.type.value.casefold())
-
-

@@ -24,8 +24,6 @@ from app.shared.data_classes import Condition  # noqa:E402
 from app.shared.data_classes import ConditionValue  # noqa:E402
 from app.shared.helpers import find_enum  # noqa:E402
 
-import random
-import string
 
 def _build_condition(condition_data, destination_page_path) -> Condition:
     sub_conditions = []
