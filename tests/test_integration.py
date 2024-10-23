@@ -295,7 +295,6 @@ def test_generate_config_to_verify_form_sections(
     input_filename,
     output_filename,
     temp_output_dir,
-
 ):
     form_configs = []
     script_dir = os.path.dirname(__file__)
@@ -334,6 +333,7 @@ def test_generate_config_to_verify_form_sections(
         output_form = json.load(file)
 
     assert len(output_form["sections"]) == len(form_configs[0]["sections"])
+
 
 @pytest.mark.parametrize(
     "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form, "
