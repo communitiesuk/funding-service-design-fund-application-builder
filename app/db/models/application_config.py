@@ -147,7 +147,7 @@ class FormSection(BaseModel):
     )
     name = Column(String())
     title = Column(String())
-    hide_title =  Column(Boolean, default=False, nullable=False)
+    hide_title = Column(Boolean, default=False, nullable=False)
     is_template = Column(Boolean, default=False, nullable=False)
 
     def as_dict(self):

@@ -461,7 +461,6 @@ def test_build_component(component_to_build, exp_result):
                     name_in_apply_json={"en": "Organisation Name"},
                     form_index=1,
                     default_next_page_id="summary-id",
-
                 ),
                 Page(
                     page_id="summary-id",

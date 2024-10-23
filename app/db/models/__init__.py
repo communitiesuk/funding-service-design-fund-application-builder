@@ -12,4 +12,4 @@ from .fund import Fund
 from .fund import Organisation
 from .round import Round
 
-__all__ = [Fund, Round, Section, Form, Page, Lizt, Component, ComponentType, Criteria, Subcriteria, Theme, Organisation]
+__all__ = [Fund, Round, Section, Form, Page, FormSection, Lizt, Component, ComponentType, Criteria, Subcriteria, Theme, Organisation]

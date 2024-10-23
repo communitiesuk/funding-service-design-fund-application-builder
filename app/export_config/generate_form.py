@@ -6,9 +6,9 @@ from app.db.models import Form
 from app.db.models import Page
 from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.models.application_config import ComponentType
-from app.db.queries.application import get_form_section_by_id
 from app.db.queries.application import get_list_by_id
 from app.shared.data_classes import ConditionValue
+from app.shared.data_classes import FormSection
 
 BASIC_FORM_STRUCTURE = {
     "startPage": None,
@@ -188,14 +188,14 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
 
 
 def build_form_section(form_section_list, form_section):
-    form_section_dict = {
-        "name": form_section.name,
-        "title": form_section.title,
-        "hideTitle": form_section.hide_title,
-    }
+    form_section_obj = FormSection(
+        name=form_section.name,
+        title=form_section.title,
+        hideTitle=form_section.hide_title,
+    )
     # Check if the list already exists in lists by name
-    if not any(existing_list["name"] == form_section_dict["name"] for existing_list in form_section_list):
-        form_section_list.append(form_section_dict)
+    if not any(existing_list["name"] == form_section_obj.name for existing_list in form_section_list):
+        form_section_list.append(form_section_obj.as_dict())
 
 
 def build_lists(pages: list[dict]) -> list:

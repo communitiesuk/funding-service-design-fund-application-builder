@@ -786,6 +786,7 @@ def get_form_section_by_name(form_section_name: str, form_id) -> FormSection:
     form_section = db.session.query(FormSection).filter_by(name=form_section_name, form_id=form_id).first()
     return form_section
 
+
 def get_form_section_by_id(form_section_id: str) -> FormSection:
     from_section = db.session.query(FormSection).where(FormSection.form_section_id == form_section_id).one_or_none()
     return from_section
