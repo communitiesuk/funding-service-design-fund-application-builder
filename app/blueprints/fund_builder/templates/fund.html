@@ -16,9 +16,12 @@
                     {{ form.hidden_tag()}}
 
                     {{input(form.name_en)}}
+                    {{input(form.name_cy)}}
                     {{input(form.title_en)}}
+                    {{input(form.title_cy)}}
                     {{input(form.short_name)}}
                     {{multilineinput(form.description_en)}}
+                    {{multilineinput(form.description_cy)}}
                     {{yes_no(form.welsh_available)}}
                     {{radios_from_enum(form.funding_type)}}
                     {{ govukButton({
