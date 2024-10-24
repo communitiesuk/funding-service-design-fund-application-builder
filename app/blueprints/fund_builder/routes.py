@@ -295,6 +295,17 @@ def round(round_id=None):
     )
 
 
+def _convert_json_data_for_form(data) -> str:
+    if isinstance(data, dict):
+        return json.dumps(data)
+    return str(data)
+
+def _convert_form_data_to_json(data) -> dict:
+    if data:
+        return json.loads(data)
+    return {}
+
+
 def populate_form_with_round_data(round):
     """
     Populate a RoundForm with data from a Round object.
@@ -340,14 +351,14 @@ def populate_form_with_round_data(round):
         "display_logo_on_pdf_exports": "true" if round.display_logo_on_pdf_exports else "false",
         "mark_as_complete_enabled": "true" if round.mark_as_complete_enabled else "false",
         "is_expression_of_interest": "true" if round.is_expression_of_interest else "false",
-        "feedback_survey_config": round.feedback_survey_config,
+        "feedback_survey_config": _convert_json_data_for_form(round.feedback_survey_config),
         "eligibility_config": (
             "true"
             if round.eligibility_config and round.eligibility_config.get("has_eligibility", "") == "true"
             else "false"
         ),
-        "eoi_decision_schema_en": round.eoi_decision_schema.get("en", "") if round.eoi_decision_schema else "",
-        "eoi_decision_schema_cy": round.eoi_decision_schema.get("cy", "") if round.eoi_decision_schema else "",
+        "eoi_decision_schema_en": _convert_json_data_for_form(round.eoi_decision_schema.get("en", "")) if round.eoi_decision_schema else "",
+        "eoi_decision_schema_cy": _convert_json_data_for_form(round.eoi_decision_schema.get("cy", "")) if round.eoi_decision_schema else "",
     }
     return RoundForm(data=round_data)
 
@@ -361,7 +372,7 @@ def update_existing_round(round, form):
     """
     round.title_json = {"en": form.title_en.data or None, "cy": form.title_cy.data or None}
     round.short_name = form.short_name.data
-    round.feedback_survey_config = form.feedback_survey_config.data
+    round.feedback_survey_config = _convert_form_data_to_json(form.feedback_survey_config.data)
     round.opens = get_datetime(form.opens)
     round.deadline = get_datetime(form.deadline)
     round.assessment_start = get_datetime(form.assessment_start)
@@ -400,7 +411,7 @@ def update_existing_round(round, form):
     round.mark_as_complete_enabled = form.mark_as_complete_enabled.data == "true"
     round.is_expression_of_interest = form.is_expression_of_interest.data == "true"
     round.eligibility_config = {"has_eligibility": form.eligibility_config.data}
-    round.eoi_decision_schema = {"en": form.eoi_decision_schema_en.data or None, "cy": form.eoi_decision_schema_cy.data or None}
+    round.eoi_decision_schema = {"en": _convert_form_data_to_json(form.eoi_decision_schema_en.data), "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data)}
     round.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
     update_round(round)
 
@@ -440,14 +451,9 @@ def create_new_round(form):
         display_logo_on_pdf_exports=form.display_logo_on_pdf_exports.data == "true",
         mark_as_complete_enabled=form.mark_as_complete_enabled.data == "true",
         is_expression_of_interest=form.is_expression_of_interest.data == "true",
-        feedback_survey_config={
-            "has_feedback_survey": form.feedback_survey_config.data,
-            "has_section_feedback": False,
-            "is_feedback_survey_optional": False,
-            "is_section_feedback_optional": False,
-        },
+        feedback_survey_config=_convert_form_data_to_json(form.feedback_survey_config.data),
         eligibility_config={"has_eligibility": form.eligibility_config.data},
-        eoi_decision_schema={"en": form.eoi_decision_schema_en.data or None, "cy": form.eoi_decision_schema_cy.data or None},
+        eoi_decision_schema={"en": _convert_form_data_to_json(form.eoi_decision_schema_en.data), "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data)},
     )
     add_round(new_round)
 
