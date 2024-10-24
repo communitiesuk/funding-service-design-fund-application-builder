@@ -218,9 +218,12 @@ def fund(fund_id=None):
         fund_data = {
             "fund_id": fund.fund_id,
             "name_en": fund.name_json.get("en", ""),
+            "name_cy": fund.name_json.get("cy", ""),
             "title_en": fund.title_json.get("en", ""),
+            "title_cy": fund.title_json.get("cy", ""),
             "short_name": fund.short_name,
             "description_en": fund.description_json.get("en", ""),
+            "description_cy": fund.description_json.get("cy", ""),
             "welsh_available": "true" if fund.welsh_available else "false",
             "funding_type": fund.funding_type.value,
         }
@@ -231,14 +234,18 @@ def fund(fund_id=None):
     if form.validate_on_submit():
         if fund_id:
             fund.name_json["en"] = form.name_en.data
+            fund.name_json["cy"] = form.name_cy.data
             fund.title_json["en"] = form.title_en.data
+            fund.title_json["cy"] = form.title_cy.data
             fund.description_json["en"] = form.description_en.data
+            fund.description_json["cy"] = form.description_cy.data
             fund.welsh_available = form.welsh_available.data == "true"
             fund.short_name = form.short_name.data
             fund.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
             fund.funding_type = form.funding_type.data
             update_fund(fund)
             flash(f"Updated fund {form.title_en.data}")
+            return redirect(url_for("build_fund_bp.view_fund", fund_id=fund.fund_id))
         else:
             new_fund = Fund(
                 name_json={"en": form.name_en.data},
@@ -274,6 +281,7 @@ def round(round_id=None):
         if round_id:
             update_existing_round(round, form)
             flash(f"Updated round {round.title_json['en']}")
+            return redirect(url_for("build_fund_bp.view_fund", fund_id=round.fund_id))
         else:
             create_new_round(form)
             flash(f"Created round {form.title_en.data}")
