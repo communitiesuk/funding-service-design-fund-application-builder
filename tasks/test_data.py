@@ -396,6 +396,7 @@ def init_unit_test_data() -> dict:
         feedback_link="http://www.google.com",
         project_name_field_id="12312312312",
         guidance_url="http://www.google.com",
+        feedback_survey_config={"has_survey": False}
     )
     # r2: Round = Round(
     #     round_id=uuid4(),

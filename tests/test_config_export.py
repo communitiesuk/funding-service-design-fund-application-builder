@@ -87,7 +87,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                     "mark_as_complete_enabled": False,
                     "is_expression_of_interest": False,
                     "eoi_decision_schema": None,
-                    "feedback_survey_config": None,
+                    "feedback_survey_config": {"has_survey":False},
                     "eligibility_config": {"has_eligibility": False},
                     "title_json": {"en": "round the first"},
                     "contact_us_banner_json": None,

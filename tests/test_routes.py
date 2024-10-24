@@ -4,6 +4,11 @@ from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
+import pytest, json
+
+from wtforms.validators import ValidationError
+from app.blueprints.fund_builder.forms.round import validate_json_field
+from unittest.mock import MagicMock
 
 
 def test_create_fund(flask_test_client, _db, clear_test_data):
@@ -172,6 +177,8 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
         "feedback_link": "http://example.com/feedback",
         "project_name_field_id": 1,
         "guidance_url": "http://example.com/guidance",
+        "test": "test",
+        "feedback_survey_config": '{"has_survey": true}',
     }
 
     test_round = seed_dynamic_data["rounds"][0]
@@ -181,3 +188,28 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
     updated_round = get_round_by_id(test_round.round_id)
     assert updated_round.title_json["en"] == "Updated Round"
     assert updated_round.short_name == "UR123"
+    assert updated_round.feedback_survey_config == {"has_survey": True}
+
+
+@pytest.mark.parametrize("input_json_string", [(None), (""), ("{}"), (""), ("{}"), ('{"1":"2"}')])
+def test_validate_json_input_valid(input_json_string):
+
+    field = MagicMock()
+    field.data = input_json_string
+    validate_json_field(None, field)
+
+
+@pytest.mark.parametrize(
+    "input_json_string, exp_error_msg",
+    [
+        ('{"1":', "Expecting value: line 1 column 6 (char 5)]"),
+        ('{"1":"quotes not closed}', "Unterminated string starting at: line 1 column 6 (char 5)"),
+    ],
+)
+def test_validate_json_input_invalid(input_json_string, exp_error_msg):
+
+    field = MagicMock()
+    field.data = input_json_string
+    with pytest.raises(ValidationError) as error:
+        validate_json_field(None, field)
+    assert exp_error_msg in str(error)
