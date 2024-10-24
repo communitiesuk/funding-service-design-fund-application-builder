@@ -177,7 +177,6 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
         "feedback_link": "http://example.com/feedback",
         "project_name_field_id": 1,
         "guidance_url": "http://example.com/guidance",
-        "test": "test",
         "feedback_survey_config": '{"has_survey": true}',
     }
 
