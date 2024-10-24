@@ -414,7 +414,7 @@ def create_new_round(form):
     new_round = Round(
         fund_id=form.fund_id.data,
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-        title_json={"en": form.title_en.data},
+        title_json={"en": form.title_en.data or None, "cy":form.title_cy.data or None},
         short_name=form.short_name.data,
         opens=get_datetime(form.opens),
         deadline=get_datetime(form.deadline),
@@ -423,17 +423,17 @@ def create_new_round(form):
         assessment_deadline=get_datetime(form.assessment_deadline),
         prospectus_link=form.prospectus_link.data,
         privacy_notice_link=form.privacy_notice_link.data,
-        contact_us_banner_json={"en": form.contact_us_banner_json.data, "cy": None},
+        contact_us_banner_json={"en": form.contact_us_banner_en.data or None, "cy": form.contact_us_banner_cy.data or None},
         reference_contact_page_over_email=form.reference_contact_page_over_email.data == "true",
         contact_email=form.contact_email.data,
         contact_phone=form.contact_phone.data,
         contact_textphone=form.contact_textphone.data,
         support_times=form.support_times.data,
         support_days=form.support_days.data,
-        instructions_json={"en": form.instructions_json.data, "cy": None},
+        instructions_json={"en": form.instructions_en.data or None, "cy": form.instructions_cy.data or None},
         feedback_link=form.feedback_link.data,
         project_name_field_id=form.project_name_field_id.data,
-        application_guidance_json={"en": form.application_guidance_json.data, "cy": None},
+        application_guidance_json={"en": form.application_guidance_en.data or None, "cy": form.application_guidance_cy.data or None},
         guidance_url=form.guidance_url.data,
         all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data == "true",
         application_fields_download_available=form.application_fields_download_available.data == "true",
@@ -447,7 +447,7 @@ def create_new_round(form):
             "is_section_feedback_optional": False,
         },
         eligibility_config={"has_eligibility": form.eligibility_config.data},
-        eoi_decision_schema={"en": form.eoi_decision_schema.data, "cy": None},
+        eoi_decision_schema={"en": form.eoi_decision_schema_en.data or None, "cy": form.eoi_decision_schema_cy.data or None},
     )
     add_round(new_round)
 
