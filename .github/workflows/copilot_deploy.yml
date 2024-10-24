@@ -12,7 +12,7 @@ on:
         - dev
         - test
         - uat
-      
+
   push:
     # Ignore README markdown and the docs folder
     # Only automatically deploy when something in the app or tests folder has changed

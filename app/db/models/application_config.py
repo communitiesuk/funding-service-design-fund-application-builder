@@ -124,6 +124,7 @@ class Form(BaseModel):
     )
     runner_publish_name = Column(db.String())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
+    form_json = Column(JSON(none_as_null=True), nullable=True)
 
     def __repr__(self):
         return (
@@ -136,6 +137,21 @@ class Form(BaseModel):
         if include_relationships & hasattr(self, "pages"):
             result["pages"] = [page.as_dict() for page in self.pages if self.pages is not None]
         return result
+
+
+class FormSection(BaseModel):
+    form_section_id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    name = Column(String())
+    title = Column(String())
+    hide_title = Column(Boolean, default=False, nullable=False)
+    is_template = Column(Boolean, default=False, nullable=False)
+
+    def as_dict(self):
+        return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}
 
 
 @dataclass
@@ -167,6 +183,13 @@ class Page(BaseModel):
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     controller = Column(String(), nullable=True)
     options = Column(JSON(none_as_null=True))
+    form_section_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("formsection.form_section_id"),
+        nullable=True,
+    )
+    form_section_id: Mapped[int | None] = mapped_column(ForeignKey(FormSection.form_section_id))
+    formsection: Mapped[FormSection | None] = relationship()
 
     def __repr__(self):
         return f"Page(/{self.display_path} - {self.name_in_apply_json['en']}, Components: {self.components})"

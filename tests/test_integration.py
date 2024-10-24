@@ -1,8 +1,6 @@
 import json
 import os
-import shutil
 from dataclasses import asdict
-from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -10,6 +8,7 @@ import pytest
 from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Form
+from app.db.models import FormSection
 from app.db.models import Fund
 from app.db.models import Lizt
 from app.db.models import Page
@@ -27,8 +26,6 @@ from app.shared.data_classes import Condition
 from app.shared.data_classes import ConditionValue
 from tasks.test_data import BASIC_FUND_INFO
 from tasks.test_data import BASIC_ROUND_INFO
-
-from config import Config
 
 
 def test_build_form_json_no_conditions(seed_dynamic_data):
@@ -284,15 +281,77 @@ def test_list_relationship(seed_dynamic_data):
     assert result.lizt
     assert result.lizt.name == "classifications_list"
 
+
 @pytest.mark.parametrize(
-    "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form",
+    "input_filename, output_filename",
     [
-        ("org-info.json", "organisation-information.json", 18, 43),
-        ("optional-all-components.json", "optional.json", 8, 27),
-        ("required-all-components.json", "required.json", 8, 27),
-        ("favourite-colours-sarah.json", "colours.json", 4, 1),
-        ("funding-required-cof-25.json", "funding-required.json", 12, 21),
-        ("Organisation-and-local-authority-information-template.json", "local-authority-and-other-organisation-information.json",16, 24),  # noqa: E501
+        ("test-section.json", "section.json"),
+    ],
+)
+def test_generate_config_to_verify_form_sections(
+    seed_dynamic_data,
+    _db,
+    monkeypatch,
+    input_filename,
+    output_filename,
+    temp_output_dir,
+):
+    form_configs = []
+    script_dir = os.path.dirname(__file__)
+    test_data_dir = os.path.join(script_dir, "test_data")
+    file_path = os.path.join(test_data_dir, input_filename)
+    with open(file_path, "r") as json_file:
+        input_form = json.load(json_file)
+        input_form["filename"] = input_filename
+        form_configs.append(input_form)
+    load_form_jsons(form_configs)
+
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round_short_name = seed_dynamic_data["rounds"][0].short_name
+    mock_round_base_paths = {round_short_name: 99}
+    # find a random section belonging to the round id and assign each form to that section
+    forms = _db.session.query(Form).filter(Form.template_name == input_filename.split(".")[0])
+    section = _db.session.query(Section).filter(Section.round_id == round_id).first()
+    for form in forms:
+        form.section_id = section.section_id
+    _db.session.commit()
+
+    # Use monkeypatch to temporarily replace ROUND_BASE_PATHS
+    import app.export_config.generate_fund_round_config as generate_fund_round_config
+
+    monkeypatch.setattr(generate_fund_round_config, "ROUND_BASE_PATHS", mock_round_base_paths)
+    result = generate_form_jsons_for_round(round_id)
+    # Simply writes the files to the output directory so no result is given directly
+    assert result is None
+
+    # Check if the directory is created
+    generated_json_form = temp_output_dir / round_short_name / "form_runner" / output_filename
+    assert generated_json_form
+
+    # compare the import file with the generated file
+    with open(generated_json_form, "r") as file:
+        output_form = json.load(file)
+
+    assert len(output_form["sections"]) == len(form_configs[0]["sections"])
+
+
+@pytest.mark.parametrize(
+    "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form, "
+    "expected_form_section_count",
+    [
+        ("org-info.json", "organisation-information.json", 18, 43, 2),
+        ("optional-all-components.json", "optional.json", 8, 27, 4),
+        ("required-all-components.json", "required.json", 8, 27, 1),
+        ("favourite-colours-sarah.json", "colours.json", 4, 1, 1),
+        ("funding-required-cof-25.json", "funding-required.json", 12, 21, 2),
+        (
+            "Organisation-and-local-authority-information-template.json",
+            "local-authority-and-other-organisation-information.json",
+            16,
+            24,
+            1,
+        ),  # noqa: E501
+        ("test-section.json", "section.json", 3, 1, 2),
     ],
 )
 def test_generate_config_for_round_valid_input(
@@ -302,7 +361,9 @@ def test_generate_config_for_round_valid_input(
     input_filename,
     output_filename,
     expected_page_count_for_form,
-    expected_component_count_for_form,temp_output_dir
+    expected_component_count_for_form,
+    expected_form_section_count,
+    temp_output_dir,
 ):
     form_configs = []
     script_dir = os.path.dirname(__file__)
@@ -320,7 +381,10 @@ def test_generate_config_for_round_valid_input(
     assert forms.count() == expected_form_count
     form = forms.first()
     pages = _db.session.query(Page).filter(Page.form_id == form.form_id)
+
     assert pages.count() == expected_page_count_for_form
+    form_sections = _db.session.query(FormSection)
+    assert form_sections.count() == expected_form_section_count
     total_components_count = sum(
         _db.session.query(Component).filter(Component.page_id == page.page_id).count() for page in pages
     )
