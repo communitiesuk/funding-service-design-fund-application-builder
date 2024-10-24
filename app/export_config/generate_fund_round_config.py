@@ -124,7 +124,7 @@ def generate_round_config(round_id):
         prospectus=round.prospectus_link,
         privacy_notice=round.privacy_notice_link,
         contact_us_banner_json=round.contact_us_banner_json,
-        reference_contact_page_over_email=False,
+        reference_contact_page_over_email=round.reference_contact_page_over_email,
         contact_email=round.contact_email,
         contact_phone=round.contact_phone,
         contact_textphone=round.contact_textphone,
@@ -141,6 +141,7 @@ def generate_round_config(round_id):
         mark_as_complete_enabled=round.mark_as_complete_enabled,
         is_expression_of_interest=round.is_expression_of_interest,
         feedback_survey_config=round.feedback_survey_config,
+        eoi_decision_schema=round.eoi_decision_schema
     )
 
     return round_export.as_dict()
