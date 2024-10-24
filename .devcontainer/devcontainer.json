@@ -1,7 +1,6 @@
 {
     "dockerComposeFile": [
-        "../docker-compose.yml",
-        "../compose.override.yml"
+        "../docker-compose.yml"
     ],
     "service": "fab",
     "shutdownAction": "none",
@@ -11,9 +10,9 @@
             "extensions": [
                 "ms-python.debugpy",
                 "ms-python.vscode-pylance",
-                "mikoz.black-py",
                 "eamodio.gitlens",
-                "ms-python.black-formatter"
+                "ms-python.black-formatter",
+                "ms-python.flake8"
             ]
         }
     },
