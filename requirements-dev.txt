@@ -110,7 +110,7 @@ flask-sqlalchemy==3.1.1
     #   funding-service-design-utils
 flask-talisman==1.1.0
     # via -r requirements.in
-flask-wtf==1.2.1
+flask-wtf==1.2.2
     # via -r requirements.in
 funding-service-design-utils==5.1.5
     # via -r requirements.in
