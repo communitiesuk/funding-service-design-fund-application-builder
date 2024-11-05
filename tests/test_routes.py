@@ -1,8 +1,14 @@
 from app.db.models import Fund
 from app.db.models import Round
+from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
+import pytest, json
+
+from wtforms.validators import ValidationError
+from app.blueprints.fund_builder.forms.round import validate_json_field
+from unittest.mock import MagicMock
 
 
 def test_create_fund(flask_test_client, _db, clear_test_data):
@@ -16,6 +22,7 @@ def test_create_fund(flask_test_client, _db, clear_test_data):
         "description_en": "New Fund Description",
         "welsh_available": "false",
         "short_name": "NF5432",
+        "funding_type": FundingType.COMPETITIVE.value,
     }
 
     response = submit_form(flask_test_client, "/fund", create_data)
@@ -30,11 +37,13 @@ def test_create_fund(flask_test_client, _db, clear_test_data):
             assert created_fund.__getattribute__(key[:-3] + "_json")["en"] == value
         elif key == "welsh_available":
             assert created_fund.welsh_available is False
+        elif key == "funding_type":
+            assert created_fund.funding_type.value == value
         else:
             assert created_fund.__getattribute__(key) == value
 
 
-def test_update_fund(flask_test_client, test_fund):
+def test_update_fund(flask_test_client, seed_dynamic_data):
     """
     Tests that a fund can be successfully updated using the /fund/<fund_id> route
     Verifies that the updated fund has the correct attributes
@@ -46,8 +55,10 @@ def test_update_fund(flask_test_client, test_fund):
         "welsh_available": "true",
         "short_name": "UF1234",
         "submit": "Submit",
+        "funding_type": "EOI",
     }
 
+    test_fund = seed_dynamic_data["funds"][0]
     response = submit_form(flask_test_client, f"/fund/{test_fund.fund_id}", update_data)
     assert response.status_code == 200
 
@@ -59,15 +70,18 @@ def test_update_fund(flask_test_client, test_fund):
             assert updated_fund.__getattribute__(key[:-3] + "_json")["en"] == value
         elif key == "welsh_available":
             assert updated_fund.welsh_available is True
+        elif key == "funding_type":
+            assert updated_fund.funding_type.value == value
         elif key != "submit":
             assert updated_fund.__getattribute__(key) == value
 
 
-def test_create_new_round(flask_test_client, test_fund):
+def test_create_new_round(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully created using the /round route
     Verifies that the created round has the correct attributes
     """
+    test_fund = seed_dynamic_data["funds"][0]
     new_round_data = {
         "fund_id": test_fund.fund_id,
         "title_en": "New Round",
@@ -119,7 +133,7 @@ def test_create_new_round(flask_test_client, test_fund):
     assert new_round.short_name == "NR123"
 
 
-def test_update_existing_round(flask_test_client, test_round):
+def test_update_existing_round(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully updated using the /round/<round_id> route
     Verifies that the updated round has the correct attributes
@@ -163,11 +177,38 @@ def test_update_existing_round(flask_test_client, test_round):
         "feedback_link": "http://example.com/feedback",
         "project_name_field_id": 1,
         "guidance_url": "http://example.com/guidance",
+        "feedback_survey_config": '{"has_survey": true}',
     }
 
+    test_round = seed_dynamic_data["rounds"][0]
     response = submit_form(flask_test_client, f"/round/{test_round.round_id}", update_round_data)
     assert response.status_code == 200
 
     updated_round = get_round_by_id(test_round.round_id)
     assert updated_round.title_json["en"] == "Updated Round"
     assert updated_round.short_name == "UR123"
+    assert updated_round.feedback_survey_config == {"has_survey": True}
+
+
+@pytest.mark.parametrize("input_json_string", [(None), (""), ("{}"), (""), ("{}"), ('{"1":"2"}')])
+def test_validate_json_input_valid(input_json_string):
+
+    field = MagicMock()
+    field.data = input_json_string
+    validate_json_field(None, field)
+
+
+@pytest.mark.parametrize(
+    "input_json_string, exp_error_msg",
+    [
+        ('{"1":', "Expecting value: line 1 column 6 (char 5)]"),
+        ('{"1":"quotes not closed}', "Unterminated string starting at: line 1 column 6 (char 5)"),
+    ],
+)
+def test_validate_json_input_invalid(input_json_string, exp_error_msg):
+
+    field = MagicMock()
+    field.data = input_json_string
+    with pytest.raises(ValidationError) as error:
+        validate_json_field(None, field)
+    assert exp_error_msg in str(error)

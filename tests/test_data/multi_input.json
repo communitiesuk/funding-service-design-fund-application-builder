@@ -1,0 +1,283 @@
+{
+  "metadata": {},
+  "startPage": "/funding-required",
+
+  "pages": [
+    {
+      "title": "Funding required",
+      "path": "/funding-required",
+      "components": [
+        {
+          "name": "RgwAoN",
+          "options": {},
+          "type": "Para",
+          "content": "<label class=\"govuk-!-font-weight-bold\">In this section, we'll ask about:\n</label>\n\n<ul class=\"govuk-list govuk-list--bullet\">\n<li>your capital funding request</li>\n<li>match funding you've identified or secured</li>\n<li>your revenue funding request (optional)</li>\n<li>description of your revenue costs</li>\n</ul>"
+        }
+      ],
+      "next": [
+        {
+          "path": "/capital-costs-for-your-project"
+        }
+      ],
+      "controller": "./pages/start.js"
+    },
+
+    {
+      "title": "Check your answers",
+      "path": "/summary",
+      "controller": "./pages/summary.js",
+      "components": [],
+      "next": [],
+      "section": "bgUGuD"
+    },
+    {
+      "path": "/capital-costs-for-your-project",
+      "title": "Capital costs for your project",
+      "controller": "RepeatingFieldPageController",
+      "options": {
+        "summaryDisplayMode": {
+          "samePage": true,
+          "separatePage": false,
+          "hideRowTitles": false
+        },
+        "customText": {
+          "samePageTitle": "Your capital costs"
+        }
+      },
+      "components": [
+        {
+          "name": "GaAAPb",
+          "options": {},
+          "type": "Details",
+          "content": "We are looking to understand:\n<div>\n<br>\n<ul class=\"govuk-list govuk-list--bullet\">\n<li>how much funding you are applying for from this fund</li>\n<li>your full operational costs </li>\n<li>any funding you've already received for your project so far</li>\n<li>any funding you've plan to secure for your project</li>\n<li>any funding you've already received towards capital costs</li>\n</ul>\n<p>We'll ask you to upload a business plan to support the answers you give us in this section.</p>\n</div>",
+          "title": "Help with management case"
+        },
+        {
+          "name": "EaxCoo",
+          "options": {},
+          "type": "Para",
+          "content": "<h2 class=\"govuk-heading-s\">Capital costs</h2>\n\n<p class=\"govuk-hint\">Tell us about the total capital costs of your project.</p>\n\n<p class=\"govuk-hint\">This should be for the whole project, not just what you're requesting from the fund.</p>\n\n<p class=\"govuk-hint\">Capital costs can be used to:\n<ul class=\"govuk-hint\">\n<li>purchase or lease the asset</li>\n<li>pay for refurbishment costs</li>\n</ul>\n</p>\n<p class=\"govuk-hint\">Remember, you can apply for up to 80% (or 90% if the development support provider has confirmed you're eligible to do this) of your capital costs, up to a maximum of £2 million.</p>\n<p class=\"govuk-hint\">You can use your business plan to provide information that supports your answers.</p>\n\n\n\n"
+        },
+        {
+          "name": "qQLyXL",
+          "options": {
+            "prefix": "£",
+            "columnTitles": [
+              "Description",
+              "Amount",
+              "Money from COF25 grant",
+              "Match funding amount",
+              "Action"
+            ],
+            "required": true
+          },
+          "type": "MultiInputField",
+          "title": "Capital costs",
+          "hint": "The MultiInputField needed",
+          "schema": {},
+          "children": [
+            {
+              "name": "GLQlOh",
+              "options": {},
+              "type": "TextField",
+              "title": "Describe the cost"
+            },
+            {
+              "name": "JtwkMy",
+              "options": {
+                "prefix": "£",
+                "classes": "govuk-!-width-one-half"
+              },
+              "type": "NumberField",
+              "title": "Amount",
+              "hint": "",
+              "schema": {}
+            },
+            {
+              "name": "LeTLDo",
+              "options": {
+                "prefix": "£",
+                "classes": "govuk-!-width-one-half"
+              },
+              "type": "NumberField",
+              "title": "How much money from the COF25 grant will you use to pay for this cost?",
+              "hint": "",
+              "schema": {}
+            },
+            {
+              "name": "pHZDWT",
+              "options": {
+                "prefix": "£",
+                "classes": "govuk-!-width-one-half"
+              },
+              "type": "NumberField",
+              "title": "How much of the match funding will you use to pay for this cost?",
+              "hint": "",
+              "schema": {}
+            }
+          ]
+        }
+      ],
+      "next": [
+        {
+          "path": "/summary"
+        }
+      ],
+      "section": "bgUGuD"
+    }
+
+  ],
+  "lists": [],
+  "sections": [
+    {
+      "name": "bgUGuD",
+      "title": "Funding required"
+    }
+  ],
+  "conditions": [
+    {
+      "displayName": "Have you secured any match funding yet-yes",
+      "name": "QyNLbn",
+      "value": {
+        "name": "Have you secured any match funding yet-yes",
+        "conditions": [
+          {
+            "field": {
+              "name": "DOvZvB",
+              "type": "YesNoField",
+              "display": "Have you secured any match funding yet?"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "true",
+              "display": "true"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Have you secured any match funding yet-no",
+      "name": "nzrkpu",
+      "value": {
+        "name": "Have you secured any match funding yet-no",
+        "conditions": [
+          {
+            "field": {
+              "name": "DOvZvB",
+              "type": "YesNoField",
+              "display": "Have you secured any match funding yet?"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "false",
+              "display": "false"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Do you have any match funding identified but not yet secured-yes",
+      "name": "DrELrt",
+      "value": {
+        "name": "Do you have any match funding identified but not yet secured-yes",
+        "conditions": [
+          {
+            "field": {
+              "name": "DmgsiG",
+              "type": "YesNoField",
+              "display": "Do you have any match funding identified but not yet secured?"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "true",
+              "display": "true"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Do you have any match funding identified but not yet secured-no",
+      "name": "nPKnjf",
+      "value": {
+        "name": "Do you have any match funding identified but not yet secured-no",
+        "conditions": [
+          {
+            "field": {
+              "name": "DmgsiG",
+              "type": "YesNoField",
+              "display": "Do you have any match funding identified but not yet secured?"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "false",
+              "display": "false"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Are you applying for revenue funding from the Community Ownership Fund 2025-yes",
+      "name": "iegbPT",
+      "value": {
+        "name": "Are you applying for revenue funding from the Community Ownership Fund 2025-yes",
+        "conditions": [
+          {
+            "field": {
+              "name": "matkNH",
+              "type": "YesNoField",
+              "display": "Are you applying for revenue funding from the Community Ownership Fund 2025? (optional)"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "true",
+              "display": "true"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Are you applying for revenue funding from the Community Ownership Fund 2025-no",
+      "name": "zVdAqG",
+      "value": {
+        "name": "Are you applying for revenue funding from the Community Ownership Fund 2025-no",
+        "conditions": [
+          {
+            "field": {
+              "name": "matkNH",
+              "type": "YesNoField",
+              "display": "Are you applying for revenue funding from the Community Ownership Fund 2025? (optional)"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "false",
+              "display": "false"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "fees": [],
+  "outputs": [],
+  "version": 2,
+  "skipSummary": false,
+  "name": "Apply for funding to save an asset in your community",
+  "feedback": {
+    "feedbackForm": false,
+    "url": ""
+  },
+  "phaseBanner": {
+    "phase": "beta"
+  }
+}

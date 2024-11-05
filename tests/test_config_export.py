@@ -1,10 +1,10 @@
 import ast
 import json
-import shutil
 from pathlib import Path
 
 import pytest
 
+from app.blueprints.fund_builder.routes import create_export_zip
 from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
@@ -13,8 +13,6 @@ from app.export_config.generate_fund_round_html import frontend_html_prefix
 from app.export_config.generate_fund_round_html import frontend_html_suffix
 from app.export_config.generate_fund_round_html import generate_all_round_html
 from app.export_config.helpers import validate_json
-
-output_base_path = Path("app") / "export_config" / "output"
 
 
 def read_data_from_output_file(file):
@@ -26,7 +24,7 @@ def read_data_from_output_file(file):
     return data
 
 
-def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
+def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, temp_output_dir):
     # Setup: Prepare valid input parameters
     fund_short_name = seed_dynamic_data["funds"][0].short_name
     round_id = seed_dynamic_data["rounds"][0].round_id
@@ -44,7 +42,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {
-            "path": output_base_path / round_short_name / "fund_store" / "round_config.py",
+            "path": temp_output_dir / round_short_name / "fund_store" / "round_config.py",
             "expected_output": {
                 "sections_config": [
                     {
@@ -65,6 +63,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
                     "name_json": {"en": "Unit Test Fund 1"},
                     "title_json": {"en": "funding to improve testing"},
                     "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
+                    "funding_type": "COMPETITIVE",
                 },
                 "round_config": {
                     "short_name": round_short_name,
@@ -87,8 +86,8 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
                     "display_logo_on_pdf_exports": False,
                     "mark_as_complete_enabled": False,
                     "is_expression_of_interest": False,
-                    "eoi_decision_schema": None,
-                    "feedback_survey_config": None,
+                    "eoi_decision_schema": {"en":{"valid": True}, "cy":{"valid":False}},
+                    "feedback_survey_config": {"has_survey": False},
                     "eligibility_config": {"has_eligibility": False},
                     "title_json": {"en": "round the first"},
                     "contact_us_banner_json": None,
@@ -96,49 +95,43 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch):
             },
         },
     ]
-    try:
-        for expected_file in expected_files:
-            path = expected_file["path"]
-            assert path.exists(), f"Expected file {path} does not exist."
+    for expected_file in expected_files:
+        path = expected_file["path"]
+        assert path.exists(), f"Expected file {path} does not exist."
 
-            with open(expected_file["path"], "r") as file:
-                data = read_data_from_output_file(file=file)
+        with open(expected_file["path"], "r") as file:
+            data = read_data_from_output_file(file=file)
 
-                if expected_file["expected_output"].get("fund_config", None):
-                    # remove keys that can't be accurately compared
-                    keys_to_remove = ["base_path"]
-                    keys_to_remove_fund_config = ["id"]
-                    keys_to_remove_round_config = [
-                        "id",
-                        "fund_id",
-                        "reminder_date",
-                        "assessment_start",
-                        "assessment_deadline",
-                        "deadline",
-                        "opens",
-                    ]
-                    keys_to_remove_section_config = ["tree_path"]
-                    data = {k: v for k, v in data.items() if k not in keys_to_remove}
-                    data["fund_config"] = {
-                        k: v for k, v in data["fund_config"].items() if k not in keys_to_remove_fund_config
-                    }
-                    data["round_config"] = {
-                        k: v for k, v in data["round_config"].items() if k not in keys_to_remove_round_config
-                    }
-                    data["sections_config"] = [
-                        {k: v for k, v in section.items() if k not in keys_to_remove_section_config}
-                        for section in data["sections_config"]
-                    ]
-                    assert expected_file["expected_output"]["fund_config"] == data["fund_config"]
-                    assert expected_file["expected_output"]["round_config"] == data["round_config"]
-                    assert expected_file["expected_output"]["sections_config"] == data["sections_config"]
-                else:
-                    assert data == expected_file["expected_output"]
-    finally:
-        # Cleanup step to remove the directory
-        directory_path = output_base_path / round_short_name
-        if directory_path.exists():
-            shutil.rmtree(directory_path)
+            if expected_file["expected_output"].get("fund_config", None):
+                # remove keys that can't be accurately compared
+                keys_to_remove = ["base_path"]
+                keys_to_remove_fund_config = ["id"]
+                keys_to_remove_round_config = [
+                    "id",
+                    "fund_id",
+                    "reminder_date",
+                    "assessment_start",
+                    "assessment_deadline",
+                    "deadline",
+                    "opens",
+                ]
+                keys_to_remove_section_config = ["tree_path"]
+                data = {k: v for k, v in data.items() if k not in keys_to_remove}
+                data["fund_config"] = {
+                    k: v for k, v in data["fund_config"].items() if k not in keys_to_remove_fund_config
+                }
+                data["round_config"] = {
+                    k: v for k, v in data["round_config"].items() if k not in keys_to_remove_round_config
+                }
+                data["sections_config"] = [
+                    {k: v for k, v in section.items() if k not in keys_to_remove_section_config}
+                    for section in data["sections_config"]
+                ]
+                assert expected_file["expected_output"]["fund_config"] == data["fund_config"]
+                assert expected_file["expected_output"]["round_config"] == data["round_config"]
+                assert expected_file["expected_output"]["sections_config"] == data["sections_config"]
+            else:
+                assert data == expected_file["expected_output"]
 
 
 def test_generate_config_for_round_invalid_input(seed_dynamic_data):
@@ -149,7 +142,7 @@ def test_generate_config_for_round_invalid_input(seed_dynamic_data):
         generate_config_for_round(round_id)
 
 
-def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
+def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data, temp_output_dir):
     # Setup: Prepare valid input parameters
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
@@ -160,7 +153,7 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {
-            "path": output_base_path / round_short_name / "form_runner" / f"{form_publish_name}.json",
+            "path": temp_output_dir / round_short_name / "form_runner" / f"{form_publish_name}.json",
             "expected_output": {
                 "startPage": "/intro-about-your-organisation",
                 "pages": [
@@ -229,26 +222,20 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data):
                 "sections": [],
                 "outputs": [],
                 "skipSummary": False,
-                "name": "About your organisation",
+                "name": "Apply for funding to improve testing",
             },
         }
     ]
-    try:
-        for expected_file in expected_files:
-            path = expected_file["path"]
-            assert path.exists(), f"Expected file {path} does not exist."
+    for expected_file in expected_files:
+        path = expected_file["path"]
+        assert path.exists(), f"Expected file {path} does not exist."
 
-        with open(expected_file["path"], "r") as file:
-            data = json.load(file)
-            for page in data["pages"]:
-                for component in page["components"]:
-                    component.pop("metadata", None)
-            assert data == expected_file["expected_output"]
-    finally:
-        # Cleanup step to remove the directory
-        directory_path = output_base_path / round_short_name
-        if directory_path.exists():
-            shutil.rmtree(directory_path)
+    with open(expected_file["path"], "r") as file:
+        data = json.load(file)
+        for page in data["pages"]:
+            for component in page["components"]:
+                component.pop("metadata", None)
+        assert data == expected_file["expected_output"]
 
 
 def test_generate_form_jsons_for_round_invalid_input(seed_dynamic_data):
@@ -259,7 +246,7 @@ def test_generate_form_jsons_for_round_invalid_input(seed_dynamic_data):
         generate_form_jsons_for_round(round_id)
 
 
-def test_generate_fund_round_html(seed_dynamic_data):
+def test_generate_fund_round_html(seed_dynamic_data, temp_output_dir):
 
     # Setup: Prepare valid input parameters
     round_id = seed_dynamic_data["rounds"][0].round_id
@@ -270,7 +257,7 @@ def test_generate_fund_round_html(seed_dynamic_data):
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {
-            "path": output_base_path
+            "path": temp_output_dir
             / round_short_name
             / "html"
             / f"{fund_short_name.casefold()}_{round_short_name.casefold()}_all_questions_en.html",
@@ -279,19 +266,13 @@ def test_generate_fund_round_html(seed_dynamic_data):
             + frontend_html_suffix,
         }
     ]
-    try:
-        for expected_file in expected_files:
-            path = expected_file["path"]
-            assert path.exists(), f"Expected file {path} does not exist."
+    for expected_file in expected_files:
+        path = expected_file["path"]
+        assert path.exists(), f"Expected file {path} does not exist."
 
-        with open(expected_file["path"], "r") as file:
-            data = file.read()
-            assert data == expected_file["expected_output"]
-    finally:
-        # Cleanup step to remove the directory
-        directory_path = output_base_path / round_short_name
-        if directory_path.exists():
-            shutil.rmtree(directory_path)
+    with open(expected_file["path"], "r") as file:
+        data = file.read()
+        assert data == expected_file["expected_output"]
 
 
 def test_generate_fund_round_html_invalid_input(seed_dynamic_data):
@@ -330,3 +311,11 @@ def test_valid_data_validate_json():
 def test_invalid_data_validate_json(data):
     result = validate_json(data, test_json_schema)
     assert not result, "The data should be invalid according to the schema"
+
+
+def test_create_export_zip(temp_output_dir):
+    test_data_path = Path("tests") / "test_data"
+    output = create_export_zip(directory_to_zip=test_data_path, zip_file_name="test_zip")
+    assert output
+    output_path = Path(output)
+    assert output_path.exists()

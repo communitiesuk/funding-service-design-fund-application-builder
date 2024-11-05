@@ -21,6 +21,7 @@ from app.blueprints.fund_builder.forms.round import RoundForm
 from app.blueprints.fund_builder.forms.round import get_datetime
 from app.blueprints.fund_builder.forms.section import SectionForm
 from app.db.models.fund import Fund
+from app.db.models.fund import FundingType
 from app.db.models.round import Round
 from app.db.queries.application import clone_single_form
 from app.db.queries.application import clone_single_round
@@ -217,10 +218,14 @@ def fund(fund_id=None):
         fund_data = {
             "fund_id": fund.fund_id,
             "name_en": fund.name_json.get("en", ""),
+            "name_cy": fund.name_json.get("cy", ""),
             "title_en": fund.title_json.get("en", ""),
+            "title_cy": fund.title_json.get("cy", ""),
             "short_name": fund.short_name,
             "description_en": fund.description_json.get("en", ""),
+            "description_cy": fund.description_json.get("cy", ""),
             "welsh_available": "true" if fund.welsh_available else "false",
+            "funding_type": fund.funding_type.value,
         }
         form = FundForm(data=fund_data)
     else:
@@ -229,13 +234,18 @@ def fund(fund_id=None):
     if form.validate_on_submit():
         if fund_id:
             fund.name_json["en"] = form.name_en.data
+            fund.name_json["cy"] = form.name_cy.data
             fund.title_json["en"] = form.title_en.data
+            fund.title_json["cy"] = form.title_cy.data
             fund.description_json["en"] = form.description_en.data
+            fund.description_json["cy"] = form.description_cy.data
             fund.welsh_available = form.welsh_available.data == "true"
             fund.short_name = form.short_name.data
             fund.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
+            fund.funding_type = form.funding_type.data
             update_fund(fund)
             flash(f"Updated fund {form.title_en.data}")
+            return redirect(url_for("build_fund_bp.view_fund", fund_id=fund.fund_id))
         else:
             new_fund = Fund(
                 name_json={"en": form.name_en.data},
@@ -244,6 +254,7 @@ def fund(fund_id=None):
                 welsh_available=form.welsh_available.data == "true",
                 short_name=form.short_name.data,
                 audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+                funding_type=FundingType(form.funding_type.data),
             )
             add_fund(new_fund)
             flash(f"Created fund {form.name_en.data}")
@@ -270,6 +281,7 @@ def round(round_id=None):
         if round_id:
             update_existing_round(round, form)
             flash(f"Updated round {round.title_json['en']}")
+            return redirect(url_for("build_fund_bp.view_fund", fund_id=round.fund_id))
         else:
             create_new_round(form)
             flash(f"Created round {form.title_en.data}")
@@ -283,6 +295,17 @@ def round(round_id=None):
     )
 
 
+def _convert_json_data_for_form(data) -> str:
+    if isinstance(data, dict):
+        return json.dumps(data)
+    return str(data)
+
+def _convert_form_data_to_json(data) -> dict:
+    if data:
+        return json.loads(data)
+    return {}
+
+
 def populate_form_with_round_data(round):
     """
     Populate a RoundForm with data from a Round object.
@@ -293,6 +316,7 @@ def populate_form_with_round_data(round):
     round_data = {
         "fund_id": round.fund_id,
         "title_en": round.title_json.get("en", ""),
+        "title_cy": round.title_json.get("cy", ""),
         "short_name": round.short_name,
         "opens": round.opens,
         "deadline": round.deadline,
@@ -301,18 +325,23 @@ def populate_form_with_round_data(round):
         "assessment_deadline": round.assessment_deadline,
         "prospectus_link": round.prospectus_link,
         "privacy_notice_link": round.privacy_notice_link,
-        "contact_us_banner_json": round.contact_us_banner_json.get("en", "") if round.contact_us_banner_json else "",
+        "contact_us_banner_en": round.contact_us_banner_json.get("en", "") if round.contact_us_banner_json else "",
+        "contact_us_banner_cy": round.contact_us_banner_json.get("cy", "") if round.contact_us_banner_json else "",
         "reference_contact_page_over_email": "true" if round.reference_contact_page_over_email else "false",
         "contact_email": round.contact_email,
         "contact_phone": round.contact_phone,
         "contact_textphone": round.contact_textphone,
         "support_times": round.support_times,
         "support_days": round.support_days,
-        "instructions_json": round.instructions_json.get("en", "") if round.instructions_json else "",
+        "instructions_en": round.instructions_json.get("en", "") if round.instructions_json else "",
+        "instructions_cy": round.instructions_json.get("cy", "") if round.instructions_json else "",
         "feedback_link": round.feedback_link,
         "project_name_field_id": round.project_name_field_id,
-        "application_guidance_json": (
+        "application_guidance_en": (
             round.application_guidance_json.get("en", "") if round.application_guidance_json else ""
+        ),
+        "application_guidance_cy": (
+            round.application_guidance_json.get("cy", "") if round.application_guidance_json else ""
         ),
         "guidance_url": round.guidance_url,
         "all_uploaded_documents_section_available": (
@@ -322,13 +351,14 @@ def populate_form_with_round_data(round):
         "display_logo_on_pdf_exports": "true" if round.display_logo_on_pdf_exports else "false",
         "mark_as_complete_enabled": "true" if round.mark_as_complete_enabled else "false",
         "is_expression_of_interest": "true" if round.is_expression_of_interest else "false",
-        "feedback_survey_config": round.feedback_survey_config,
+        "feedback_survey_config": _convert_json_data_for_form(round.feedback_survey_config),
         "eligibility_config": (
             "true"
             if round.eligibility_config and round.eligibility_config.get("has_eligibility", "") == "true"
             else "false"
         ),
-        "eoi_decision_schema": round.eoi_decision_schema.get("en", "") if round.eoi_decision_schema else "",
+        "eoi_decision_schema_en": _convert_json_data_for_form(round.eoi_decision_schema.get("en", "")) if round.eoi_decision_schema else "",
+        "eoi_decision_schema_cy": _convert_json_data_for_form(round.eoi_decision_schema.get("cy", "")) if round.eoi_decision_schema else "",
     }
     return RoundForm(data=round_data)
 
@@ -340,9 +370,9 @@ def update_existing_round(round, form):
     :param Round round: The round object to update
     :param RoundForm form: The form with the new round data
     """
-    round.title_json = {"en": form.title_en.data if form.title_en.data else ""}
+    round.title_json = {"en": form.title_en.data or None, "cy": form.title_cy.data or None}
     round.short_name = form.short_name.data
-    round.feedback_survey_config = form.feedback_survey_config.data
+    round.feedback_survey_config = _convert_form_data_to_json(form.feedback_survey_config.data)
     round.opens = get_datetime(form.opens)
     round.deadline = get_datetime(form.deadline)
     round.assessment_start = get_datetime(form.assessment_start)
@@ -366,13 +396,13 @@ def update_existing_round(round, form):
     round.is_expression_of_interest = form.is_expression_of_interest.data == "true"
     round.short_name = form.short_name.data
     round.contact_us_banner_json = {
-        "en": form.contact_us_banner_json.data if form.contact_us_banner_json.data else "",
-        "cy": "",
+        "en": form.contact_us_banner_en.data or None,
+        "cy": form.contact_us_banner_cy.data or None,
     }
-    round.instructions_json = {"en": form.instructions_json.data if form.instructions_json.data else "", "cy": ""}
+    round.instructions_json = {"en": form.instructions_en.data or None, "cy": form.instructions_cy.data or None}
     round.application_guidance_json = {
-        "en": form.application_guidance_json.data if form.application_guidance_json.data else "",
-        "cy": "",
+        "en": form.application_guidance_en.data or None,
+        "cy": form.application_guidance_cy.data or None,
     }
     round.guidance_url = form.guidance_url.data
     round.all_uploaded_documents_section_available = form.all_uploaded_documents_section_available.data == "true"
@@ -381,7 +411,7 @@ def update_existing_round(round, form):
     round.mark_as_complete_enabled = form.mark_as_complete_enabled.data == "true"
     round.is_expression_of_interest = form.is_expression_of_interest.data == "true"
     round.eligibility_config = {"has_eligibility": form.eligibility_config.data}
-    round.eoi_decision_schema = {"en": form.eoi_decision_schema.data, "cy": ""}
+    round.eoi_decision_schema = {"en": _convert_form_data_to_json(form.eoi_decision_schema_en.data), "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data)}
     round.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
     update_round(round)
 
@@ -395,7 +425,7 @@ def create_new_round(form):
     new_round = Round(
         fund_id=form.fund_id.data,
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-        title_json={"en": form.title_en.data},
+        title_json={"en": form.title_en.data or None, "cy":form.title_cy.data or None},
         short_name=form.short_name.data,
         opens=get_datetime(form.opens),
         deadline=get_datetime(form.deadline),
@@ -404,31 +434,26 @@ def create_new_round(form):
         assessment_deadline=get_datetime(form.assessment_deadline),
         prospectus_link=form.prospectus_link.data,
         privacy_notice_link=form.privacy_notice_link.data,
-        contact_us_banner_json={"en": form.contact_us_banner_json.data, "cy": None},
+        contact_us_banner_json={"en": form.contact_us_banner_en.data or None, "cy": form.contact_us_banner_cy.data or None},
         reference_contact_page_over_email=form.reference_contact_page_over_email.data == "true",
         contact_email=form.contact_email.data,
         contact_phone=form.contact_phone.data,
         contact_textphone=form.contact_textphone.data,
         support_times=form.support_times.data,
         support_days=form.support_days.data,
-        instructions_json={"en": form.instructions_json.data, "cy": None},
+        instructions_json={"en": form.instructions_en.data or None, "cy": form.instructions_cy.data or None},
         feedback_link=form.feedback_link.data,
         project_name_field_id=form.project_name_field_id.data,
-        application_guidance_json={"en": form.application_guidance_json.data, "cy": None},
+        application_guidance_json={"en": form.application_guidance_en.data or None, "cy": form.application_guidance_cy.data or None},
         guidance_url=form.guidance_url.data,
         all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data == "true",
         application_fields_download_available=form.application_fields_download_available.data == "true",
         display_logo_on_pdf_exports=form.display_logo_on_pdf_exports.data == "true",
         mark_as_complete_enabled=form.mark_as_complete_enabled.data == "true",
         is_expression_of_interest=form.is_expression_of_interest.data == "true",
-        feedback_survey_config={
-            "has_feedback_survey": form.feedback_survey_config.data,
-            "has_section_feedback": False,
-            "is_feedback_survey_optional": False,
-            "is_section_feedback_optional": False,
-        },
+        feedback_survey_config=_convert_form_data_to_json(form.feedback_survey_config.data),
         eligibility_config={"has_eligibility": form.eligibility_config.data},
-        eoi_decision_schema={"en": form.eoi_decision_schema.data, "cy": None},
+        eoi_decision_schema={"en": _convert_form_data_to_json(form.eoi_decision_schema_en.data), "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data)},
     )
     add_round(new_round)
 
@@ -523,6 +548,15 @@ def view_form_questions(round_id, form_id):
     )
 
 
+def create_export_zip(directory_to_zip, zip_file_name) -> str:
+    # Output zip file path (temporary)
+    output_zip_path = Config.TEMP_FILE_PATH / zip_file_name
+
+    # Create a zip archive of the directory
+    shutil.make_archive(base_name=output_zip_path, format="zip", root_dir=directory_to_zip)
+    return f"{output_zip_path}.zip"
+
+
 @build_fund_bp.route("/create_export_files/<round_id>", methods=["GET"])
 def create_export_files(round_id):
     generate_form_jsons_for_round(round_id)
@@ -530,13 +564,9 @@ def create_export_files(round_id):
     generate_config_for_round(round_id)
     round_short_name = get_round_by_id(round_id).short_name
 
-    # Directory to zip
-    directory_to_zip = f"app/export_config/output/{round_short_name}/"
-    # Output zip file path (temporary)
-    output_zip_path = f"app/export_config/output/{round_short_name}.zip"
-
-    # Create a zip archive of the directory
-    shutil.make_archive(output_zip_path.replace(".zip", ""), "zip", directory_to_zip)
+    output_zip_path = create_export_zip(
+        directory_to_zip=Config.TEMP_FILE_PATH / round_short_name, zip_file_name=round_short_name
+    )
 
     # Ensure the file is removed after sending it
     @after_this_request

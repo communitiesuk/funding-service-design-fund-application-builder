@@ -8,6 +8,7 @@ from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.models.application_config import ComponentType
 from app.db.queries.application import get_list_by_id
 from app.shared.data_classes import ConditionValue
+from app.shared.data_classes import FormSection
 
 BASIC_FORM_STRUCTURE = {
     "startPage": None,
@@ -81,7 +82,7 @@ def build_component(component: Component) -> dict:
             "type": component.type.value if component.type else None,
             "content": component.content,
             "options": component.options or {},
-            "schema": {},
+            "schema": component.schema or {},
             "title": component.title,
             "name": component.runner_component_name,
         }
@@ -93,7 +94,7 @@ def build_component(component: Component) -> dict:
             "type": component.type.value,
             "title": component.title,
             "hint": component.hint_text or "",
-            "schema": {},
+            "schema": component.schema or {},
             "name": component.runner_component_name,
             "metadata": {
                 # "fund_builder_id": str(component.component_id) TODO why do we need this?
@@ -107,6 +108,9 @@ def build_component(component: Component) -> dict:
         built_component.update({"list": component.lizt.name})
         built_component["metadata"].update({"fund_builder_list_id": str(component.list_id)})
         built_component.update({"values": {"type": "listRef"}})
+
+    if component.type is ComponentType.MULTI_INPUT_FIELD:
+        built_component.update({"children": component.children})
 
     return built_component
 
@@ -124,6 +128,10 @@ def build_page(page: Page = None) -> dict:
             "title": page.name_in_apply_json["en"],
         }
     )
+    if page.formsection:
+        built_page.update({"section": page.formsection.name})
+    if page.options:
+        built_page.update({"options": page.options})
     # Having a 'null' controller element breaks the form-json, needs to not be there if blank
     if page.controller:
         built_page["controller"] = page.controller
@@ -177,6 +185,17 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
             this_page_in_results["next"].append({"path": "/summary"})
 
     return partial_form_json
+
+
+def build_form_section(form_section_list, form_section):
+    form_section_obj = FormSection(
+        name=form_section.name,
+        title=form_section.title,
+        hideTitle=form_section.hide_title,
+    )
+    # Check if the list already exists in lists by name
+    if not any(existing_list["name"] == form_section_obj.name for existing_list in form_section_list):
+        form_section_list.append(form_section_obj.as_dict())
 
 
 def build_lists(pages: list[dict]) -> list:
@@ -251,7 +270,7 @@ def human_to_kebab_case(word: str) -> str | None:
         return word.replace(" ", "-").strip().lower()
 
 
-def build_form_json(form: Form) -> dict:
+def build_form_json(form: Form, fund_title:str = None) -> dict:
     """
     Takes in a single Form object and then generates the form runner json for that form.
 
@@ -259,11 +278,13 @@ def build_form_json(form: Form) -> dict:
     """
 
     results = copy.deepcopy(BASIC_FORM_STRUCTURE)
-    results["name"] = form.name_in_apply_json["en"]
-
+    results["name"] = f"Apply for {fund_title}" if fund_title else "Access Funding"
+    results["sections"] = []
     # Build the basic page structure
     for page in form.pages:
         results["pages"].append(build_page(page=page))
+        if page.formsection:
+            build_form_section(results["sections"], page.formsection)
 
     # start page is the page with the controller ending start.js
     start_page = _find_page_by_controller(form.pages, "start.js")

@@ -1,5 +1,6 @@
 import logging
 from os import getenv
+from pathlib import Path
 
 from fsd_utils import configclass
 
@@ -16,3 +17,4 @@ class DevelopmentConfig(Config):
         "DATABASE_URL",
         "postgresql://postgres:password@fab-db:5432/fab",  # pragma: allowlist secret
     )
+    TEMP_FILE_PATH = Path("app") / "export_config" / "output"

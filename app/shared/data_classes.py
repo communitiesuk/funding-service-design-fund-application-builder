@@ -4,6 +4,8 @@ from dataclasses import field
 from typing import Dict
 from typing import Optional
 
+from app.db.models.fund import FundingType
+
 
 @dataclass
 class SubCondition:
@@ -103,6 +105,7 @@ class FundExport:
     owner_organisation_name: str
     owner_organisation_shortname: str
     owner_organisation_logo_uri: str
+    funding_type: FundingType
     name_json: NameJson = field(default_factory=NameJson)
     title_json: TitleJson = field(default_factory=TitleJson)
     description_json: DescriptionJson = field(default_factory=DescriptionJson)
@@ -152,6 +155,16 @@ class RoundExport:
     eligibility_config: Optional[Dict[str, bool]] = field(default_factory=lambda: {"has_eligibility": False})
     title_json: TitleJson = field(default_factory=TitleJson)
     contact_us_banner_json: Optional[Dict[str, str]] = None
+
+    def as_dict(self):
+        return asdict(self)
+
+
+@dataclass
+class FormSection:
+    name: str
+    title: str
+    hideTitle: Optional[bool] = None
 
     def as_dict(self):
         return asdict(self)
