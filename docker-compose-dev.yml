@@ -51,3 +51,10 @@ services:
       - 'NODE_CONFIG={"safelist": ["fab"]}'
       - PREVIEW_MODE=true
       - NODE_ENV=development
+      - SINGLE_REDIS=true
+      - FORM_RUNNER_ADAPTER_REDIS_INSTANCE_URI=redis://redis-data:6379
+
+  redis-data:
+    image: redis
+    ports:
+      - 6379:6379

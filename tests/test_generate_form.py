@@ -7,12 +7,14 @@ import pytest
 
 from app.db.models import Component
 from app.db.models import ComponentType
+from app.db.models import FormSection
 from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models.application_config import Form
 from app.export_config.generate_form import build_component
 from app.export_config.generate_form import build_conditions
 from app.export_config.generate_form import build_form_json
+from app.export_config.generate_form import build_form_section
 from app.export_config.generate_form import build_lists
 from app.export_config.generate_form import build_navigation
 from app.export_config.generate_form import build_page
@@ -190,7 +192,7 @@ def test_build_page_controller_not_specified():
                 name_in_apply_json={"en": "Page with Options Name"},
                 form_index=1,
                 components=[],
-                options = {"first": "option"}
+                options={"first": "option"},
             )
         ),
     ],
@@ -373,7 +375,33 @@ list_id = uuid4()
                 "hint": "This must be a hint",
                 "schema": {},
                 "metadata": {},
-                "children":[{'name': 'GLQlOh', 'options': {}, 'type': 'TextField', 'title': 'Describe the cost'}, {'name': 'JtwkMy', 'options': {'prefix': '£', 'classes': 'govuk-!-width-one-half'}, 'type': 'NumberField', 'title': 'Amount', 'hint': '', 'schema': {}}, {'name': 'LeTLDo', 'options': {'prefix': '£', 'classes': 'govuk-!-width-one-half'}, 'type': 'NumberField', 'title': 'How much money from the COF25 grant will you use to pay for this cost?', 'hint': '', 'schema': {}}, {'name': 'pHZDWT', 'options': {'prefix': '£', 'classes': 'govuk-!-width-one-half'}, 'type': 'NumberField', 'title': 'How much of the match funding will you use to pay for this cost?', 'hint': '', 'schema': {}}]
+                "children": [
+                    {"name": "GLQlOh", "options": {}, "type": "TextField", "title": "Describe the cost"},
+                    {
+                        "name": "JtwkMy",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "Amount",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "LeTLDo",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much money from the COF25 grant will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "pHZDWT",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much of the match funding will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                ],
             },
         ),
     ],
@@ -887,7 +915,7 @@ def test_build_form(input_form, exp_results):
     results = build_form_json(form=input_form)
     assert results
     assert len(results["pages"]) == len(exp_results["pages"])
-    assert results["name"] == input_form.name_in_apply_json["en"]
+    assert results["name"] == "Access Funding"
     for exp_page in exp_results["pages"]:
         result_page = next((res_page for res_page in results["pages"] if res_page["path"] == exp_page["path"]), None)
         assert result_page, f"{exp_page['path']}"
@@ -956,3 +984,15 @@ def test_build_start_page(input_content, input_form, expected_title, expected_pa
     assert result["controller"] == "./pages/start.js"
     assert result["next"] == expected_next
     assert result["components"][0]["content"] == expected_content
+
+
+@pytest.mark.parametrize(
+    "input_form, sections_count",
+    [(FormSection(name="test", title="Test section", hide_title=False), 1)],
+)
+def test_build_form_sections(input_form, sections_count):
+    sections = []
+    build_form_section(sections, input_form)
+    assert len(sections) == sections_count
+    assert sections[0]["title"] == "Test section"
+    assert sections[0]["name"] == "test"

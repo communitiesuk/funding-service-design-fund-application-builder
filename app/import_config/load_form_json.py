@@ -6,6 +6,7 @@ import sys
 from uuid import UUID
 
 from app.db.queries.application import get_list_by_name
+from app.db.queries.application import insert_form_section
 from app.db.queries.application import insert_list
 from app.export_config.generate_form import human_to_kebab_case
 
@@ -101,6 +102,14 @@ def _find_list_and_create_if_not_existing(list_name: str, all_lists_in_form: lis
     return new_list.list_id
 
 
+def _find_form_section(form_section_name: str, form_section_list: list[dict]) -> UUID:
+    form_section_to_search = form_section_name if form_section_name else "FabDefault"
+    form_section_from_db = next(
+        form_section for form_section in form_section_list if form_section.name == form_section_to_search
+    )
+    return form_section_from_db.form_section_id
+
+
 def insert_component_as_template(component, page_id, page_index, lizts):
     # if component has a list, insert the list into the database
     list_id = None
@@ -130,7 +139,7 @@ def insert_component_as_template(component, page_id, page_index, lizts):
         runner_component_name=component.get("name", None),
         list_id=list_id,
         children=component.get("children", None),
-        schema=component.get("schema", None)
+        schema=component.get("schema", None),
     )
     try:
         db.session.add(new_component)
@@ -149,7 +158,8 @@ def insert_page_as_template(page, form_id):
         controller=page.get("controller", None),
         is_template=True,
         template_name=page.get("title", None),
-        options = page.get("options", None),
+        options=page.get("options", None),
+        form_section_id=page.get("section", None),
     )
     try:
         db.session.add(new_page)
@@ -184,11 +194,33 @@ def insert_page_default_next_page(pages_config, db_pages):
     db.session.flush()
 
 
+def create_form_sections_db(form_config):
+    form_section_list = []
+    for form_section in form_config["sections"]:
+        form_section_list.append(
+            insert_form_section(do_commit=False, form_section_config={"is_template": True, **form_section})
+        )
+    # create default section if any of the page doesn't have section
+    page_exists_without_section = any(page.get("section", None) is None for page in form_config["pages"])
+    if page_exists_without_section:
+        section_info = {"name": "FabDefault", "title": "Default section", "hideTitle": True}
+        form_section_list.append(
+            insert_form_section(do_commit=False, form_section_config={"is_template": True, **section_info})
+        )
+    return form_section_list
+
+
 def insert_form_config(form_config, form_id):
     inserted_pages = []
     inserted_components = []
     start_page_path = form_config["startPage"]
+    form_section_list = create_form_sections_db(form_config)
+
     for page in form_config.get("pages", []):
+        form_section = page.get("section", None)
+        # fetch the form section_id  from db
+        form_section_id = _find_form_section(form_section, form_section_list)
+        page["section"] = form_section_id
         if page["path"] == start_page_path:
             page["controller"] = "start.js"
         inserted_page = insert_page_as_template(page, form_id)
@@ -224,6 +256,7 @@ def insert_form_as_template(form, template_name=None):
         section_index=None,
         runner_publish_name=human_to_kebab_case(form_name),
         source_template_id=None,
+        form_json=form,
     )
 
     try:

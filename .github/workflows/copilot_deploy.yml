@@ -1,5 +1,5 @@
 name: Deploy to AWS
-run-name: ${{ github.event_name == 'workflow_dispatch' && format('Deploy to {0}', github.event.inputs.environment) || (github.ref == 'refs/heads/main' && 'Deploy to Test-UAT-Prod' || 'Build & Unit Test') }}
+run-name: ${{ github.event_name == 'workflow_dispatch' && format('Deploy to {0}', github.event.inputs.environment) || (github.ref == 'refs/heads/main' && 'Deploy to Test-UAT' || 'Build & Unit Test') }}
 
 on:
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
         - dev
         - test
         - uat
-      
+
   push:
     # Ignore README markdown and the docs folder
     # Only automatically deploy when something in the app or tests folder has changed

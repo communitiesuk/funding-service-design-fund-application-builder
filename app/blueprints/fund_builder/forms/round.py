@@ -12,6 +12,17 @@ from wtforms.validators import URL
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
+import json
+
+
+def validate_json_field(form, field):
+    str_content = field.data
+    if not str_content:
+        return
+    try:
+        json.loads(str_content)
+    except Exception as ex:
+        raise ValidationError(f"Content is not valid JSON. Underlying error: [{str(ex)}]")
 
 
 def get_datetime(form_field):
@@ -74,9 +85,13 @@ class DateInputForm(Form):
 
 
 class RoundForm(FlaskForm):
+
+    JSON_FIELD_HINT = "Valid json format, using double quotes, lowercase true/false"
+
     round_id = HiddenField("Round ID")
     fund_id = StringField("Fund", validators=[DataRequired()])
-    title_en = StringField("Title", validators=[DataRequired()])
+    title_en = StringField("Title (en)", validators=[DataRequired()])
+    title_cy = StringField("Title (cy)", description="Leave blank for English-only funds")
     short_name = StringField(
         "Short Name",
         description="Choose a unique short name with 6 or fewer characters",
@@ -90,27 +105,41 @@ class RoundForm(FlaskForm):
     prospectus_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
     privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), URL()])
     application_reminder_sent = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    contact_us_banner_json = TextAreaField("Contact Us Banner")
+    contact_us_banner_en = TextAreaField(
+        "Contact Us Banner (en)", description="HTML to display to override the default 'Contact Us' page content"
+    )
+    contact_us_banner_cy = TextAreaField("Contact Us Banner (cy)", description="Leave blank for English-only funds")
     reference_contact_page_over_email = RadioField(
         "Reference contact page over email", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
-    contact_email = StringField("Contact Email", validators=[DataRequired()])
-    contact_phone = StringField("Contact Phone", validators=[DataRequired()])
-    contact_textphone = StringField("Contact Textphone", validators=[DataRequired()])
+    contact_email = StringField("Contact Email")
+    contact_phone = StringField("Contact Phone")
+    contact_textphone = StringField("Contact Textphone")
     support_times = StringField("Support times", validators=[DataRequired()])
     support_days = StringField("Support Days", validators=[DataRequired()])
-    instructions_json = TextAreaField("Instructions")
+    instructions_en = TextAreaField("Instructions (en)")
+    instructions_cy = StringField("Instructions (cy)", description="Leave blank for English-only funds")
     feedback_link = URLField("Feedback Link", validators=[DataRequired(), URL()])
-    project_name_field_id = StringField("Project name", validators=[DataRequired()])
-    application_guidance_json = TextAreaField("Application Guidance")
+    project_name_field_id = StringField("Project name field ID", validators=[DataRequired()])
+    application_guidance_en = TextAreaField("Application Guidance (en)")
+    application_guidance_cy = TextAreaField(
+        "Application Guidance (cy)", description="Leave blank for English-only funds"
+    )
     guidance_url = URLField("Guidance link", validators=[DataRequired(), URL()])
     all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     application_fields_download_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     display_logo_on_pdf_exports = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     mark_as_complete_enabled = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     is_expression_of_interest = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    feedback_survey_config = TextAreaField("Feedback Survey")
+    feedback_survey_config = TextAreaField(
+        "Feedback Survey", validators=[validate_json_field], description=JSON_FIELD_HINT
+    )
     eligibility_config = RadioField(
         "Has eligibility config", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
-    eoi_decision_schema = TextAreaField("EOI Decision schema")
+    eoi_decision_schema_en = TextAreaField(
+        "EOI Decision schema (en)", validators=[validate_json_field], description=JSON_FIELD_HINT
+    )
+    eoi_decision_schema_cy = TextAreaField(
+        "EOI Decision schema (cy)", description="Leave blank for English-only funds", validators=[validate_json_field]
+    )

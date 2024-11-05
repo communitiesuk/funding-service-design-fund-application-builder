@@ -2,6 +2,7 @@ import json
 
 from flask import current_app
 
+from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import validate_json
@@ -21,7 +22,8 @@ form_schema = {
                 "properties": {
                     "path": {"type": "string"},
                     "title": {"type": "string"},
-                    "options":{"type":"object"},
+                    "options": {"type": "object"},
+                    "section": {"type": "string"},
                     "components": {
                         "type": "array",
                         "items": {
@@ -42,7 +44,7 @@ form_schema = {
                                 "metadata": {
                                     "type": "object",
                                 },
-                                "children": {"type": "array"}
+                                "children": {"type": "array"},
                             },
                         },
                     },
@@ -88,10 +90,11 @@ def generate_form_jsons_for_round(round_id):
     if not round_id:
         raise ValueError("Round ID is required to generate form JSONs.")
     round = get_round_by_id(round_id)
+    fund = get_fund_by_id(round.fund_id)
     current_app.logger.info(f"Generating form JSONs for round {round_id}.")
     for section in round.sections:
         for form in section.forms:
-            result = build_form_json(form)
+            result = build_form_json(form=form, fund_title=fund.title_json["en"])
             form_json = json.dumps(result, indent=4)
             valid_json = validate_json(result, form_schema)
             if valid_json:
