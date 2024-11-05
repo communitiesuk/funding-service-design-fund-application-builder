@@ -1,12 +1,23 @@
+import shutil
+
 import pytest
 from flask_migrate import upgrade
 from sqlalchemy import text
 
 from app.create_app import create_app
+from config import Config
 from tasks.test_data import init_unit_test_data
 from tasks.test_data import insert_test_data
 
 pytest_plugins = ["fsd_test_utils.fixtures.db_fixtures"]
+
+
+@pytest.fixture(scope="session")
+def temp_output_dir():
+    temp_dir = Config.TEMP_FILE_PATH
+    yield temp_dir
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
 
 
 @pytest.fixture(scope="function")

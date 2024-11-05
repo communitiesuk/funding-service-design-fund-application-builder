@@ -1,25 +1,32 @@
 {% extends "base.html" %}
+{% set pageHeading %}{{ 'Update a Round' if round_id else 'Create a Round' }}{% endset %}
+
 {% from "macros/wtfToGovUk.html" import input %}
 {% from "macros/wtfToGovUk.html" import dateinput %}
+{% from "macros/wtfToGovUk.html" import multilineinput %}
 {% from "macros/wtfToGovUk.html" import yes_no %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 class="govuk-heading-l">Create a Round</h1>
+        <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <form method="POST">
                     {{ form.hidden_tag()}}
-                    {{ govukSelect({
-                        "id": form.fund_id.id,
-                        "name": form.fund_id.name,
-                        "label": {
-                          "text": form.fund_id.label
-                        },
-                        "items": all_funds})}}
+                    {% if not round_id %}
+                        {{ govukSelect({
+                            "id": form.fund_id.id,
+                            "name": form.fund_id.name,
+                            "label": {
+                            "text": form.fund_id.label
+                            },
+                            "items": all_funds
+                        })}}
+                    {% endif %}
                     {{input(form.title_en)}}
+                    {{input(form.title_cy)}}
                     {{input(form.short_name)}}
                     {{dateinput(form.opens)}}
                     {{dateinput(form.deadline)}}
@@ -28,7 +35,29 @@
                     {{dateinput(form.assessment_deadline)}}
                     {{input(form.prospectus_link)}}
                     {{input(form.privacy_notice_link)}}
-
+                    {{ multilineinput(form.contact_us_banner_en) }}
+                    {{ multilineinput(form.contact_us_banner_cy) }}
+                    {{ yes_no(form.reference_contact_page_over_email) }}
+                    {{ input(form.contact_email) }}
+                    {{ input(form.contact_phone) }}
+                    {{ input(form.contact_textphone) }}
+                    {{ input(form.support_times) }}
+                    {{ input(form.support_days) }}
+                    {{ multilineinput(form.instructions_en) }}
+                    {{ multilineinput(form.instructions_cy) }}
+                    {{input(form.feedback_link)}}
+                    {{ input(form.project_name_field_id) }}
+                    {{ multilineinput(form.application_guidance_en) }}
+                    {{ multilineinput(form.application_guidance_cy) }}
+                    {{ input(form.guidance_url) }}
+                    {{ yes_no(form.application_fields_download_available) }}
+                    {{ yes_no(form.display_logo_on_pdf_exports) }}
+                    {{ yes_no(form.mark_as_complete_enabled) }}
+                    {{ yes_no(form.is_expression_of_interest) }}
+                    {{ multilineinput(form.feedback_survey_config) }}
+                    {{ yes_no(form.eligibility_config) }}
+                    {{ multilineinput(form.eoi_decision_schema_en) }}
+                    {{ multilineinput(form.eoi_decision_schema_cy) }}
                     {{ govukButton({
                     "text": "Save"
                     }) }}

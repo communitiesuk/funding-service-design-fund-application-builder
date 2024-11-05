@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% set pageHeading %}
+    Fund Settings
+{% endset %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {%- from "govuk_frontend_jinja/components/accordion/macro.html" import govukAccordion -%}
 {%- from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList -%}
@@ -6,7 +9,7 @@
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-l">Fund Settings</h1>
+            <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
             <form method="POST">
                 {{ govukSelect({
                                 "id": "fund_id",
@@ -65,8 +68,21 @@
                                 "value": {
                                 "text": fund.welsh_available
                                 },
-                                }
+                                },
+                                {
+                                    "key": {
+                                    "text": "Funding Type"
+                                    },
+                                    "value": {
+                                    "text": fund.funding_type.get_text_for_display()
+                                    },
+                                    }
                                 ]
+                                }) }}
+                                {{ govukButton({
+                                    "text": "Edit Fund",
+                                    "href": url_for("build_fund_bp.fund", fund_id=fund.fund_id),
+                                    "classes": "govuk-button--secondary"
                                 }) }}
                 <h2 class="govuk-heading-m">Application Rounds</h2>
                 {% set rounds_content = [] %}
@@ -144,6 +160,159 @@
                                         "text": round.privacy_notice_link
                                         },
                                         },
+                                        {
+                            "key": {
+                            "text": "Contact us banner json"
+                            },
+                            "value": {
+                            "text": round.contact_us_banner_json["en"]
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Reference contact page over email"
+                            },
+                            "value": {
+                            "text": round.reference_contact_page_over_email
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Contact email"
+                            },
+                            "value": {
+                            "text": round.contact_email
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Contact phone"
+                            },
+                            "value": {
+                            "text": round.contact_phone
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Contact text phone"
+                            },
+                            "value": {
+                            "text": round.contact_textphone
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Support times"
+                            },
+                            "value": {
+                            "text": round.support_times
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Support days"
+                            },
+                            "value": {
+                            "text": round.support_days
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Instructions json"
+                            },
+                            "value": {
+                            "text": round.instructions_json["en"]
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Feedback Link"
+                            },
+                            "value": {
+                            "text": round.feedback_link
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Project name field id"
+                            },
+                            "value": {
+                            "text": round.project_name_field_id
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Application Guidance json"
+                            },
+                            "value": {
+                            "text": round.application_guidance_json["en"]
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Guidance Link"
+                            },
+                            "value": {
+                            "text": round.guidance_url
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Mark as completed enabled"
+                            },
+                            "value": {
+                            "text": round.mark_as_complete_enabled
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Is Expression of Interest"
+                            },
+                            "value": {
+                            "text": round.is_expression_of_interest
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Display logo on pdf exports"
+                            },
+                            "value": {
+                            "text": round.display_logo_on_pdf_exports
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Application field download available"
+                            },
+                            "value": {
+                            "text": round.application_fields_download_available
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Feedback survey config"
+                            },
+                            "value": {
+                            "text": round.feedback_survey_config
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "Eligibility config"
+                            },
+                            "value": {
+                            "text": True if round.eligibility_config["has_eligibility"] == "true" else False
+                            },
+                            },
+                            {
+                            "key": {
+                            "text": "EOI decision schema"
+                            },
+                            "value": {
+                            "text": round.eoi_decision_schema["en"]
+                            },
+                            },
+
                                         ]
                                         }) +  govukButton({
                                             "text": "Build Application",
@@ -153,6 +322,10 @@
                                                 "text": "Clone this round",
                                                 "href": url_for("build_fund_bp.clone_round", round_id=round.round_id, fund_id=fund.fund_id),
                                                 "classes": "govuk-button--secondary"
+                                                }) + govukButton({
+                                                    "text": "Edit Round",
+                                                    "href": url_for("build_fund_bp.round", round_id=round.round_id),
+                                                    "classes": "govuk-button--secondary"
                                                 })
 
                     } }) %}

@@ -8,6 +8,8 @@ match FLASK_ENV:
         from config.envs.development import DevelopmentConfig as Config
     case "dev":
         from config.envs.dev import DevConfig as Config
+    case "test":
+        from config.envs.test import TestConfig as Config
     case "unit_test":
         from config.envs.unit_test import UnitTestConfig as Config
     case _:

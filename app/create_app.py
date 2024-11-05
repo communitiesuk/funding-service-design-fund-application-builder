@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_assets import Environment
+from fsd_utils.logging import logging
 from jinja2 import ChoiceLoader
 from jinja2 import PackageLoader
 from jinja2 import PrefixLoader
@@ -39,6 +40,9 @@ def create_app() -> Flask:
         compare_type=True,
         compare_server_default=True,
     )
+
+    # Initialise logging
+    logging.init_app(flask_app)
 
     # Bundle and compile assets
     assets = Environment()

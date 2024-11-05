@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% set pageHeading %}Create Application Form{% endset %}
 
 {%- from "govuk_frontend_jinja/components/input/macro.html" import govukInput -%}
 {%- from "govuk_frontend_jinja/components/textarea/macro.html" import govukTextarea -%}
@@ -6,7 +7,7 @@
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 class="govuk-heading-l">Create Application Form</h1>
+        <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
         <form id="form_form" method="POST">
 
             <select multiple hidden name="selected_pages" id="frm_selected_pages"></select>

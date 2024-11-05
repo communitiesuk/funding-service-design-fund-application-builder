@@ -1,18 +1,20 @@
 import copy
+from dataclasses import asdict
 
 from app.db.models import Component
 from app.db.models import Form
 from app.db.models import Page
+from app.db.models.application_config import READ_ONLY_COMPONENTS
+from app.db.models.application_config import ComponentType
 from app.db.queries.application import get_list_by_id
-from app.db.queries.application import get_template_page_by_display_path
+from app.shared.data_classes import ConditionValue
+from app.shared.data_classes import FormSection
 
 BASIC_FORM_STRUCTURE = {
-    "metadata": {},
     "startPage": None,
     "pages": [],
     "lists": [],
     "conditions": [],
-    "fees": [],
     "sections": [],
     "outputs": [],
     "skipSummary": False,
@@ -44,27 +46,26 @@ def build_conditions(component: Component) -> list:
     results = []
     for condition in component.conditions:
         result = {
-            "displayName": condition["name"],
+            "displayName": condition["display_name"],
             "name": condition["name"],
-            "value": {
-                "name": condition["name"],
-                "conditions": [
-                    {
-                        "field": {
-                            "name": component.runner_component_name,
-                            "type": component.type.value,
-                            "display": component.title,
-                        },
-                        "operator": condition["operator"],
-                        "value": {
-                            "type": "Value",
-                            "value": condition["value"],
-                            "display": condition["value"],
-                        },
-                    }
-                ],
-            },
+            "value": asdict(
+                ConditionValue(
+                    name=condition["value"]["name"],
+                    conditions=[],
+                )
+            ),
         }
+        for sc in condition["value"]["conditions"]:
+            sub_condition = {
+                "field": sc["field"],
+                "operator": sc["operator"],
+                "value": sc["value"],
+            }
+            # only add coordinator if it exists
+            if "coordinator" in sc and sc.get("coordinator") is not None:
+                sub_condition["coordinator"] = sc.get("coordinator", None)
+            result["value"]["conditions"].append(sub_condition)
+
         results.append(result)
 
     return results
@@ -74,37 +75,52 @@ def build_component(component: Component) -> dict:
     """
     Builds the component json in form runner format for the supplied Component object
     """
-    built_component = {
-        "options": component.options or {},
-        "type": component.type.value,
-        "title": component.title,
-        "hint": component.hint_text or "",
-        "schema": {},
-        "name": component.runner_component_name,
-        "metadata": {
-            # "fund_builder_id": str(component.component_id) TODO why do we need this?
-        },
-    }
+    # Depends on component (if read only type then this needs to be a different structure)
+
+    if component.type in READ_ONLY_COMPONENTS:
+        built_component = {
+            "type": component.type.value if component.type else None,
+            "content": component.content,
+            "options": component.options or {},
+            "schema": component.schema or {},
+            "title": component.title,
+            "name": component.runner_component_name,
+        }
+        # Remove keys with None values (it varies for read only components)
+        built_component = {k: v for k, v in built_component.items() if v is not None}
+    else:
+        built_component = {
+            "options": component.options or {},
+            "type": component.type.value,
+            "title": component.title,
+            "hint": component.hint_text or "",
+            "schema": component.schema or {},
+            "name": component.runner_component_name,
+            "metadata": {
+                # "fund_builder_id": str(component.component_id) TODO why do we need this?
+            },
+        }
     # add a reference to the relevant list if this component use a list
-    if component.lizt:
+    if component.type.value is ComponentType.YES_NO_FIELD.value:
+        # implicit list
+        built_component.update({"values": {"type": "listRef"}})
+    elif component.lizt:
         built_component.update({"list": component.lizt.name})
         built_component["metadata"].update({"fund_builder_list_id": str(component.list_id)})
+        built_component.update({"values": {"type": "listRef"}})
+
+    if component.type is ComponentType.MULTI_INPUT_FIELD:
+        built_component.update({"children": component.children})
+
     return built_component
 
 
-def build_page(page: Page = None, page_display_path: str = None) -> dict:
+def build_page(page: Page = None) -> dict:
     """
-    Builds the form runner JSON structure for the supplied page. If that page is None, retrieves a template
-    page with the display_path matching page_display_path.
-
-    This accounts for conditional logic where the destination target will be the display path of a template
-    page, but that page does not actually live in the main hierarchy as branching logic uses a fixed set of
-    conditions at this stage.
+    Builds the form runner JSON structure for the supplied page.
 
     Then builds all the components on this page and adds them to the page json structure
     """
-    if not page:
-        page = get_template_page_by_display_path(page_display_path)
     built_page = copy.deepcopy(BASIC_PAGE_STRUCTURE)
     built_page.update(
         {
@@ -112,6 +128,10 @@ def build_page(page: Page = None, page_display_path: str = None) -> dict:
             "title": page.name_in_apply_json["en"],
         }
     )
+    if page.formsection:
+        built_page.update({"section": page.formsection.name})
+    if page.options:
+        built_page.update({"options": page.options})
     # Having a 'null' controller element breaks the form-json, needs to not be there if blank
     if page.controller:
         built_page["controller"] = page.controller
@@ -147,26 +167,12 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
         for component in page.components:
             if not component.conditions:
                 continue
-            form_json_conditions = build_conditions(component)
             has_conditions = True
+            form_json_conditions = build_conditions(component)
             partial_form_json["conditions"].extend(form_json_conditions)
 
             for condition in component.conditions:
-                if condition["destination_page_path"] == "CONTINUE":
-                    destination_path = f"/{next_path}"
-                else:
-                    destination_path = f"/{condition['destination_page_path'].lstrip('/')}"
-                # TODO No longer needed since db schema change?
-                # If this points to a pre-built page flow, add that in now (it won't be in the input)
-                # if (
-                #     destination_path not in [page["path"] for page in partial_form_json["pages"]]
-                #     and not destination_path == "/summary"
-                # ):
-                #     sub_page = build_page(page_display_path=destination_path[1:])
-                #     if not sub_page.get("next", None):
-                #         sub_page["next"] = [{"path": f"/{next_path}"}]
-
-                #     partial_form_json["pages"].append(sub_page)
+                destination_path = f"/{condition['destination_page_path'].lstrip('/')}"
 
                 this_page_in_results["next"].append(
                     {
@@ -179,6 +185,17 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
             this_page_in_results["next"].append({"path": "/summary"})
 
     return partial_form_json
+
+
+def build_form_section(form_section_list, form_section):
+    form_section_obj = FormSection(
+        name=form_section.name,
+        title=form_section.title,
+        hideTitle=form_section.hide_title,
+    )
+    # Check if the list already exists in lists by name
+    if not any(existing_list["name"] == form_section_obj.name for existing_list in form_section_list):
+        form_section_list.append(form_section_obj.as_dict())
 
 
 def build_lists(pages: list[dict]) -> list:
@@ -219,20 +236,26 @@ def build_start_page(content: str, form: Form) -> dict:
             "title": form.name_in_apply_json["en"],
             "path": f"/intro-{human_to_kebab_case(form.name_in_apply_json['en'])}",
             "controller": "./pages/start.js",
-            "next": [{"path": f"/{form.pages[0].display_path}"}],
         }
     )
-    ask_about = '<p class="govuk-body">We will ask you about:</p> <ul>'
-    for page in form.pages:
-        ask_about += f"<li>{page.name_in_apply_json['en']}</li>"
-    ask_about += "</ul>"
+    ask_about = None
+    if len(form.pages) > 0:
+        ask_about = '<p class="govuk-body">We will ask you about:</p> <ul>'
+        for page in form.pages:
+            ask_about += f"<li>{page.name_in_apply_json['en']}</li>"
+        ask_about += "</ul>"
+        start_page.update(
+            {
+                "next": [{"path": f"/{form.pages[0].display_path}"}],
+            }
+        )
 
     start_page["components"].append(
         {
             "name": "start-page-content",
             "options": {},
             "type": "Html",
-            "content": f'<p class="govuk-body">{content}</p>{ask_about}',
+            "content": f'<p class="govuk-body">{content or ""}</p>{ask_about or ""}',
             "schema": {},
         }
     )
@@ -247,7 +270,7 @@ def human_to_kebab_case(word: str) -> str | None:
         return word.replace(" ", "-").strip().lower()
 
 
-def build_form_json(form: Form) -> dict:
+def build_form_json(form: Form, fund_title:str = None) -> dict:
     """
     Takes in a single Form object and then generates the form runner json for that form.
 
@@ -255,11 +278,13 @@ def build_form_json(form: Form) -> dict:
     """
 
     results = copy.deepcopy(BASIC_FORM_STRUCTURE)
-    results["name"] = form.name_in_apply_json["en"]
-
+    results["name"] = f"Apply for {fund_title}" if fund_title else "Access Funding"
+    results["sections"] = []
     # Build the basic page structure
     for page in form.pages:
         results["pages"].append(build_page(page=page))
+        if page.formsection:
+            build_form_section(results["sections"], page.formsection)
 
     # start page is the page with the controller ending start.js
     start_page = _find_page_by_controller(form.pages, "start.js")

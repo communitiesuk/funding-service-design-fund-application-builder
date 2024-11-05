@@ -1,3 +1,6 @@
+import json
+import os
+from dataclasses import asdict
 from uuid import uuid4
 
 import pytest
@@ -5,6 +8,7 @@ import pytest
 from app.db.models import Component
 from app.db.models import ComponentType
 from app.db.models import Form
+from app.db.models import FormSection
 from app.db.models import Fund
 from app.db.models import Lizt
 from app.db.models import Page
@@ -14,6 +18,12 @@ from app.db.queries.application import get_component_by_id
 from app.db.queries.fund import get_fund_by_id
 from app.export_config.generate_assessment_config import build_assessment_config
 from app.export_config.generate_form import build_form_json
+from app.export_config.generate_fund_round_form_jsons import (
+    generate_form_jsons_for_round,
+)
+from app.import_config.load_form_json import load_form_jsons
+from app.shared.data_classes import Condition
+from app.shared.data_classes import ConditionValue
 from tasks.test_data import BASIC_FUND_INFO
 from tasks.test_data import BASIC_ROUND_INFO
 
@@ -68,7 +78,11 @@ page_2_id = uuid4()
 @pytest.mark.seed_config(
     {
         "funds": [Fund(fund_id=fund_id, short_name="UTFWC", **BASIC_FUND_INFO)],
-        "rounds": [Round(round_id=round_id, fund_id=fund_id, short_name="UTRWC", **BASIC_ROUND_INFO)],
+        "rounds": [
+            Round(
+                round_id=round_id, title_json={"en": "UT RWC"}, fund_id=fund_id, short_name="UTRWC", **BASIC_ROUND_INFO
+            )
+        ],
         "sections": [
             Section(
                 section_id=section_id, index=1, round_id=round_id, name_in_apply_json={"en": "Organisation Information"}
@@ -126,18 +140,50 @@ page_2_id = uuid4()
                 runner_component_name="does_your_organisation_use_other_names",
                 is_template=True,
                 conditions=[
-                    {
-                        "name": "organisation_other_names_no",
-                        "value": "false",  # this must be lowercaes or the navigation doesn't work
-                        "operator": "is",
-                        "destination_page_path": "CONTINUE",
-                    },
-                    {
-                        "name": "organisation_other_names_yes",
-                        "value": "true",  # this must be lowercaes or the navigation doesn't work
-                        "operator": "is",
-                        "destination_page_path": "organisation-alternative-names",
-                    },
+                    asdict(
+                        Condition(
+                            name="organisation_other_names_no",
+                            display_name="org other names no",
+                            destination_page_path="/summary",
+                            value=ConditionValue(
+                                name="org other names no",
+                                conditions=[
+                                    {
+                                        "field": {
+                                            "name": "org_other_names",
+                                            "type": "YesNoField",
+                                            "display": "org other names",
+                                        },
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "false", "display": "false"},
+                                        "coordinator": None,
+                                    },
+                                ],
+                            ),
+                        ),
+                    ),
+                    asdict(
+                        Condition(
+                            name="organisation_other_names_yes",
+                            display_name="org other names yes",
+                            destination_page_path="/organisation-alternative-names",
+                            value=ConditionValue(
+                                name="org other names yes",
+                                conditions=[
+                                    {
+                                        "field": {
+                                            "name": "org_other_names",
+                                            "type": "YesNoField",
+                                            "display": "org other names",
+                                        },
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "true", "display": "false"},
+                                        "coordinator": None,
+                                    },
+                                ],
+                            ),
+                        ),
+                    ),
                 ],
             ),
             Component(
@@ -234,3 +280,340 @@ def test_list_relationship(seed_dynamic_data):
     assert result.list_id == list_id
     assert result.lizt
     assert result.lizt.name == "classifications_list"
+
+
+@pytest.mark.parametrize(
+    "input_filename, output_filename",
+    [
+        ("test-section.json", "section.json"),
+    ],
+)
+def test_generate_config_to_verify_form_sections(
+    seed_dynamic_data,
+    _db,
+    monkeypatch,
+    input_filename,
+    output_filename,
+    temp_output_dir,
+):
+    form_configs = []
+    script_dir = os.path.dirname(__file__)
+    test_data_dir = os.path.join(script_dir, "test_data")
+    file_path = os.path.join(test_data_dir, input_filename)
+    with open(file_path, "r") as json_file:
+        input_form = json.load(json_file)
+        input_form["filename"] = input_filename
+        form_configs.append(input_form)
+    load_form_jsons(form_configs)
+
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round_short_name = seed_dynamic_data["rounds"][0].short_name
+    mock_round_base_paths = {round_short_name: 99}
+    # find a random section belonging to the round id and assign each form to that section
+    forms = _db.session.query(Form).filter(Form.template_name == input_filename.split(".")[0])
+    section = _db.session.query(Section).filter(Section.round_id == round_id).first()
+    for form in forms:
+        form.section_id = section.section_id
+    _db.session.commit()
+
+    # Use monkeypatch to temporarily replace ROUND_BASE_PATHS
+    import app.export_config.generate_fund_round_config as generate_fund_round_config
+
+    monkeypatch.setattr(generate_fund_round_config, "ROUND_BASE_PATHS", mock_round_base_paths)
+    result = generate_form_jsons_for_round(round_id)
+    # Simply writes the files to the output directory so no result is given directly
+    assert result is None
+
+    # Check if the directory is created
+    generated_json_form = temp_output_dir / round_short_name / "form_runner" / output_filename
+    assert generated_json_form
+
+    # compare the import file with the generated file
+    with open(generated_json_form, "r") as file:
+        output_form = json.load(file)
+
+    assert len(output_form["sections"]) == len(form_configs[0]["sections"])
+
+
+@pytest.mark.parametrize(
+    "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form, "
+    "expected_form_section_count",
+    [
+        ("org-info.json", "organisation-information.json", 18, 43, 2),
+        ("optional-all-components.json", "optional.json", 8, 27, 4),
+        ("required-all-components.json", "required.json", 8, 27, 1),
+        ("favourite-colours-sarah.json", "colours.json", 4, 1, 1),
+        ("funding-required-cof-25.json", "funding-required.json", 12, 21, 2),
+        (
+            "Organisation-and-local-authority-information-template.json",
+            "local-authority-and-other-organisation-information.json",
+            16,
+            24,
+            1,
+        ),  # noqa: E501
+        ("test-section.json", "section.json", 3, 1, 2),
+    ],
+)
+def test_generate_config_for_round_valid_input(
+    seed_dynamic_data,
+    _db,
+    monkeypatch,
+    input_filename,
+    output_filename,
+    expected_page_count_for_form,
+    expected_component_count_for_form,
+    expected_form_section_count,
+    temp_output_dir,
+):
+    form_configs = []
+    script_dir = os.path.dirname(__file__)
+    test_data_dir = os.path.join(script_dir, "test_data")
+    file_path = os.path.join(test_data_dir, input_filename)
+    with open(file_path, "r") as json_file:
+        input_form = json.load(json_file)
+        input_form["filename"] = input_filename
+        form_configs.append(input_form)
+    load_form_jsons(form_configs)
+
+    expected_form_count = 1
+    # check form config is in the database
+    forms = _db.session.query(Form).filter(Form.template_name == input_filename.split(".")[0])
+    assert forms.count() == expected_form_count
+    form = forms.first()
+    pages = _db.session.query(Page).filter(Page.form_id == form.form_id)
+
+    assert pages.count() == expected_page_count_for_form
+    form_sections = _db.session.query(FormSection)
+    assert form_sections.count() == expected_form_section_count
+    total_components_count = sum(
+        _db.session.query(Component).filter(Component.page_id == page.page_id).count() for page in pages
+    )
+    assert total_components_count == expected_component_count_for_form
+
+    # associate forms with a round
+    round_id = seed_dynamic_data["rounds"][0].round_id
+    round_short_name = seed_dynamic_data["rounds"][0].short_name
+    mock_round_base_paths = {round_short_name: 99}
+    # find a random section belonging to the round id and assign each form to that section
+    section = _db.session.query(Section).filter(Section.round_id == round_id).first()
+    for form in forms:
+        form.section_id = section.section_id
+    _db.session.commit()
+
+    # Use monkeypatch to temporarily replace ROUND_BASE_PATHS
+    import app.export_config.generate_fund_round_config as generate_fund_round_config
+
+    monkeypatch.setattr(generate_fund_round_config, "ROUND_BASE_PATHS", mock_round_base_paths)
+    result = generate_form_jsons_for_round(round_id)
+    # Simply writes the files to the output directory so no result is given directly
+    assert result is None
+
+    # Check if the directory is created
+    generated_json_form = temp_output_dir / round_short_name / "form_runner" / output_filename
+    assert generated_json_form
+
+    # compare the import file with the generated file
+    with open(generated_json_form, "r") as file:
+        output_form = json.load(file)
+
+    # Compare the contents of the files
+
+    # ensure the keys of the output form are in the input form keys
+    assert set(output_form.keys()) - {"name"} <= set(
+        input_form.keys()
+    ), "Output form keys are not a subset of input form keys, ignoring 'name'"
+
+    # check conditions length is equal
+    input_condition_count = len(input_form.get("conditions", []))
+    output_condition_count = len(output_form.get("conditions", []))
+    assert output_condition_count <= input_condition_count  # sometime we remove specified but unused conditions
+
+    # check that content of each page (including page[components] and page[next] within form[pages] is the same
+    for input_page in input_form["pages"]:
+
+        # find page in output pages
+        output_page = next((p for p in output_form["pages"] if p["path"] == input_page["path"]), None)
+        assert input_page["path"] == output_page["path"]
+        assert input_page["title"] == output_page["title"]
+        for next_dict in input_page["next"]:
+            # find next in output page
+            output_next = next((n for n in output_page["next"] if n["path"] == next_dict["path"]), None)
+            assert next_dict["path"] == output_next["path"]
+            assert next_dict.get("condition", None) == output_next.get("condition", None)
+
+        # compare components
+        for input_component in input_page["components"]:
+            # find component in output page
+            output_component = None
+            for c in output_page.get("components", []):
+                # Get name or content for both components safely
+                output_name_or_content = c.get("name") or c.get("content")
+                input_name_or_content = input_component.get("name") or input_component.get("content")
+                print(f"Checking output: {output_name_or_content} vs input: {input_name_or_content}")
+                if output_name_or_content == input_name_or_content:
+                    output_component = c
+                    break
+
+            for key in input_component:
+                assert input_component[key] == output_component[key]
+
+
+# colour_json={
+#     "metadata": {},
+#     "startPage": "/what-is-your-favourite-colour-sarah",
+#     "pages": [
+#         {
+#             "title": "What is your favourite colour? Sarah",
+#             "path": "/what-is-your-favourite-colour-sarah",
+#             "components": [
+#                 {
+#                     "name": "OPEHhy",
+#                     "options": {
+#                         "hideTitle": True
+#                     },
+#                     "type": "RadiosField",
+#                     "title": "Favourite Colour",
+#                     "list": "iLMNKs"
+#                 }
+#             ],
+#             "next": [
+#                 {
+#                     "path": "/red-page-title",
+#                     "condition": "FyEDLl"
+#                 },
+#                 {
+#                     "path": "/green",
+#                     "condition": "wLwzXz"
+#                 },
+#                 {
+#                     "path": "/summary",
+#                     "condition": "CMLrkp"
+#                 }
+#             ]
+#         },
+#         {
+#             "path": "/red-page-title",
+#             "title": "Red PAge Title",
+#             "components": [],
+#             "next": [
+#                 {
+#                     "path": "/summary"
+#                 }
+#             ]
+#         },
+#         {
+#             "title": "Summary",
+#             "path": "/summary",
+#             "controller": "./pages/summary.js",
+#             "components": [],
+#             "next": []
+#         },
+#         {
+#             "path": "/green",
+#             "title": "Green",
+#             "components": [],
+#             "next": [
+#                 {
+#                     "path": "/summary"
+#                 }
+#             ]
+#         }
+#     ],
+#     "lists": [
+#         {
+#             "title": "Colours",
+#             "name": "iLMNKs",
+#             "type": "string",
+#             "items": [
+#                 {
+#                     "text": "Red",
+#                     "value": "red"
+#                 },
+#                 {
+#                     "text": "Green",
+#                     "value": "green"
+#                 },
+#                 {
+#                     "text": "Blue",
+#                     "value": "blue"
+#                 }
+#             ]
+#         }
+#     ],
+#     "sections": [],
+#     "conditions": [
+#         {
+#             "displayName": "red",
+#             "name": "FyEDLl",
+#             "value": {
+#                 "name": "red",
+#                 "conditions": [
+#                     {
+#                         "field": {
+#                             "name": "OPEHhy",
+#                             "type": "RadiosField",
+#                             "display": "Favourite Colour"
+#                         },
+#                         "operator": "is",
+#                         "value": {
+#                             "type": "Value",
+#                             "value": "red",
+#                             "display": "red"
+#                         }
+#                     }
+#                 ]
+#             }
+#         },
+#         {
+#             "displayName": "green",
+#             "name": "wLwzXz",
+#             "value": {
+#                 "name": "green",
+#                 "conditions": [
+#                     {
+#                         "field": {
+#                             "name": "OPEHhy",
+#                             "type": "RadiosField",
+#                             "display": "Favourite Colour"
+#                         },
+#                         "operator": "is",
+#                         "value": {
+#                             "type": "Value",
+#                             "value": "green",
+#                             "display": "green"
+#                         }
+#                     }
+#                 ]
+#             }
+#         },
+#         {
+#             "displayName": "blue",
+#             "name": "CMLrkp",
+#             "value": {
+#                 "name": "blue",
+#                 "conditions": [
+#                     {
+#                         "field": {
+#                             "name": "OPEHhy",
+#                             "type": "RadiosField",
+#                             "display": "Favourite Colour"
+#                         },
+#                         "operator": "is",
+#                         "value": {
+#                             "type": "Value",
+#                             "value": "blue",
+#                             "display": "blue"
+#                         }
+#                     }
+#                 ]
+#             }
+#         }
+#     ],
+#     "fees": [],
+#     "outputs": [],
+#     "version": 2,
+#     "skipSummary": False,
+#     "feeOptions": {},
+#     "markAsComplete": False
+# }
+# def test_import_fave_colours():

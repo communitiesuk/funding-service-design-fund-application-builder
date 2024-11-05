@@ -2,12 +2,15 @@ import os
 import sys
 from os import getenv
 
+sys.path.insert(1, ".")
+
+os.environ.update({"FLASK_ENV": "development"})
+
+from flask_migrate import upgrade  # noqa: E402
 from invoke import task  # noqa:E402
 
-from app import app
-
-sys.path.insert(1, ".")
-os.environ.update({"FLASK_ENV": "tasks"})
+from app import app  # noqa: E402
+from app.import_config.load_form_json import load_form_jsons  # noqa: E402
 
 from .test_data import init_salmon_fishing_fund  # noqa:E402
 from .test_data import insert_test_data  # noqa:E402
@@ -49,6 +52,7 @@ def recreate_local_dbs(c):
             print(
                 f"{db_uri} db created...",
             )
+            upgrade()
 
 
 @task
@@ -66,6 +70,7 @@ def create_test_data(c):
         )
         db.session.commit()
         insert_test_data(db=db, test_data=init_salmon_fishing_fund())
+        load_form_jsons()
 
 
 @task

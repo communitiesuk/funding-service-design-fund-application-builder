@@ -41,7 +41,27 @@ class ComponentType(Enum):
     CLIENT_SIDE_FILE_UPLOAD_FIELD = "ClientSideFileUploadField"
     WEBSITE_FIELD = "WebsiteField"
     MULTILINE_TEXT_FIELD = "MultilineTextField"
+    NUMBER_FIELD = "NumberField"
+    DATE_FIELD = "DateField"
+    DATE_TIME_FIELD = "DateTimeField"
+    DATE_TIME_PARTS_FIELD = "DateTimePartsField"
+    SELECT_FIELD = "SelectField"
+    INSET_TEXT_FIELD = "InsetText"
+    DETAILS_FIELD = "Details"
+    LIST_FIELD = "List"
+    AUTO_COMPLETE_FIELD = "AutocompleteField"
+    FILE_UPLOAD_FIELD = "FileUploadField"
+    MONTH_YEAR_FIELD = "MonthYearField"
+    TIME_FIELD = "TimeField"
+    MULTI_INPUT_FIELD = "MultiInputField"
 
+
+READ_ONLY_COMPONENTS = [
+    ComponentType.HTML,
+    ComponentType.PARA,
+    ComponentType.INSET_TEXT_FIELD,
+    ComponentType.DETAILS_FIELD,
+]
 
 
 @dataclass
@@ -62,13 +82,16 @@ class Section(BaseModel):
     is_template = Column(Boolean, default=False, nullable=False)
     audit_info = Column(JSON(none_as_null=True))
     forms: Mapped[List["Form"]] = relationship(
-        "Form", order_by="Form.section_index", collection_class=ordering_list("section_index"), passive_deletes="all"
+        "Form",
+        order_by="Form.section_index",
+        collection_class=ordering_list("section_index", count_from=1),
+        passive_deletes="all",
     )
     index = Column(Integer())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
     def __repr__(self):
-        return f"Section([{self.section_id}], {self.name_in_apply_json['en']}, Forms: {self.forms})"
+        return f"Section({self.index}, {self.name_in_apply_json['en']} [{self.section_id}], Forms: {self.forms})"
 
     def as_dict(self, include_relationships=False):
         result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}
@@ -90,6 +113,7 @@ class Form(BaseModel):
         primary_key=True,
         default=uuid.uuid4,
     )
+    # TODO rename this to 'name in tasklist' as no longer us as the name in the apply json
     name_in_apply_json = Column(JSON(none_as_null=True), nullable=False, unique=False)
     template_name = Column(String(), nullable=True)
     is_template = Column(Boolean, default=False, nullable=False)
@@ -100,15 +124,34 @@ class Form(BaseModel):
     )
     runner_publish_name = Column(db.String())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
+    form_json = Column(JSON(none_as_null=True), nullable=True)
 
     def __repr__(self):
-        return f"Form({self.runner_publish_name} - {self.name_in_apply_json['en']}, Pages: {self.pages})"
+        return (
+            f"Form({self.section_index}, {self.runner_publish_name}"
+            + f"- {self.name_in_apply_json['en']}, Pages: {self.pages})"
+        )
 
     def as_dict(self, include_relationships=False):
         result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}
         if include_relationships & hasattr(self, "pages"):
             result["pages"] = [page.as_dict() for page in self.pages if self.pages is not None]
         return result
+
+
+class FormSection(BaseModel):
+    form_section_id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+    name = Column(String())
+    title = Column(String())
+    hide_title = Column(Boolean, default=False, nullable=False)
+    is_template = Column(Boolean, default=False, nullable=False)
+
+    def as_dict(self):
+        return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}
 
 
 @dataclass
@@ -139,6 +182,14 @@ class Page(BaseModel):
     )
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     controller = Column(String(), nullable=True)
+    options = Column(JSON(none_as_null=True))
+    form_section_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("formsection.form_section_id"),
+        nullable=True,
+    )
+    form_section_id: Mapped[int | None] = mapped_column(ForeignKey(FormSection.form_section_id))
+    formsection: Mapped[FormSection | None] = relationship()
 
     def __repr__(self):
         return f"Page(/{self.display_path} - {self.name_in_apply_json['en']}, Components: {self.components})"
@@ -191,19 +242,22 @@ class Component(BaseModel):
         nullable=True,  # will be null where this is a template and not linked to a theme
     )
     # TODO make these 2 json so we can do welsh?
-    title = Column(String())
+    title = Column(String(), nullable=True)
+    content = Column(String(), nullable=True)
     hint_text = Column(String(), nullable=True)
     options = Column(JSON(none_as_null=False))
+    schema = Column(JSON(none_as_null=False))
     type = Column(ENUM(ComponentType))
     template_name = Column(String(), nullable=True)
     is_template = Column(Boolean, default=False, nullable=False)
     audit_info = Column(JSON(none_as_null=True))
+    children = Column(JSON(none_as_null=True))  # TODO model this as a proper hierarchy
     page_index = Column(Integer())
     theme_index = Column(Integer())
     conditions = Column(JSON(none_as_null=True))
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     runner_component_name = Column(
-        String(), nullable=False
+        String(), nullable=True  # None for display only fields
     )  # TODO add validation to make sure it's only letters, numbers and _
     list_id = Column(
         UUID(as_uuid=True),
@@ -228,8 +282,8 @@ class Component(BaseModel):
             "yesnofield": "text",
             "freetextfield": "free_text",
             "checkboxesfield": "list",
-            #TODO add multilinetext field and update types of components in sync with formrunner
-            #"multilinetextfield": "list",
+            # TODO add multilinetext field and update types of components in sync with formrunner
+            # "multilinetextfield": "list",
             "multiinputfield": "table",
             "clientsidefileuploadfield": "s3bucketPath",
             "radiosfield": "text",

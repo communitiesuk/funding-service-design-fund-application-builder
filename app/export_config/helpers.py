@@ -1,5 +1,4 @@
 import os
-from datetime import date
 
 import jsonschema
 from flask import current_app
@@ -8,28 +7,29 @@ from jsonschema import validate
 from app.blueprints.self_serve.routes import human_to_kebab_case
 from app.blueprints.self_serve.routes import human_to_snake_case
 from app.shared.helpers import convert_to_dict
+from config import Config
 
 
 def write_config(config, filename, round_short_name, config_type):
     # Get the directory of the current file
-    current_dir = os.path.dirname(__file__)
 
     # Construct the path to the output directory relative to this file's location
-    base_output_dir = os.path.join(current_dir, f"output/{round_short_name}/")
+    base_output_dir = Config.TEMP_FILE_PATH / round_short_name
 
     if config_type == "form_json":
-        output_dir = os.path.join(base_output_dir, "form_runner/")
+        output_dir = base_output_dir / "form_runner"
         content_to_write = config
-        file_path = os.path.join(output_dir, f"{human_to_kebab_case(filename)}.json")
+        file_path = output_dir / f"{human_to_kebab_case(filename)}.json"
     elif config_type == "python_file":
-        output_dir = os.path.join(base_output_dir, "fund_store/")
+        output_dir = base_output_dir / "fund_store"
         config_dict = convert_to_dict(config)  # Convert config to dict for non-JSON types
-        content_to_write = str(config_dict)
-        file_path = os.path.join(output_dir, f"{human_to_snake_case(filename)}_{date.today().strftime('%d-%m-%Y')}.py")
+        content_to_write = "LOADER_CONFIG="
+        content_to_write += str(config_dict)
+        file_path = output_dir / f"{human_to_snake_case(filename)}.py"
     elif config_type == "html":
-        output_dir = os.path.join(base_output_dir, "html/")
+        output_dir = base_output_dir / "html"
         content_to_write = config
-        file_path = os.path.join(output_dir, f"{filename}.html")
+        file_path = output_dir / f"{filename}_all_questions_en.html"
 
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)

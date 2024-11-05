@@ -1,3 +1,4 @@
+from dataclasses import asdict
 from datetime import datetime
 from random import randint
 from uuid import uuid4
@@ -14,6 +15,9 @@ from app.db.models import Round
 from app.db.models import Section
 from app.db.models import Subcriteria
 from app.db.models import Theme
+from app.db.models.fund import FundingType
+from app.shared.data_classes import Condition
+from app.shared.data_classes import ConditionValue
 
 BASIC_FUND_INFO = {
     "name_json": {"en": "Unit Test Fund"},
@@ -21,17 +25,45 @@ BASIC_FUND_INFO = {
     "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
     "welsh_available": False,
     "owner_organisation_id": None,
+    "funding_type": FundingType.COMPETITIVE,
 }
 BASIC_ROUND_INFO = {
     "audit_info": {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-    "title_json": {"en": "round the first"},
-    "opens": datetime.now(),
-    "deadline": datetime.now(),
-    "assessment_start": datetime.now(),
-    "reminder_date": datetime.now(),
-    "assessment_deadline": datetime.now(),
-    "prospectus_link": "http://www.google.com",
-    "privacy_notice_link": "http://www.google.com",
+    "opens": "2024-10-01T11:59:00",
+    "deadline": "2024-10-31T11:59:00",
+    "assessment_start": "2024-10-01T11:59:00",
+    "reminder_date": "2024-10-20T11:59:00",
+    "assessment_deadline": "2024-11-30T11:59:00",
+    "project_name_field_id": 1,
+    "prospectus_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
+    "privacy_notice_link": "https://www.gov.uk/government/organisations/"
+    "ministry-of-housing-communities-local-government",
+    "reference_contact_page_over_email": False,
+    "contact_email": "help@fab.gov.uk",
+    "contact_phone": "01234 123123",
+    "contact_textphone": "None",
+    "support_times": "12-2",
+    "support_days": "Just Mondays",
+    "instructions_json": {},
+    "feedback_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
+    "application_guidance_json": {
+        "en": "You can view <a href='{all_questions_url}'>all the questions we will ask you</a> if you want to."
+    },
+    "guidance_url": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
+    "all_uploaded_documents_section_available": False,
+    "application_fields_download_available": False,
+    "display_logo_on_pdf_exports": False,
+    "mark_as_complete_enabled": False,
+    "is_expression_of_interest": False,
+    "eoi_decision_schema": {},
+    "feedback_survey_config": {
+        "has_feedback_survey": False,
+        "has_section_feedback": False,
+        "is_feedback_survey_optional": False,
+        "is_section_feedback_optional": False,
+    },
+    "eligibility_config": {"has_eligibility": False},
+    "contact_us_banner_json": {},
 }
 
 page_one_id = uuid4()
@@ -62,35 +94,22 @@ def init_salmon_fishing_fund():
         welsh_available=False,
         short_name=f"SFF{randint(0,999)}",
         owner_organisation_id=o.organisation_id,
+        funding_type=FundingType.COMPETITIVE,
     )
 
     r: Round = Round(
         round_id=uuid4(),
         fund_id=f.fund_id,
-        audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
         title_json={"en": "round the first"},
         short_name="TEST",
-        opens=datetime.now(),
-        deadline=datetime.now(),
-        assessment_start=datetime.now(),
-        reminder_date=datetime.now(),
-        assessment_deadline=datetime.now(),
-        prospectus_link="http://www.google.com",
-        privacy_notice_link="http://www.google.com",
+        **BASIC_ROUND_INFO,
     )
     r2: Round = Round(
         round_id=uuid4(),
         fund_id=f.fund_id,
-        audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
         title_json={"en": "round the second"},
-        short_name=f"R{randint(0,999)}",
-        opens=datetime.now(),
-        deadline=datetime.now(),
-        assessment_start=datetime.now(),
-        reminder_date=datetime.now(),
-        assessment_deadline=datetime.now(),
-        prospectus_link="http://www.google.com",
-        privacy_notice_link="http://www.google.com",
+        short_name="TEST2",
+        **BASIC_ROUND_INFO,
     )
 
     s1: Section = Section(
@@ -192,7 +211,7 @@ def init_salmon_fishing_fund():
         component_id=uuid4(),
         page_id=p1.page_id,
         title="What is your organisation's name?",
-        hint_text="This must match the regsitered legal organisation name",
+        hint_text="This must match the registered legal organisation name",
         type=ComponentType.TEXT_FIELD,
         page_index=1,
         theme_id=t1.theme_id,
@@ -211,25 +230,55 @@ def init_salmon_fishing_fund():
         options={"hideTitle": False, "classes": ""},
         runner_component_name="does_your_organisation_use_other_names",
         conditions=[
-            {
-                "name": "organisation_other_names_no",
-                "value": "false",  # this must be lowercase or the navigation doesn't work
-                "operator": "is",
-                "destination_page_path": "organisation-address",
-            },
-            {
-                "name": "organisation_other_names_yes",
-                "value": "true",  # this must be lowercase or the navigation doesn't work
-                "operator": "is",
-                "destination_page_path": "organisation-alternative-names",
-            },
+            asdict(
+                Condition(
+                    name="organisation_other_names_no",
+                    display_name="Other Name No",
+                    destination_page_path="/organisation-address",
+                    value=ConditionValue(
+                        name="Other Name No",
+                        conditions=[
+                            {
+                                "field": {
+                                    "name": "does_your_organisation_use_other_names",
+                                    "type": "YesNoField",
+                                    "display": "Does your organisation use other names?",
+                                },
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "false", "display": "false"},
+                            }
+                        ],
+                    ),
+                )
+            ),
+            asdict(
+                Condition(
+                    name="organisation_other_names_yes",
+                    display_name="Other Name Yes",
+                    destination_page_path="/organisation-alternative-names",
+                    value=ConditionValue(
+                        name="Other Name Yes",
+                        conditions=[
+                            {
+                                "field": {
+                                    "name": "does_your_organisation_use_other_names",
+                                    "type": "YesNoField",
+                                    "display": "Does your organisation use other names?",
+                                },
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "true", "display": "true"},
+                            }
+                        ],
+                    ),
+                )
+            ),
         ],
     )
     c2: Component = Component(
         component_id=uuid4(),
         page_id=p2.page_id,
         title="What is your organisation's address?",
-        hint_text="This must match the regsitered organisation address",
+        hint_text="This must match the registered organisation address",
         type=ComponentType.UK_ADDRESS_FIELD,
         page_index=1,
         theme_id=t1.theme_id,
@@ -267,10 +316,29 @@ def init_salmon_fishing_fund():
         runner_component_name="organisation_classification",
         list_id=l1.list_id,
     )
+
+    fd: Fund = Fund(
+        fund_id=uuid4(),
+        name_json={"en": "Cats and Trees Fund"},
+        title_json={"en": "funding to rescue more cats from trees"},
+        description_json={"en": "A £10m fund to improve access to ladders for rescuing cats stuck up trees."},
+        welsh_available=False,
+        short_name="CTF",
+        owner_organisation_id=o.organisation_id,
+        funding_type=FundingType.COMPETITIVE,
+    )
+
+    rd: Round = Round(
+        round_id=uuid4(),
+        fund_id=fd.fund_id,
+        title_json={"en": "First Round"},
+        short_name="R1",
+        **BASIC_ROUND_INFO,
+    )
     return {
         "lists": [l1],
-        "funds": [f],
-        "rounds": [r, r2],
+        "funds": [f, fd],
+        "rounds": [r, r2, rd],
         "sections": [s1],
         "forms": [f1, f2],
         "pages": [p1, p2, p3, p5, p_org_alt_names],
@@ -304,6 +372,7 @@ def init_unit_test_data() -> dict:
         welsh_available=False,
         short_name=f"UTF{randint(0,999)}",
         owner_organisation_id=o.organisation_id,
+        funding_type=FundingType.COMPETITIVE,
     )
 
     r: Round = Round(
@@ -319,6 +388,16 @@ def init_unit_test_data() -> dict:
         assessment_deadline=datetime.now(),
         prospectus_link="http://www.google.com",
         privacy_notice_link="http://www.google.com",
+        contact_email="test@test.com",
+        contact_phone="0123334444",
+        contact_textphone="0123334444",
+        support_times="9am to 5pm",
+        support_days="Monday to Friday",
+        feedback_link="http://www.google.com",
+        project_name_field_id="12312312312",
+        guidance_url="http://www.google.com",
+        feedback_survey_config={"has_survey": False},
+        eoi_decision_schema={"en": {"valid": True}, "cy": {"valid": False}},
     )
     # r2: Round = Round(
     #     round_id=uuid4(),
@@ -366,7 +445,7 @@ def init_unit_test_data() -> dict:
         component_id=uuid4(),
         page_id=p1.page_id,
         title="What is your organisation's name?",
-        hint_text="This must match the regsitered legal organisation name",
+        hint_text="This must match the registered legal organisation name",
         type=ComponentType.TEXT_FIELD,
         page_index=1,
         theme_id=t1.theme_id,

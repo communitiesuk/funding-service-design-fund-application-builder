@@ -1,0 +1,26 @@
+{% from "macros/wtfToGovUk.html" import input %}
+{%- from "govuk_frontend_jinja/components/file-upload/macro.html" import govukFileUpload -%}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+
+{% extends "base.html" %}
+{% set pageHeading %}
+Rename Template
+{% endset %}
+{% block content %}
+<div class="govuk-grid-row">
+    <h1 class="govuk-heading-l">{{pageHeading}}</h1>
+</div>
+<div class="govuk-grid-row">
+    <fieldset class="govuk-fieldset">
+        <form method="POST">
+            {{ template_form.hidden_tag()}}
+
+            {{ input(template_form.template_name)}}
+            {{ input(template_form.tasklist_name)}}
+            {{ input(template_form.url_path)}}
+            {{ govukButton({"text": "Save"}) }}
+        </form>
+    </fieldset>
+</div>
+{% endblock %}

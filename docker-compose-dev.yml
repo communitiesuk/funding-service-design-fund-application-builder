@@ -1,6 +1,7 @@
 services:
-  fab:
-    hostname: fab
+  fab-dc:
+    hostname: fab-dc
+    container_name: fab-dc
     build:
       context: ../funding-service-design-fund-application-builder
       dockerfile: Dockerfile
@@ -10,36 +11,35 @@ services:
     command: ["sh", "-c", "python -m flask db upgrade && python -m debugpy --listen 0.0.0.0:5601 -m flask run --no-debugger --host 0.0.0.0 --port 8080"]
     ports:
       - 8080:8080
-      - 5686:5601
+      - 5696:5601
     environment:
-      - FORM_RUNNER_INTERNAL_HOST=http://form-runner:3009
-      - FORM_RUNNER_EXTERNAL_HOST=http://localhost:3009
-      - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fund_builder   # pragma: allowlist secret
+      - FORM_RUNNER_INTERNAL_HOST=http://form-runner-dc:3009
+      - FORM_RUNNER_EXTERNAL_HOST=http://localhost:3019
+      - DATABASE_URL=postgresql://postgres:password@fab-db-dc:5432/fund_builder   # pragma: allowlist secret
       - FLASK_DEBUG=0
       - FLASK_ENV=development
-    depends_on: [fab-db, form-runner]
+      - SECRET_KEY=local
+    depends_on: [fab-db-dc, form-runner-dc]
 
-  fab-db:
+  fab-db-dc:
     image: postgres
-    container_name: fab-db
+    container_name: fab-db-dc
     ports:
-      - 5432:5432
+      - 5435:5432
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - ~/apps/postgres:/var/lib/postgresql/data-fab
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=fund_builder
-      - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fund_builder
-      - DATABASE_URL_UNIT_TEST=postgresql://postgres:password@fab-db:5432/fab_unit_test
 
-  form-runner:
-    container_name: form-runner
+  form-runner-dc:
+    container_name: form-runner-dc
     build:
       context: ../digital-form-builder-adapter
       dockerfile: ./runner/Dockerfile
     ports:
-      - "3009:3009"
-      - 9228:9228
+      - "3019:3009"
+      - 9238:9228
     command: yarn runner dev
     environment:
       - CHOKIDAR_USEPOLLING=true
@@ -51,3 +51,10 @@ services:
       - 'NODE_CONFIG={"safelist": ["fab"]}'
       - PREVIEW_MODE=true
       - NODE_ENV=development
+      - SINGLE_REDIS=true
+      - FORM_RUNNER_ADAPTER_REDIS_INSTANCE_URI=redis://redis-data:6379
+
+  redis-data:
+    image: redis
+    ports:
+      - 6379:6379

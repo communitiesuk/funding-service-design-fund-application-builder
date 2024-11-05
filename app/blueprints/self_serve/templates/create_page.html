@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% set pageHeading %}Build Form Page{% endset %}
 
 {%- from "govuk_frontend_jinja/components/input/macro.html" import govukInput -%}
 {%- from "govuk_frontend_jinja/components/textarea/macro.html" import govukTextarea -%}
@@ -6,7 +7,7 @@
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        <h1 class="govuk-heading-l">Build Form Page</h1>
+        <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <form method="POST" id="page_form">

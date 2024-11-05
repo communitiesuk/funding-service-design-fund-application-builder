@@ -1,14 +1,31 @@
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Dict
 from typing import Optional
 
+from app.db.models.fund import FundingType
+
+
+@dataclass
+class SubCondition:
+    field: dict
+    operator: str
+    value: dict
+    coordinator: Optional[str]
+
+
+@dataclass
+class ConditionValue:
+    name: str
+    conditions: list[SubCondition]
+
 
 @dataclass
 class Condition:
     name: str
-    value: str
-    operator: str
+    display_name: str
+    value: ConditionValue
     destination_page_path: str
 
 
@@ -28,6 +45,9 @@ class FormNameJson:
 class FundSectionBase:
     section_name: SectionName
     tree_path: str
+
+    def as_dict(self):
+        return asdict(self)
 
 
 @dataclass
@@ -67,7 +87,7 @@ class ContactUsBannerJson:
 @dataclass
 class FeedbackSurveyConfig:
     has_feedback_survey: Optional[bool] = None
-    has_section_feedback: Optional[bool] = None
+    has_section_feedback: Optional[bool] = False
     is_feedback_survey_optional: Optional[bool] = None
     is_section_feedback_optional: Optional[bool] = None
 
@@ -85,9 +105,13 @@ class FundExport:
     owner_organisation_name: str
     owner_organisation_shortname: str
     owner_organisation_logo_uri: str
+    funding_type: FundingType
     name_json: NameJson = field(default_factory=NameJson)
     title_json: TitleJson = field(default_factory=TitleJson)
     description_json: DescriptionJson = field(default_factory=DescriptionJson)
+
+    def as_dict(self):
+        return asdict(self)
 
 
 @dataclass
@@ -119,8 +143,28 @@ class RoundExport:
     display_logo_on_pdf_exports: Optional[bool] = None
     mark_as_complete_enabled: Optional[bool] = None
     is_expression_of_interest: Optional[bool] = None
-    eoi_decision_schema: Optional[str] = None  # Adjust type as
-    feedback_survey_config: FeedbackSurveyConfig = field(default_factory=FeedbackSurveyConfig)
-    eligibility_config: EligibilityConfig = field(default_factory=EligibilityConfig)
+    eoi_decision_schema: Optional[Dict[str, str]] = None
+    feedback_survey_config: Optional[Dict[str, bool]] = field(
+        default_factory=lambda: {
+            "has_feedback_survey": False,
+            "has_section_feedback": False,
+            "is_feedback_survey_optional": False,
+            "is_section_feedback_optional": False,
+        }
+    )
+    eligibility_config: Optional[Dict[str, bool]] = field(default_factory=lambda: {"has_eligibility": False})
     title_json: TitleJson = field(default_factory=TitleJson)
-    contact_us_banner_json: ContactUsBannerJson = field(default_factory=ContactUsBannerJson)
+    contact_us_banner_json: Optional[Dict[str, str]] = None
+
+    def as_dict(self):
+        return asdict(self)
+
+
+@dataclass
+class FormSection:
+    name: str
+    title: str
+    hideTitle: Optional[bool] = None
+
+    def as_dict(self):
+        return asdict(self)

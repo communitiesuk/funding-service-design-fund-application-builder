@@ -1,0 +1,159 @@
+{
+    "metadata": {},
+    "startPage": "/what-is-your-favourite-colour-sarah",
+    "pages": [
+        {
+            "title": "What is your favourite colour? Sarah",
+            "path": "/what-is-your-favourite-colour-sarah",
+            "components": [
+                {
+                    "name": "OPEHhy",
+                    "options": {
+                        "hideTitle": true
+                    },
+                    "type": "RadiosField",
+                    "title": "Favourite Colour",
+                    "list": "iLMNKs"
+                }
+            ],
+            "next": [
+                {
+                    "path": "/red-page-title",
+                    "condition": "FyEDLl"
+                },
+                {
+                    "path": "/green",
+                    "condition": "wLwzXz"
+                },
+                {
+                    "path": "/summary",
+                    "condition": "CMLrkp"
+                }
+            ]
+        },
+        {
+            "path": "/red-page-title",
+            "title": "Red PAge Title",
+            "components": [],
+            "next": [
+                {
+                    "path": "/summary"
+                }
+            ]
+        },
+        {
+            "title": "Summary",
+            "path": "/summary",
+            "controller": "./pages/summary.js",
+            "components": [],
+            "next": []
+        },
+        {
+            "path": "/green",
+            "title": "Green",
+            "components": [],
+            "next": [
+                {
+                    "path": "/summary"
+                }
+            ]
+        }
+    ],
+    "lists": [
+        {
+            "title": "Colours",
+            "name": "iLMNKs",
+            "type": "string",
+            "items": [
+                {
+                    "text": "Red",
+                    "value": "red"
+                },
+                {
+                    "text": "Green",
+                    "value": "green"
+                },
+                {
+                    "text": "Blue",
+                    "value": "blue"
+                }
+            ]
+        }
+    ],
+    "sections": [],
+    "conditions": [
+        {
+            "displayName": "red",
+            "name": "FyEDLl",
+            "value": {
+                "name": "red",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "OPEHhy",
+                            "type": "RadiosField",
+                            "display": "Favourite Colour"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "red",
+                            "display": "red"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "green",
+            "name": "wLwzXz",
+            "value": {
+                "name": "green",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "OPEHhy",
+                            "type": "RadiosField",
+                            "display": "Favourite Colour"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "green",
+                            "display": "green"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "blue",
+            "name": "CMLrkp",
+            "value": {
+                "name": "blue",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "OPEHhy",
+                            "type": "RadiosField",
+                            "display": "Favourite Colour"
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "blue",
+                            "display": "blue"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "fees": [],
+    "outputs": [],
+    "version": 2,
+    "skipSummary": false,
+    "feeOptions": {},
+    "markAsComplete": false,
+    "name":"colours"
+}
