@@ -14,7 +14,8 @@
         "strings": false
     },
     "editor.quickSuggestionsDelay": 10,
-    "black-formatter.interpreter": [
-        "/usr/local/bin/python",
-    ],
+    "sonarlint.connectedMode.project": {
+        "connectionId": "communitiesuk",
+        "projectKey": "communitiesuk_funding-service-design-fund-application-builder"
+    },
 }
