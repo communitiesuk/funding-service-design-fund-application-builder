@@ -2,7 +2,7 @@
 #   Database
 #-----------------------------------
 
-SQLAlchemy[mypy]>=2.0.30
+SQLAlchemy[mypy]>=2.0.36
 Flask-SQLAlchemy==3.1.1
 Flask-Migrate==4.0.7
 sqlalchemy-utils==0.41.2
