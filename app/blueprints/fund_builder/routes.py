@@ -252,21 +252,21 @@ def fund(fund_id=None):
             update_fund(fund)
             flash(f"Updated fund {form.title_en.data}")
             return redirect(url_for("build_fund_bp.view_fund", fund_id=fund.fund_id))
-        else:
-            new_fund = Fund(
-                name_json={"en": form.name_en.data},
-                title_json={"en": form.title_en.data},
-                description_json={"en": form.description_en.data},
-                welsh_available=form.welsh_available.data == "true",
-                short_name=form.short_name.data,
-                audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-                funding_type=FundingType(form.funding_type.data),
-                ggis_scheme_reference_number=(
-                    form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
-                ),
-            )
-            add_fund(new_fund)
-            flash(f"Created fund {form.name_en.data}")
+
+        new_fund = Fund(
+            name_json={"en": form.name_en.data},
+            title_json={"en": form.title_en.data},
+            description_json={"en": form.description_en.data},
+            welsh_available=form.welsh_available.data == "true",
+            short_name=form.short_name.data,
+            audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+            funding_type=FundingType(form.funding_type.data),
+            ggis_scheme_reference_number=(
+                form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
+            ),
+        )
+        add_fund(new_fund)
+        flash(f"Created fund {form.name_en.data}")
         return redirect(url_for(BUILD_FUND_BP_INDEX))
 
     return render_template("fund.html", form=form, fund_id=fund_id)
