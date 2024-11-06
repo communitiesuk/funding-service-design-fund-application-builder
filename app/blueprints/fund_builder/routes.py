@@ -226,6 +226,9 @@ def fund(fund_id=None):
             "description_cy": fund.description_json.get("cy", ""),
             "welsh_available": "true" if fund.welsh_available else "false",
             "funding_type": fund.funding_type.value,
+            "ggis_scheme_reference_number": (
+                fund.ggis_scheme_reference_number if fund.ggis_scheme_reference_number else ""
+            ),
         }
         form = FundForm(data=fund_data)
     else:
@@ -243,6 +246,9 @@ def fund(fund_id=None):
             fund.short_name = form.short_name.data
             fund.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
             fund.funding_type = form.funding_type.data
+            fund.ggis_scheme_reference_number = (
+                form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
+            )
             update_fund(fund)
             flash(f"Updated fund {form.title_en.data}")
             return redirect(url_for("build_fund_bp.view_fund", fund_id=fund.fund_id))
@@ -255,6 +261,9 @@ def fund(fund_id=None):
                 short_name=form.short_name.data,
                 audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
                 funding_type=FundingType(form.funding_type.data),
+                ggis_scheme_reference_number=(
+                    form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
+                ),
             )
             add_fund(new_fund)
             flash(f"Created fund {form.name_en.data}")
@@ -299,6 +308,7 @@ def _convert_json_data_for_form(data) -> str:
     if isinstance(data, dict):
         return json.dumps(data)
     return str(data)
+
 
 def _convert_form_data_to_json(data) -> dict:
     if data:
@@ -357,8 +367,12 @@ def populate_form_with_round_data(round):
             if round.eligibility_config and round.eligibility_config.get("has_eligibility", "") == "true"
             else "false"
         ),
-        "eoi_decision_schema_en": _convert_json_data_for_form(round.eoi_decision_schema.get("en", "")) if round.eoi_decision_schema else "",
-        "eoi_decision_schema_cy": _convert_json_data_for_form(round.eoi_decision_schema.get("cy", "")) if round.eoi_decision_schema else "",
+        "eoi_decision_schema_en": (
+            _convert_json_data_for_form(round.eoi_decision_schema.get("en", "")) if round.eoi_decision_schema else ""
+        ),
+        "eoi_decision_schema_cy": (
+            _convert_json_data_for_form(round.eoi_decision_schema.get("cy", "")) if round.eoi_decision_schema else ""
+        ),
     }
     return RoundForm(data=round_data)
 
@@ -411,7 +425,10 @@ def update_existing_round(round, form):
     round.mark_as_complete_enabled = form.mark_as_complete_enabled.data == "true"
     round.is_expression_of_interest = form.is_expression_of_interest.data == "true"
     round.eligibility_config = {"has_eligibility": form.eligibility_config.data}
-    round.eoi_decision_schema = {"en": _convert_form_data_to_json(form.eoi_decision_schema_en.data), "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data)}
+    round.eoi_decision_schema = {
+        "en": _convert_form_data_to_json(form.eoi_decision_schema_en.data),
+        "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data),
+    }
     round.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
     update_round(round)
 
@@ -425,7 +442,7 @@ def create_new_round(form):
     new_round = Round(
         fund_id=form.fund_id.data,
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-        title_json={"en": form.title_en.data or None, "cy":form.title_cy.data or None},
+        title_json={"en": form.title_en.data or None, "cy": form.title_cy.data or None},
         short_name=form.short_name.data,
         opens=get_datetime(form.opens),
         deadline=get_datetime(form.deadline),
@@ -434,7 +451,10 @@ def create_new_round(form):
         assessment_deadline=get_datetime(form.assessment_deadline),
         prospectus_link=form.prospectus_link.data,
         privacy_notice_link=form.privacy_notice_link.data,
-        contact_us_banner_json={"en": form.contact_us_banner_en.data or None, "cy": form.contact_us_banner_cy.data or None},
+        contact_us_banner_json={
+            "en": form.contact_us_banner_en.data or None,
+            "cy": form.contact_us_banner_cy.data or None,
+        },
         reference_contact_page_over_email=form.reference_contact_page_over_email.data == "true",
         contact_email=form.contact_email.data,
         contact_phone=form.contact_phone.data,
@@ -444,7 +464,10 @@ def create_new_round(form):
         instructions_json={"en": form.instructions_en.data or None, "cy": form.instructions_cy.data or None},
         feedback_link=form.feedback_link.data,
         project_name_field_id=form.project_name_field_id.data,
-        application_guidance_json={"en": form.application_guidance_en.data or None, "cy": form.application_guidance_cy.data or None},
+        application_guidance_json={
+            "en": form.application_guidance_en.data or None,
+            "cy": form.application_guidance_cy.data or None,
+        },
         guidance_url=form.guidance_url.data,
         all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data == "true",
         application_fields_download_available=form.application_fields_download_available.data == "true",
@@ -453,7 +476,10 @@ def create_new_round(form):
         is_expression_of_interest=form.is_expression_of_interest.data == "true",
         feedback_survey_config=_convert_form_data_to_json(form.feedback_survey_config.data),
         eligibility_config={"has_eligibility": form.eligibility_config.data},
-        eoi_decision_schema={"en": _convert_form_data_to_json(form.eoi_decision_schema_en.data), "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data)},
+        eoi_decision_schema={
+            "en": _convert_form_data_to_json(form.eoi_decision_schema_en.data),
+            "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data),
+        },
     )
     add_round(new_round)
 

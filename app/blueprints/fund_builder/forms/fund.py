@@ -41,3 +41,4 @@ class FundForm(FlaskForm):
     description_cy = TextAreaField("Description", description="Leave blank for English-only funds")
     welsh_available = RadioField("Welsh Available", choices=[("true", "Yes"), ("false", "No")], default="false")
     funding_type = GovUkRadioEnumField(label="Funding Type", source_enum=FundingType)
+    ggis_scheme_reference_number = StringField("GGIS Scheme Reference Number", validators=[Length(max=255)])

@@ -26,6 +26,7 @@ BASIC_FUND_INFO = {
     "welsh_available": False,
     "owner_organisation_id": None,
     "funding_type": FundingType.COMPETITIVE,
+    "ggis_scheme_reference_number": "G2-SCH-0000092414",
 }
 BASIC_ROUND_INFO = {
     "audit_info": {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
@@ -95,6 +96,7 @@ def init_salmon_fishing_fund():
         short_name=f"SFF{randint(0,999)}",
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
+        ggis_scheme_reference_number="G1-SCH-0000092414",
     )
 
     r: Round = Round(
@@ -326,6 +328,7 @@ def init_salmon_fishing_fund():
         short_name="CTF",
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
+        ggis_scheme_reference_number="G2-SCH-0000092414",
     )
 
     rd: Round = Round(
@@ -373,6 +376,7 @@ def init_unit_test_data() -> dict:
         short_name=f"UTF{randint(0,999)}",
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
+        ggis_scheme_reference_number="G3-SCH-0000092414",
     )
 
     r: Round = Round(
