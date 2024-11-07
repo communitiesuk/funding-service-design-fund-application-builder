@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from flask_wtf import FlaskForm
 from flask_wtf import Form
@@ -12,7 +13,6 @@ from wtforms.validators import URL
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
-import json
 
 
 def validate_json_field(form, field):

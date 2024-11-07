@@ -141,7 +141,7 @@ def generate_round_config(round_id):
         mark_as_complete_enabled=round.mark_as_complete_enabled,
         is_expression_of_interest=round.is_expression_of_interest,
         feedback_survey_config=round.feedback_survey_config,
-        eoi_decision_schema=round.eoi_decision_schema
+        eoi_decision_schema=round.eoi_decision_schema,
     )
 
     return round_export.as_dict()

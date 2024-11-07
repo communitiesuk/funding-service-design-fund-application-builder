@@ -77,3 +77,4 @@ class Fund(BaseModel):
     # Define the relationship to access the owning Organisation directly
     owner_organisation: Mapped["Organisation"] = relationship("Organisation", back_populates="funds")
     funding_type = Column(ENUM(FundingType), nullable=False, unique=False)
+    ggis_scheme_reference_number = Column("ggis_scheme_reference_number", db.String(255), nullable=True, unique=False)

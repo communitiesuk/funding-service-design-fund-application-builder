@@ -86,7 +86,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                     "display_logo_on_pdf_exports": False,
                     "mark_as_complete_enabled": False,
                     "is_expression_of_interest": False,
-                    "eoi_decision_schema": {"en":{"valid": True}, "cy":{"valid":False}},
+                    "eoi_decision_schema": {"en": {"valid": True}, "cy": {"valid": False}},
                     "feedback_survey_config": {"has_survey": False},
                     "eligibility_config": {"has_eligibility": False},
                     "title_json": {"en": "round the first"},
