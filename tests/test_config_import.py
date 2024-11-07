@@ -36,7 +36,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename,
     expected_page_count_for_form = 8
     expected_component_count_for_form = 27
     # check form config is in the database
-    forms = _db.session.query(Form).filter(Form.template_name == filename.split(".")[0])
+    forms = _db.session.query(Form).filter(Form.runner_publish_name == filename.split(".")[0])
     assert forms.count() == expected_form_count
     form = forms.first()
     pages = _db.session.query(Page).filter(Page.form_id == form.form_id)
@@ -82,7 +82,7 @@ def test_import_multi_input_field(seed_dynamic_data, _db):
         form["filename"] = "test_mult_input"
 
     load_json_from_file(form, template_name="test_input_multi_input")
-    forms = _db.session.query(Form).filter(Form.template_name == "test_input_multi_input")
+    forms = _db.session.query(Form).filter(Form.runner_publish_name == "test_input_multi_input")
     assert forms.count() == 1
     pages = _db.session.query(Page).filter(Page.form_id == forms.first().form_id)
     assert pages.count() == 3

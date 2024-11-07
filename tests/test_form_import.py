@@ -32,16 +32,17 @@ from tests.unit_test_data import test_form_json_condition_org_type_c
     ],
 )
 def test_build_conditions(input_condition, exp_result):
-    result = _build_condition(condition_data=input_condition, destination_page_path=exp_result.destination_page_path)
+    result = _build_condition(condition_data=input_condition, source_page_path=None, destination_page_path=exp_result.destination_page_path)
     assert result == exp_result
 
 
 @pytest.mark.parametrize(
     "input_page, input_conditions, exp_condition_count",
     [
-        ({"next": [{"path": "default-next"}]}, [], 0),
+        ({"path":"/here",
+          "next": [{"path": "default-next"}]}, [], 0),
         (
-            {"next": [{"path": "next-a", "condition": "condition-a"}]},
+            {"path":"/here","next": [{"path": "next-a", "condition": "condition-a"}]},
             [
                 asdict(
                     Condition(
@@ -58,7 +59,7 @@ def test_build_conditions(input_condition, exp_result):
             1,
         ),
         (
-            {"next": [{"path": "next-a", "condition": "condition-a"}]},
+            {"path":"/here","next": [{"path": "next-a", "condition": "condition-a"}]},
             [
                 asdict(
                     Condition(
@@ -82,6 +83,10 @@ def test_build_conditions(input_condition, exp_result):
 def test_add_conditions_to_components(mocker, input_page, input_conditions, exp_condition_count):
     mock_component = Component()
     mocker.patch("app.import_config.load_form_json._get_component_by_runner_name", return_value=mock_component)
+    mocker.patch("app.import_config.load_form_json.get_all_pages_in_parent_form", return_value=[uuid4()])
+
+    # Set up other necessary mocks and test data
+    db = mocker.Mock()
     with mock.patch(
         "app.import_config.load_form_json._build_condition",
         return_value=Condition(name=None, display_name=None, destination_page_path=None, value=None),

@@ -235,6 +235,7 @@ def init_salmon_fishing_fund():
                     name="organisation_other_names_no",
                     display_name="Other Name No",
                     destination_page_path="/organisation-address",
+                    source_page_path="/organisation-name",
                     value=ConditionValue(
                         name="Other Name No",
                         conditions=[
@@ -256,6 +257,7 @@ def init_salmon_fishing_fund():
                     name="organisation_other_names_yes",
                     display_name="Other Name Yes",
                     destination_page_path="/organisation-alternative-names",
+                    source_page_path="/organisation-name",
                     value=ConditionValue(
                         name="Other Name Yes",
                         conditions=[

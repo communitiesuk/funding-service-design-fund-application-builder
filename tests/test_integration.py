@@ -145,6 +145,7 @@ page_2_id = uuid4()
                             name="organisation_other_names_no",
                             display_name="org other names no",
                             destination_page_path="/summary",
+                            source_page_path="/organisation-name",
                             value=ConditionValue(
                                 name="org other names no",
                                 conditions=[
@@ -167,6 +168,7 @@ page_2_id = uuid4()
                             name="organisation_other_names_yes",
                             display_name="org other names yes",
                             destination_page_path="/organisation-alternative-names",
+                            source_page_path="/organisation-name",
                             value=ConditionValue(
                                 name="org other names yes",
                                 conditions=[
@@ -285,7 +287,7 @@ def test_list_relationship(seed_dynamic_data):
 @pytest.mark.parametrize(
     "input_filename, output_filename",
     [
-        ("test-section.json", "section.json"),
+        ("test-section.json", "test-section.json"),
     ],
 )
 def test_generate_config_to_verify_form_sections(
@@ -310,7 +312,7 @@ def test_generate_config_to_verify_form_sections(
     round_short_name = seed_dynamic_data["rounds"][0].short_name
     mock_round_base_paths = {round_short_name: 99}
     # find a random section belonging to the round id and assign each form to that section
-    forms = _db.session.query(Form).filter(Form.template_name == input_filename.split(".")[0])
+    forms = _db.session.query(Form).filter(Form.runner_publish_name == input_filename.split(".")[0])
     section = _db.session.query(Section).filter(Section.round_id == round_id).first()
     for form in forms:
         form.section_id = section.section_id
@@ -336,22 +338,23 @@ def test_generate_config_to_verify_form_sections(
 
 
 @pytest.mark.parametrize(
-    "input_filename, output_filename,,expected_page_count_for_form,expected_component_count_for_form, "
+    "input_filename, output_filename,expected_page_count_for_form,expected_component_count_for_form, "
     "expected_form_section_count",
     [
-        ("org-info.json", "organisation-information.json", 18, 43, 2),
-        ("optional-all-components.json", "optional.json", 8, 27, 4),
-        ("required-all-components.json", "required.json", 8, 27, 1),
-        ("favourite-colours-sarah.json", "colours.json", 4, 1, 1),
-        ("funding-required-cof-25.json", "funding-required.json", 12, 21, 2),
+        ("asset-information.json", "asset-information.json", 23, 29, 2),
+        ("org-info.json", "org-info.json", 18, 43, 2),
+        ("optional-all-components.json", "optional-all-components.json", 8, 27, 4),
+        ("required-all-components.json", "required-all-components.json", 8, 27, 1),
+        ("favourite-colours.json", "favourite-colours.json", 4, 1, 1),
+        ("funding-required-cof-25.json", "funding-required-cof-25.json", 12, 21, 2),
         (
-            "Organisation-and-local-authority-information-template.json",
-            "local-authority-and-other-organisation-information.json",
+            "organisation-and-local-authority-information-template.json",
+            "organisation-and-local-authority-information-template.json",
             16,
             24,
             1,
         ),  # noqa: E501
-        ("test-section.json", "section.json", 3, 1, 2),
+        ("test-section.json", "test-section.json", 3, 1, 2),
     ],
 )
 def test_generate_config_for_round_valid_input(
@@ -377,7 +380,7 @@ def test_generate_config_for_round_valid_input(
 
     expected_form_count = 1
     # check form config is in the database
-    forms = _db.session.query(Form).filter(Form.template_name == input_filename.split(".")[0])
+    forms = _db.session.query(Form).filter(Form.runner_publish_name == input_filename.split(".")[0])
     assert forms.count() == expected_form_count
     form = forms.first()
     pages = _db.session.query(Page).filter(Page.form_id == form.form_id)
@@ -390,6 +393,7 @@ def test_generate_config_for_round_valid_input(
     )
     assert total_components_count == expected_component_count_for_form
 
+    # PART 2 GENERATE FORM JSON'S
     # associate forms with a round
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
@@ -411,6 +415,7 @@ def test_generate_config_for_round_valid_input(
     # Check if the directory is created
     generated_json_form = temp_output_dir / round_short_name / "form_runner" / output_filename
     assert generated_json_form
+    # assert number of conditions is equal or less than the input form
 
     # compare the import file with the generated file
     with open(generated_json_form, "r") as file:

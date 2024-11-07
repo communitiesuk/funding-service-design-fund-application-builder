@@ -4,7 +4,7 @@ import json
 import os
 import sys
 from uuid import UUID
-
+from sqlalchemy.orm.attributes import flag_modified
 from app.db.queries.application import get_list_by_name
 from app.db.queries.application import insert_form_section
 from app.db.queries.application import insert_list
@@ -22,9 +22,23 @@ from app.db.models import Page  # noqa:E402
 from app.shared.data_classes import Condition  # noqa:E402
 from app.shared.data_classes import ConditionValue  # noqa:E402
 from app.shared.helpers import find_enum  # noqa:E402
+from app.shared.helpers import get_all_pages_in_parent_form  # noqa:E402
 
-
-def _build_condition(condition_data, destination_page_path) -> Condition:
+def _build_condition(condition_data, source_page_path, destination_page_path) -> Condition:
+    """
+    Build a Condition instance from the given condition data
+    
+    Args:
+        condition_data (dict): The condition data to build the Condition instance from
+        source_page_path (str): The path of the source page. 
+            Sometimes the conditions component that is referenced is on another page,
+            so we need to retain the page using the condition.
+        destination_page_path (str): The path of the destination page
+        
+    Returns:
+        Condition: The built Condition instance
+        
+    """
     sub_conditions = []
     for c in condition_data["value"]["conditions"]:
         sc = {
@@ -40,17 +54,18 @@ def _build_condition(condition_data, destination_page_path) -> Condition:
         name=condition_data["name"],
         display_name=condition_data["displayName"],
         value=condition_value,
+        source_page_path=source_page_path,
         destination_page_path=destination_page_path,
     )
     return result
 
 
-def _get_component_by_runner_name(db, runner_component_name, page_id):
+def _get_component_by_runner_name(db, runner_component_name, page_ids: list):
 
     return (
         db.session.query(Component)
         .filter(Component.runner_component_name == runner_component_name)
-        .filter(Component.page_id == page_id)
+        .filter(Component.page_id.in_(page_ids))
         .first()
     )
 
@@ -62,31 +77,41 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
     # Initialize a cache for components to reduce database queries
     components_cache = {}
 
+
     if "next" in page:
+        page_ids = get_all_pages_in_parent_form(db, page_id)
+
         for path in page["next"]:
             if "condition" in path:
                 target_condition_name = path["condition"]
                 # Use the conditions dictionary for faster lookup
                 if target_condition_name in conditions_dict:
+
                     condition_data = conditions_dict[target_condition_name]
                     # for condition in condition_data["value"]["conditions"]:
                     runner_component_name = condition_data["value"]["conditions"][0]["field"]["name"]
 
                     # Use the cache to reduce database queries
                     if runner_component_name not in components_cache:
-                        component_to_update = _get_component_by_runner_name(db, runner_component_name, page_id)
+                        # the condition might be referencing a component on another page, so we should pass through all possible page ids
+                        component_to_update = _get_component_by_runner_name(db, runner_component_name, page_ids)
                         components_cache[runner_component_name] = component_to_update
                     else:
-                        component_to_update = components_cache[runner_component_name]
+                        component_to_update = components_cache[runner_component_name] # here 
 
                     # Create a new Condition instance with a different variable name
-                    new_condition = _build_condition(condition_data, destination_page_path=path["path"])
+                    new_condition = _build_condition(condition_data, source_page_path=page["path"], destination_page_path=path["path"]) # here
 
                     # Add the new condition to the conditions list of the component to update
                     if component_to_update.conditions:
                         component_to_update.conditions.append(asdict(new_condition))
+                        # Mark the conditions column as modified so SQLAlchemy knows it has changed
+                        # When you directly modify an element in a JSON column (like appending to a list), SQLAlchemy may not automatically recognize it. Explicitly marking the attribute as modified solves this issue.
+                        flag_modified(component_to_update, "conditions")
                     else:
                         component_to_update.conditions = [asdict(new_condition)]
+
+          
 
 
 def _find_list_and_create_if_not_existing(list_name: str, all_lists_in_form: list[dict]) -> UUID:
@@ -232,9 +257,15 @@ def insert_form_config(form_config, form_id):
             )
             inserted_components.append(inserted_component)
         db.session.flush()  # flush to make components available for conditions
+
+    # add separately as conditions can reference components on other  pages
+    for page in form_config.get("pages", []):
         add_conditions_to_components(db, page, form_config["conditions"], inserted_page.page_id)
+        # flush so that the updated components are available for the next iteration
+        db.session.flush()
+
     insert_page_default_next_page(form_config.get("pages", None), inserted_pages)
-    db.session.flush()
+    db.session.commit()
     return inserted_pages, inserted_components
 
 
@@ -250,11 +281,11 @@ def insert_form_as_template(form, template_name=None):
     new_form = Form(
         section_id=None,
         name_in_apply_json={"en": form_name},
-        template_name=template_name,
+        template_name=form_name,
         is_template=True,
         audit_info=None,
         section_index=None,
-        runner_publish_name=human_to_kebab_case(form_name),
+        runner_publish_name=human_to_kebab_case(template_name),
         source_template_id=None,
         form_json=form,
     )
