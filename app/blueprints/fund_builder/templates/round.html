@@ -22,7 +22,10 @@
                             "label": {
                             "text": form.fund_id.label
                             },
-                            "items": all_funds
+                            "items": all_funds,
+                            "errorMessage": {
+                                "text": form.fund_id.errors[0] if form.fund_id.errors else ""
+                            } if form.fund_id.errors else None
                         })}}
                     {% endif %}
                     {{input(form.title_en)}}
@@ -54,7 +57,12 @@
                     {{ yes_no(form.display_logo_on_pdf_exports) }}
                     {{ yes_no(form.mark_as_complete_enabled) }}
                     {{ yes_no(form.is_expression_of_interest) }}
-                    {{ multilineinput(form.feedback_survey_config) }}
+                    {{ yes_no(form.has_feedback_survey) }}
+                    {{ yes_no(form.has_section_feedback) }}
+                    {{ yes_no(form.has_research_survey) }}
+                    {{ yes_no(form.is_feedback_survey_optional) }}
+                    {{ yes_no(form.is_section_feedback_optional) }}
+                    {{ yes_no(form.is_research_survey_optional) }}
                     {{ yes_no(form.eligibility_config) }}
                     {{ multilineinput(form.eoi_decision_schema_en) }}
                     {{ multilineinput(form.eoi_decision_schema_cy) }}

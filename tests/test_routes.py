@@ -181,7 +181,7 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
         "feedback_link": "http://example.com/feedback",
         "project_name_field_id": 1,
         "guidance_url": "http://example.com/guidance",
-        "feedback_survey_config": '{"has_survey": true}',
+        "has_feedback_survey": "true",
     }
 
     test_round = seed_dynamic_data["rounds"][0]
@@ -191,7 +191,14 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
     updated_round = get_round_by_id(test_round.round_id)
     assert updated_round.title_json["en"] == "Updated Round"
     assert updated_round.short_name == "UR123"
-    assert updated_round.feedback_survey_config == {"has_survey": True}
+    assert updated_round.feedback_survey_config == {
+        "has_feedback_survey": True,
+        "has_section_feedback": False,
+        "has_research_survey": False,
+        "is_feedback_survey_optional": False,
+        "is_section_feedback_optional": False,
+        "is_research_survey_optional": False,
+    }
 
 
 @pytest.mark.parametrize("input_json_string", [(None), (""), ("{}"), (""), ("{}"), ('{"1":"2"}')])
