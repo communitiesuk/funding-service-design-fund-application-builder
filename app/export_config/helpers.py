@@ -31,6 +31,12 @@ def write_config(config, filename, round_short_name, config_type):
         content_to_write = config
         file_path = output_dir / f"{filename}_all_questions_en.html"
 
+    elif config_type == "temp_assess":
+        output_dir = base_output_dir / "assessment_store"
+        content_to_write = str(config)
+        file_path = output_dir / f"{human_to_snake_case(filename)}.py"
+
+
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
@@ -41,6 +47,8 @@ def write_config(config, filename, round_short_name, config_type):
         elif config_type == "python_file":
             print(content_to_write, file=f)  # Print the dictionary for non-JSON types
         elif config_type == "html":
+            f.write(content_to_write)
+        elif config_type == "temp_assess":
             f.write(content_to_write)
 
 

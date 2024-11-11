@@ -5,13 +5,17 @@ from flask import current_app
 from app.db import db
 from app.db.models import Form
 from app.db.models import Section
+from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
+from app.export_config.generate_form import human_to_kebab_case
 from app.export_config.helpers import write_config
 from app.shared.data_classes import FundExport
 from app.shared.data_classes import FundSectionForm
 from app.shared.data_classes import FundSectionSection
 from app.shared.data_classes import RoundExport
+from config import Config
+from app.all_questions.metadata_utils import form_json_to_assessment_display_types
 
 # TODO : The Round path might be better as a placeholder to avoid conflict in the actual fund store.
 # Decide on this further down the line.
@@ -172,4 +176,94 @@ def generate_config_for_round(round_id):
     round_display_config = generate_application_display_config(round_id)
     TEMPLATE_FUND_ROUND_EXPORT["sections_config"] = round_display_config
     fund_round_export = TEMPLATE_FUND_ROUND_EXPORT
-    write_config(fund_round_export, fund_config["short_name"], fund_round_export["round_config"]["short_name"], "python_file")
+    write_config(
+        fund_round_export, fund_config["short_name"], fund_round_export["round_config"]["short_name"], "python_file"
+    )
+
+    if Config.GENERATE_LOCAL_CONFIG:
+        fund_id = fund_config["id"]
+        fund_short_name = fund_config["short_name"]
+        round_short_name = round_config["short_name"]
+        fund_round = f"{str.upper(fund_short_name)}{str.upper(round_short_name)}"
+        fund_round_ids = f"{fund_id}:{round_id}"
+
+        scored = []
+        unscored = []
+        i = 0
+        sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
+        for section in sections:
+            i += 1
+            type_of_criteria = "scored" if i % 2 == 0 else "unscored"  # do a random half scored and unscored
+            criteria = {
+                "id": human_to_kebab_case(section.name_in_apply_json["en"]),
+                "name": section.name_in_apply_json["en"],
+                "sub_criteria": [],
+            }
+            if type_of_criteria == "scored":
+                criteria["weighting"] = 1 / len(round_config)
+                scored.append(criteria)
+            else:
+                unscored.append(criteria)
+
+            for form in section.forms:
+                sc = {
+                    "id": form.runner_publish_name,
+                    "name": form.name_in_apply_json["en"],
+                    "themes": [],
+                }
+                for page in form.pages:
+                    if page.display_path == "summary":
+                        continue
+                    theme = {
+                        "id": human_to_kebab_case(page.name_in_apply_json["en"]),
+                        "name": page.name_in_apply_json["en"],
+                        "answers": [],
+                    }
+                    for component in page.components:
+                        if component.type in READ_ONLY_COMPONENTS:
+                            continue
+                        answer = {
+                            "field_id": component.runner_component_name,
+                            "form_name": form.runner_publish_name,
+                            "field_type": component.type.name,
+                            "presentation_type": form_json_to_assessment_display_types.get(component.type.name, "text"),
+                            "question": component.title
+                        }
+                        theme["answers"].append(answer)
+                    sc["themes"].append(theme)
+                criteria["sub_criteria"].append(sc)
+
+        temp_assess_output = {
+            "notfn_config": {
+                fund_id: {
+                    "fund_name": fund_short_name,
+                    "template_id": {
+                        "en": "6441da8a-1a42-4fe1-ad05-b7fb5f46a761",  # Using COF25 template
+                        "cy": "129490b8-4e35-4dc2-a8fb-bfd3be9e90d0",  # Using COF25 template
+                    },
+                },
+            },
+            "fund_round_to_assessment_mapping": {
+                fund_round_ids: {
+                    "schema_id": f"{fund_round}_assessment",
+                    "unscored_sections": unscored,
+                    "scored_criteria": scored,
+                },
+            },
+            "fund_round_data_key_mappings": {
+                fund_round: {
+                    "location": None,
+                    "asset_type": None,
+                    "funding_one": None,
+                    "funding_two": None,
+                },
+            },
+            "fund_round_mapping_config": {
+                fund_round: {
+                    "fund_id": fund_id,
+                    "round_id": round_id,
+                    "type_of_application": str.upper(fund_short_name),
+                },
+            },
+        }
+        write_config(temp_assess_output, "temp_assess", fund_round_export["round_config"]["short_name"], "temp_assess")
