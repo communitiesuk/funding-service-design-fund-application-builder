@@ -172,4 +172,4 @@ def generate_config_for_round(round_id):
     round_display_config = generate_application_display_config(round_id)
     TEMPLATE_FUND_ROUND_EXPORT["sections_config"] = round_display_config
     fund_round_export = TEMPLATE_FUND_ROUND_EXPORT
-    write_config(fund_round_export, "round_config", fund_round_export["round_config"]["short_name"], "python_file")
+    write_config(fund_round_export, fund_config["short_name"], fund_round_export["round_config"]["short_name"], "python_file")
