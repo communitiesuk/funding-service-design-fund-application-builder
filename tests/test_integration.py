@@ -415,7 +415,6 @@ def test_generate_config_for_round_valid_input(
     # Check if the directory is created
     generated_json_form = temp_output_dir / round_short_name / "form_runner" / output_filename
     assert generated_json_form
-    # assert number of conditions is equal or less than the input form
 
     # compare the import file with the generated file
     with open(generated_json_form, "r") as file:
