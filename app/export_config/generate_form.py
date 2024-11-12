@@ -270,7 +270,7 @@ def human_to_kebab_case(word: str) -> str | None:
         return word.replace(" ", "-").strip().lower()
 
 
-def build_form_json(form: Form, fund_title:str = None) -> dict:
+def build_form_json(form: Form, fund_title: str = None) -> dict:
     """
     Takes in a single Form object and then generates the form runner json for that form.
 

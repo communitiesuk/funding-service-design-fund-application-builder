@@ -148,8 +148,10 @@ class RoundExport:
         default_factory=lambda: {
             "has_feedback_survey": False,
             "has_section_feedback": False,
+            "has_research_survey": False,
             "is_feedback_survey_optional": False,
             "is_section_feedback_optional": False,
+            "is_research_survey_optional": False,
         }
     )
     eligibility_config: Optional[Dict[str, bool]] = field(default_factory=lambda: {"has_eligibility": False})

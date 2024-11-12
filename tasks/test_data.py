@@ -26,6 +26,7 @@ BASIC_FUND_INFO = {
     "welsh_available": False,
     "owner_organisation_id": None,
     "funding_type": FundingType.COMPETITIVE,
+    "ggis_scheme_reference_number": "G2-SCH-0000092414",
 }
 BASIC_ROUND_INFO = {
     "audit_info": {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
@@ -59,8 +60,10 @@ BASIC_ROUND_INFO = {
     "feedback_survey_config": {
         "has_feedback_survey": False,
         "has_section_feedback": False,
+        "has_research_survey": False,
         "is_feedback_survey_optional": False,
         "is_section_feedback_optional": False,
+        "is_research_survey_optional": False,
     },
     "eligibility_config": {"has_eligibility": False},
     "contact_us_banner_json": {},
@@ -95,6 +98,7 @@ def init_salmon_fishing_fund():
         short_name=f"SFF{randint(0,999)}",
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
+        ggis_scheme_reference_number="G1-SCH-0000092414",
     )
 
     r: Round = Round(
@@ -326,6 +330,7 @@ def init_salmon_fishing_fund():
         short_name="CTF",
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
+        ggis_scheme_reference_number="G2-SCH-0000092414",
     )
 
     rd: Round = Round(
@@ -373,6 +378,7 @@ def init_unit_test_data() -> dict:
         short_name=f"UTF{randint(0,999)}",
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
+        ggis_scheme_reference_number="G3-SCH-0000092414",
     )
 
     r: Round = Round(
@@ -396,7 +402,14 @@ def init_unit_test_data() -> dict:
         feedback_link="http://www.google.com",
         project_name_field_id="12312312312",
         guidance_url="http://www.google.com",
-        feedback_survey_config={"has_survey": False},
+        feedback_survey_config={
+            "has_feedback_survey": False,
+            "has_section_feedback": False,
+            "has_research_survey": False,
+            "is_feedback_survey_optional": False,
+            "is_section_feedback_optional": False,
+            "is_research_survey_optional": False,
+        },
         eoi_decision_schema={"en": {"valid": True}, "cy": {"valid": False}},
     )
     # r2: Round = Round(

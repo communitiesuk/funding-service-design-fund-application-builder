@@ -42,7 +42,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {
-            "path": temp_output_dir / round_short_name / "fund_store" / "round_config.py",
+            "path": temp_output_dir / round_short_name / "fund_store" / f"{fund_short_name}.py",
             "expected_output": {
                 "sections_config": [
                     {
@@ -86,8 +86,15 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                     "display_logo_on_pdf_exports": False,
                     "mark_as_complete_enabled": False,
                     "is_expression_of_interest": False,
-                    "eoi_decision_schema": {"en":{"valid": True}, "cy":{"valid":False}},
-                    "feedback_survey_config": {"has_survey": False},
+                    "eoi_decision_schema": {"en": {"valid": True}, "cy": {"valid": False}},
+                    "feedback_survey_config": {
+                        "has_feedback_survey": False,
+                        "has_section_feedback": False,
+                        "has_research_survey": False,
+                        "is_feedback_survey_optional": False,
+                        "is_section_feedback_optional": False,
+                        "is_research_survey_optional": False,
+                    },
                     "eligibility_config": {"has_eligibility": False},
                     "title_json": {"en": "round the first"},
                     "contact_us_banner_json": None,
