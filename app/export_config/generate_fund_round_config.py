@@ -202,10 +202,8 @@ def generate_default_assessment_mappings(fund_config, round_config):
 
     scored = []
     unscored = []
-    i = 0
     sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
-    for section in sections:
-        i += 1
+    for i, section in enumerate(sections, start=1):
         type_of_criteria = "scored" if i % 2 == 0 else "unscored"  # do a random half scored and unscored
         criteria = {
             "id": human_to_kebab_case(section.name_in_apply_json["en"]),
