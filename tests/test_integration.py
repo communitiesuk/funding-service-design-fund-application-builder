@@ -312,7 +312,7 @@ def test_generate_config_to_verify_form_sections(
     round_short_name = seed_dynamic_data["rounds"][0].short_name
     mock_round_base_paths = {round_short_name: 99}
     # find a random section belonging to the round id and assign each form to that section
-    forms = _db.session.query(Form).filter(Form.runner_publish_name == input_filename.split(".")[0])
+    forms = _db.session.query(Form).filter(Form.runner_publish_name == input_filename)
     section = _db.session.query(Section).filter(Section.round_id == round_id).first()
     for form in forms:
         form.section_id = section.section_id
@@ -380,7 +380,7 @@ def test_generate_config_for_round_valid_input(
 
     expected_form_count = 1
     # check form config is in the database
-    forms = _db.session.query(Form).filter(Form.runner_publish_name == input_filename.split(".")[0])
+    forms = _db.session.query(Form).filter(Form.runner_publish_name == input_filename)
     assert forms.count() == expected_form_count
     form = forms.first()
     pages = _db.session.query(Page).filter(Page.form_id == form.form_id)

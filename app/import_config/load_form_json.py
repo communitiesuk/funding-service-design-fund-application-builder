@@ -269,7 +269,7 @@ def insert_form_config(form_config, form_id):
     return inserted_pages, inserted_components
 
 
-def insert_form_as_template(form, template_name=None):
+def insert_form_as_template(form, template_name=None, filename=None):
     start_page_path = form.get("startPage")
     if "name" in form:
         form_name = form.get("name")
@@ -277,15 +277,16 @@ def insert_form_as_template(form, template_name=None):
         # If form doesn't have a name element, use the title of the start page
         form_name = next(p for p in form["pages"] if p["path"] == start_page_path)["title"]
     if not template_name:
-        template_name = form["filename"].split(".")[0]
+        template_name = filename.split(".")[0]
+
     new_form = Form(
         section_id=None,
         name_in_apply_json={"en": form_name},
-        template_name=form_name,
+        template_name=template_name,
         is_template=True,
         audit_info=None,
         section_index=None,
-        runner_publish_name=human_to_kebab_case(template_name),
+        runner_publish_name=human_to_kebab_case(filename),
         source_template_id=None,
         form_json=form,
     )
@@ -310,7 +311,7 @@ def read_json_from_directory(directory_path):
                 form_configs.append(form)
     return form_configs
 
-
+#  TODO: CAN THIS NOW BE REMOVED?
 def load_form_jsons(override_fund_config=None):
     db = app.extensions["sqlalchemy"]
     try:
@@ -322,7 +323,7 @@ def load_form_jsons(override_fund_config=None):
             form_configs = override_fund_config
         for form_config in form_configs:
             # prepare all row commits
-            inserted_form = insert_form_as_template(form_config)
+            inserted_form = insert_form_as_template(form_config, None, form_config["filename"])
             db.session.flush()  # flush to get the form id
             inserted_pages, inserted_components = insert_form_config(form_config, inserted_form.form_id)
         db.session.commit()
@@ -332,11 +333,11 @@ def load_form_jsons(override_fund_config=None):
         raise e
 
 
-def load_json_from_file(data, template_name):
+def load_json_from_file(data, template_name, filename):
     db = app.extensions["sqlalchemy"]
     try:
         data["filename"] = human_to_kebab_case(template_name)
-        inserted_form = insert_form_as_template(data, template_name=template_name)
+        inserted_form = insert_form_as_template(data, template_name=template_name, filename=filename)
         db.session.flush()  # flush to get the form id
         insert_form_config(data, inserted_form.form_id)
         db.session.commit()
