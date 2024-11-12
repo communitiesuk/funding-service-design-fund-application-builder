@@ -86,7 +86,6 @@ def test_add_conditions_to_components(mocker, input_page, input_conditions, exp_
     mocker.patch("app.import_config.load_form_json.get_all_pages_in_parent_form", return_value=[uuid4()])
 
     # Set up other necessary mocks and test data
-    db = mocker.Mock()
     with mock.patch(
         "app.import_config.load_form_json._build_condition",
         return_value=Condition(name=None, display_name=None, destination_page_path=None, value=None),
