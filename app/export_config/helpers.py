@@ -1,4 +1,5 @@
 import os
+from string import Template
 
 import jsonschema
 from flask import current_app
@@ -8,7 +9,6 @@ from app.blueprints.self_serve.routes import human_to_kebab_case
 from app.blueprints.self_serve.routes import human_to_snake_case
 from app.shared.helpers import convert_to_dict
 from config import Config
-from string import Template
 
 
 def write_config(config, filename, round_short_name, config_type):
