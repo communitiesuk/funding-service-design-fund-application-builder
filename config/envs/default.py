@@ -21,3 +21,4 @@ class DefaultConfig(object):
     SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URL")
 
     TEMP_FILE_PATH = Path("/tmp")
+    GENERATE_LOCAL_CONFIG = False

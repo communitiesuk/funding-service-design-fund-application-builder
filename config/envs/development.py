@@ -18,3 +18,5 @@ class DevelopmentConfig(Config):
         "postgresql://postgres:password@fab-db:5432/fab",  # pragma: allowlist secret
     )
     TEMP_FILE_PATH = Path("app") / "export_config" / "output"
+
+    GENERATE_LOCAL_CONFIG = True
