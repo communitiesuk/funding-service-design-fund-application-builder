@@ -14,8 +14,10 @@ from app.shared.data_classes import FundExport
 from app.shared.data_classes import FundSectionForm
 from app.shared.data_classes import FundSectionSection
 from app.shared.data_classes import RoundExport
+from app.export_config import helpers
 from config import Config
 from app.all_questions.metadata_utils import form_json_to_assessment_display_types
+import json
 
 # TODO : The Round path might be better as a placeholder to avoid conflict in the actual fund store.
 # Decide on this further down the line.
@@ -244,40 +246,14 @@ def generate_default_assessment_mappings(fund_config, round_config):
                     theme["answers"].append(answer)
                 sc["themes"].append(theme)
             criteria["sub_criteria"].append(sc)
-
-    temp_assess_output = {
-        # Simple RECORD_OF_APPLICATION config for notify - uses the cof25 templates
-        "notfn_config": {
-            fund_id: {
-                "fund_name": fund_short_name,
-                "template_id": {
-                    "en": "6441da8a-1a42-4fe1-ad05-b7fb5f46a761",  # Using COF25 template
-                    "cy": "129490b8-4e35-4dc2-a8fb-bfd3be9e90d0",  # Using COF25 template
-                },
-            },
-        },
-        # all the following sections need adding to assessment-store
-        "fund_round_to_assessment_mapping": {
-            fund_round_ids: {
-                "schema_id": f"{fund_round}_assessment",
-                "unscored_sections": unscored,
-                "scored_criteria": scored,
-            },
-        },
-        "fund_round_data_key_mappings": {
-            fund_round: {
-                "location": None,
-                "asset_type": None,
-                "funding_one": None,
-                "funding_two": None,
-            },
-        },
-        "fund_round_mapping_config": {
-            fund_round: {
-                "fund_id": fund_id,
-                "round_id": round_id,
-                "type_of_application": str.upper(fund_short_name),
-            },
-        },
-    }
+    temp_assess_output = copy.deepcopy(helpers.temp_assess_output)
+    temp_assess_output = temp_assess_output.substitute(
+        fund_round=fund_round,
+        fund_id=fund_id,
+        round_id=round_id,
+        fund_round_ids=fund_round_ids,
+        fund_short_name=fund_short_name,
+        scored=json.dumps(scored),
+        unscored=json.dumps(unscored)
+    )
     write_config(temp_assess_output, "temp_assess", round_short_name, "temp_assess")

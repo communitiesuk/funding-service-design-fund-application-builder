@@ -8,6 +8,7 @@ from app.blueprints.self_serve.routes import human_to_kebab_case
 from app.blueprints.self_serve.routes import human_to_snake_case
 from app.shared.helpers import convert_to_dict
 from config import Config
+from string import Template
 
 
 def write_config(config, filename, round_short_name, config_type):
@@ -36,7 +37,6 @@ def write_config(config, filename, round_short_name, config_type):
         content_to_write = str(config)
         file_path = output_dir / f"{human_to_snake_case(filename)}.py"
 
-
     # Ensure the output directory exists
     os.makedirs(output_dir, exist_ok=True)
 
@@ -62,3 +62,42 @@ def validate_json(data, schema):
         current_app.logger.error("Given JSON data is invalid")
         current_app.logger.error(err)
         return False
+
+
+temp_assess_output = Template(
+    """
+{
+    "notfn_config": {
+        "${fund_id}": {
+            "fund_name": "${fund_short_name}",
+            "template_id": {
+                "en": "6441da8a-1a42-4fe1-ad05-b7fb5f46a761",
+                "cy": "129490b8-4e35-4dc2-a8fb-bfd3be9e90d0",
+            },
+        },
+    },
+    "fund_round_to_assessment_mapping": {
+        "${fund_round_ids}": {
+            "schema_id": "${fund_round}_assessment",
+            "unscored_sections": ${unscored},
+            "scored_criteria": ${scored},
+        },
+    },
+    "fund_round_data_key_mappings": {
+        "${fund_round}": {
+            "location": None,
+            "asset_type": None,
+            "funding_one": None,
+            "funding_two": None,
+        },
+    },
+    "fund_round_mapping_config": {
+        "${fund_round}": {
+            "fund_id": "${fund_id}",
+            "round_id": "${round_id}",
+            "type_of_application": "${fund_short_name}",
+        },
+    },
+}
+"""
+)
