@@ -4,7 +4,9 @@ import json
 import os
 import sys
 from uuid import UUID
+
 from sqlalchemy.orm.attributes import flag_modified
+
 from app.db.queries.application import get_list_by_name
 from app.db.queries.application import insert_form_section
 from app.db.queries.application import insert_list
@@ -17,28 +19,28 @@ from app.create_app import app  # noqa:E402
 from app.db import db  # noqa:E402
 from app.db.models import Component  # noqa:E402
 from app.db.models import ComponentType  # noqa:E402
-from app.db.models import Form  # noqa:E402
 from app.db.models import Page  # noqa:E402
+from app.db.queries.application import insert_new_form
 from app.shared.data_classes import Condition  # noqa:E402
 from app.shared.data_classes import ConditionValue  # noqa:E402
 from app.shared.helpers import find_enum  # noqa:E402
 from app.shared.helpers import get_all_pages_in_parent_form  # noqa:E402
-from app.db.queries.application import insert_new_form
+
 
 def _build_condition(condition_data, source_page_path, destination_page_path) -> Condition:
     """
     Build a Condition instance from the given condition data
-    
+
     Args:
         condition_data (dict): The condition data to build the Condition instance from
-        source_page_path (str): The path of the source page. 
+        source_page_path (str): The path of the source page.
             Sometimes the conditions component that is referenced is on another page,
             so we need to retain the page using the condition.
         destination_page_path (str): The path of the destination page
-        
+
     Returns:
         Condition: The built Condition instance
-        
+
     """
     sub_conditions = []
     for c in condition_data["value"]["conditions"]:
@@ -78,7 +80,6 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
     # Initialize a cache for components to reduce database queries
     components_cache = {}
 
-
     if "next" in page:
         page_ids = get_all_pages_in_parent_form(db, page_id)
 
@@ -98,10 +99,12 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
                         component_to_update = _get_component_by_runner_name(db, runner_component_name, page_ids)
                         components_cache[runner_component_name] = component_to_update
                     else:
-                        component_to_update = components_cache[runner_component_name] # here 
+                        component_to_update = components_cache[runner_component_name]  # here
 
                     # Create a new Condition instance with a different variable name
-                    new_condition = _build_condition(condition_data, source_page_path=page["path"], destination_page_path=path["path"]) # here
+                    new_condition = _build_condition(
+                        condition_data, source_page_path=page["path"], destination_page_path=path["path"]
+                    )  # here
 
                     # Add the new condition to the conditions list of the component to update
                     if component_to_update.conditions:
@@ -111,8 +114,6 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
                         flag_modified(component_to_update, "conditions")
                     else:
                         component_to_update.conditions = [asdict(new_condition)]
-
-          
 
 
 def _find_list_and_create_if_not_existing(list_name: str, all_lists_in_form: list[dict]) -> UUID:
@@ -280,17 +281,19 @@ def insert_form_as_template(form, template_name=None, filename=None):
     if not template_name:
         template_name = filename.split(".")[0]
 
-    new_form = insert_new_form({
-        "section_id": None,
-        "name_in_apply_json": {"en": form_name},
-        "template_name": template_name,
-        "is_template": True,
-        "audit_info": None,
-        "section_index": None,
-        "runner_publish_name": human_to_kebab_case(filename).lower(),
-        "source_template_id": None,
-        "form_json": form,
-    })
+    new_form = insert_new_form(
+        {
+            "section_id": None,
+            "name_in_apply_json": {"en": form_name},
+            "template_name": template_name,
+            "is_template": True,
+            "audit_info": None,
+            "section_index": None,
+            "runner_publish_name": human_to_kebab_case(filename).lower(),
+            "source_template_id": None,
+            "form_json": form,
+        }
+    )
 
     return new_form
 

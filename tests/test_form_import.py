@@ -32,17 +32,18 @@ from tests.unit_test_data import test_form_json_condition_org_type_c
     ],
 )
 def test_build_conditions(input_condition, exp_result):
-    result = _build_condition(condition_data=input_condition, source_page_path=None, destination_page_path=exp_result.destination_page_path)
+    result = _build_condition(
+        condition_data=input_condition, source_page_path=None, destination_page_path=exp_result.destination_page_path
+    )
     assert result == exp_result
 
 
 @pytest.mark.parametrize(
     "input_page, input_conditions, exp_condition_count",
     [
-        ({"path":"/here",
-          "next": [{"path": "default-next"}]}, [], 0),
+        ({"path": "/here", "next": [{"path": "default-next"}]}, [], 0),
         (
-            {"path":"/here","next": [{"path": "next-a", "condition": "condition-a"}]},
+            {"path": "/here", "next": [{"path": "next-a", "condition": "condition-a"}]},
             [
                 asdict(
                     Condition(
@@ -59,7 +60,7 @@ def test_build_conditions(input_condition, exp_result):
             1,
         ),
         (
-            {"path":"/here","next": [{"path": "next-a", "condition": "condition-a"}]},
+            {"path": "/here", "next": [{"path": "next-a", "condition": "condition-a"}]},
             [
                 asdict(
                     Condition(

@@ -1,23 +1,23 @@
 import copy
+import json
 
 from flask import current_app
 
+from app.all_questions.metadata_utils import form_json_to_assessment_display_types
 from app.db import db
 from app.db.models import Form
 from app.db.models import Section
 from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
+from app.export_config import helpers
 from app.export_config.generate_form import human_to_kebab_case
 from app.export_config.helpers import write_config
 from app.shared.data_classes import FundExport
 from app.shared.data_classes import FundSectionForm
 from app.shared.data_classes import FundSectionSection
 from app.shared.data_classes import RoundExport
-from app.export_config import helpers
 from config import Config
-from app.all_questions.metadata_utils import form_json_to_assessment_display_types
-import json
 
 # TODO : The Round path might be better as a placeholder to avoid conflict in the actual fund store.
 # Decide on this further down the line.
@@ -252,6 +252,6 @@ def generate_default_assessment_mappings(fund_config, round_config):
         fund_round_ids=fund_round_ids,
         fund_short_name=fund_short_name,
         scored=json.dumps(scored),
-        unscored=json.dumps(unscored)
+        unscored=json.dumps(unscored),
     )
     write_config(temp_assess_output, "temp_assess", round_short_name, "temp_assess")
