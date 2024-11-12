@@ -42,7 +42,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {
-            "path": temp_output_dir / round_short_name / "fund_store" / f"{fund_short_name}.py",
+            "path": temp_output_dir / round_short_name / "fund_store" / f"{str.lower(fund_short_name)}.py",
             "expected_output": {
                 "sections_config": [
                     {

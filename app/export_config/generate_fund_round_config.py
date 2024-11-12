@@ -5,13 +5,19 @@ from flask import current_app
 from app.db import db
 from app.db.models import Form
 from app.db.models import Section
+from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
+from app.export_config.generate_form import human_to_kebab_case
 from app.export_config.helpers import write_config
 from app.shared.data_classes import FundExport
 from app.shared.data_classes import FundSectionForm
 from app.shared.data_classes import FundSectionSection
 from app.shared.data_classes import RoundExport
+from app.export_config import helpers
+from config import Config
+from app.all_questions.metadata_utils import form_json_to_assessment_display_types
+import json
 
 # TODO : The Round path might be better as a placeholder to avoid conflict in the actual fund store.
 # Decide on this further down the line.
@@ -172,4 +178,80 @@ def generate_config_for_round(round_id):
     round_display_config = generate_application_display_config(round_id)
     TEMPLATE_FUND_ROUND_EXPORT["sections_config"] = round_display_config
     fund_round_export = TEMPLATE_FUND_ROUND_EXPORT
-    write_config(fund_round_export, fund_config["short_name"], fund_round_export["round_config"]["short_name"], "python_file")
+    write_config(
+        fund_round_export, fund_config["short_name"], fund_round_export["round_config"]["short_name"], "python_file"
+    )
+
+    if Config.GENERATE_LOCAL_CONFIG:
+        generate_default_assessment_mappings(fund_config, round_config)
+
+
+def generate_default_assessment_mappings(fund_config, round_config):
+    # The following config is not tested for production use
+    # It is generated to make local testing easier - you can add an application to fab and export it with a basic
+    # auto-generated assessment config.
+    # Each form is a sub-critiera, each page a theme. Half scored, half unscored.
+    # The output in the assessment_store folder needs to be added to the
+    # assessment_mapping_fund_round file in assessment-store
+    fund_id = fund_config["id"]
+    round_id = round_config["id"]
+    fund_short_name = fund_config["short_name"]
+    round_short_name = round_config["short_name"]
+    fund_round = f"{str.upper(fund_short_name)}{str.upper(round_short_name)}"
+    fund_round_ids = f"{fund_id}:{round_id}"
+
+    scored = []
+    unscored = []
+    sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
+    for i, section in enumerate(sections, start=1):
+        type_of_criteria = "scored" if i % 2 == 0 else "unscored"  # do a random half scored and unscored
+        criteria = {
+            "id": human_to_kebab_case(section.name_in_apply_json["en"]),
+            "name": section.name_in_apply_json["en"],
+            "sub_criteria": [],
+        }
+        if type_of_criteria == "scored":
+            # half the sections will be scored, divide the weighting between them
+            criteria["weighting"] = 1 / (len(sections) / 2)
+            scored.append(criteria)
+        else:
+            unscored.append(criteria)
+
+        for form in section.forms:
+            sc = {
+                "id": form.runner_publish_name,
+                "name": form.name_in_apply_json["en"],
+                "themes": [],
+            }
+            for page in form.pages:
+                if page.display_path == "summary":
+                    continue
+                theme = {
+                    "id": human_to_kebab_case(page.name_in_apply_json["en"]),
+                    "name": page.name_in_apply_json["en"],
+                    "answers": [],
+                }
+                for component in page.components:
+                    if component.type in READ_ONLY_COMPONENTS:
+                        continue
+                    answer = {
+                        "field_id": component.runner_component_name,
+                        "form_name": form.runner_publish_name,
+                        "field_type": component.type.name,
+                        "presentation_type": form_json_to_assessment_display_types.get(component.type.name, "text"),
+                        "question": component.title,
+                    }
+                    theme["answers"].append(answer)
+                sc["themes"].append(theme)
+            criteria["sub_criteria"].append(sc)
+    temp_assess_output = copy.deepcopy(helpers.temp_assess_output)
+    temp_assess_output = temp_assess_output.substitute(
+        fund_round=fund_round,
+        fund_id=fund_id,
+        round_id=round_id,
+        fund_round_ids=fund_round_ids,
+        fund_short_name=fund_short_name,
+        scored=json.dumps(scored),
+        unscored=json.dumps(unscored)
+    )
+    write_config(temp_assess_output, "temp_assess", round_short_name, "temp_assess")
