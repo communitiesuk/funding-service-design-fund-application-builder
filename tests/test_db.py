@@ -57,10 +57,12 @@ def test_add_fund(flask_test_client, _db, clear_test_data):
         short_name=f"X{randint(0,99999)}",
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
+        ggis_scheme_reference_number="G2-SCH-0000092414",
     )
     result = add_fund(f)
     assert result
     assert result.fund_id
+    assert result.ggis_scheme_reference_number
 
 
 @pytest.mark.seed_config(
@@ -74,6 +76,7 @@ def test_add_fund(flask_test_client, _db, clear_test_data):
                 welsh_available=False,
                 short_name="TFCR1",
                 funding_type=FundingType.COMPETITIVE,
+                ggis_scheme_reference_number="G1-SCH-0000092415",
             )
         ]
     }
@@ -136,6 +139,7 @@ def test_get_all_funds(flask_test_client, _db, seed_dynamic_data):
                 welsh_available=False,
                 short_name="TF1",
                 funding_type=FundingType.COMPETITIVE,
+                ggis_scheme_reference_number="G2-SCH-0000092414",
             )
         ]
     }
@@ -144,6 +148,7 @@ def test_get_fund_by_id(seed_dynamic_data):
     result: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
     assert result
     assert result.name_json["en"] == "Test Fund 1"
+    assert result.ggis_scheme_reference_number == "G2-SCH-0000092414"
 
 
 def test_get_fund_by_id_none(flask_test_client, _db):

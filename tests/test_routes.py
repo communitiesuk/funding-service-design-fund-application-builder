@@ -1,14 +1,15 @@
+from unittest.mock import MagicMock
+
+import pytest
+from wtforms.validators import ValidationError
+
+from app.blueprints.fund_builder.forms.round import validate_json_field
 from app.db.models import Fund
 from app.db.models import Round
 from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
-import pytest, json
-
-from wtforms.validators import ValidationError
-from app.blueprints.fund_builder.forms.round import validate_json_field
-from unittest.mock import MagicMock
 
 
 def test_create_fund(flask_test_client, _db, clear_test_data):
@@ -23,11 +24,11 @@ def test_create_fund(flask_test_client, _db, clear_test_data):
         "welsh_available": "false",
         "short_name": "NF5432",
         "funding_type": FundingType.COMPETITIVE.value,
+        "ggis_scheme_reference_number": "G1-SCH-0000092415",
     }
 
     response = submit_form(flask_test_client, "/fund", create_data)
     assert response.status_code == 200
-
     created_fund = Fund.query.filter_by(short_name="NF5432").first()
     assert created_fund is not None
     for key, value in create_data.items():
@@ -39,6 +40,8 @@ def test_create_fund(flask_test_client, _db, clear_test_data):
             assert created_fund.welsh_available is False
         elif key == "funding_type":
             assert created_fund.funding_type.value == value
+        elif key == "ggis_scheme_reference_number":
+            assert created_fund.ggis_scheme_reference_number == value
         else:
             assert created_fund.__getattribute__(key) == value
 
@@ -56,6 +59,7 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
         "short_name": "UF1234",
         "submit": "Submit",
         "funding_type": "EOI",
+        "ggis_scheme_reference_number": "G3-SCH-0000092414",
     }
 
     test_fund = seed_dynamic_data["funds"][0]
@@ -177,7 +181,7 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
         "feedback_link": "http://example.com/feedback",
         "project_name_field_id": 1,
         "guidance_url": "http://example.com/guidance",
-        "feedback_survey_config": '{"has_survey": true}',
+        "has_feedback_survey": "true",
     }
 
     test_round = seed_dynamic_data["rounds"][0]
@@ -187,7 +191,14 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
     updated_round = get_round_by_id(test_round.round_id)
     assert updated_round.title_json["en"] == "Updated Round"
     assert updated_round.short_name == "UR123"
-    assert updated_round.feedback_survey_config == {"has_survey": True}
+    assert updated_round.feedback_survey_config == {
+        "has_feedback_survey": True,
+        "has_section_feedback": False,
+        "has_research_survey": False,
+        "is_feedback_survey_optional": False,
+        "is_section_feedback_optional": False,
+        "is_research_survey_optional": False,
+    }
 
 
 @pytest.mark.parametrize("input_json_string", [(None), (""), ("{}"), (""), ("{}"), ('{"1":"2"}')])
