@@ -181,89 +181,103 @@ def generate_config_for_round(round_id):
     )
 
     if Config.GENERATE_LOCAL_CONFIG:
-        fund_id = fund_config["id"]
-        fund_short_name = fund_config["short_name"]
-        round_short_name = round_config["short_name"]
-        fund_round = f"{str.upper(fund_short_name)}{str.upper(round_short_name)}"
-        fund_round_ids = f"{fund_id}:{round_id}"
+        generate_default_assessment_mappings(fund_config, round_config)
 
-        scored = []
-        unscored = []
-        i = 0
-        sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
-        for section in sections:
-            i += 1
-            type_of_criteria = "scored" if i % 2 == 0 else "unscored"  # do a random half scored and unscored
-            criteria = {
-                "id": human_to_kebab_case(section.name_in_apply_json["en"]),
-                "name": section.name_in_apply_json["en"],
-                "sub_criteria": [],
-            }
-            if type_of_criteria == "scored":
-                criteria["weighting"] = 1 / len(round_config)
-                scored.append(criteria)
-            else:
-                unscored.append(criteria)
 
-            for form in section.forms:
-                sc = {
-                    "id": form.runner_publish_name,
-                    "name": form.name_in_apply_json["en"],
-                    "themes": [],
-                }
-                for page in form.pages:
-                    if page.display_path == "summary":
-                        continue
-                    theme = {
-                        "id": human_to_kebab_case(page.name_in_apply_json["en"]),
-                        "name": page.name_in_apply_json["en"],
-                        "answers": [],
-                    }
-                    for component in page.components:
-                        if component.type in READ_ONLY_COMPONENTS:
-                            continue
-                        answer = {
-                            "field_id": component.runner_component_name,
-                            "form_name": form.runner_publish_name,
-                            "field_type": component.type.name,
-                            "presentation_type": form_json_to_assessment_display_types.get(component.type.name, "text"),
-                            "question": component.title
-                        }
-                        theme["answers"].append(answer)
-                    sc["themes"].append(theme)
-                criteria["sub_criteria"].append(sc)
+def generate_default_assessment_mappings(fund_config, round_config):
+    # The following config is not tested for production use
+    # It is generated to make local testing easier - you can add an application to fab and export it with a basic
+    # auto-generated assessment config.
+    # Each form is a sub-critiera, each page a theme. Half scored, half unscored.
+    # The output in the assessment_store folder needs to be added to the
+    # assessment_mapping_fund_round file in assessment-store
+    fund_id = fund_config["id"]
+    round_id = round_config["id"]
+    fund_short_name = fund_config["short_name"]
+    round_short_name = round_config["short_name"]
+    fund_round = f"{str.upper(fund_short_name)}{str.upper(round_short_name)}"
+    fund_round_ids = f"{fund_id}:{round_id}"
 
-        temp_assess_output = {
-            "notfn_config": {
-                fund_id: {
-                    "fund_name": fund_short_name,
-                    "template_id": {
-                        "en": "6441da8a-1a42-4fe1-ad05-b7fb5f46a761",  # Using COF25 template
-                        "cy": "129490b8-4e35-4dc2-a8fb-bfd3be9e90d0",  # Using COF25 template
-                    },
-                },
-            },
-            "fund_round_to_assessment_mapping": {
-                fund_round_ids: {
-                    "schema_id": f"{fund_round}_assessment",
-                    "unscored_sections": unscored,
-                    "scored_criteria": scored,
-                },
-            },
-            "fund_round_data_key_mappings": {
-                fund_round: {
-                    "location": None,
-                    "asset_type": None,
-                    "funding_one": None,
-                    "funding_two": None,
-                },
-            },
-            "fund_round_mapping_config": {
-                fund_round: {
-                    "fund_id": fund_id,
-                    "round_id": round_id,
-                    "type_of_application": str.upper(fund_short_name),
-                },
-            },
+    scored = []
+    unscored = []
+    i = 0
+    sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
+    for section in sections:
+        i += 1
+        type_of_criteria = "scored" if i % 2 == 0 else "unscored"  # do a random half scored and unscored
+        criteria = {
+            "id": human_to_kebab_case(section.name_in_apply_json["en"]),
+            "name": section.name_in_apply_json["en"],
+            "sub_criteria": [],
         }
-        write_config(temp_assess_output, "temp_assess", fund_round_export["round_config"]["short_name"], "temp_assess")
+        if type_of_criteria == "scored":
+            # half the sections will be scored, divide the weighting between them
+            criteria["weighting"] = 1 / (len(sections) / 2)
+            scored.append(criteria)
+        else:
+            unscored.append(criteria)
+
+        for form in section.forms:
+            sc = {
+                "id": form.runner_publish_name,
+                "name": form.name_in_apply_json["en"],
+                "themes": [],
+            }
+            for page in form.pages:
+                if page.display_path == "summary":
+                    continue
+                theme = {
+                    "id": human_to_kebab_case(page.name_in_apply_json["en"]),
+                    "name": page.name_in_apply_json["en"],
+                    "answers": [],
+                }
+                for component in page.components:
+                    if component.type in READ_ONLY_COMPONENTS:
+                        continue
+                    answer = {
+                        "field_id": component.runner_component_name,
+                        "form_name": form.runner_publish_name,
+                        "field_type": component.type.name,
+                        "presentation_type": form_json_to_assessment_display_types.get(component.type.name, "text"),
+                        "question": component.title,
+                    }
+                    theme["answers"].append(answer)
+                sc["themes"].append(theme)
+            criteria["sub_criteria"].append(sc)
+
+    temp_assess_output = {
+        # Simple RECORD_OF_APPLICATION config for notify - uses the cof25 templates
+        "notfn_config": {
+            fund_id: {
+                "fund_name": fund_short_name,
+                "template_id": {
+                    "en": "6441da8a-1a42-4fe1-ad05-b7fb5f46a761",  # Using COF25 template
+                    "cy": "129490b8-4e35-4dc2-a8fb-bfd3be9e90d0",  # Using COF25 template
+                },
+            },
+        },
+        # all the following sections need adding to assessment-store
+        "fund_round_to_assessment_mapping": {
+            fund_round_ids: {
+                "schema_id": f"{fund_round}_assessment",
+                "unscored_sections": unscored,
+                "scored_criteria": scored,
+            },
+        },
+        "fund_round_data_key_mappings": {
+            fund_round: {
+                "location": None,
+                "asset_type": None,
+                "funding_one": None,
+                "funding_two": None,
+            },
+        },
+        "fund_round_mapping_config": {
+            fund_round: {
+                "fund_id": fund_id,
+                "round_id": round_id,
+                "type_of_application": str.upper(fund_short_name),
+            },
+        },
+    }
+    write_config(temp_assess_output, "temp_assess", round_short_name, "temp_assess")
