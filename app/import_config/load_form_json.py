@@ -20,7 +20,7 @@ from app.db import db  # noqa:E402
 from app.db.models import Component  # noqa:E402
 from app.db.models import ComponentType  # noqa:E402
 from app.db.models import Page  # noqa:E402
-from app.db.queries.application import insert_new_form # noqa:E402
+from app.db.queries.application import insert_new_form  # noqa:E402
 from app.shared.data_classes import Condition  # noqa:E402
 from app.shared.data_classes import ConditionValue  # noqa:E402
 from app.shared.helpers import find_enum  # noqa:E402
@@ -95,7 +95,7 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
 
                     # Use the cache to reduce database queries
                     if runner_component_name not in components_cache:
-                        # the condition might be referencing a component on another page, so we should pass 
+                        # the condition might be referencing a component on another page, so we should pass
                         # through all possible page ids
                         component_to_update = _get_component_by_runner_name(db, runner_component_name, page_ids)
                         components_cache[runner_component_name] = component_to_update
@@ -111,8 +111,8 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
                     if component_to_update.conditions:
                         component_to_update.conditions.append(asdict(new_condition))
                         # Mark the conditions column as modified so SQLAlchemy knows it has changed
-                        # When you directly modify an element in a JSON column (like appending to a list), 
-                        # SQLAlchemy may not automatically recognize it. Explicitly marking the attribute as 
+                        # When you directly modify an element in a JSON column (like appending to a list),
+                        # SQLAlchemy may not automatically recognize it. Explicitly marking the attribute as
                         # modified solves this issue.
                         flag_modified(component_to_update, "conditions")
                     else:
