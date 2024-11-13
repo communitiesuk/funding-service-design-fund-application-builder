@@ -27,6 +27,7 @@ class Condition:
     display_name: str
     value: ConditionValue
     destination_page_path: str
+    source_page_path: Optional[str] = None
 
 
 @dataclass

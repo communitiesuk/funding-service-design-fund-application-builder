@@ -1,6 +1,7 @@
 {
   "metadata": {},
   "startPage": "/asset-information",
+
   "pages": [
     {
       "title": "Asset information",
@@ -10,7 +11,7 @@
           "name": "JGhnud",
           "options": {},
           "type": "Para",
-          "content": "<label class=\"govuk-!-font-weight-bold\">In this section, we'll ask about:\n</label>\n\n<ul class=\"govuk-list govuk-list--bullet\">\n<li>asset type</li>\n<li>what you intend to do with the asset</li>\n<li>asset ownership status</li>\n<li>asset ownership details (if applicable)</li>\n<li>public ownership details (if applicable)</li>\n<li>reason asset is at risk</li>\n<li>Asset of Community Value details (if applicable)</li>\n<li>Community Asset Transfer details (if applicable)</li>\n</ul>"
+          "content": "<label class=\"govuk-!-font-weight-bold\">In this section, we'll ask about:\n</label>\n\n<ul class=\"govuk-list govuk-list--bullet\">\n<li>asset type</li>\n<li>what you intend to do with the asset</li>\n<li>asset ownership status</li>\n<li>asset ownership details (if applicable)</li>\n<li>public ownership details (if applicable)</li>\n<li>reason asset is at risk</li>\n<li>Asset of Community Value details (if applicable)</li>\n</ul>"
         }
       ],
       "next": [
@@ -71,10 +72,6 @@
         },
         {
           "path": "/upload-asset-valuation-or-lease-agreement"
-        },
-        {
-          "path": "/upload-asset-valuation-or-lease-agreement-pJQtXk",
-          "condition": "hWsHyx"
         }
       ],
       "section": "wxYZcT"
@@ -298,10 +295,6 @@
           "condition": "EQpfAl"
         },
         {
-          "path": "/community-asset-transfer",
-          "condition": "rrSKPO"
-        },
-        {
           "path": "/assets-of-community-value"
         }
       ],
@@ -320,7 +313,7 @@
       ],
       "next": [
         {
-          "path": "/summary"
+          "path": "/local-service-provision"
         }
       ],
       "section": "wxYZcT"
@@ -418,59 +411,135 @@
       ],
       "next": [
         {
-          "path": "/community-asset-transfer",
-          "condition": "rrSKPO"
-        },
-        {
           "path": "/assets-of-community-value"
         }
       ],
       "section": "wxYZcT"
     },
     {
-      "path": "/community-asset-transfer",
-      "title": "Community asset transfer",
+      "path": "/local-service-provision",
+      "title": "Local service provision",
       "components": [
         {
-          "name": "WKIGQE",
+          "name": "mZwrmI",
+          "options": {},
+          "type": "YesNoField",
+          "title": "Are there assets or services of a similar type available locally?"
+        }
+      ],
+      "next": [
+        {
+          "path": "/local-service-provision-mmUOLb",
+          "condition": "yeEMBf"
+        },
+        {
+          "path": "/local-service-provision-bgqNrc"
+        }
+      ],
+      "section": "wxYZcT"
+    },
+    {
+      "path": "/local-service-provision-mmUOLb",
+      "title": "Local service provision",
+      "components": [
+        {
+          "name": "BfgLCc",
+          "options": {},
+          "type": "YesNoField",
+          "title": "Is your asset different from what is available locally?"
+        }
+      ],
+      "next": [
+        {
+          "path": "/local-service-provision-cNfGYA",
+          "condition": "nlbrNc"
+        },
+        {
+          "path": "/local-service-provision-JcqzLI"
+        }
+      ],
+      "section": "wxYZcT"
+    },
+    {
+      "path": "/local-service-provision-bgqNrc",
+      "title": "Local service provision",
+      "components": [
+        {
+          "name": "GEJNWF",
           "options": {
             "maxWords": "500"
           },
           "type": "FreeTextField",
-          "title": "Describe the current status of the Community Asset Transfer"
+          "title": "How accessible is the closest asset or service?",
+          "hint": "For example, if you are applying to fund a swimming pool, where is the next closest swimming facility?"
         }
       ],
       "next": [
         {
-          "path": "/assets-of-community-value"
+          "path": "/local-service-provision-JcqzLI"
         }
       ],
       "section": "wxYZcT"
     },
     {
-      "path": "/upload-asset-valuation-or-lease-agreement-pJQtXk",
-      "title": "Upload asset valuation or lease agreement",
+      "path": "/local-service-provision-cNfGYA",
+      "title": "Local service provision",
       "components": [
         {
-          "name": "TtOReP",
+          "name": "WTZoVD",
           "options": {
-            "dropzoneConfig": {
-              "maxFiles": 1,
-              "parallelUploads": 1,
-              "maxFilesize": 10,
-              "acceptedFiles": "image/jpeg,image/png,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.oasis.opendocument.text,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.spreadsheet"
-            },
-            "showNoScriptWarning": false,
-            "minimumRequiredFiles": 1
+            "maxWords": "500"
           },
-          "type": "ClientSideFileUploadField",
-          "title": "Please upload evidence that shows the asset is already leased by your organisation.",
-          "hint": "<label class=\"gov-uk-hint\">\nThis could be a copy of your tenancy agreement, or agreed heads of terms, showing at least 15 years tenancy with reasonable break clauses.\n\n<p>It should be a single file no bigger than 10MB in an accepted format (jpg, jpeg, png, pdf, txt, doc, docx, odt, csv, xls, xlsx, ods).</p>\n</label>"
+          "type": "FreeTextField",
+          "title": "Tell us how and why your asset or the service is different"
         }
       ],
       "next": [
         {
-          "path": "/terms-of-your-lease"
+          "path": "/local-service-provision-bgqNrc"
+        }
+      ],
+      "section": "wxYZcT"
+    },
+    {
+      "path": "/local-service-provision-JcqzLI",
+      "title": "Local service provision",
+      "components": [
+        {
+          "name": "CFFsxV",
+          "options": {},
+          "type": "YesNoField",
+          "title": "Does part of your project include a commercial aspect?",
+          "hint": "For example, a community centre which also has a community café attached that helps to subsidise the activities of the centre"
+        }
+      ],
+      "next": [
+        {
+          "path": "/local-service-provision-ShxyWq",
+          "condition": "hJonvv"
+        },
+        {
+          "path": "/summary"
+        }
+      ],
+      "section": "wxYZcT"
+    },
+    {
+      "path": "/local-service-provision-ShxyWq",
+      "title": "Local service provision",
+      "components": [
+        {
+          "name": "FDZQTQ",
+          "options": {
+            "maxWords": "500"
+          },
+          "type": "FreeTextField",
+          "title": "Tell us how the commercial aspect relates to the other services you provide"
+        }
+      ],
+      "next": [
+        {
+          "path": "/summary"
         }
       ],
       "section": "wxYZcT"
@@ -972,6 +1041,72 @@
               "type": "Value",
               "value": "Part of a Community Asset Transfer",
               "display": "Part of a Community Asset Transfer"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Are there assets or services of  a similar type available locally-yes ",
+      "name": "yeEMBf",
+      "value": {
+        "name": "Are there assets or services of  a similar type available locally-yes ",
+        "conditions": [
+          {
+            "field": {
+              "name": "mZwrmI",
+              "type": "YesNoField",
+              "display": "Are there assets or services of a similar type available locally?"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "true",
+              "display": "true"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Is your asset different from what is available locally-yes",
+      "name": "nlbrNc",
+      "value": {
+        "name": "Is your asset different from what is available locally-yes",
+        "conditions": [
+          {
+            "field": {
+              "name": "BfgLCc",
+              "type": "YesNoField",
+              "display": "Is your asset different from what is available locally?"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "true",
+              "display": "true"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "Does part of your project include a commercial aspect-yes",
+      "name": "hJonvv",
+      "value": {
+        "name": "Does part of your project include a commercial aspect-yes",
+        "conditions": [
+          {
+            "field": {
+              "name": "CFFsxV",
+              "type": "YesNoField",
+              "display": "Does part of your project include a commercial aspect?"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "true",
+              "display": "true"
             }
           }
         ]

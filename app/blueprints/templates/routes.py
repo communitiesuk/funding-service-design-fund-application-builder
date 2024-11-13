@@ -26,10 +26,10 @@ template_bp = Blueprint(
 )
 
 
-def json_import(data, template_name):
+def json_import(data, template_name, filename):
     from app.import_config.load_form_json import load_json_from_file
 
-    load_json_from_file(data=data, template_name=template_name)
+    load_json_from_file(data=data, template_name=template_name, filename=filename)
 
 
 def _build_rows(forms: list[Form]) -> list[dict]:
@@ -77,10 +77,10 @@ def view_templates():
 
         if file:
             try:
-                secure_filename(file.filename)
+                filename = secure_filename(file.filename)
                 file_data = file.read().decode("utf-8")
                 form_data = json.loads(file_data)
-                json_import(data=form_data, template_name=template_name)
+                json_import(data=form_data, template_name=template_name, filename=filename)
             except Exception as e:
                 print(e)
                 form.error = "Invalid file: Please upload valid JSON file"

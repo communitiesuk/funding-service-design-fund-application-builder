@@ -20,7 +20,14 @@ def write_config(config, filename, round_short_name, config_type):
     if config_type == "form_json":
         output_dir = base_output_dir / "form_runner"
         content_to_write = config
-        file_path = output_dir / f"{human_to_kebab_case(filename)}.json"
+        # Ensure the filename ends with .json
+        if not filename.endswith(".json"):
+            if any(
+                filename.endswith(ext) for ext in [".py", ".html", ".txt", ".csv"]
+            ):  # Add other file types as needed
+                raise ValueError(f"Invalid file type for form_json: {filename}")
+            filename = f"{filename}.json"
+        file_path = output_dir / f"{human_to_kebab_case(filename)}"
     elif config_type == "python_file":
         output_dir = base_output_dir / "fund_store"
         config_dict = convert_to_dict(config)  # Convert config to dict for non-JSON types

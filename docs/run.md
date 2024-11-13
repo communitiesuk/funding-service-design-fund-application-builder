@@ -36,6 +36,6 @@ Below is a docker-compose file that will start both the FAB app, and the form ru
 ```
 To run locally using digital-form-builder-adapter
 
-docker-compose -f docker-compose-dev.yml up
+docker compose -f docker-compose-dev.yml up
 
 ```

@@ -363,8 +363,12 @@ def insert_new_form(new_form_config):
         section_index=new_form_config.get("section_index"),
         runner_publish_name=new_form_config.get("runner_publish_name", None),
     )
-    db.session.add(form)
-    db.session.commit()
+    try:
+        db.session.add(form)
+        db.session.commit()
+    except Exception as e:
+        print(e)
+        raise e
     return form
 
 
