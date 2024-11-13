@@ -91,7 +91,13 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
 
                     condition_data = conditions_dict[target_condition_name]
                     # for condition in condition_data["value"]["conditions"]:
-                    runner_component_name = condition_data["value"]["conditions"][0]["field"]["name"]
+                    # sometimes its in this format '"name": "nweebX.TiKRCy"'
+                    # ("section_name" + "." + "component_name"),
+                    # so we need to extract the component name
+                    if "." in condition_data["value"]["conditions"][0]["field"]["name"]:
+                        runner_component_name = condition_data["value"]["conditions"][0]["field"]["name"].split(".")[1]
+                    else:
+                        runner_component_name = condition_data["value"]["conditions"][0]["field"]["name"]
 
                     # Use the cache to reduce database queries
                     if runner_component_name not in components_cache:

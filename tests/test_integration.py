@@ -348,11 +348,11 @@ def test_generate_config_to_verify_form_sections(
         ("favourite-colours.json", "favourite-colours.json", 4, 1, 1),
         ("funding-required-cof-25.json", "funding-required-cof-25.json", 12, 21, 2),
         (
-            "organisation-and-local-authority-information-template.json",
-            "organisation-and-local-authority-information-template.json",
+            "organisation-and-local-authority.json",
+            "organisation-and-local-authority.json",
             16,
             24,
-            1,
+            2,
         ),  # noqa: E501
         ("test-section.json", "test-section.json", 3, 1, 2),
     ],
