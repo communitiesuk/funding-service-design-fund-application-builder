@@ -106,7 +106,7 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
                         component_to_update = _get_component_by_runner_name(db, runner_component_name, page_ids)
                         components_cache[runner_component_name] = component_to_update
                     else:
-                        component_to_update = components_cache[runner_component_name]  # here
+                        component_to_update = components_cache[runner_component_name]
 
                     # Create a new Condition instance with a different variable name
                     new_condition = _build_condition(
