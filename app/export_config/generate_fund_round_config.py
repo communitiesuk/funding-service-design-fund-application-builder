@@ -108,6 +108,7 @@ def generate_fund_config(round_id):
         owner_organisation_shortname="None",
         owner_organisation_logo_uri="None",
         funding_type=fund.funding_type.value,
+        ggis_scheme_reference_number=fund.ggis_scheme_reference_number,
     )
     return fund_export.as_dict()
 

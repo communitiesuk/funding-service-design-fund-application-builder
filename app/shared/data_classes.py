@@ -106,6 +106,7 @@ class FundExport:
     owner_organisation_name: str
     owner_organisation_shortname: str
     owner_organisation_logo_uri: str
+    ggis_scheme_reference_number: str
     funding_type: FundingType
     name_json: NameJson = field(default_factory=NameJson)
     title_json: TitleJson = field(default_factory=TitleJson)
