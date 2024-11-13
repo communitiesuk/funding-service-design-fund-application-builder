@@ -64,6 +64,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                     "title_json": {"en": "funding to improve testing"},
                     "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
                     "funding_type": "COMPETITIVE",
+                    "ggis_scheme_reference_number": "G3-SCH-0000092414",
                 },
                 "round_config": {
                     "short_name": round_short_name,

@@ -131,15 +131,11 @@ class RoundForm(FlaskForm):
     display_logo_on_pdf_exports = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     mark_as_complete_enabled = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     is_expression_of_interest = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    has_feedback_survey = RadioField(
-        "Has feedback survey", choices=[("true", "Yes"), ("false", "No")], default="false"
-    )
+    has_feedback_survey = RadioField("Has feedback survey", choices=[("true", "Yes"), ("false", "No")], default="false")
     has_section_feedback = RadioField(
         "Has section feedback", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
-    has_research_survey = RadioField(
-        "Has research survey", choices=[("true", "Yes"), ("false", "No")], default="false"
-    )
+    has_research_survey = RadioField("Has research survey", choices=[("true", "Yes"), ("false", "No")], default="false")
     is_feedback_survey_optional = RadioField(
         "Is feedback survey optional", choices=[("true", "Yes"), ("false", "No")], default="false"
     )

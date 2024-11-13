@@ -378,20 +378,22 @@ def populate_form_with_round_data(round):
         ),
         "is_feedback_survey_optional": (
             "true"
-            if round.feedback_survey_config and round.feedback_survey_config.get("is_feedback_survey_optional", "") == "true"
+            if round.feedback_survey_config
+            and round.feedback_survey_config.get("is_feedback_survey_optional", "") == "true"
             else "false"
         ),
         "is_section_feedback_optional": (
             "true"
-            if round.feedback_survey_config and round.feedback_survey_config.get("is_section_feedback_optional", "") == "true"
+            if round.feedback_survey_config
+            and round.feedback_survey_config.get("is_section_feedback_optional", "") == "true"
             else "false"
         ),
         "is_research_survey_optional": (
             "true"
-            if round.feedback_survey_config and round.feedback_survey_config.get("is_research_survey_optional", "") == "true"
+            if round.feedback_survey_config
+            and round.feedback_survey_config.get("is_research_survey_optional", "") == "true"
             else "false"
         ),
-
         "eligibility_config": (
             "true"
             if round.eligibility_config and round.eligibility_config.get("has_eligibility", "") == "true"
