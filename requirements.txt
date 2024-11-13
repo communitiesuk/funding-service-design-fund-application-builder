@@ -137,7 +137,7 @@ packaging==24.1
     # via
     #   gunicorn
     #   marshmallow
-pandas==2.2.2
+pandas==2.2.3
     # via -r requirements.in
 psycopg2-binary==2.9.9
     # via -r requirements.in
