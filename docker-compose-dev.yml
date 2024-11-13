@@ -39,7 +39,7 @@ services:
       context: ../digital-form-builder-adapter
       dockerfile: ./runner/Dockerfile
     ports:
-      - "3019:3010"
+      - "3019:3009"
       - 9238:9228
     command: yarn runner dev
     environment:
