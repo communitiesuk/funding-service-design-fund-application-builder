@@ -24,7 +24,7 @@ dependencies = [
     "marshmallow-sqlalchemy==1.0.0",
     "openpyxl>=3.1.5",
     "pandas>=2.2.2",
-    "psycopg2-binary==2.9.9",
+    "psycopg2-binary==2.9.10",
     "pyscss==1.4.0",
     "requests==2.32.3",
     "sqlalchemy-json==0.7.0",
