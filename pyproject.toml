@@ -21,7 +21,7 @@ dependencies = [
     "govuk-frontend-jinja==3.4.0",
     "jsmin==3.0.1",
     "jsonschema>=4.23.0",
-    "marshmallow-sqlalchemy==1.0.0",
+    "marshmallow-sqlalchemy==1.1.0",
     "openpyxl>=3.1.5",
     "pandas>=2.2.2",
     "psycopg2-binary==2.9.9",
