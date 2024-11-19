@@ -5,7 +5,7 @@ description = "Prototype Fund Application Builder (FAB) app for building applica
 authors = ["MHCLG"]
 license = "MIT License"
 
-requires-python = ">=3.10, <3.11"
+requires-python = "~=3.10.0"
 dependencies = [
     "airium==0.2.6",
     "cssmin==0.2.0",
