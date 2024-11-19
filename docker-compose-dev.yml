@@ -23,7 +23,7 @@ services:
     depends_on: [fab-db-dc, form-runner-dc]
 
   fab-db-dc:
-    image: postgres
+    image: postgres@sha256:163763c8afd28cae69035ce84b12d8180179559c747c0701b3cad17818a0dbc5
     container_name: fab-db-dc
     ports:
       - 5435:5432
@@ -56,6 +56,6 @@ services:
       - FORM_RUNNER_ADAPTER_REDIS_INSTANCE_URI=redis://redis-data:6379
 
   redis-data:
-    image: redis
+    image: redis@sha256:af0be38eb8e43191bae9b03fe5c928803930b6f93e2dde3a7ad1165c04b1ce22
     ports:
       - 6379:6379
