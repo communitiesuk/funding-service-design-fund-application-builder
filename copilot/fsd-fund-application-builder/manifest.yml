@@ -10,7 +10,7 @@ type: Load Balanced Web Service
 http:
   # Requests to this path will be forwarded to your service.
   # To match all requests you can use the "/" path.
-  path: '/'
+  path: "/"
   # You can specify a custom health check path. The default is "/".
   #healthcheck: '/healthcheck'
   alias: fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk
@@ -39,7 +39,7 @@ network:
   connect: true # Enable Service Connect for intra-environment traffic between services.
 
 # storage:
-  # readonly_fs: true       # Limit to read-only access to mounted root filesystems.
+# readonly_fs: true       # Limit to read-only access to mounted root filesystems.
 
 # Optional fields for more advanced use-cases.
 #
@@ -53,13 +53,13 @@ variables:
   FLASK_ENV: ${COPILOT_ENVIRONMENT_NAME}
   FORM_RUNNER_EXTERNAL_HOST: "https://forms.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
   FORM_RUNNER_INTERNAL_HOST: "http://fsd-form-runner-adapter:3009"
-  FUND_STORE_API_HOST: "http://fsd-fund-store:8080"
   NOTIFICATION_SERVICE_HOST: http://fsd-notification:8080
   MAINTENANCE_MODE: false
 
 secrets:
   RSA256_PUBLIC_KEY_BASE64: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/RSA256_PUBLIC_KEY_BASE64
   SECRET_KEY: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/SECRET_KEY
+  FUND_STORE_API_HOST: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/FUND_STORE_API_HOST
 
 # You can override any of the values defined above by environment.
 environments:
@@ -68,7 +68,7 @@ environments:
       spot: 1
   test:
     deployment:
-      rolling: 'recreate'
+      rolling: "recreate"
     count:
       spot: 2
   uat:
