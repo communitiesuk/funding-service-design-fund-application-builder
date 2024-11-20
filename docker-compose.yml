@@ -16,6 +16,6 @@ services:
 
 
   fab-db:
-    image: postgres
+    image: postgres@sha256:163763c8afd28cae69035ce84b12d8180179559c747c0701b3cad17818a0dbc5
     environment:
      - POSTGRES_PASSWORD=password
