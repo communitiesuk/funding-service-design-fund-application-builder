@@ -1,0 +1,66 @@
+{
+  "startPage": "/project-name",
+  "pages": [
+    {
+      "path": "/summary",
+      "title": "Summary",
+      "components": [],
+      "next": [],
+      "section": "FabDefault",
+      "controller": "./pages/summary.js"
+    },
+    {
+      "path": "/project-overview",
+      "title": "Project overview",
+      "components": [
+        {
+          "options": {},
+          "type": "FreeTextField",
+          "title": "Project overview",
+          "hint": "Give a brief summary of your project, including what you hope to achieve",
+          "schema": {},
+          "name": "KJtdhs"
+        }
+      ],
+      "next": [
+        {
+          "path": "/summary"
+        }
+      ],
+      "section": "FabDefault"
+    },
+    {
+      "path": "/project-name",
+      "title": "Project name",
+      "components": [
+        {
+          "options": {},
+          "type": "TextField",
+          "title": "Project name",
+          "hint": "",
+          "schema": {},
+          "name": "VcyKVN"
+        }
+      ],
+      "next": [
+        {
+          "path": "/project-overview"
+        }
+      ],
+      "section": "FabDefault",
+      "controller": "start.js"
+    }
+  ],
+  "lists": [],
+  "conditions": [],
+  "sections": [
+    {
+      "name": "FabDefault",
+      "title": "Default section",
+      "hideTitle": true
+    }
+  ],
+  "outputs": [],
+  "skipSummary": false,
+  "name": "Project Name (Sample)"
+}
