@@ -2,7 +2,6 @@ services:
   fab:
     build:
       context: .
-      target: fab-dev
       args:
         - USE_DEV_REQUIREMENTS=true
     volumes:
