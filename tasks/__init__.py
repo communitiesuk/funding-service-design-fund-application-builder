@@ -7,6 +7,7 @@ from tasks.export_tasks import generate_fund_and_round_config
 from tasks.export_tasks import generate_round_form_jsons
 from tasks.export_tasks import generate_round_html
 from tasks.export_tasks import publish_form_json_to_runner
+from tasks.fake_fund_tasks import upsert_ctdf
 
 task.auto_dash_names = True
 
@@ -18,4 +19,5 @@ __all__ = [
     generate_round_form_jsons,
     generate_round_html,
     publish_form_json_to_runner,
+    upsert_ctdf,
 ]

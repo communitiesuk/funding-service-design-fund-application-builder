@@ -56,8 +56,8 @@ def recreate_local_dbs(c):
 
 
 @task
-def create_test_data(c):
-    """Inserts some initial test data"""
+def recreate_test_data(c):
+    """Truncates all tables, then inserts some initial test data"""
     from sqlalchemy import text
 
     with app.app_context():
@@ -69,6 +69,16 @@ def create_test_data(c):
             )
         )
         db.session.commit()
+        insert_test_data(db=db, test_data=init_salmon_fishing_fund())
+        load_form_jsons()
+
+
+@task
+def create_test_data(c):
+    """Inserts some initial test data"""
+
+    with app.app_context():
+        db = app.extensions["sqlalchemy"]
         insert_test_data(db=db, test_data=init_salmon_fishing_fund())
         load_form_jsons()
 
