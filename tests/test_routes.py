@@ -1,6 +1,8 @@
 from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
+from flask import current_app
 from wtforms.validators import ValidationError
 
 from app.blueprints.fund_builder.forms.round import validate_json_field
@@ -10,6 +12,26 @@ from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
+
+
+@pytest.fixture(autouse=True)
+def patch_validate_token_rs256():
+    # This fixture patches validate_token_rs256 for all tests automatically.
+    with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
+        mock_validate_token_rs256.return_value = {
+            "accountId": "test-account-id",
+            "roles": [],
+            "email": "test@communities.gov.uk",
+        }
+        yield mock_validate_token_rs256
+
+
+@pytest.fixture(autouse=True)
+def set_auth_cookie(flask_test_client):
+    # This fixture sets the authentication cookie on every test.
+    user_token_cookie_name = current_app.config.get("FSD_USER_TOKEN_COOKIE_NAME", "fsd_user_token")
+    flask_test_client.set_cookie(key=user_token_cookie_name, value="dummy_jwt_token")
+    yield
 
 
 def test_create_fund(flask_test_client, _db, clear_test_data):

@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import render_template
 from fsd_utils.logging import logging
 from jinja2 import ChoiceLoader
 from jinja2 import PackageLoader
@@ -8,8 +9,6 @@ from app.blueprints.dev.routes import dev_bp
 from app.blueprints.fund_builder.routes import build_fund_bp
 from app.blueprints.self_serve.routes import self_serve_bp
 from app.blueprints.templates.routes import template_bp
-from app.db.models import Fund  # noqa:F401
-from app.db.models import Round  # noqa:F401
 
 
 def create_app() -> Flask:
@@ -49,6 +48,10 @@ def create_app() -> Flask:
         ]
     )
     flask_app.jinja_env.add_extension("jinja2.ext.do")
+
+    @flask_app.errorhandler(403)
+    def forbidden_error(error):
+        return render_template("403.html"), 403
 
     return flask_app
 

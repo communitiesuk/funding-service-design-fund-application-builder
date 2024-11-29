@@ -3,6 +3,9 @@ from flask import current_app
 from flask import redirect
 from flask import request
 from flask import url_for
+from fsd_utils.authentication.decorators import SupportedApp
+from fsd_utils.authentication.decorators import check_internal_user
+from fsd_utils.authentication.decorators import login_required
 
 from app.blueprints.self_serve.data.data_access import clear_all_responses
 from app.blueprints.self_serve.data.data_access import get_all_components
@@ -22,6 +25,8 @@ dev_bp = Blueprint(
 
 
 @dev_bp.route("/responses")
+@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
+@check_internal_user
 def view_responses():
     """
     Retrieves all responses received from a 'Save per page' callback when a form is in preview mode.
@@ -32,6 +37,8 @@ def view_responses():
 
 
 @dev_bp.route("/responses/clear")
+@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
+@check_internal_user
 def clear_responses():
     """
     Clears all responses received from a 'Save per page' callback when a form is in preview mode.
@@ -41,6 +48,8 @@ def clear_responses():
 
 
 @dev_bp.route("/save", methods=["PUT"])
+@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
+@check_internal_user
 def save_per_page():
     """
     Mock version of the 'save per page' route in application store - used to save and enable viewing of save
@@ -66,24 +75,32 @@ def save_per_page():
 
 
 @dev_bp.route("/forms")
+@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
+@check_internal_user
 def view_forms():
     forms = get_saved_forms()
     return forms
 
 
 @dev_bp.route("/pages")
+@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
+@check_internal_user
 def view_pages():
     forms = get_all_pages()
     return forms
 
 
 @dev_bp.route("/sections")
+@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
+@check_internal_user
 def view_sections():
     forms = get_all_sections()
     return forms
 
 
 @dev_bp.route("/questions")
+@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
+@check_internal_user
 def view_questions():
     forms = get_all_components()
     return forms
