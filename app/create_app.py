@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import render_template
 from flask_assets import Environment
 from fsd_utils.logging import logging
 from jinja2 import ChoiceLoader
@@ -61,6 +62,10 @@ def create_app() -> Flask:
         ]
     )
     flask_app.jinja_env.add_extension("jinja2.ext.do")
+
+    @flask_app.errorhandler(403)
+    def forbidden_error(error):
+        return render_template("403.html"), 403
 
     return flask_app
 

@@ -20,3 +20,12 @@ class DevelopmentConfig(Config):
     TEMP_FILE_PATH = Path("app") / "export_config" / "output"
 
     GENERATE_LOCAL_CONFIG = True
+
+    DEBUG_USER_ON = True
+    DEBUG_USER = {
+        "full_name": "Development User",
+        "email": "dev@communities.gov.uk",
+        "roles": [],
+        "highest_role_map": {},
+    }
+    DEBUG_USER_ACCOUNT_ID = "00000000-0000-0000-0000-000000000000"
