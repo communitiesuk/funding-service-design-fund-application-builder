@@ -173,7 +173,7 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
 
             for condition in component.conditions:
                 # If no source page is set use the components parent page
-                if condition["source_page_path"] is not None:
+                if condition is not None and condition["source_page_path"] is not None:
                     source_page_to_update = next(
                         p for p in partial_form_json["pages"] if p["path"] == f"{condition['source_page_path']}"
                     )
