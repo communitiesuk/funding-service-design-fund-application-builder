@@ -1,5 +1,7 @@
 import ast
 import json
+import secrets
+import string
 from pathlib import Path
 
 import pytest
@@ -199,7 +201,7 @@ def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data, temp_outpu
                                 "options": {},
                                 "type": "Html",
                                 "content": '<p class="govuk-body"></p><p class="govuk-body">'
-                                "We will ask you about:</p> <ul><li>Organisation Name</li></ul>",
+                                           "We will ask you about:</p> <ul><li>Organisation Name</li></ul>",
                                 "schema": {},
                             }
                         ],
@@ -255,7 +257,6 @@ def test_generate_form_jsons_for_round_invalid_input(seed_dynamic_data):
 
 
 def test_generate_fund_round_html(seed_dynamic_data, temp_output_dir):
-
     # Setup: Prepare valid input parameters
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
@@ -266,12 +267,12 @@ def test_generate_fund_round_html(seed_dynamic_data, temp_output_dir):
     expected_files = [
         {
             "path": temp_output_dir
-            / round_short_name
-            / "html"
-            / f"{fund_short_name.casefold()}_{round_short_name.casefold()}_all_questions_en.html",
+                    / round_short_name
+                    / "html"
+                    / f"{fund_short_name.casefold()}_{round_short_name.casefold()}_all_questions_en.html",
             "expected_output": frontend_html_prefix
-            + '<div class="govuk-!-margin-bottom-8">\n  <h2 class="govuk-heading-m ">\n    Table of contents\n  </h2>\n  <ol class="govuk-list govuk-list--number">\n    <li>\n      <a class="govuk-link" href="#organisation-information">\n        Organisation Information\n      </a>\n    </li>\n  </ol>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h2 class="govuk-heading-l" id="organisation-information">\n    1. Organisation Information\n  </h2>\n  <h3 class="govuk-heading-m">\n    1.1. About your organisation\n  </h3>\n  <h4 class="govuk-heading-s">\n    1.1.1. Organisation Name\n  </h4>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      What is your organisation\'s name?\n    </p>\n    <p class="govuk-body">\n      This must match the registered legal organisation name\n    </p>\n  </div>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      How is your organisation classified?\n    </p>\n    <ul class="govuk-list govuk-list--bullet">\n      <li class="">\n        Charity\n      </li>\n      <li class="">\n        Public Limited Company\n      </li>\n    </ul>\n  </div>\n</div>'  # noqa: E501
-            + frontend_html_suffix,
+                               + '<div class="govuk-!-margin-bottom-8">\n  <h2 class="govuk-heading-m ">\n    Table of contents\n  </h2>\n  <ol class="govuk-list govuk-list--number">\n    <li>\n      <a class="govuk-link" href="#organisation-information">\n        Organisation Information\n      </a>\n    </li>\n  </ol>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h2 class="govuk-heading-l" id="organisation-information">\n    1. Organisation Information\n  </h2>\n  <h3 class="govuk-heading-m">\n    1.1. About your organisation\n  </h3>\n  <h4 class="govuk-heading-s">\n    1.1.1. Organisation Name\n  </h4>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      What is your organisation\'s name?\n    </p>\n    <p class="govuk-body">\n      This must match the registered legal organisation name\n    </p>\n  </div>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      How is your organisation classified?\n    </p>\n    <ul class="govuk-list govuk-list--bullet">\n      <li class="">\n        Charity\n      </li>\n      <li class="">\n        Public Limited Company\n      </li>\n    </ul>\n  </div>\n</div>'  # noqa: E501
+                               + frontend_html_suffix,
         }
     ]
     for expected_file in expected_files:
@@ -323,7 +324,9 @@ def test_invalid_data_validate_json(data):
 
 def test_create_export_zip(temp_output_dir):
     test_data_path = Path("tests") / "test_data"
-    output = create_export_zip(directory_to_zip=test_data_path, zip_file_name="test_zip")
+    random_post_fix = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+    output = create_export_zip(directory_to_zip=test_data_path, zip_file_name="test_zip",
+                               random_post_fix=random_post_fix)
     assert output
     output_path = Path(output)
     assert output_path.exists()

@@ -11,11 +11,12 @@ from app.shared.helpers import convert_to_dict
 from config import Config
 
 
-def write_config(config, filename, round_short_name, config_type):
+def write_config(config, filename, round_short_name, config_type, base_output_dir=None):
     # Get the directory of the current file
 
     # Construct the path to the output directory relative to this file's location
-    base_output_dir = Config.TEMP_FILE_PATH / round_short_name
+    if base_output_dir is None:
+        base_output_dir = Config.TEMP_FILE_PATH / round_short_name
 
     if config_type == "form_json":
         output_dir = base_output_dir / "form_runner"
@@ -23,7 +24,7 @@ def write_config(config, filename, round_short_name, config_type):
         # Ensure the filename ends with .json
         if not filename.endswith(".json"):
             if any(
-                filename.endswith(ext) for ext in [".py", ".html", ".txt", ".csv"]
+                    filename.endswith(ext) for ext in [".py", ".html", ".txt", ".csv"]
             ):  # Add other file types as needed
                 raise ValueError(f"Invalid file type for form_json: {filename}")
             filename = f"{filename}.json"

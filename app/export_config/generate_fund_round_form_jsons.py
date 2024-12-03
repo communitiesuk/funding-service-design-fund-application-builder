@@ -73,7 +73,7 @@ form_schema = {
 }
 
 
-def generate_form_jsons_for_round(round_id):
+def generate_form_jsons_for_round(round_id, base_output_dir=None):
     """
     Generates JSON configurations for all forms associated with a given funding round.
 
@@ -98,6 +98,6 @@ def generate_form_jsons_for_round(round_id):
             form_json = json.dumps(result, indent=4)
             valid_json = validate_json(result, form_schema)
             if valid_json:
-                write_config(form_json, form.runner_publish_name, round.short_name, "form_json")
+                write_config(form_json, form.runner_publish_name, round.short_name, "form_json", base_output_dir)
             else:
                 current_app.logger.error(f"Form JSON for {form.runner_publish_name} is invalid.")

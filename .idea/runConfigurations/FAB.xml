@@ -1,0 +1,32 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="FAB" type="PythonConfigurationType" factoryName="Python">
+    <module name="funding-service-design-fund-application-builder" />
+    <option name="ENV_FILES" value="" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="DATABASE_URL" value="postgresql://postgres:password@localhost:5432/fsd_application_builder" />
+      <env name="FLASK_DEBUG" value="0" />
+      <env name="FLASK_ENV" value="development" />
+      <env name="FORM_RUNNER_EXTERNAL_HOST" value="http://localhost:3019" />
+      <env name="FORM_RUNNER_INTERNAL_HOST" value="=http://localhost:3009" />
+      <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="SECRET_KEY" value="local" />
+    </envs>
+    <option name="SDK_HOME" value="" />
+    <option name="SDK_NAME" value="Python 3.10 (funding-service-design-fund-application-builder)" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="IS_MODULE_SDK" value="false" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="SCRIPT_NAME" value="flask" />
+    <option name="PARAMETERS" value="run --port 3020 --cert=$PROJECT_DIR$/../../../../fund_projects/funding-service-design-docker-runner/certs/cert.pem --key=$PROJECT_DIR$/../../../../fund_projects/funding-service-design-docker-runner/certs/key.pem" />
+    <option name="SHOW_COMMAND_LINE" value="false" />
+    <option name="EMULATE_TERMINAL" value="false" />
+    <option name="MODULE_MODE" value="true" />
+    <option name="REDIRECT_INPUT" value="false" />
+    <option name="INPUT_FILE" value="" />
+    <method v="2" />
+  </configuration>
+</component>
