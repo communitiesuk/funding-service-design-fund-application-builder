@@ -29,7 +29,7 @@ frontend_html_suffix = """
 """
 
 
-def generate_all_round_html(round_id):
+def generate_all_round_html(round_id, base_output_dir=None):
     """
     Generates an HTML representation for a specific funding round.
 
@@ -70,4 +70,4 @@ def generate_all_round_html(round_id):
     html_content = frontend_html_prefix
     html_content += print_html(print_data)
     html_content += frontend_html_suffix
-    write_config(html_content, f"{fund.short_name.casefold()}_{round.short_name.casefold()}", round.short_name, "html")
+    write_config(html_content, f"{fund.short_name.casefold()}_{round.short_name.casefold()}", round.short_name, "html", base_output_dir)

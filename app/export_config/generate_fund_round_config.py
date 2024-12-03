@@ -154,7 +154,7 @@ def generate_round_config(round_id):
     return round_export.as_dict()
 
 
-def generate_config_for_round(round_id):
+def generate_config_for_round(round_id, base_output_dir=None):
     """
     Generates configuration for a specific funding round.
 
@@ -180,14 +180,14 @@ def generate_config_for_round(round_id):
     TEMPLATE_FUND_ROUND_EXPORT["sections_config"] = round_display_config
     fund_round_export = TEMPLATE_FUND_ROUND_EXPORT
     write_config(
-        fund_round_export, fund_config["short_name"], fund_round_export["round_config"]["short_name"], "python_file"
+        fund_round_export, fund_config["short_name"], fund_round_export["round_config"]["short_name"], "python_file", base_output_dir
     )
 
     if Config.GENERATE_LOCAL_CONFIG:
-        generate_default_assessment_mappings(fund_config, round_config)
+        generate_default_assessment_mappings(fund_config, round_config, base_output_dir)
 
 
-def generate_default_assessment_mappings(fund_config, round_config):
+def generate_default_assessment_mappings(fund_config, round_config, base_output_dir):
     # The following config is not tested for production use
     # It is generated to make local testing easier - you can add an application to fab and export it with a basic
     # auto-generated assessment config.
@@ -255,4 +255,4 @@ def generate_default_assessment_mappings(fund_config, round_config):
         scored=json.dumps(scored),
         unscored=json.dumps(unscored),
     )
-    write_config(temp_assess_output, "temp_assess", round_short_name, "temp_assess")
+    write_config(temp_assess_output, "temp_assess", round_short_name, "temp_assess", base_output_dir)

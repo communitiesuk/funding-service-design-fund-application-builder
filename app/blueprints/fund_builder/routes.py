@@ -1,6 +1,8 @@
 import json
 import os
+import random
 import shutil
+import string
 from datetime import datetime
 from random import randint
 
@@ -198,9 +200,8 @@ def build_application(round_id):
 
 @build_fund_bp.route("/fund/<fund_id>/round/<round_id>/clone")
 def clone_round(round_id, fund_id):
-
     cloned = clone_single_round(
-        round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0,999)}"  # nosec B311
+        round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0, 999)}"  # nosec B311
     )
     flash(f"Cloned new round: {cloned.short_name}")
 
@@ -379,19 +380,19 @@ def populate_form_with_round_data(round):
         "is_feedback_survey_optional": (
             "true"
             if round.feedback_survey_config
-            and round.feedback_survey_config.get("is_feedback_survey_optional", "") == "true"
+               and round.feedback_survey_config.get("is_feedback_survey_optional", "") == "true"
             else "false"
         ),
         "is_section_feedback_optional": (
             "true"
             if round.feedback_survey_config
-            and round.feedback_survey_config.get("is_section_feedback_optional", "") == "true"
+               and round.feedback_survey_config.get("is_section_feedback_optional", "") == "true"
             else "false"
         ),
         "is_research_survey_optional": (
             "true"
             if round.feedback_survey_config
-            and round.feedback_survey_config.get("is_research_survey_optional", "") == "true"
+               and round.feedback_survey_config.get("is_research_survey_optional", "") == "true"
             else "false"
         ),
         "eligibility_config": (
@@ -562,7 +563,7 @@ def download_form_json(form_id):
     return Response(
         response=json.dumps(form_json),
         mimetype="application/json",
-        headers={"Content-Disposition": f"attachment;filename=form-{randint(0,999)}.json"},  # nosec B311
+        headers={"Content-Disposition": f"attachment;filename=form-{randint(0, 999)}.json"},  # nosec B311
     )
 
 
@@ -620,9 +621,9 @@ def view_form_questions(round_id, form_id):
     )
 
 
-def create_export_zip(directory_to_zip, zip_file_name) -> str:
+def create_export_zip(directory_to_zip, zip_file_name, random_post_fix) -> str:
     # Output zip file path (temporary)
-    output_zip_path = Config.TEMP_FILE_PATH / zip_file_name
+    output_zip_path = Config.TEMP_FILE_PATH / f"{zip_file_name}-{random_post_fix}"
 
     # Create a zip archive of the directory
     shutil.make_archive(base_name=output_zip_path, format="zip", root_dir=directory_to_zip)
@@ -631,19 +632,22 @@ def create_export_zip(directory_to_zip, zip_file_name) -> str:
 
 @build_fund_bp.route("/create_export_files/<round_id>", methods=["GET"])
 def create_export_files(round_id):
-    generate_form_jsons_for_round(round_id)
-    generate_all_round_html(round_id)
-    generate_config_for_round(round_id)
     round_short_name = get_round_by_id(round_id).short_name
-
+    # Construct the path to the output directory relative to this file's location
+    random_post_fix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    base_output_dir = Config.TEMP_FILE_PATH / f"{round_short_name}-{random_post_fix}"
+    generate_form_jsons_for_round(round_id, base_output_dir)
+    generate_all_round_html(round_id, base_output_dir)
+    generate_config_for_round(round_id, base_output_dir)
     output_zip_path = create_export_zip(
-        directory_to_zip=Config.TEMP_FILE_PATH / round_short_name, zip_file_name=round_short_name
+        directory_to_zip=base_output_dir, zip_file_name=round_short_name, random_post_fix=random_post_fix
     )
 
     # Ensure the file is removed after sending it
     @after_this_request
     def remove_file(response):
         os.remove(output_zip_path)
+        shutil.rmtree(base_output_dir)
         return response
 
     # Return the zipped folder for the user to download
