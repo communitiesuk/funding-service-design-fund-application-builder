@@ -23,7 +23,7 @@ services:
     depends_on: [fab-db-dc, form-runner-dc]
 
   fab-db-dc:
-    image: postgres@sha256:163763c8afd28cae69035ce84b12d8180179559c747c0701b3cad17818a0dbc5
+    image: postgres@sha256:fe4efc6901dda0d952306fd962643d8022d7bb773ffe13fe8a21551b9276e50c
     container_name: fab-db-dc
     ports:
       - 5435:5432
