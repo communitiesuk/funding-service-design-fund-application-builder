@@ -1,6 +1,6 @@
 import ast
 import json
-import random
+import secrets
 import string
 from pathlib import Path
 
@@ -324,7 +324,7 @@ def test_invalid_data_validate_json(data):
 
 def test_create_export_zip(temp_output_dir):
     test_data_path = Path("tests") / "test_data"
-    random_post_fix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    random_post_fix = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     output = create_export_zip(directory_to_zip=test_data_path, zip_file_name="test_zip",
                                random_post_fix=random_post_fix)
     assert output

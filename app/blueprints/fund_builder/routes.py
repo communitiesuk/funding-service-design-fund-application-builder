@@ -1,6 +1,6 @@
 import json
 import os
-import random
+import secrets
 import shutil
 import string
 from datetime import datetime
@@ -634,7 +634,7 @@ def create_export_zip(directory_to_zip, zip_file_name, random_post_fix) -> str:
 def create_export_files(round_id):
     round_short_name = get_round_by_id(round_id).short_name
     # Construct the path to the output directory relative to this file's location
-    random_post_fix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    random_post_fix = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     base_output_dir = Config.TEMP_FILE_PATH / f"{round_short_name}-{random_post_fix}"
     generate_form_jsons_for_round(round_id, base_output_dir)
     generate_all_round_html(round_id, base_output_dir)
