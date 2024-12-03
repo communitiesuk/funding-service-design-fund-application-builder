@@ -127,10 +127,18 @@ class RoundForm(FlaskForm):
     )
     guidance_url = URLField("Guidance link", validators=[DataRequired(), URL()])
     all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    application_fields_download_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    display_logo_on_pdf_exports = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    mark_as_complete_enabled = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    is_expression_of_interest = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
+    application_fields_download_available = RadioField(
+        "Application fields download available", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
+    display_logo_on_pdf_exports = RadioField(
+        "Display logo on PDF exports", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
+    mark_as_complete_enabled = RadioField(
+        "Mark as complete enabled", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
+    is_expression_of_interest = RadioField(
+        "Is expression of interest", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
     has_feedback_survey = RadioField("Has feedback survey", choices=[("true", "Yes"), ("false", "No")], default="false")
     has_section_feedback = RadioField(
         "Has section feedback", choices=[("true", "Yes"), ("false", "No")], default="false"
