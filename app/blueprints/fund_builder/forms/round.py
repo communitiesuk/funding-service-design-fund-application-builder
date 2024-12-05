@@ -121,8 +121,8 @@ class RoundForm(FlaskForm):
 
     round_id = HiddenField("Round ID")
     fund_id = StringField("Fund", validators=[DataRequired()])
-    title_en = StringField("Title (en)", validators=[DataRequired()])
-    title_cy = StringField("Title (cy)", description="Leave blank for English-only funds")
+    title_en = StringField("Title (English)", validators=[DataRequired()])
+    title_cy = StringField("Title (Welsh)", description="Leave blank for English-only funds")
     short_name = StringField(
         "Short Name",
         description="Choose a unique short name with 6 or fewer characters",
@@ -137,9 +137,9 @@ class RoundForm(FlaskForm):
     privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), validate_flexible_url])
     application_reminder_sent = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     contact_us_banner_en = TextAreaField(
-        "Contact Us Banner (en)", description="HTML to display to override the default 'Contact Us' page content"
+        "Contact Us Banner (English)", description="HTML to display to override the default 'Contact Us' page content"
     )
-    contact_us_banner_cy = TextAreaField("Contact Us Banner (cy)", description="Leave blank for English-only funds")
+    contact_us_banner_cy = TextAreaField("Contact Us Banner (Welsh)", description="Leave blank for English-only funds")
     reference_contact_page_over_email = RadioField(
         "Reference contact page over email", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
@@ -148,13 +148,13 @@ class RoundForm(FlaskForm):
     contact_textphone = StringField("Contact Textphone")
     support_times = StringField("Support times", validators=[DataRequired()])
     support_days = StringField("Support Days", validators=[DataRequired()])
-    instructions_en = TextAreaField("Instructions (en)")
-    instructions_cy = StringField("Instructions (cy)", description="Leave blank for English-only funds")
+    instructions_en = TextAreaField("Instructions (English)")
+    instructions_cy = StringField("Instructions (Welsh)", description="Leave blank for English-only funds")
     feedback_link = URLField("Feedback Link", validators=[DataRequired(), validate_flexible_url])
     project_name_field_id = StringField("Project name field ID", validators=[DataRequired()])
-    application_guidance_en = TextAreaField("Application Guidance (en)")
+    application_guidance_en = TextAreaField("Application Guidance (English)")
     application_guidance_cy = TextAreaField(
-        "Application Guidance (cy)", description="Leave blank for English-only funds"
+        "Application Guidance (Welsh)", description="Leave blank for English-only funds"
     )
     guidance_url = URLField("Guidance link", validators=[DataRequired(), validate_flexible_url])
     all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
@@ -180,8 +180,10 @@ class RoundForm(FlaskForm):
         "Has eligibility config", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
     eoi_decision_schema_en = TextAreaField(
-        "EOI Decision schema (en)", validators=[validate_json_field], description=JSON_FIELD_HINT
+        "EOI Decision schema (English)", validators=[validate_json_field], description=JSON_FIELD_HINT
     )
     eoi_decision_schema_cy = TextAreaField(
-        "EOI Decision schema (cy)", description="Leave blank for English-only funds", validators=[validate_json_field]
+        "EOI Decision schema (Welsh)",
+        description="Leave blank for English-only funds",
+        validators=[validate_json_field],
     )
