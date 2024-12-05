@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 
 from flask_wtf import FlaskForm
 from flask_wtf import Form
@@ -9,7 +10,6 @@ from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
 from wtforms import URLField
-from wtforms.validators import URL
 from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
@@ -23,6 +23,37 @@ def validate_json_field(form, field):
         json.loads(str_content)
     except Exception as ex:
         raise ValidationError(f"Content is not valid JSON. Underlying error: [{str(ex)}]")
+
+
+def validate_flexible_url(form, field):
+    """
+    Validates URLs allowing:
+    - Optional scheme (http://, https://)
+    - Domain names with multiple subdomains
+    - Optional paths, query parameters
+    - Common TLDs
+    - No scheme required
+    """
+    if not field.data:
+        return
+
+    pattern = (
+        # Optional scheme
+        r"^(?:(?:http|https)://)?"
+        # Domain with optional subdomains
+        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,63})"
+        # Optional port
+        r"(?::\d+)?"
+        # Optional path
+        r"(?:/[^/\s]*)*"
+        # Optional query string
+        r"(?:\?[^\s]*)?"
+        # Optional fragment
+        r"(?:#[^\s]*)?$"
+    )
+
+    if not re.match(pattern, field.data, re.IGNORECASE):
+        raise ValidationError("Invalid URL. Please enter a valid web address.")
 
 
 def get_datetime(form_field):
@@ -102,8 +133,8 @@ class RoundForm(FlaskForm):
     assessment_start = FormField(DateInputForm, label="Assessment Start Date")
     reminder_date = FormField(DateInputForm, label="Reminder Date")
     assessment_deadline = FormField(DateInputForm, label="Assessment Deadline")
-    prospectus_link = URLField("Prospectus Link", validators=[DataRequired(), URL()])
-    privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), URL()])
+    prospectus_link = URLField("Prospectus Link", validators=[DataRequired(), validate_flexible_url])
+    privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), validate_flexible_url])
     application_reminder_sent = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     contact_us_banner_en = TextAreaField(
         "Contact Us Banner (en)", description="HTML to display to override the default 'Contact Us' page content"
@@ -119,13 +150,13 @@ class RoundForm(FlaskForm):
     support_days = StringField("Support Days", validators=[DataRequired()])
     instructions_en = TextAreaField("Instructions (en)")
     instructions_cy = StringField("Instructions (cy)", description="Leave blank for English-only funds")
-    feedback_link = URLField("Feedback Link", validators=[DataRequired(), URL()])
+    feedback_link = URLField("Feedback Link", validators=[DataRequired(), validate_flexible_url])
     project_name_field_id = StringField("Project name field ID", validators=[DataRequired()])
     application_guidance_en = TextAreaField("Application Guidance (en)")
     application_guidance_cy = TextAreaField(
         "Application Guidance (cy)", description="Leave blank for English-only funds"
     )
-    guidance_url = URLField("Guidance link", validators=[DataRequired(), URL()])
+    guidance_url = URLField("Guidance link", validators=[DataRequired(), validate_flexible_url])
     all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     application_fields_download_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     display_logo_on_pdf_exports = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
