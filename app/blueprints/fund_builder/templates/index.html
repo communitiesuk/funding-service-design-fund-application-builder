@@ -7,9 +7,12 @@
                 {% set html %}
                     <p class="govuk-notification-banner__body">{{ messages[0] }}</p>
                 {% endset %}
-                {{ govukNotificationBanner({
-                                "html": html
-                                }) }}
+                {{
+                    govukNotificationBanner({
+                        "html": html,
+                        "type": "success"
+                    })
+                }}
             {% endif %}
         {% endwith %}
         <div class="govuk-grid-row">
