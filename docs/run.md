@@ -6,8 +6,6 @@ This repo contains a devcontainer spec for VS code at [.devcontainer](.devcontai
 If developing locally, you will need a postgres instance running and to set the following environment variables:
  - `DATABASE_URL` to a suitable connection string. The default used is
  `postgresql://postgres:password@fab-db:5432/fund_builder`.   # pragma: allowlist secret
- - `DATABASE_URL_TEST` default
- `postgresql://postgres:password@fab-db:5432/fund_builder_unit_test`  # pragma: allowlist secret
 
 ## General
 Run the app with `flask run` (include `--debug` for auto reloading on file changes)

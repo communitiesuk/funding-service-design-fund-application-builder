@@ -16,7 +16,7 @@ class UnitTestConfig(Config):
     SECRET_KEY = "unit_test"  # pragma: allowlist secret
 
     SQLALCHEMY_DATABASE_URI = getenv(
-        "DATABASE_URL_TEST",
-        "postgresql://postgres:postgres@127.0.0.1:5432/fab_store_test",  # pragma: allowlist secret
+        "DATABASE_URL",
+        "postgresql://postgres:password@127.0.0.1:5432/fab_store_test",  # pragma: allowlist secret
     )
     TEMP_FILE_PATH = Path("app") / "export_config" / "output"
