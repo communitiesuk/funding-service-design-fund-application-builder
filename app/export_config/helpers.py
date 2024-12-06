@@ -79,7 +79,14 @@ assess_output = Template(
     "fund_round_to_assessment_mapping": {
         "schema_id": "${fund_round}_assessment",
         "unscored_sections": ${unscored}
-    }
+    },
+    "fund_round_mapping_config": {
+        "${fund_round}": {
+            "fund_id": "${fund_id}",
+            "round_id": "${round_id}",
+            "type_of_application": "${fund_short_name}",
+        },
+    },
 }
 """
 )
