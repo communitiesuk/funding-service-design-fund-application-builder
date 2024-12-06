@@ -280,8 +280,9 @@ def round(round_id=None):
     Renders a template to select a fund and add or update a round to that fund. If saved, validates the round form data
     and saves to DB
     """
-    all_funds = get_all_funds()
     form = RoundForm()
+    params = {"all_funds": all_funds_as_govuk_select_items(get_all_funds())}
+    params["selected_fund_id"] = request.form.get("fund_id", None)
 
     if round_id:
         round = get_round_by_id(round_id)
@@ -292,17 +293,14 @@ def round(round_id=None):
             update_existing_round(round, form)
             flash(f"Updated round {round.title_json['en']}")
             return redirect(url_for("build_fund_bp.view_fund", fund_id=round.fund_id))
-        else:
-            create_new_round(form)
-            flash(f"Created round {form.title_en.data}")
+        create_new_round(form)
+        flash(f"Created round {form.title_en.data}")
         return redirect(url_for(BUILD_FUND_BP_INDEX))
 
-    return render_template(
-        "round.html",
-        form=form,
-        all_funds=all_funds_as_govuk_select_items(all_funds),
-        round_id=round_id,
-    )
+    params["round_id"] = round_id
+    params["form"] = form
+
+    return render_template("round.html", **params)
 
 
 def _convert_json_data_for_form(data) -> str:
@@ -380,19 +378,19 @@ def populate_form_with_round_data(round):
         "is_feedback_survey_optional": (
             "true"
             if round.feedback_survey_config
-               and round.feedback_survey_config.get("is_feedback_survey_optional", "") == "true"
+            and round.feedback_survey_config.get("is_feedback_survey_optional", "") == "true"
             else "false"
         ),
         "is_section_feedback_optional": (
             "true"
             if round.feedback_survey_config
-               and round.feedback_survey_config.get("is_section_feedback_optional", "") == "true"
+            and round.feedback_survey_config.get("is_section_feedback_optional", "") == "true"
             else "false"
         ),
         "is_research_survey_optional": (
             "true"
             if round.feedback_survey_config
-               and round.feedback_survey_config.get("is_research_survey_optional", "") == "true"
+            and round.feedback_survey_config.get("is_research_survey_optional", "") == "true"
             else "false"
         ),
         "eligibility_config": (
@@ -634,7 +632,7 @@ def create_export_zip(directory_to_zip, zip_file_name, random_post_fix) -> str:
 def create_export_files(round_id):
     round_short_name = get_round_by_id(round_id).short_name
     # Construct the path to the output directory relative to this file's location
-    random_post_fix = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+    random_post_fix = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     base_output_dir = Config.TEMP_FILE_PATH / f"{round_short_name}-{random_post_fix}"
     generate_form_jsons_for_round(round_id, base_output_dir)
     generate_all_round_html(round_id, base_output_dir)

@@ -20,9 +20,10 @@
                             "id": form.fund_id.id,
                             "name": form.fund_id.name,
                             "label": {
-                            "text": form.fund_id.label
+                            "text": "Select Fund"
                             },
                             "items": all_funds,
+                            "value":selected_fund_id,
                             "errorMessage": {
                                 "text": form.fund_id.errors[0] if form.fund_id.errors else ""
                             } if form.fund_id.errors else None
