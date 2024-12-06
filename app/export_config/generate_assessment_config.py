@@ -256,7 +256,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
                     answer = {
                         "field_id": component.runner_component_name,
                         "form_name": form.runner_publish_name,
-                        "field_type": component.type.name,
+                        "field_type": component.type.value[0].lower() + component.type.value[1:],
                         "presentation_type": form_json_to_assessment_display_types.get(component.type.name, "text"),
                         "question": component.title,
                     }
