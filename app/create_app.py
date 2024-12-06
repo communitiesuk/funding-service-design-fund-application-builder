@@ -1,11 +1,9 @@
 from flask import Flask
-from flask_assets import Environment
 from fsd_utils.logging import logging
 from jinja2 import ChoiceLoader
 from jinja2 import PackageLoader
 from jinja2 import PrefixLoader
 
-import static_assets
 from app.blueprints.dev.routes import dev_bp
 from app.blueprints.fund_builder.routes import build_fund_bp
 from app.blueprints.self_serve.routes import self_serve_bp
@@ -43,16 +41,6 @@ def create_app() -> Flask:
 
     # Initialise logging
     logging.init_app(flask_app)
-
-    # Bundle and compile assets
-    assets = Environment()
-    assets.init_app(flask_app)
-
-    static_assets.init_assets(
-        flask_app,
-        auto_build=True,
-        static_folder="app/static/dist",
-    )
 
     flask_app.jinja_loader = ChoiceLoader(
         [

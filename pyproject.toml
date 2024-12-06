@@ -8,8 +8,6 @@ license = "MIT License"
 requires-python = "~=3.10.0"
 dependencies = [
     "airium==0.2.6",
-    "cssmin==0.2.0",
-    "flask-assets==2.1.0",
     "flask-babel==4.0.0",
     "flask-compress==1.15",
     "flask-migrate==4.0.7",
@@ -19,7 +17,6 @@ dependencies = [
     "flask==3.0.3",
     "funding-service-design-utils==5.1.5",
     "govuk-frontend-jinja==3.4.0",
-    "jsmin==3.0.1",
     "jsonschema==4.23.0",
     "marshmallow-sqlalchemy==1.0.0",
     "openpyxl==3.1.5",
@@ -29,7 +26,6 @@ dependencies = [
     "sqlalchemy-json==0.7.0",
     "sqlalchemy-utils==0.41.2",
     "sqlalchemy[mypy]==2.0.36",
-    "pyscss==1.4.0",
 ]
 
 [tool.black]
