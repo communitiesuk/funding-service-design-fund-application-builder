@@ -47,7 +47,7 @@ jobs:
     with:
       environment: dev
       app_name: fund-application-builder
-      db_name: fsd-fund-application-builder
+      run_db_migrations: true
       image_location: ${{ needs.paketo_build.outputs.image_location }}
 
   # post_dev_deploy_tests:
@@ -75,7 +75,7 @@ jobs:
     with:
       environment: test
       app_name: fund-application-builder
-      db_name: fsd-fund-application-builder
+      run_db_migrations: true
       image_location: ${{ needs.paketo_build.outputs.image_location }}
 
   # post_test_deploy_tests:
@@ -104,7 +104,7 @@ jobs:
     with:
       environment: uat
       app_name: fund-application-builder
-      db_name: fsd-fund-application-builder
+      run_db_migrations: true
       image_location: ${{ needs.paketo_build.outputs.image_location }}
 
   # post_uat_deploy_tests:
@@ -133,6 +133,5 @@ jobs:
   #   with:
   #     environment: prod
   #     app_name: fund-application-builder
-  #     version: sha-${{ github.sha }}
-  #     db_name: fsd-fund-application-builder
+  #     run_db_migrations: true
   #     image_location: ${{ needs.paketo_build.outputs.image_location }}
