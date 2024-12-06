@@ -19,28 +19,7 @@ def init_assets(app=None, auto_build=False, static_folder="app/static/dist"):
         # This file needs to be shipped with your code.
         env.manifest = "file"
 
-        # js = Bundle(
-        #     "./js/namespaces.js",
-        #     "./js/helpers.js",
-        #     "./js/all.js",
-        #     "./js/fsd_cookies.js",
-        #     "./js/components/**/*.js",
-        #     filters="jsmin",
-        #     output="js/main.min.js",
-        # )
-
-        # css = Bundle(
-        #     "./scss/*.scss",
-        #     filters="pyscss,cssmin",
-        #     output="css/main.min.css",
-        #     extra={"rel": "stylesheet/css"},
-        # )
-
-        # env.register("default_styles", css)
-        # env.register("main_js", js)
-
         bundles = []
-        # bundles = [css, js]
 
         return bundles
 
