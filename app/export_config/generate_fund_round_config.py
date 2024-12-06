@@ -126,7 +126,7 @@ def generate_round_config(round_id):
         deadline=round.deadline.isoformat(),
         assessment_start=round.assessment_start.isoformat(),
         assessment_deadline=round.assessment_deadline.isoformat(),
-        application_reminder_sent=False,
+        application_reminder_sent=round.application_reminder_sent,
         reminder_date=round.reminder_date.isoformat(),
         prospectus=round.prospectus_link,
         privacy_notice=round.privacy_notice_link,
@@ -148,6 +148,7 @@ def generate_round_config(round_id):
         mark_as_complete_enabled=round.mark_as_complete_enabled,
         is_expression_of_interest=round.is_expression_of_interest,
         feedback_survey_config=round.feedback_survey_config,
+        eligibility_config=round.eligibility_config,
         eoi_decision_schema=round.eoi_decision_schema,
     )
 
@@ -180,7 +181,11 @@ def generate_config_for_round(round_id, base_output_dir=None):
     TEMPLATE_FUND_ROUND_EXPORT["sections_config"] = round_display_config
     fund_round_export = TEMPLATE_FUND_ROUND_EXPORT
     write_config(
-        fund_round_export, fund_config["short_name"], fund_round_export["round_config"]["short_name"], "python_file", base_output_dir
+        fund_round_export,
+        fund_config["short_name"],
+        fund_round_export["round_config"]["short_name"],
+        "python_file",
+        base_output_dir,
     )
 
     if Config.GENERATE_LOCAL_CONFIG:

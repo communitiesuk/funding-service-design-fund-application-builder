@@ -412,6 +412,7 @@ def init_unit_test_data() -> dict:
             "is_section_feedback_optional": False,
             "is_research_survey_optional": False,
         },
+        eligibility_config={"has_eligibility": False},
         eoi_decision_schema={"en": {"valid": True}, "cy": {"valid": False}},
     )
     # r2: Round = Round(
