@@ -38,9 +38,10 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
 
     monkeypatch.setattr(generate_fund_round_config, "ROUND_BASE_PATHS", mock_round_base_paths)
     # Execute: Call the function with valid inputs
-    result = generate_config_for_round(round_id)
+    fund_config, round_config = generate_config_for_round(round_id)
     # Simply writes the files to the output directory so no result is given directly
-    assert result is None
+    assert fund_config is not None
+    assert round_config is not None
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {

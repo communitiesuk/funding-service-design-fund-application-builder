@@ -4,6 +4,7 @@ import sys
 import requests
 
 from app import app
+from app.export_config.generate_assessment_config import generate_assessment_config_for_round
 
 sys.path.insert(1, ".")
 from invoke import task  # noqa:E402
@@ -50,6 +51,14 @@ def generate_round_html(c, roundid):
     with app.app_context():
         generate_all_round_html(roundid)
 
+@task
+def generate_assessment_config(c, fund_config, round_config):
+    if not fund_config and not round_config:
+        print("Round and Fund configurations are required.")
+        return
+    print(f"Generating default assessment configurations.")
+    with app.app_context():
+        generate_assessment_config_for_round(fund_config, round_config)
 
 @task
 def publish_form_json_to_runner(c, filename):
