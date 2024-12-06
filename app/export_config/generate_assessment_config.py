@@ -1,13 +1,20 @@
+import copy
 import json
 import os
 
 import click
 
-from app.db.models import Component
+from app.all_questions.metadata_utils import form_json_to_assessment_display_types
+from app.db import db
+from app.db.models import Component, Section
 from app.db.models import Criteria
 from app.db.models import Subcriteria
 from app.db.models import Theme
+from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.queries.application import get_form_for_component
+from app.export_config import helpers
+from app.export_config.generate_form import human_to_kebab_case
+
 
 # # TODO this is copied from fund-store metadata_utils for now
 # form_json_to_assessment_display_types = {
@@ -188,11 +195,11 @@ def build_assessment_config(criteria_list: list[Criteria]) -> dict:
     prompt=True,
 )
 def generate_assessment_config(
-    input_folder,
-    input_file,
-    output_folder,
-    output_file,
-    forms_dir,
+        input_folder,
+        input_file,
+        output_folder,
+        output_file,
+        forms_dir,
 ):
     with open(os.path.join(input_folder, input_file), "r") as f:
         input_data = json.load(f)
@@ -203,6 +210,69 @@ def generate_assessment_config(
 
     with open(os.path.join(output_folder, output_file), "w") as f:
         json.dump(assessment_config, f)
+
+
+def generate_assessment_config_for_round(fund_config, round_config, base_output_dir):
+    # The following config is not tested for production use
+    # It is generated to make local testing easier - you can add an application to fab and export it with a basic
+    # auto-generated assessment config.
+    # Each form is a sub-critiera, each page a theme. Half scored, half unscored.
+    # The output in the assessment_store folder needs to be added to the
+    # assessment_mapping_fund_round file in assessment-store
+    fund_id = fund_config["id"]
+    round_id = round_config["id"]
+    fund_short_name = fund_config["short_name"]
+    round_short_name = round_config["short_name"]
+    fund_round = f"{str.upper(fund_short_name)}{str.upper(round_short_name)}"
+    fund_round_ids = f"{fund_id}:{round_id}"
+
+    unscored = []
+    sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
+    for i, section in enumerate(sections, start=1):
+        criteria = {
+            "id": human_to_kebab_case(section.name_in_apply_json["en"]),
+            "name": section.name_in_apply_json["en"],
+            "sub_criteria": [],
+        }
+        unscored.append(criteria)
+
+        for form in section.forms:
+            sc = {
+                "id": form.runner_publish_name,
+                "name": form.name_in_apply_json["en"],
+                "themes": [],
+            }
+            for page in form.pages:
+                if page.display_path == "summary":
+                    continue
+                theme = {
+                    "id": human_to_kebab_case(page.name_in_apply_json["en"]),
+                    "name": page.name_in_apply_json["en"],
+                    "answers": [],
+                }
+                for component in page.components:
+                    if component.type in READ_ONLY_COMPONENTS:
+                        continue
+                    answer = {
+                        "field_id": component.runner_component_name,
+                        "form_name": form.runner_publish_name,
+                        "field_type": component.type.value[0].lower() + component.type.value[1:],
+                        "presentation_type": form_json_to_assessment_display_types.get(component.type.name, "text"),
+                        "question": component.title,
+                    }
+                    theme["answers"].append(answer)
+                sc["themes"].append(theme)
+            criteria["sub_criteria"].append(sc)
+    assess_output = copy.deepcopy(helpers.assess_output)
+    assess_output = assess_output.substitute(
+        fund_round=fund_round,
+        fund_id=fund_id,
+        round_id=round_id,
+        fund_round_ids=fund_round_ids,
+        fund_short_name=fund_short_name,
+        unscored=json.dumps(unscored)
+    )
+    helpers.write_config(assess_output, "assessment_config", round_short_name, "assessment", base_output_dir)
 
 
 if __name__ == "__main__":

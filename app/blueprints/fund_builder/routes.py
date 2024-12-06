@@ -46,6 +46,7 @@ from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
 from app.db.queries.round import update_round
 from app.export_config.generate_all_questions import print_html
+from app.export_config.generate_assessment_config import generate_assessment_config_for_round
 from app.export_config.generate_form import build_form_json
 from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.export_config.generate_fund_round_form_jsons import (
@@ -636,7 +637,8 @@ def create_export_files(round_id):
     base_output_dir = Config.TEMP_FILE_PATH / f"{round_short_name}-{random_post_fix}"
     generate_form_jsons_for_round(round_id, base_output_dir)
     generate_all_round_html(round_id, base_output_dir)
-    generate_config_for_round(round_id, base_output_dir)
+    fund_config, round_config = generate_config_for_round(round_id, base_output_dir)
+    generate_assessment_config_for_round(fund_config, round_config, base_output_dir)
     output_zip_path = create_export_zip(
         directory_to_zip=base_output_dir, zip_file_name=round_short_name, random_post_fix=random_post_fix
     )
