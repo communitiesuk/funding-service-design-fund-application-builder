@@ -1,5 +1,6 @@
 import logging
 from logging.config import fileConfig
+from pathlib import Path
 
 from alembic import context
 from flask import current_app
@@ -92,6 +93,14 @@ def run_migrations_online():
 
         with context.begin_transaction():
             context.run_migrations()
+
+    # if we're running on the main db (as opposed to the test db)
+    if connectable.url.database == "fab_store":
+        with open(Path(__file__).parent / ".current-alembic-head", "w") as f:
+            # write the current head to `.current-alembic-head`. This will prevent conflicting migrations
+            # being merged at the same time and breaking the build.
+            head = context.get_head_revision() or ""
+            f.write(head + "\n")
 
 
 if context.is_offline_mode():
