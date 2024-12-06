@@ -150,13 +150,13 @@ class RoundForm(FlaskForm):
     support_days = StringField("Support Days", validators=[DataRequired()])
     instructions_en = TextAreaField("Instructions (English)")
     instructions_cy = StringField("Instructions (Welsh)", description="Leave blank for English-only funds")
-    feedback_link = URLField("Feedback Link", validators=[DataRequired(), validate_flexible_url])
+    feedback_link = URLField("Feedback Link", validators=[validate_flexible_url])
     project_name_field_id = StringField("Project name field ID", validators=[DataRequired()])
     application_guidance_en = TextAreaField("Application Guidance (English)")
     application_guidance_cy = TextAreaField(
         "Application Guidance (Welsh)", description="Leave blank for English-only funds"
     )
-    guidance_url = URLField("Guidance link", validators=[DataRequired(), validate_flexible_url])
+    guidance_url = URLField("Guidance link", validators=[validate_flexible_url])
     all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     application_fields_download_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     display_logo_on_pdf_exports = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
