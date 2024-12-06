@@ -5,8 +5,8 @@ The database schema is defined in [app/db/models.py](./app/db/models.py) and is 
 ### Entity Relationship Diagram
 See [Here](./app/db/database_ERD_9-8-24.png)
 
-### Recreate Local DBs
-For both `DATABASE_URL` and `DATABASE_URL_TEST`, drops the database if it exists and then recreates it.
+### Recreate Local DB
+For `DATABASE_URL`, drop the database if it exists and then recreate it.
 
 ### Init migrations
 Deletes the [versions](./app/db/migrations/versions/) directory and runs `migrate()` to generate a new intial migration version for the SQLAlchemy models.

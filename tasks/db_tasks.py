@@ -28,31 +28,24 @@ def recreate_local_dbs(c):
     from sqlalchemy_utils.functions import database_exists
     from sqlalchemy_utils.functions import drop_database
 
-    uris = [
-        getenv(
-            "DATABASE_URL",
-            "postgresql://postgres:password@fab-db:5432/fab",  # pragma: allowlist secret
-        ),
-        getenv(
-            "DATABASE_URL_TEST",
-            "postgresql://postgres:password@fab-db:5432/fab_store_test",  # pragma: allowlist secret
-        ),
-    ]
+    db_uri = getenv(
+        "DATABASE_URL",
+        "postgresql://postgres:password@fab-db:5432/fab",  # pragma: allowlist secret
+    )
     with app.app_context():
-        for db_uri in uris:
-            if database_exists(db_uri):
-                print("Existing database found!\n")
-                drop_database(db_uri)
-                print("Existing database dropped!\n")
-            else:
-                print(
-                    f"{db_uri} not found...",
-                )
-            create_database(db_uri)
+        if database_exists(db_uri):
+            print("Existing database found!\n")
+            drop_database(db_uri)
+            print("Existing database dropped!\n")
+        else:
             print(
-                f"{db_uri} db created...",
+                f"{db_uri} not found...",
             )
-            upgrade()
+        create_database(db_uri)
+        print(
+            f"{db_uri} db created...",
+        )
+        upgrade()
 
 
 @task
