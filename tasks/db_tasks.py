@@ -34,8 +34,8 @@ def recreate_local_dbs(c):
             "postgresql://postgres:password@fab-db:5432/fab",  # pragma: allowlist secret
         ),
         getenv(
-            "DATABASE_URL_UNIT_TEST",
-            "postgresql://postgres:password@fab-db:5432/fab_unit_test",  # pragma: allowlist secret
+            "DATABASE_URL_TEST",
+            "postgresql://postgres:password@fab-db:5432/fab_store_test",  # pragma: allowlist secret
         ),
     ]
     with app.app_context():

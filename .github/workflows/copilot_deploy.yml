@@ -25,7 +25,7 @@ jobs:
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/pre-deploy.yml@main
     with:
       postgres_unit_testing: true
-      db_name: fab_unit_test
+      db_name: fab_store_test
 
   paketo_build:
     needs: [ setup ]

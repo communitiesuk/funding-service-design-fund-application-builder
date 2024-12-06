@@ -9,7 +9,7 @@ services:
     command: sleep infinity
     environment:
       - DATABASE_URL=postgresql://postgres:password@fab-db:5432/fab
-      - DATABASE_URL_UNIT_TEST=postgresql://postgres:password@fab-db:5432/fab_unit_test
+      - DATABASE_URL_TEST=postgresql://postgres:password@fab-db:5432/fab_store_test
       - SECRET_KEY=local
       - FLASK_ENV=development
 
