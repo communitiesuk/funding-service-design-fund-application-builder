@@ -143,9 +143,9 @@ class RoundForm(FlaskForm):
     reference_contact_page_over_email = RadioField(
         "Reference contact page over email", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
-    contact_email = StringField("Contact Email")
-    contact_phone = StringField("Contact Phone")
-    contact_textphone = StringField("Contact Textphone")
+    contact_email = StringField("Grant team email address")
+    contact_phone = StringField("Grant team phone number")
+    contact_textphone = StringField("Grant team text phone number")
     support_times = StringField("Support Times for Applicants", validators=[DataRequired()])
     support_days = StringField("Support Days", validators=[DataRequired()])
     instructions_en = TextAreaField("Instructions (English)")
