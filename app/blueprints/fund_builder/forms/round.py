@@ -134,7 +134,7 @@ class RoundForm(FlaskForm):
     round_id = HiddenField("Round ID")
     fund_id = StringField("Fund", validators=[DataRequired()])
     title_en = StringField("Title (English)", validators=[DataRequired()])
-    title_cy = StringField("Title (Welsh)", description="Leave blank for English-only funds")
+    title_cy = StringField("Title (Welsh)")
     short_name = StringField(
         "Short name",
         description="Choose a unique short name with 6 or fewer characters",
