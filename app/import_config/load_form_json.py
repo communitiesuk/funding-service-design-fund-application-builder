@@ -115,12 +115,15 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
 
                     # Add the new condition to the conditions list of the component to update
                     if component_to_update.conditions:
-                        component_to_update.conditions.append(asdict(new_condition))
-                        # Mark the conditions column as modified so SQLAlchemy knows it has changed
-                        # When you directly modify an element in a JSON column (like appending to a list),
-                        # SQLAlchemy may not automatically recognize it. Explicitly marking the attribute as
-                        # modified solves this issue.
-                        flag_modified(component_to_update, "conditions")
+                        # check is there similar condition is added into a component and if yes then it will be ignored,
+                        # this search will be done based on the unique name
+                        if any(d["name"] == new_condition.name for d in component_to_update.conditions) is False:
+                            component_to_update.conditions.append(asdict(new_condition))
+                            # Mark the conditions column as modified so SQLAlchemy knows it has changed
+                            # When you directly modify an element in a JSON column (like appending to a list),
+                            # SQLAlchemy may not automatically recognize it. Explicitly marking the attribute as
+                            # modified solves this issue.
+                            flag_modified(component_to_update, "conditions")
                     else:
                         component_to_update.conditions = [asdict(new_condition)]
 
