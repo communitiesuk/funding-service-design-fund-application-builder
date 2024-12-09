@@ -46,7 +46,9 @@ from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
 from app.db.queries.round import update_round
 from app.export_config.generate_all_questions import print_html
-from app.export_config.generate_assessment_config import generate_assessment_config_for_round
+from app.export_config.generate_assessment_config import (
+    generate_assessment_config_for_round,
+)
 from app.export_config.generate_form import build_form_json
 from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.export_config.generate_fund_round_form_jsons import (
@@ -463,7 +465,7 @@ def update_existing_round(round, form):
     round.display_logo_on_pdf_exports = form.display_logo_on_pdf_exports.data == "true"
     round.mark_as_complete_enabled = form.mark_as_complete_enabled.data == "true"
     round.is_expression_of_interest = form.is_expression_of_interest.data == "true"
-    round.eligibility_config = {"has_eligibility": form.eligibility_config.data}
+    round.eligibility_config = {"has_eligibility": form.eligibility_config.data == "true"}
     round.eoi_decision_schema = {
         "en": _convert_form_data_to_json(form.eoi_decision_schema_en.data),
         "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data),
@@ -514,14 +516,14 @@ def create_new_round(form):
         mark_as_complete_enabled=form.mark_as_complete_enabled.data == "true",
         is_expression_of_interest=form.is_expression_of_interest.data == "true",
         feedback_survey_config={
-            "has_feedback_survey": form.has_feedback_survey.data,
-            "has_section_feedback": form.has_section_feedback.data,
-            "has_research_survey": form.has_research_survey.data,
-            "is_feedback_survey_optional": form.is_feedback_survey_optional.data,
-            "is_section_feedback_optional": form.is_section_feedback_optional.data,
-            "is_research_survey_optional": form.is_research_survey_optional.data,
+            "has_feedback_survey": form.has_feedback_survey.data == "true",
+            "has_section_feedback": form.has_section_feedback.data == "true",
+            "has_research_survey": form.has_research_survey.data == "true",
+            "is_feedback_survey_optional": form.is_feedback_survey_optional.data == "true",
+            "is_section_feedback_optional": form.is_section_feedback_optional.data == "true",
+            "is_research_survey_optional": form.is_research_survey_optional.data == "true",
         },
-        eligibility_config={"has_eligibility": form.eligibility_config.data},
+        eligibility_config={"has_eligibility": form.eligibility_config.data == "true"},
         eoi_decision_schema={
             "en": _convert_form_data_to_json(form.eoi_decision_schema_en.data),
             "cy": _convert_form_data_to_json(form.eoi_decision_schema_cy.data),
