@@ -146,7 +146,7 @@ class RoundForm(FlaskForm):
     contact_email = StringField("Contact Email")
     contact_phone = StringField("Contact Phone")
     contact_textphone = StringField("Contact Textphone")
-    support_times = StringField("Support times", validators=[DataRequired()])
+    support_times = StringField("Support Times for Applicants", validators=[DataRequired()])
     support_days = StringField("Support Days", validators=[DataRequired()])
     instructions_en = TextAreaField("Instructions (English)")
     instructions_cy = StringField("Instructions (Welsh)", description="Leave blank for English-only funds")
