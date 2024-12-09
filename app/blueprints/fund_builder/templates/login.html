@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{%- from 'govuk_frontend_jinja/components/button/macro.html' import govukButton -%}
+
+{# Override main width to two thirds #}
+{% set mainClasses = "govuk-!-width-two-thirds" %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <h1 class="govuk-heading-l">Sign in to use FAB</h1>
+    <p class="govuk-body">
+      Sign in using the Microsoft account for your work email address.
+    </p>
+
+    {{ govukButton({
+      "text": "Sign in using Microsoft",
+      "href": config['AUTHENTICATOR_HOST'] + "/sso/login?return_app=fund-application-builder",
+      "classes": "login-button"
+    }) }}
+  </div>
+{% endblock content %}
