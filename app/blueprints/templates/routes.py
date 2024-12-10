@@ -16,6 +16,7 @@ from app.db.queries.application import get_all_template_sections
 from app.db.queries.application import get_form_by_id
 from app.db.queries.application import get_form_by_template_name
 from app.db.queries.application import update_form
+from app.shared.helpers import error_formatter
 
 # Blueprint for routes used by FAB PoC to manage templates
 template_bp = Blueprint(
@@ -88,7 +89,10 @@ def view_templates():
 
         return redirect(url_for("template_bp.view_templates"))
 
-    return render_template("view_templates.html", **params)
+    error = None
+    if 'uploadform' in params:
+        error = error_formatter(params['uploadform'].errors)
+    return render_template("view_templates.html", **params, error=error)
 
 
 @template_bp.route("/forms/<form_id>", methods=["GET", "POST"])
@@ -114,7 +118,10 @@ def edit_form_template(form_id):
             )
             return redirect(url_for("template_bp.view_templates"))
         params["template_form"] = template_form
-        return render_template("edit_form_template.html", **params)
+        error = None
+        if 'template_form' in params:
+            error = error_formatter(params['template_form'].errors)
+        return render_template("edit_form_template.html", **params, error=error)
 
     if request.args.get("action") == "remove":
         delete_form(form_id=form_id, cascade=True)

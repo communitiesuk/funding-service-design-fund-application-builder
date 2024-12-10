@@ -2,6 +2,7 @@
 {%- from "govuk_frontend_jinja/components/file-upload/macro.html" import govukFileUpload -%}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 
 {% extends "base.html" %}
 {% set pageHeading %}
@@ -9,6 +10,14 @@
 {% endset %}
 {% block content %}
     <div class="govuk-grid-row">
+        {% if error %}
+            {{
+                govukErrorSummary({
+                    "titleText": error.titleText,
+                    "errorList": error.errorList
+                })
+            }}
+        {% endif %}
         <h1 class="govuk-heading-l">{{pageHeading}}</h1>
     </div>
     <div class="govuk-grid-row">

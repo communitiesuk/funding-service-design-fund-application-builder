@@ -55,6 +55,7 @@ from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
 from app.export_config.generate_fund_round_html import generate_all_round_html
+from app.shared.helpers import error_formatter
 from config import Config
 
 BUILD_FUND_BP_INDEX = "build_fund_bp.index"
@@ -273,7 +274,8 @@ def fund(fund_id=None):
         flash(f"Created fund {form.name_en.data}")
         return redirect(url_for(BUILD_FUND_BP_INDEX))
 
-    return render_template("fund.html", form=form, fund_id=fund_id)
+    error = error_formatter(form.errors)
+    return render_template("fund.html", form=form, fund_id=fund_id, error=error)
 
 
 @build_fund_bp.route("/round", methods=["GET", "POST"])
@@ -303,8 +305,8 @@ def round(round_id=None):
     params["round_id"] = round_id
     params["form"] = form
 
-    return render_template("round.html", **params)
-
+    error = error_formatter(params["form"].errors)
+    return render_template("round.html", **params, error=error)
 
 def _convert_json_data_for_form(data) -> str:
     if isinstance(data, dict):

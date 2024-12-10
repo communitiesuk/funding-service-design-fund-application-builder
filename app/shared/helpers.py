@@ -36,3 +36,19 @@ def get_all_pages_in_parent_form(db, page_id):
     page_ids = [p.page_id for p in page_ids]
 
     return page_ids
+
+# This formatter will read all the errors and then convert them to the required format to support error-summary display
+def error_formatter(errors):
+    error = None
+    if errors:
+        errorsList = []
+        for field, errors in errors.items():
+            if isinstance(errors, list):
+                errorsList.extend([{'text': err, 'href': f'#{field}'} for err in errors])
+            elif isinstance(errors, dict):
+                # Check if any of the datetime fields have errors
+                if any(len(errors.get(key, '')) > 0 for key in ['day', 'month', 'years', 'hour', 'minute']):
+                    errorsList.append({'text': "Enter valid datetime", 'href': f'#{field}'})
+        if errorsList:
+            error = {'titleText': "There is a problem", 'errorList': errorsList}
+    return error
