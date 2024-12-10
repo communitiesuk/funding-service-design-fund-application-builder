@@ -71,11 +71,6 @@ build_fund_bp = Blueprint(
 )
 
 
-@build_fund_bp.route("/healthcheck")
-def healthcheck():
-    return "OK", 200
-
-
 @build_fund_bp.route("/")
 @login_requested
 def index():
@@ -327,6 +322,7 @@ def round(round_id=None):
 
     error = error_formatter(params["form"].errors)
     return render_template("round.html", **params, error=error)
+
 
 def _convert_json_data_for_form(data) -> str:
     if isinstance(data, dict):

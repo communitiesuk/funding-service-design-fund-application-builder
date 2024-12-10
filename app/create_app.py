@@ -3,6 +3,8 @@ from flask import render_template
 from fsd_utils.authentication.decorators import SupportedApp
 from fsd_utils.authentication.decorators import check_internal_user
 from fsd_utils.authentication.decorators import login_required
+from fsd_utils.healthchecks.checkers import FlaskRunningChecker
+from fsd_utils.healthchecks.healthcheck import Healthcheck
 from fsd_utils.logging import logging
 from jinja2 import ChoiceLoader
 from jinja2 import PackageLoader
@@ -12,7 +14,6 @@ from app.blueprints.dev.routes import dev_bp
 from app.blueprints.fund_builder.routes import build_fund_bp
 from app.blueprints.self_serve.routes import self_serve_bp
 from app.blueprints.templates.routes import template_bp
-
 
 PUBLIC_ROUTES = [
     "static",
@@ -26,8 +27,7 @@ def protect_private_routes(flask_app: Flask) -> Flask:
         if endpoint in PUBLIC_ROUTES:
             continue
         flask_app.view_functions[endpoint] = login_required(
-            check_internal_user(view_func),
-            return_app=SupportedApp.FUND_APPLICATION_BUILDER
+            check_internal_user(view_func), return_app=SupportedApp.FUND_APPLICATION_BUILDER
         )
     return flask_app
 
@@ -75,6 +75,9 @@ def create_app() -> Flask:
     @flask_app.errorhandler(403)
     def forbidden_error(error):
         return render_template("403.html"), 403
+
+    health = Healthcheck(flask_app)
+    health.add_check(FlaskRunningChecker())
 
     return flask_app
 
