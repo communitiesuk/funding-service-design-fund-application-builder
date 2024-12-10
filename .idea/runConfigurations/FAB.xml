@@ -5,11 +5,11 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
-      <env name="DATABASE_URL" value="postgresql://postgres:password@localhost:5432/fsd_application_builder" />
+      <env name="DATABASE_URL" value="postgresql://postgres:password@localhost:5432/fab_store" />
       <env name="FLASK_DEBUG" value="0" />
       <env name="FLASK_ENV" value="development" />
-      <env name="FORM_RUNNER_EXTERNAL_HOST" value="http://localhost:3019" />
-      <env name="FORM_RUNNER_INTERNAL_HOST" value="=http://localhost:3009" />
+      <env name="FORM_RUNNER_EXTERNAL_HOST" value="http://localhost:3009" />
+      <env name="FORM_RUNNER_INTERNAL_HOST" value="http://localhost:3009" />
       <env name="PYTHONUNBUFFERED" value="1" />
       <env name="SECRET_KEY" value="local" />
     </envs>
