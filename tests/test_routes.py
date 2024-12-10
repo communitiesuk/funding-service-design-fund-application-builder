@@ -14,8 +14,16 @@ from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
 
 
-@pytest.fixture(autouse=True)
-def patch_validate_token_rs256():
+@pytest.fixture
+def set_auth_cookie(flask_test_client):
+    # This fixture sets the authentication cookie on every test.
+    user_token_cookie_name = current_app.config.get("FSD_USER_TOKEN_COOKIE_NAME", "fsd_user_token")
+    flask_test_client.set_cookie(key=user_token_cookie_name, value="dummy_jwt_token")
+    yield
+
+
+@pytest.fixture
+def patch_validate_token_rs256_internal_user():
     # This fixture patches validate_token_rs256 for all tests automatically.
     with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
         mock_validate_token_rs256.return_value = {
@@ -26,15 +34,20 @@ def patch_validate_token_rs256():
         yield mock_validate_token_rs256
 
 
-@pytest.fixture(autouse=True)
-def set_auth_cookie(flask_test_client):
-    # This fixture sets the authentication cookie on every test.
-    user_token_cookie_name = current_app.config.get("FSD_USER_TOKEN_COOKIE_NAME", "fsd_user_token")
-    flask_test_client.set_cookie(key=user_token_cookie_name, value="dummy_jwt_token")
-    yield
+@pytest.fixture
+def patch_validate_token_rs256_external_user():
+    # This fixture patches validate_token_rs256 for all tests automatically.
+    with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
+        mock_validate_token_rs256.return_value = {
+            "accountId": "test-account-id",
+            "roles": [],
+            "email": "test@gmail.com",
+        }
+        yield mock_validate_token_rs256
 
 
-def test_create_fund(flask_test_client, _db, clear_test_data):
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_fund(flask_test_client):
     """
     Tests that a fund can be successfully created using the /fund route
     Verifies that the created fund has the correct attributes
@@ -68,6 +81,7 @@ def test_create_fund(flask_test_client, _db, clear_test_data):
             assert created_fund.__getattribute__(key) == value
 
 
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_update_fund(flask_test_client, seed_dynamic_data):
     """
     Tests that a fund can be successfully updated using the /fund/<fund_id> route
@@ -102,6 +116,7 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
             assert updated_fund.__getattribute__(key) == value
 
 
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_new_round(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully created using the /round route
@@ -159,6 +174,7 @@ def test_create_new_round(flask_test_client, seed_dynamic_data):
     assert new_round.short_name == "NR123"
 
 
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_update_existing_round(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully updated using the /round/<round_id> route
@@ -245,3 +261,51 @@ def test_validate_json_input_invalid(input_json_string, exp_error_msg):
     with pytest.raises(ValidationError) as error:
         validate_json_field(None, field)
     assert exp_error_msg in str(error)
+
+
+def test_index_redirects_to_login_for_unauthenticated_user(flask_test_client):
+    """
+    Tests that unauthenticated users are redirected to the login page when trying to access the index route.
+    """
+    response = flask_test_client.get("/")
+    assert response.status_code == 302
+    assert response.location == "/login"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_index_redirects_to_dashboard_for_authenticated_user(flask_test_client):
+    """
+    Tests that authenticated users are redirected to the dashboard when trying to access the index route.
+    """
+    response = flask_test_client.get("/")
+    assert response.status_code == 302
+    assert response.location == "/dashboard"
+
+
+def test_login_renders_for_unauthenticated_user(flask_test_client):
+    """
+    Tests that the login page renders correctly for unauthenticated users.
+    """
+    response = flask_test_client.get("/login")
+    assert response.status_code == 200
+    assert b"Sign in to use FAB" in response.data
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_dashboard_renders_for_internal_user(flask_test_client):
+    """
+    Tests that authenticated internal users can access the dashboard.
+    """
+    response = flask_test_client.get("/dashboard")
+    assert response.status_code == 200
+    assert b"What do you want to do?" in response.data
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_external_user")
+def test_dashboard_forbidden_for_external_user(flask_test_client):
+    """
+    Tests that authenticated external users are forbidden from accessing the dashboard.
+    """
+    response = flask_test_client.get("/dashboard")
+    assert response.status_code == 403
+    assert b"You do not have permission to access this page" in response.data
