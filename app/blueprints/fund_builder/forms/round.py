@@ -14,6 +14,8 @@ from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
 
+from app.shared.helpers import no_spaces_between_letters
+
 
 def validate_json_field(form, field):
     str_content = field.data
@@ -126,7 +128,7 @@ class RoundForm(FlaskForm):
     short_name = StringField(
         "Short Name",
         description="Choose a unique short name with 6 or fewer characters",
-        validators=[DataRequired(), Length(max=6)],
+        validators=[DataRequired(), Length(max=6), no_spaces_between_letters],
     )
     opens = FormField(DateInputForm, label="Opens")
     deadline = FormField(DateInputForm, label="Deadline")

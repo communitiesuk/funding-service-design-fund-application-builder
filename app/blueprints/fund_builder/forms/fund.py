@@ -9,6 +9,7 @@ from wtforms.validators import DataRequired
 from wtforms.validators import Length
 
 from app.db.models.fund import FundingType
+from app.shared.helpers import no_spaces_between_letters
 
 
 class GovUkRadioEnumField(RadioField):
@@ -36,7 +37,7 @@ class FundForm(FlaskForm):
     name_cy = StringField("Name (Welsh)", description="Leave blank for English-only funds")
     title_en = StringField("Title (English)", validators=[DataRequired()])
     title_cy = StringField("Title (Welsh)", description="Leave blank for English-only funds")
-    short_name = StringField("Short Name", validators=[DataRequired(), Length(max=10)])
+    short_name = StringField("Short Name", validators=[DataRequired(), Length(max=10), no_spaces_between_letters])
     description_en = TextAreaField("Description", validators=[DataRequired()])
     description_cy = TextAreaField("Description (Welsh)", description="Leave blank for English-only funds")
     welsh_available = RadioField("Welsh Available", choices=[("true", "Yes"), ("false", "No")], default="false")

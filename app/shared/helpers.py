@@ -1,5 +1,7 @@
+import re
 from dataclasses import asdict
 from dataclasses import is_dataclass
+from wtforms.validators import ValidationError
 
 from app.db.models import Page
 
@@ -52,3 +54,12 @@ def error_formatter(errors):
         if errorsList:
             error = {'titleText': "There is a problem", 'errorList': errorsList}
     return error
+
+
+# Custom validator to check for spaces between letters
+def no_spaces_between_letters(form, field):
+    # Regular expression to check for spaces between letters
+    if not field.data:
+        return
+    if re.search(r'\b\w+\s+\w+\b', field.data):  # Matches sequences with spaces in between
+        raise ValidationError("Spaces between letters are not allowed.")
