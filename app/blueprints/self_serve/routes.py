@@ -8,9 +8,6 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
-from fsd_utils.authentication.decorators import SupportedApp
-from fsd_utils.authentication.decorators import check_internal_user
-from fsd_utils.authentication.decorators import login_required
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.self_serve.data.data_access import get_all_components
@@ -41,8 +38,6 @@ self_serve_bp = Blueprint(
 
 
 @self_serve_bp.route("/download_json", methods=["POST"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def generate_json():
     form_json = generate_form_config_from_request()["form_json"]
 
@@ -71,8 +66,6 @@ def generate_form_config_from_request():
 
 
 @self_serve_bp.route("/form_questions", methods=["POST"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def view_form_questions():
     form_config = generate_form_config_from_request()
     print_data = generate_print_data_for_sections(
@@ -89,8 +82,6 @@ def view_form_questions():
 
 
 @self_serve_bp.route("/section_questions", methods=["POST"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def view_section_questions():
     # form_config = generate_form_config_from_request()
     # print_data = generate_print_data_for_sections(
@@ -112,8 +103,6 @@ def view_section_questions():
 
 # Create routes
 @self_serve_bp.route("section", methods=["GET", "POST", "PUT", "DELETE"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def section():
     # TODO: Create frontend routes and connect to middleware
     if request.method == "PUT":
@@ -142,8 +131,6 @@ def section():
 
 
 @self_serve_bp.route("/form", methods=["GET", "POST", "PUT", "DELETE"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def form():
     # TODO: Create frontend routes and connect to middleware
     if request.method == "PUT":
@@ -182,8 +169,6 @@ def form():
 
 
 @self_serve_bp.route("/page", methods=["GET", "POST", "PUT", "DELETE"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def page():
     # TODO: Create frontend routes and connect to middleware
     if request.method == "PUT":
@@ -216,8 +201,6 @@ def page():
 
 
 @self_serve_bp.route("/question", methods=["GET", "PUT", "POST", "DELETE"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def question():
     # TODO: Create frontend routes and connect to middleware
     if request.method == "PUT":

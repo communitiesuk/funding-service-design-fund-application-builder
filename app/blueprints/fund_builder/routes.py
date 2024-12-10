@@ -17,10 +17,7 @@ from flask import render_template
 from flask import request
 from flask import send_file
 from flask import url_for
-from fsd_utils.authentication.decorators import SupportedApp
-from fsd_utils.authentication.decorators import check_internal_user
 from fsd_utils.authentication.decorators import login_requested
-from fsd_utils.authentication.decorators import login_required
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
@@ -93,15 +90,11 @@ def login():
 
 
 @build_fund_bp.route("/dashboard", methods=["GET"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def dashboard():
     return render_template("index.html")
 
 
 @build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def section(round_id):
     round_obj = get_round_by_id(round_id)
     fund_obj = get_fund_by_id(round_obj.fund_id)
@@ -164,8 +157,6 @@ def section(round_id):
 
 
 @build_fund_bp.route("/fund/round/<round_id>/section/<section_id>/forms", methods=["POST", "GET"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def configure_forms_in_section(round_id, section_id):
     if request.method == "GET":
         if request.args.get("action") == "remove":
@@ -194,8 +185,6 @@ def all_funds_as_govuk_select_items(all_funds: list) -> list:
 
 
 @build_fund_bp.route("/fund/view", methods=["GET", "POST"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def view_fund():
     """
     Renders a template providing a drop down list of funds. If a fund is selected, renders its config info
@@ -219,8 +208,6 @@ def view_fund():
 
 
 @build_fund_bp.route("/fund/round/<round_id>/application_config")
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def build_application(round_id):
     """
     Renders a template displaying application configuration info for the chosen round
@@ -236,8 +223,6 @@ def build_application(round_id):
 
 
 @build_fund_bp.route("/fund/<fund_id>/round/<round_id>/clone")
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def clone_round(round_id, fund_id):
     cloned = clone_single_round(
         round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0, 999)}"  # nosec B311
@@ -249,8 +234,6 @@ def clone_round(round_id, fund_id):
 
 @build_fund_bp.route("/fund", methods=["GET", "POST"])
 @build_fund_bp.route("/fund/<fund_id>", methods=["GET", "POST"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def fund(fund_id=None):
     """
     Renders a template to allow a user to add or update a fund, when saved validates the form data and saves to DB
@@ -317,8 +300,6 @@ def fund(fund_id=None):
 
 @build_fund_bp.route("/round", methods=["GET", "POST"])
 @build_fund_bp.route("/round/<round_id>", methods=["GET", "POST"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def round(round_id=None):
     """
     Renders a template to select a fund and add or update a round to that fund. If saved, validates the round form data
@@ -574,8 +555,6 @@ def create_new_round(form):
 
 
 @build_fund_bp.route("/preview/<form_id>", methods=["GET"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def preview_form(form_id):
     """
     Generates the form json for a chosen form, does not persist this, but publishes it to the form runner using the
@@ -597,8 +576,6 @@ def preview_form(form_id):
 
 
 @build_fund_bp.route("/download/<form_id>", methods=["GET"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def download_form_json(form_id):
     """
     Generates form json for the selected form and returns it as a file download
@@ -614,8 +591,6 @@ def download_form_json(form_id):
 
 
 @build_fund_bp.route("/fund/round/<round_id>/all_questions", methods=["GET"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def view_all_questions(round_id):
     """
     Generates the form data for all sections in the selected round, then uses that to generate the 'All Questions'
@@ -644,8 +619,6 @@ def view_all_questions(round_id):
 
 
 @build_fund_bp.route("/fund/round/<round_id>/all_questions/<form_id>", methods=["GET"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def view_form_questions(round_id, form_id):
     """
     Generates the form data for this form, then uses that to generate the 'All Questions'
@@ -681,8 +654,6 @@ def create_export_zip(directory_to_zip, zip_file_name, random_post_fix) -> str:
 
 
 @build_fund_bp.route("/create_export_files/<round_id>", methods=["GET"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def create_export_files(round_id):
     round_short_name = get_round_by_id(round_id).short_name
     # Construct the path to the output directory relative to this file's location

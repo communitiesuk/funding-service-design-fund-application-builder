@@ -5,9 +5,6 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
-from fsd_utils.authentication.decorators import SupportedApp
-from fsd_utils.authentication.decorators import check_internal_user
-from fsd_utils.authentication.decorators import login_required
 from werkzeug.utils import secure_filename
 
 from app.blueprints.fund_builder.forms.templates import TemplateFormForm
@@ -58,8 +55,6 @@ def _build_rows(forms: list[Form]) -> list[dict]:
 
 
 @template_bp.route("/all", methods=["GET", "POST"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def view_templates():
     sections = get_all_template_sections()
     forms = get_all_template_forms()
@@ -101,8 +96,6 @@ def view_templates():
 
 
 @template_bp.route("/forms/<form_id>", methods=["GET", "POST"])
-@login_required(return_app=SupportedApp.FUND_APPLICATION_BUILDER)
-@check_internal_user
 def edit_form_template(form_id):
     template_form = TemplateFormForm()
     params = {

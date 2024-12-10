@@ -1,5 +1,8 @@
 from flask import Flask
 from flask import render_template
+from fsd_utils.authentication.decorators import SupportedApp
+from fsd_utils.authentication.decorators import check_internal_user
+from fsd_utils.authentication.decorators import login_required
 from fsd_utils.logging import logging
 from jinja2 import ChoiceLoader
 from jinja2 import PackageLoader
@@ -11,6 +14,24 @@ from app.blueprints.self_serve.routes import self_serve_bp
 from app.blueprints.templates.routes import template_bp
 
 
+PUBLIC_ROUTES = [
+    "static",
+    "build_fund_bp.index",
+    "build_fund_bp.login",
+]
+
+
+def protect_private_routes(flask_app: Flask) -> Flask:
+    for endpoint, view_func in flask_app.view_functions.items():
+        if endpoint in PUBLIC_ROUTES:
+            continue
+        flask_app.view_functions[endpoint] = login_required(
+            check_internal_user(view_func),
+            return_app=SupportedApp.FUND_APPLICATION_BUILDER
+        )
+    return flask_app
+
+
 def create_app() -> Flask:
 
     flask_app = Flask("__name__", static_url_path="/assets")
@@ -18,6 +39,8 @@ def create_app() -> Flask:
     flask_app.register_blueprint(dev_bp)
     flask_app.register_blueprint(build_fund_bp)
     flask_app.register_blueprint(template_bp)
+
+    protect_private_routes(flask_app)
 
     flask_app.config.from_object("config.Config")
 
