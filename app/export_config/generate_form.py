@@ -284,7 +284,7 @@ def build_form_json(form: Form, fund_title: str = None) -> dict:
     """
 
     results = copy.deepcopy(BASIC_FORM_STRUCTURE)
-    results["name"] = f"Apply for {fund_title}" if fund_title else "Access Funding"
+    results["name"] = fund_title or "Access Funding"
     results["sections"] = []
     # Build the basic page structure
     for page in form.pages:
