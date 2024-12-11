@@ -53,11 +53,6 @@ def get_list_by_id(list_id: str) -> Lizt:
     return lizt
 
 
-def get_list_by_name(list_name: str) -> Lizt:
-    lizt = db.session.query(Lizt).filter_by(name=list_name).first()
-    return lizt
-
-
 def _initiate_cloned_component(to_clone: Component, new_page_id=None, new_theme_id=None):
     clone = Component(**to_clone.as_dict())
 
