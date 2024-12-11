@@ -126,44 +126,52 @@ class RoundForm(FlaskForm):
     title_en = StringField("Title (English)", validators=[DataRequired()])
     title_cy = StringField("Title (Welsh)", description="Leave blank for English-only funds")
     short_name = StringField(
-        "Short Name",
+        "Short name",
         description="Choose a unique short name with 6 or fewer characters",
         validators=[DataRequired(), Length(max=6), no_spaces_between_letters],
     )
     opens = FormField(DateInputForm, label="Opens")
     deadline = FormField(DateInputForm, label="Deadline")
-    assessment_start = FormField(DateInputForm, label="Assessment Start Date")
-    reminder_date = FormField(DateInputForm, label="Reminder Date")
-    assessment_deadline = FormField(DateInputForm, label="Assessment Deadline")
-    prospectus_link = URLField("Prospectus Link", validators=[DataRequired(), validate_flexible_url])
-    privacy_notice_link = URLField("Privacy Notice Link", validators=[DataRequired(), validate_flexible_url])
+    assessment_start = FormField(DateInputForm, label="Assessment start date")
+    reminder_date = FormField(DateInputForm, label="Reminder date")
+    assessment_deadline = FormField(DateInputForm, label="Assessment deadline")
+    prospectus_link = URLField("Prospectus link", validators=[DataRequired(), validate_flexible_url])
+    privacy_notice_link = URLField("Privacy notice link", validators=[DataRequired(), validate_flexible_url])
     application_reminder_sent = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     contact_us_banner_en = TextAreaField(
-        "Contact Us Banner (English)", description="HTML to display to override the default 'Contact Us' page content"
+        "Contact Us banner (English)", description="HTML to display to override the default 'Contact Us' page content"
     )
-    contact_us_banner_cy = TextAreaField("Contact Us Banner (Welsh)", description="Leave blank for English-only funds")
+    contact_us_banner_cy = TextAreaField("Contact Us banner (Welsh)", description="Leave blank for English-only funds")
     reference_contact_page_over_email = RadioField(
         "Reference contact page over email", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
     contact_email = StringField("Grant team email address")
     contact_phone = StringField("Grant team phone number")
     contact_textphone = StringField("Grant team text phone number")
-    support_times = StringField("Support Times for Applicants", validators=[DataRequired()])
-    support_days = StringField("Support Days", validators=[DataRequired()])
+    support_times = StringField("Support times for applicants", validators=[DataRequired()])
+    support_days = StringField("Support days", validators=[DataRequired()])
     instructions_en = TextAreaField("Instructions (English)")
     instructions_cy = StringField("Instructions (Welsh)", description="Leave blank for English-only funds")
-    feedback_link = URLField("Feedback Link", validators=[validate_flexible_url])
+    feedback_link = URLField("Feedback link", validators=[validate_flexible_url])
     project_name_field_id = StringField("Project name field ID", validators=[DataRequired()])
-    application_guidance_en = TextAreaField("Application Guidance (English)")
+    application_guidance_en = TextAreaField("Application guidance (English)")
     application_guidance_cy = TextAreaField(
-        "Application Guidance (Welsh)", description="Leave blank for English-only funds"
+        "Application guidance (Welsh)", description="Leave blank for English-only funds"
     )
     guidance_url = URLField("Guidance link", validators=[validate_flexible_url])
     all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    application_fields_download_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    display_logo_on_pdf_exports = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    mark_as_complete_enabled = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
-    is_expression_of_interest = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
+    application_fields_download_available = RadioField(
+        "Application fields download available", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
+    display_logo_on_pdf_exports = RadioField(
+        "Display logo on PDF exports", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
+    mark_as_complete_enabled = RadioField(
+        "Mark as complete enabled", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
+    is_expression_of_interest = RadioField(
+        "Is expression of interest", choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
     has_feedback_survey = RadioField("Has feedback survey", choices=[("true", "Yes"), ("false", "No")], default="false")
     has_section_feedback = RadioField(
         "Has section feedback", choices=[("true", "Yes"), ("false", "No")], default="false"
@@ -182,10 +190,10 @@ class RoundForm(FlaskForm):
         "Has eligibility config", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
     eoi_decision_schema_en = TextAreaField(
-        "EOI Decision schema (English)", validators=[validate_json_field], description=JSON_FIELD_HINT
+        "EOI decision schema (English)", validators=[validate_json_field], description=JSON_FIELD_HINT
     )
     eoi_decision_schema_cy = TextAreaField(
-        "EOI Decision schema (Welsh)",
+        "EOI decision schema (Welsh)",
         description="Leave blank for English-only funds",
         validators=[validate_json_field],
     )
