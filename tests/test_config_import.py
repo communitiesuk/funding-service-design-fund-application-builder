@@ -1,12 +1,18 @@
 import json
 import os
 from pathlib import Path
+from unittest.mock import MagicMock
+from unittest.mock import patch
+from uuid import uuid4
 
 import pytest
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
 from app.db.models import Component
 from app.db.models import Form
 from app.db.models import FormSection
+from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models.application_config import ComponentType
 from app.import_config.load_form_json import load_form_jsons
@@ -91,3 +97,49 @@ def test_import_multi_input_field(seed_dynamic_data, _db):
     assert multi_input_component
     assert multi_input_component.type == ComponentType.MULTI_INPUT_FIELD
     assert len(multi_input_component.children) == 4
+
+
+def test_creates_unique_lists_per_form_with_shared_list_name(app: Flask, clean_db: SQLAlchemy):
+    with app.app_context():
+        shared_list_name = "shared_list"
+        form_config_1 = {
+            "name": "Form 1",
+            "startPage": "/start",
+            "sections": [{"name": "section1", "title": "Section 1"}],
+            "lists": [{"name": shared_list_name, "items": ["item1"]}],
+            "pages": [{"path": "/start", "title": "Start Page", "components": [{"list": shared_list_name}]}],
+            "conditions": [],
+        }
+        form_config_2 = {
+            "name": "Form 2",
+            "startPage": "/start",
+            "sections": [{"name": "section1", "title": "Section 1"}],
+            "lists": [{"name": shared_list_name, "items": ["item1"]}],
+            "pages": [{"path": "/start", "title": "Start Page", "components": [{"list": shared_list_name}]}],
+            "conditions": [],
+        }
+        with (
+            patch("app.import_config.load_form_json.create_form_sections_db") as mock_create_sections,
+            patch("app.import_config.load_form_json.insert_page_as_template") as mock_insert_page,
+            patch("app.import_config.load_form_json.insert_component_as_template") as mock_insert_component,
+        ):
+
+            # Create a mock form section with the required name property
+            mock_form_section = MagicMock()
+            mock_form_section.name = "FabDefault"
+            mock_form_section.form_section_id = uuid4()
+
+            mock_create_sections.return_value = [mock_form_section]
+            mock_insert_page.return_value = MagicMock(page_id=1)
+            mock_insert_component.return_value = MagicMock(component_id=1)
+
+            # Load both forms
+            load_json_from_file(form_config_1, "form1", "form1.json")
+            load_json_from_file(form_config_2, "form2", "form2.json")
+
+            # Query lists and verify
+            lists = clean_db.session.query(Lizt).all()
+            assert len(lists) == 2
+            assert lists[0].name == "shared_list"
+            assert lists[1].name == "shared_list"
+            assert lists[0].list_id != lists[1].list_id

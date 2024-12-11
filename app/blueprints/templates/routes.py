@@ -91,7 +91,7 @@ def view_templates():
 
     error = None
     if "uploadform" in params:
-        error = error_formatter(params["uploadform"].errors)
+        error = error_formatter(params["uploadform"])
     return render_template("view_templates.html", **params, error=error)
 
 
@@ -120,7 +120,7 @@ def edit_form_template(form_id):
         params["template_form"] = template_form
         error = None
         if "template_form" in params:
-            error = error_formatter(params["template_form"].errors)
+            error = error_formatter(params["template_form"])
         return render_template("edit_form_template.html", **params, error=error)
 
     if request.args.get("action") == "remove":

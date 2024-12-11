@@ -289,7 +289,7 @@ def fund(fund_id=None):
         flash(f"Created fund {form.name_en.data}")
         return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
 
-    error = error_formatter(form.errors)
+    error = error_formatter(form)
     return render_template("fund.html", form=form, fund_id=fund_id, error=error)
 
 
@@ -320,7 +320,7 @@ def round(round_id=None):
     params["round_id"] = round_id
     params["form"] = form
 
-    error = error_formatter(params["form"].errors)
+    error = error_formatter(params["form"])
     return render_template("round.html", **params, error=error)
 
 
@@ -345,6 +345,7 @@ def populate_form_with_round_data(round):
     """
     round_data = {
         "fund_id": round.fund_id,
+        "round_id": round.round_id,
         "title_en": round.title_json.get("en", ""),
         "title_cy": round.title_json.get("cy", ""),
         "short_name": round.short_name,
