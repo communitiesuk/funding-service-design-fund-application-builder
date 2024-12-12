@@ -65,7 +65,7 @@ def view_templates():
         "form_template_rows": _build_rows(forms),
         "uploadform": form,
         "breadcrumb_items": [
-            {"text": "Home", "href": url_for("build_fund_bp.index")},
+            {"text": "Home", "href": url_for("build_fund_bp.dashboard")},
             {"text": "Manage Templates", "href": "#"},
         ],
     }
@@ -90,8 +90,8 @@ def view_templates():
         return redirect(url_for("template_bp.view_templates"))
 
     error = None
-    if 'uploadform' in params:
-        error = error_formatter(params['uploadform'].errors)
+    if "uploadform" in params:
+        error = error_formatter(params["uploadform"].errors)
     return render_template("view_templates.html", **params, error=error)
 
 
@@ -100,7 +100,7 @@ def edit_form_template(form_id):
     template_form = TemplateFormForm()
     params = {
         "breadcrumb_items": [
-            {"text": "Home", "href": url_for("build_fund_bp.index")},
+            {"text": "Home", "href": url_for("build_fund_bp.dashboard")},
             {"text": "Manage Templates", "href": url_for("template_bp.view_templates")},
             {"text": "Rename Template", "href": "#"},
         ],
@@ -119,8 +119,8 @@ def edit_form_template(form_id):
             return redirect(url_for("template_bp.view_templates"))
         params["template_form"] = template_form
         error = None
-        if 'template_form' in params:
-            error = error_formatter(params['template_form'].errors)
+        if "template_form" in params:
+            error = error_formatter(params["template_form"].errors)
         return render_template("edit_form_template.html", **params, error=error)
 
     if request.args.get("action") == "remove":
