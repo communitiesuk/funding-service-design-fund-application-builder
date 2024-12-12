@@ -38,7 +38,7 @@ class FundForm(FlaskForm):
     title_en = StringField("Title (English)", validators=[DataRequired()])
     title_cy = StringField("Title (Welsh)")
     short_name = StringField("Short name", validators=[DataRequired(), Length(max=10), no_spaces_between_letters])
-    description_en = TextAreaField("Description", validators=[DataRequired()])
+    description_en = TextAreaField("Description (English)", validators=[DataRequired()])
     description_cy = TextAreaField("Description (Welsh)")
     welsh_available = RadioField("Welsh available", choices=[("true", "Yes"), ("false", "No")], default="false")
     funding_type = GovUkRadioEnumField(label="Funding type", source_enum=FundingType)
