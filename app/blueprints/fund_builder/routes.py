@@ -60,7 +60,7 @@ from app.export_config.generate_fund_round_html import generate_all_round_html
 from app.shared.helpers import error_formatter
 from config import Config
 
-BUILD_FUND_BP_INDEX = "build_fund_bp.index"
+BUILD_FUND_BP_DASHBOARD = "build_fund_bp.dashboard"
 
 # Blueprint for routes used by v1 of FAB - using the DB
 build_fund_bp = Blueprint(
@@ -140,7 +140,7 @@ def section(round_id):
         ]
 
     params["breadcrumb_items"] = [
-        {"text": "Home", "href": url_for(BUILD_FUND_BP_INDEX)},
+        {"text": "Home", "href": url_for(BUILD_FUND_BP_DASHBOARD)},
         {"text": fund_obj.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund_obj.fund_id)},
         {
             "text": round_obj.title_json["en"],
@@ -195,7 +195,7 @@ def view_fund():
         params["fund"] = fund
         params["selected_fund_id"] = fund_id
     params["breadcrumb_items"] = [
-        {"text": "Home", "href": url_for(BUILD_FUND_BP_INDEX)},
+        {"text": "Home", "href": url_for(BUILD_FUND_BP_DASHBOARD)},
         {"text": fund.title_json["en"] if fund else "Manage Application Configuration", "href": "#"},
     ]
 
@@ -210,7 +210,7 @@ def build_application(round_id):
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     breadcrumb_items = [
-        {"text": "Home", "href": url_for(BUILD_FUND_BP_INDEX)},
+        {"text": "Home", "href": url_for(BUILD_FUND_BP_DASHBOARD)},
         {"text": fund.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund.fund_id)},
         {"text": round.title_json["en"], "href": "#"},
     ]
@@ -287,7 +287,7 @@ def fund(fund_id=None):
         )
         add_fund(new_fund)
         flash(f"Created fund {form.name_en.data}")
-        return redirect(url_for(BUILD_FUND_BP_INDEX))
+        return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
 
     error = error_formatter(form.errors)
     return render_template("fund.html", form=form, fund_id=fund_id, error=error)
@@ -315,7 +315,7 @@ def round(round_id=None):
             return redirect(url_for("build_fund_bp.view_fund", fund_id=round.fund_id))
         create_new_round(form)
         flash(f"Created round {form.title_en.data}")
-        return redirect(url_for(BUILD_FUND_BP_INDEX))
+        return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
 
     params["round_id"] = round_id
     params["form"] = form
