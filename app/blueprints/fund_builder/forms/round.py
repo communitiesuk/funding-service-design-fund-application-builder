@@ -124,7 +124,7 @@ class RoundForm(FlaskForm):
     round_id = HiddenField("Round ID")
     fund_id = StringField("Fund", validators=[DataRequired()])
     title_en = StringField("Title (English)", validators=[DataRequired()])
-    title_cy = StringField("Title (Welsh)", description="Leave blank for English-only funds")
+    title_cy = StringField("Title (Welsh)")
     short_name = StringField(
         "Short name",
         description="Choose a unique short name with 6 or fewer characters",
@@ -141,7 +141,7 @@ class RoundForm(FlaskForm):
     contact_us_banner_en = TextAreaField(
         "Contact Us banner (English)", description="HTML to display to override the default 'Contact Us' page content"
     )
-    contact_us_banner_cy = TextAreaField("Contact Us banner (Welsh)", description="Leave blank for English-only funds")
+    contact_us_banner_cy = TextAreaField("Contact Us banner (Welsh)")
     reference_contact_page_over_email = RadioField(
         "Reference contact page over email", choices=[("true", "Yes"), ("false", "No")], default="false"
     )
@@ -151,13 +151,11 @@ class RoundForm(FlaskForm):
     support_times = StringField("Support times for applicants", validators=[DataRequired()])
     support_days = StringField("Support days", validators=[DataRequired()])
     instructions_en = TextAreaField("Instructions (English)")
-    instructions_cy = StringField("Instructions (Welsh)", description="Leave blank for English-only funds")
+    instructions_cy = StringField("Instructions (Welsh)")
     feedback_link = URLField("Feedback link", validators=[validate_flexible_url])
     project_name_field_id = StringField("Project name field ID", validators=[DataRequired()])
     application_guidance_en = TextAreaField("Application guidance (English)")
-    application_guidance_cy = TextAreaField(
-        "Application guidance (Welsh)", description="Leave blank for English-only funds"
-    )
+    application_guidance_cy = TextAreaField("Application guidance (Welsh)")
     guidance_url = URLField("Guidance link", validators=[validate_flexible_url])
     all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
     application_fields_download_available = RadioField(
