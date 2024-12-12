@@ -7,7 +7,6 @@ from uuid import UUID
 
 from sqlalchemy.orm.attributes import flag_modified
 
-from app.db.queries.application import get_list_by_name
 from app.db.queries.application import insert_form_section
 from app.db.queries.application import insert_list
 from app.export_config.generate_form import human_to_kebab_case
@@ -128,19 +127,6 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
                         component_to_update.conditions = [asdict(new_condition)]
 
 
-def _find_list_and_create_if_not_existing(list_name: str, all_lists_in_form: list[dict]) -> UUID:
-    list_from_form = next(li for li in all_lists_in_form if li["name"] == list_name)
-
-    # Check if this list already exists in the database
-    existing_list = get_list_by_name(list_name=list_name)
-    if existing_list:
-        return existing_list.list_id
-
-    # If it doesn't, insert new list
-    new_list = insert_list(do_commit=False, list_config={"is_template": True, **list_from_form})
-    return new_list.list_id
-
-
 def _find_form_section(form_section_name: str, form_section_list: list[dict]) -> UUID:
     form_section_to_search = form_section_name if form_section_name else "FabDefault"
     form_section_from_db = next(
@@ -149,12 +135,9 @@ def _find_form_section(form_section_name: str, form_section_list: list[dict]) ->
     return form_section_from_db.form_section_id
 
 
-def insert_component_as_template(component, page_id, page_index, lizts):
-    # if component has a list, insert the list into the database
-    list_id = None
-    component_list = component.get("list", None)
-    if component_list:
-        list_id = _find_list_and_create_if_not_existing(list_name=component_list, all_lists_in_form=lizts)
+def insert_component_as_template(component, page_id, page_index, list_names_to_ids):
+    # if component has a list, get the list ID
+    list_id = list_names_to_ids.get(component.get("list"), None)
 
     # establish component type
     component_type = component.get("type", None)
@@ -255,6 +238,11 @@ def insert_form_config(form_config, form_id):
     start_page_path = form_config["startPage"]
     form_section_list = create_form_sections_db(form_config)
 
+    list_names_to_ids = {}
+    for lizt in form_config.get("lists", []):
+        new_list = insert_list(do_commit=False, list_config={"is_template": True, **lizt})
+        list_names_to_ids[lizt["name"]] = new_list.list_id
+
     for page in form_config.get("pages", []):
         form_section = page.get("section", None)
         # fetch the form section_id  from db
@@ -267,7 +255,7 @@ def insert_form_config(form_config, form_id):
         db.session.flush()  # flush to get the page id
         for c_idx, component in enumerate(page.get("components", [])):
             inserted_component = insert_component_as_template(
-                component, inserted_page.page_id, (c_idx + 1), form_config["lists"]
+                component, inserted_page.page_id, (c_idx + 1), list_names_to_ids
             )
             inserted_components.append(inserted_component)
         db.session.flush()  # flush to make components available for conditions
