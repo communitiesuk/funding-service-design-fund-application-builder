@@ -11,11 +11,13 @@ from flask import Blueprint
 from flask import Response
 from flask import after_this_request
 from flask import flash
+from flask import g
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import send_file
 from flask import url_for
+from fsd_utils.authentication.decorators import login_requested
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
@@ -70,7 +72,20 @@ build_fund_bp = Blueprint(
 
 
 @build_fund_bp.route("/")
+@login_requested
 def index():
+    if not g.is_authenticated:
+        return redirect(url_for("build_fund_bp.login"))
+    return redirect(url_for("build_fund_bp.dashboard"))
+
+
+@build_fund_bp.route("/login", methods=["GET"])
+def login():
+    return render_template("login.html")
+
+
+@build_fund_bp.route("/dashboard", methods=["GET"])
+def dashboard():
     return render_template("index.html")
 
 
@@ -307,6 +322,7 @@ def round(round_id=None):
 
     error = error_formatter(params["form"].errors)
     return render_template("round.html", **params, error=error)
+
 
 def _convert_json_data_for_form(data) -> str:
     if isinstance(data, dict):

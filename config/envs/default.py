@@ -1,3 +1,4 @@
+import base64
 import logging
 from os import environ
 from os import getenv
@@ -12,6 +13,7 @@ class DefaultConfig(object):
     # Logging
     FSD_LOG_LEVEL = logging.WARNING
 
+    FLASK_ENV = CommonConfig.FLASK_ENV
     SECRET_KEY = CommonConfig.SECRET_KEY
 
     FAB_HOST = getenv("FAB_HOST", "fab:8080/")
@@ -22,3 +24,11 @@ class DefaultConfig(object):
 
     TEMP_FILE_PATH = Path("/tmp")
     GENERATE_LOCAL_CONFIG = False
+
+    FSD_USER_TOKEN_COOKIE_NAME = "fsd_user_token"
+    AUTHENTICATOR_HOST = getenv("AUTHENTICATOR_HOST", "https://authenticator.levellingup.gov.localhost:4004")
+
+    # RSA 256 Keys
+    RSA256_PUBLIC_KEY_BASE64 = getenv("RSA256_PUBLIC_KEY_BASE64")
+    if RSA256_PUBLIC_KEY_BASE64:
+        RSA256_PUBLIC_KEY: str = base64.b64decode(RSA256_PUBLIC_KEY_BASE64).decode()
