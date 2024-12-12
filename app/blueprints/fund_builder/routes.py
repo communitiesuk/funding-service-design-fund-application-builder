@@ -301,8 +301,10 @@ def round(round_id=None):
     and saves to DB
     """
     form = RoundForm()
-    params = {"all_funds": all_funds_as_govuk_select_items(get_all_funds())}
+    all_funds = get_all_funds()
+    params = {"all_funds": all_funds_as_govuk_select_items(all_funds)}
     params["selected_fund_id"] = request.form.get("fund_id", None)
+    params["welsh_availability"] = json.dumps({str(fund.fund_id): fund.welsh_available for fund in all_funds})
 
     if round_id:
         round = get_round_by_id(round_id)
