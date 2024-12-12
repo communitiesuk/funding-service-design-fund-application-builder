@@ -4,8 +4,6 @@ import shutil
 import urllib.request
 import zipfile
 
-import static_assets
-
 
 def build_govuk_assets(static_dist_root="app/static/dist"):
     DIST_ROOT = "./" + static_dist_root
@@ -88,7 +86,6 @@ def build_all(static_dist_root="app/static/dist", remove_existing=False):
         if os.path.exists(relative_dist_root):
             shutil.rmtree(relative_dist_root)
     build_govuk_assets(static_dist_root=static_dist_root)
-    static_assets.build_bundles(static_folder=static_dist_root)
 
 
 if __name__ == "__main__":

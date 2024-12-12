@@ -1,5 +1,5 @@
 version = 1
-requires-python = "==3.10.*"
+requires-python = ">=3.10.0, <3.11"
 resolution-markers = [
     "(platform_machine == 'AMD64' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform == 'win32') or (platform_machine == 'WIN32' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform == 'win32') or (platform_machine == 'aarch64' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform == 'win32') or (platform_machine == 'amd64' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform == 'win32') or (platform_machine == 'ppc64le' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform == 'win32') or (platform_machine == 'win32' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform == 'win32') or (platform_machine == 'x86_64' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform == 'win32')",
     "(platform_machine == 'AMD64' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform != 'win32') or (platform_machine == 'WIN32' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform != 'win32') or (platform_machine == 'aarch64' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform != 'win32') or (platform_machine == 'amd64' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform != 'win32') or (platform_machine == 'ppc64le' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform != 'win32') or (platform_machine == 'win32' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform != 'win32') or (platform_machine == 'x86_64' and platform_python_implementation != 'PyPy' and platform_system == 'Windows' and sys_platform != 'win32')",
@@ -325,12 +325,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e5/66/9bfd2d69fb4479d38439076132a620972939f7949015563dce5e61d29a8b/cssbeautifier-1.15.1.tar.gz", hash = "sha256:9f7064362aedd559c55eeecf6b6bed65e05f33488dcbe39044f0403c26e1c006", size = 25673 }
 
 [[package]]
-name = "cssmin"
-version = "0.2.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8e/d8/dc9da69bb186303f7ab41adef0a5b6d34da2fdba006827620877760241c3/cssmin-0.2.0.tar.gz", hash = "sha256:e012f0cc8401efcf2620332339011564738ae32be8c84b2e43ce8beaec1067b6", size = 3228 }
-
-[[package]]
 name = "debugpy"
 version = "1.8.2"
 source = { registry = "https://pypi.org/simple" }
@@ -451,19 +445,6 @@ wheels = [
 ]
 
 [[package]]
-name = "flask-assets"
-version = "2.1.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "flask" },
-    { name = "webassets" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/3e/8b/1bc3887678557a1ff85fe294ef7f1139ca0f8956195741c8fad39b69616f/Flask-Assets-2.1.0.tar.gz", hash = "sha256:f84d6532ffe59c9ff352885e8740ff4da25c0bcfacd805f0a806815e44354813", size = 24280 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/bc/11fe3ca1c4970e1a7dc401a7dd237fc005167abeb74b5456fa8b5ae2e1c7/Flask_Assets-2.1.0-py3-none-any.whl", hash = "sha256:a56c476b15f84701712cc3b4b4a001ebbe62b1dcbe81c23f96fbe6f261b75324", size = 8505 },
-]
-
-[[package]]
 name = "flask-babel"
 version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -563,9 +544,7 @@ version = "0.0.1"
 source = { virtual = "." }
 dependencies = [
     { name = "airium" },
-    { name = "cssmin" },
     { name = "flask" },
-    { name = "flask-assets" },
     { name = "flask-babel" },
     { name = "flask-compress" },
     { name = "flask-migrate" },
@@ -574,20 +553,18 @@ dependencies = [
     { name = "flask-wtf" },
     { name = "funding-service-design-utils" },
     { name = "govuk-frontend-jinja" },
-    { name = "jsmin" },
     { name = "jsonschema" },
     { name = "marshmallow-sqlalchemy" },
     { name = "openpyxl" },
     { name = "pandas" },
     { name = "psycopg2-binary" },
-    { name = "pyscss" },
     { name = "requests" },
     { name = "sqlalchemy", extra = ["mypy"] },
     { name = "sqlalchemy-json" },
     { name = "sqlalchemy-utils" },
 ]
 
-[package.dev-dependencies]
+[package.dependency-groups]
 dev = [
     { name = "beautifulsoup4" },
     { name = "black" },
@@ -607,9 +584,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "airium", specifier = "==0.2.6" },
-    { name = "cssmin", specifier = "==0.2.0" },
     { name = "flask", specifier = "==3.0.3" },
-    { name = "flask-assets", specifier = "==2.1.0" },
     { name = "flask-babel", specifier = "==4.0.0" },
     { name = "flask-compress", specifier = "==1.15" },
     { name = "flask-migrate", specifier = "==4.0.7" },
@@ -618,20 +593,18 @@ requires-dist = [
     { name = "flask-wtf", specifier = "==1.2.1" },
     { name = "funding-service-design-utils", specifier = "==5.1.5" },
     { name = "govuk-frontend-jinja", specifier = "==3.4.0" },
-    { name = "jsmin", specifier = "==3.0.1" },
     { name = "jsonschema", specifier = "==4.23.0" },
     { name = "marshmallow-sqlalchemy", specifier = "==1.0.0" },
     { name = "openpyxl", specifier = "==3.1.5" },
     { name = "pandas", specifier = "==2.2.2" },
     { name = "psycopg2-binary", specifier = "==2.9.9" },
-    { name = "pyscss", specifier = "==1.4.0" },
     { name = "requests", specifier = "==2.32.3" },
     { name = "sqlalchemy", extras = ["mypy"], specifier = "==2.0.36" },
     { name = "sqlalchemy-json", specifier = "==0.7.0" },
     { name = "sqlalchemy-utils", specifier = "==0.41.2" },
 ]
 
-[package.metadata.requires-dev]
+[package.metadata.dependency-groups]
 dev = [
     { name = "beautifulsoup4", specifier = "==4.12.3" },
     { name = "black", specifier = "==24.8.0" },
@@ -810,12 +783,6 @@ dependencies = [
     { name = "six" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/69/3e/dd37e1a7223247e3ef94714abf572415b89c4e121c4af48e9e4c392e2ca0/jsbeautifier-1.15.1.tar.gz", hash = "sha256:ebd733b560704c602d744eafc839db60a1ee9326e30a2a80c4adb8718adc1b24", size = 75606 }
-
-[[package]]
-name = "jsmin"
-version = "3.0.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/5e/73/e01e4c5e11ad0494f4407a3f623ad4d87714909f50b17a06ed121034ff6e/jsmin-3.0.1.tar.gz", hash = "sha256:c0959a121ef94542e807a674142606f7e90214a2b3d1eb17300244bbb5cc2bfc", size = 13925 }
 
 [[package]]
 name = "json5"
@@ -1126,15 +1093,6 @@ wheels = [
 crypto = [
     { name = "cryptography" },
 ]
-
-[[package]]
-name = "pyscss"
-version = "1.4.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "six" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/92/30/64c818fd317e03138f98ca67800edb6a916f59fc07b3d7e535e84c3c333a/pyScss-1.4.0.tar.gz", hash = "sha256:8f35521ffe36afa8b34c7d6f3195088a7057c185c2b8f15ee459ab19748669ff", size = 122100 }
 
 [[package]]
 name = "pytest"
@@ -1529,15 +1487,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/68/60/db9f95e6ad456f1872486769c55628c7901fb4de5a72c2f7bdd912abf0c1/virtualenv-20.26.3.tar.gz", hash = "sha256:4c43a2a236279d9ea36a0d76f98d84bd6ca94ac4e0f4a3b9d46d05e10fea542a", size = 9057588 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/07/4d/410156100224c5e2f0011d435e477b57aed9576fc7fe137abcf14ec16e11/virtualenv-20.26.3-py3-none-any.whl", hash = "sha256:8cc4a31139e796e9a7de2cd5cf2489de1217193116a8fd42328f1bd65f434589", size = 5684792 },
-]
-
-[[package]]
-name = "webassets"
-version = "2.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c1/c4/2da869584205c064614535cc626defa493b98f0d114e8f4741c99800000e/webassets-2.0.tar.gz", hash = "sha256:167132337677c8cedc9705090f6d48da3fb262c8e0b2773b29f3352f050181cd", size = 288016 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ce/7c/be5d23512974c5843e94aacec163fc31539e91d1e740dd9b886f7714f9d1/webassets-2.0-py3-none-any.whl", hash = "sha256:a31a55147752ba1b3dc07dee0ad8c8efff274464e08bbdb88c1fd59ffd552724", size = 142873 },
 ]
 
 [[package]]
