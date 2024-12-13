@@ -224,7 +224,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
 
     unscored = []
     sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
-    for i, section in enumerate(sections, start=1):
+    for _i, section in enumerate(sections, start=1):
         criteria = {
             "id": human_to_kebab_case(section.name_in_apply_json["en"]),
             "name": section.name_in_apply_json["en"],

@@ -316,7 +316,6 @@ PAGES = [
         "component_names": [],
         "show_in_builder": False,
         "controller": "./pages/summary.js",
-        "show_in_builder": False,
     },
     {
         "id": "alternative-organisation-name",
