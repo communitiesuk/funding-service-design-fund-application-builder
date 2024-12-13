@@ -1,8 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms.validators import InputRequired
-from wtforms.validators import Optional
+from wtforms import RadioField, StringField
+from wtforms.validators import InputRequired, Optional
 from wtforms.widgets import RadioInput
 
 
@@ -15,7 +13,6 @@ class GovUkRadioField(RadioField):
 
 
 class QuestionForm(FlaskForm):
-
     id = StringField(
         label="Question ID",
         validators=[InputRequired(message="Supply a unique ID")],

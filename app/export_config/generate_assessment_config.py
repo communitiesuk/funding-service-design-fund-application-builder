@@ -6,15 +6,11 @@ import click
 
 from app.all_questions.metadata_utils import form_json_to_assessment_display_types
 from app.db import db
-from app.db.models import Component, Section
-from app.db.models import Criteria
-from app.db.models import Subcriteria
-from app.db.models import Theme
+from app.db.models import Component, Criteria, Section, Subcriteria, Theme
 from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.queries.application import get_form_for_component
 from app.export_config import helpers
 from app.export_config.generate_form import human_to_kebab_case
-
 
 # # TODO this is copied from fund-store metadata_utils for now
 # form_json_to_assessment_display_types = {
@@ -195,11 +191,11 @@ def build_assessment_config(criteria_list: list[Criteria]) -> dict:
     prompt=True,
 )
 def generate_assessment_config(
-        input_folder,
-        input_file,
-        output_folder,
-        output_file,
-        forms_dir,
+    input_folder,
+    input_file,
+    output_folder,
+    output_file,
+    forms_dir,
 ):
     with open(os.path.join(input_folder, input_file), "r") as f:
         input_data = json.load(f)
@@ -270,7 +266,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
         round_id=round_id,
         fund_round_ids=fund_round_ids,
         fund_short_name=fund_short_name,
-        unscored=json.dumps(unscored)
+        unscored=json.dumps(unscored),
     )
     helpers.write_config(assess_output, "assessment_config", round_short_name, "assessment", base_output_dir)
 

@@ -1,22 +1,16 @@
 import json
 import os
 from pathlib import Path
-from unittest.mock import MagicMock
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from app.db.models import Component
-from app.db.models import Form
-from app.db.models import FormSection
-from app.db.models import Lizt
-from app.db.models import Page
+from app.db.models import Component, Form, FormSection, Lizt, Page
 from app.db.models.application_config import ComponentType
-from app.import_config.load_form_json import load_form_jsons
-from app.import_config.load_form_json import load_json_from_file
+from app.import_config.load_form_json import load_form_jsons, load_json_from_file
 
 
 # add files in /test_data t orun the below test against each file

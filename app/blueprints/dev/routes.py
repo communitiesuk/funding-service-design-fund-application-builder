@@ -1,16 +1,14 @@
-from flask import Blueprint
-from flask import current_app
-from flask import redirect
-from flask import request
-from flask import url_for
+from flask import Blueprint, current_app, redirect, request, url_for
 
-from app.blueprints.self_serve.data.data_access import clear_all_responses
-from app.blueprints.self_serve.data.data_access import get_all_components
-from app.blueprints.self_serve.data.data_access import get_all_pages
-from app.blueprints.self_serve.data.data_access import get_all_sections
-from app.blueprints.self_serve.data.data_access import get_responses
-from app.blueprints.self_serve.data.data_access import get_saved_forms
-from app.blueprints.self_serve.data.data_access import save_response
+from app.blueprints.self_serve.data.data_access import (
+    clear_all_responses,
+    get_all_components,
+    get_all_pages,
+    get_all_sections,
+    get_responses,
+    get_saved_forms,
+    save_response,
+)
 
 # Blueprint for dev related routes, eg. saving responses from when the form is in preview mode in the form runner
 dev_bp = Blueprint(

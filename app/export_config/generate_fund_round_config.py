@@ -1,23 +1,13 @@
 import copy
-import json
 
 from flask import current_app
 
-from app.all_questions.metadata_utils import form_json_to_assessment_display_types
 from app.db import db
-from app.db.models import Form
-from app.db.models import Section
-from app.db.models.application_config import READ_ONLY_COMPONENTS
+from app.db.models import Form, Section
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
-from app.export_config import helpers
-from app.export_config.generate_form import human_to_kebab_case
 from app.export_config.helpers import write_config
-from app.shared.data_classes import FundExport
-from app.shared.data_classes import FundSectionForm
-from app.shared.data_classes import FundSectionSection
-from app.shared.data_classes import RoundExport
-from config import Config
+from app.shared.data_classes import FundExport, FundSectionForm, FundSectionSection, RoundExport
 
 # TODO : The Round path might be better as a placeholder to avoid conflict in the actual fund store.
 # Decide on this further down the line.
@@ -42,7 +32,6 @@ TEMPLATE_FUND_ROUND_EXPORT = {"sections_config": [], "fund_config": {}, "round_c
 
 
 def generate_application_display_config(round_id):
-
     ordered_sections = []
     # get round
     round = get_round_by_id(round_id)
@@ -188,6 +177,3 @@ def generate_config_for_round(round_id, base_output_dir=None):
         base_output_dir,
     )
     return fund_config, round_config
-
-
-

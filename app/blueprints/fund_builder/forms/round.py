@@ -2,17 +2,9 @@ import datetime
 import json
 import re
 
-from flask_wtf import FlaskForm
-from flask_wtf import Form
-from wtforms import FormField
-from wtforms import HiddenField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import URLField
-from wtforms.validators import DataRequired
-from wtforms.validators import Length
-from wtforms.validators import ValidationError
+from flask_wtf import FlaskForm, Form
+from wtforms import FormField, HiddenField, RadioField, StringField, TextAreaField, URLField
+from wtforms.validators import DataRequired, Length, ValidationError
 
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_short_name_and_fund_id
@@ -128,7 +120,6 @@ class DateInputForm(Form):
 
 
 class RoundForm(FlaskForm):
-
     JSON_FIELD_HINT = "Valid json format, using double quotes, lowercase true/false"
 
     round_id = HiddenField("Round ID")

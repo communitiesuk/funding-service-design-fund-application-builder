@@ -2,15 +2,16 @@ import copy
 import fnmatch
 from typing import Tuple
 
-from bs4 import BeautifulSoup
-from bs4 import NavigableString
+from bs4 import BeautifulSoup, NavigableString
 
-from app.all_questions.read_forms import build_section_header
-from app.all_questions.read_forms import determine_display_value_for_condition
-from app.all_questions.read_forms import determine_if_just_html_page
-from app.all_questions.read_forms import increment_lowest_in_hierarchy
-from app.all_questions.read_forms import remove_lowest_in_hierarchy
-from app.all_questions.read_forms import strip_leading_numbers
+from app.all_questions.read_forms import (
+    build_section_header,
+    determine_display_value_for_condition,
+    determine_if_just_html_page,
+    increment_lowest_in_hierarchy,
+    remove_lowest_in_hierarchy,
+    strip_leading_numbers,
+)
 
 FIELD_TYPES_WITH_MAX_WORDS = ["freetextfield", "multilinetextfield"]
 

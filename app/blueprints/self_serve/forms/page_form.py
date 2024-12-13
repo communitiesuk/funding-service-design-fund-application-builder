@@ -1,12 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField
-from wtforms import SelectMultipleField
-from wtforms import StringField
+from wtforms import BooleanField, SelectMultipleField, StringField
 from wtforms.validators import InputRequired
 
 
 class PageForm(FlaskForm):
-
     id = StringField(
         label="Page ID",
         validators=[InputRequired(message="Supply a unique ID")],

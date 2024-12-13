@@ -7,8 +7,7 @@ from uuid import UUID
 
 from sqlalchemy.orm.attributes import flag_modified
 
-from app.db.queries.application import insert_form_section
-from app.db.queries.application import insert_list
+from app.db.queries.application import insert_form_section, insert_list
 from app.export_config.generate_form import human_to_kebab_case
 
 sys.path.insert(1, ".")
@@ -16,14 +15,20 @@ from dataclasses import asdict  # noqa:E402
 
 from app.create_app import app  # noqa:E402
 from app.db import db  # noqa:E402
-from app.db.models import Component  # noqa:E402
-from app.db.models import ComponentType  # noqa:E402
-from app.db.models import Page  # noqa:E402
+from app.db.models import (
+    Component,  # noqa:E402
+    ComponentType,  # noqa:E402
+    Page,  # noqa:E402
+)
 from app.db.queries.application import insert_new_form  # noqa:E402
-from app.shared.data_classes import Condition  # noqa:E402
-from app.shared.data_classes import ConditionValue  # noqa:E402
-from app.shared.helpers import find_enum  # noqa:E402
-from app.shared.helpers import get_all_pages_in_parent_form  # noqa:E402
+from app.shared.data_classes import (
+    Condition,  # noqa:E402
+    ConditionValue,  # noqa:E402
+)
+from app.shared.helpers import (
+    find_enum,  # noqa:E402
+    get_all_pages_in_parent_form,  # noqa:E402
+)
 
 
 def _build_condition(condition_data, source_page_path, destination_page_path) -> Condition:
@@ -63,7 +68,6 @@ def _build_condition(condition_data, source_page_path, destination_page_path) ->
 
 
 def _get_component_by_runner_name(db, runner_component_name, page_ids: list):
-
     return (
         db.session.query(Component)
         .filter(Component.runner_component_name == runner_component_name)
@@ -87,7 +91,6 @@ def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
                 target_condition_name = path["condition"]
                 # Use the conditions dictionary for faster lookup
                 if target_condition_name in conditions_dict:
-
                     condition_data = conditions_dict[target_condition_name]
                     # for condition in condition_data["value"]["conditions"]:
                     # sometimes its in this format '"name": "nweebX.TiKRCy"'

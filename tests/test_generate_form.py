@@ -5,36 +5,36 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Component
-from app.db.models import ComponentType
-from app.db.models import FormSection
-from app.db.models import Lizt
-from app.db.models import Page
+from app.db.models import Component, ComponentType, FormSection, Lizt, Page
 from app.db.models.application_config import Form
-from app.export_config.generate_form import build_component
-from app.export_config.generate_form import build_conditions
-from app.export_config.generate_form import build_form_json
-from app.export_config.generate_form import build_form_section
-from app.export_config.generate_form import build_lists
-from app.export_config.generate_form import build_navigation
-from app.export_config.generate_form import build_page
-from app.export_config.generate_form import build_start_page
-from app.export_config.generate_form import human_to_kebab_case
-from tests.unit_test_data import mock_c_1
-from tests.unit_test_data import mock_c_2
-from tests.unit_test_data import mock_form_1
-from tests.unit_test_data import test_condition_org_type_a
-from tests.unit_test_data import test_condition_org_type_b
-from tests.unit_test_data import test_condition_org_type_c
-from tests.unit_test_data import test_form_json_condition_org_type_a
-from tests.unit_test_data import test_form_json_condition_org_type_b
-from tests.unit_test_data import test_form_json_condition_org_type_c
-from tests.unit_test_data import test_form_json_page_org_type_a
-from tests.unit_test_data import test_form_json_page_org_type_b
-from tests.unit_test_data import test_form_json_page_org_type_c
-from tests.unit_test_data import test_page_object_org_type_a
-from tests.unit_test_data import test_page_object_org_type_b
-from tests.unit_test_data import test_page_object_org_type_c
+from app.export_config.generate_form import (
+    build_component,
+    build_conditions,
+    build_form_json,
+    build_form_section,
+    build_lists,
+    build_navigation,
+    build_page,
+    build_start_page,
+    human_to_kebab_case,
+)
+from tests.unit_test_data import (
+    mock_c_1,
+    mock_c_2,
+    mock_form_1,
+    test_condition_org_type_a,
+    test_condition_org_type_b,
+    test_condition_org_type_c,
+    test_form_json_condition_org_type_a,
+    test_form_json_condition_org_type_b,
+    test_form_json_condition_org_type_c,
+    test_form_json_page_org_type_a,
+    test_form_json_page_org_type_b,
+    test_form_json_page_org_type_c,
+    test_page_object_org_type_a,
+    test_page_object_org_type_b,
+    test_page_object_org_type_c,
+)
 
 
 @pytest.mark.parametrize(
@@ -604,7 +604,6 @@ def test_build_component(component_to_build, exp_result):
     ],
 )
 def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_next):
-
     results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
     for page in results["pages"]:
         exp_next_this_page = exp_next[page["path"]]
