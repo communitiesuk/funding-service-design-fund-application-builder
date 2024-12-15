@@ -9,6 +9,8 @@ from app.db.models import FormSection
 from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models import Section
+from app.db.models.assessment_config import Criteria
+from app.db.models.assessment_config import Subcriteria
 from app.db.models.round import Round
 from app.db.queries.round import get_round_by_id
 
@@ -20,6 +22,14 @@ def get_all_template_sections() -> list[Section]:
 def get_section_by_id(section_id) -> Section:
     s = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
     return s
+
+
+def get_criteria_by_id(criteria_id) -> Criteria:
+    return db.session.query(Criteria).where(Criteria.criteria_id == criteria_id).one_or_none()
+
+
+def get_subcriteria_by_id(subcriteria_id) -> Subcriteria:
+    return db.session.query(Subcriteria).where(Subcriteria.subcriteria_id == subcriteria_id).one_or_none()
 
 
 def get_all_template_forms() -> list[Form]:
@@ -155,7 +165,6 @@ def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> For
     cloned_pages = []
     cloned_components = []
     for page_to_clone in form_to_clone.pages:
-
         cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=clone.form_id)
         cloned_pages.append(cloned_page)
         cloned_components.extend(_initiate_cloned_components_for_page(page_to_clone.components, cloned_page.page_id))
@@ -171,7 +180,6 @@ def _initiate_cloned_components_for_page(
 ):
     cloned_components = []
     for component_to_clone in components_to_clone:
-
         cloned_component = _initiate_cloned_component(
             component_to_clone, new_page_id=new_page_id, new_theme_id=None
         )  # TODO how should themes work when cloning?
@@ -273,6 +281,43 @@ def insert_new_section(new_section_config):
     return section
 
 
+def insert_new_criteria(new_criteria_config):
+    criteria = Criteria(
+        criteria_id=uuid4(),
+        round_id=new_criteria_config.get("round_id", None),
+        name=new_criteria_config.get("name"),
+        weighting=new_criteria_config.get("weighting"),
+        template_name=new_criteria_config.get("template_name", None),
+        is_template=new_criteria_config.get("is_template", False),
+        source_template_id=new_criteria_config.get("source_template_id", None),
+        audit_info=new_criteria_config.get("audit_info", {}),
+        index=new_criteria_config.get("index"),
+    )
+
+    db.session.add(criteria)
+    db.session.commit()
+
+    return criteria
+
+
+def insert_new_subcriteria(new_subcriteria_config):
+    subcriteria = Subcriteria(
+        subcriteria_id=uuid4(),
+        criteria_id=new_subcriteria_config.get("criteria_id"),
+        name=new_subcriteria_config.get("name"),
+        template_name=new_subcriteria_config.get("template_name", None),
+        is_template=new_subcriteria_config.get("is_template", False),
+        source_template_id=new_subcriteria_config.get("source_template_id", None),
+        audit_info=new_subcriteria_config.get("audit_info", {}),
+        criteria_index=new_subcriteria_config.get("criteria_index"),
+    )
+
+    db.session.add(subcriteria)
+    db.session.commit()
+
+    return subcriteria
+
+
 def update_section(section_id, new_section_config):
     section = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
     if section:
@@ -286,6 +331,34 @@ def update_section(section_id, new_section_config):
 
         db.session.commit()
     return section
+
+
+def update_criteria(criteria_id, new_criteria_config):
+    criteria = db.session.query(Criteria).where(Criteria.criteria_id == criteria_id).one_or_none()
+    if criteria:
+        allowed_keys = ["round_id", "name", "weighting", "is_template", "audit_info", "index"]
+
+        for key, value in new_criteria_config.items():
+            if key in allowed_keys:
+                setattr(criteria, key, value)
+
+        db.session.commit()
+
+    return criteria
+
+
+def update_subcriteria(subcriteria_id, new_subcriteria_config):
+    subcriteria = db.session.query(Subcriteria).where(Subcriteria.subcriteria_id == subcriteria_id).one_or_none()
+    if subcriteria:
+        allowed_keys = ["name", "is_template", "audit_info", "criteria_index"]
+
+        for key, value in new_subcriteria_config.items():
+            if key in allowed_keys:
+                setattr(subcriteria, key, value)
+
+        db.session.commit()
+
+    return subcriteria
 
 
 def delete_section_from_round(round_id, section_id, cascade: bool = False):

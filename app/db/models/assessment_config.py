@@ -10,6 +10,7 @@ from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import REAL
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import Boolean
@@ -32,12 +33,18 @@ class Criteria(BaseModel):
         ForeignKey("round.round_id"),
         nullable=True,
     )
+    round = relationship("Round", back_populates="criteria")
     name = Column(String())
     weighting = Column(REAL(precision=2))
     template_name = Column("Template Name", String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
-    subcriteria: Mapped[List["Subcriteria"]] = relationship("Subcriteria")
+    subcriteria: Mapped[List["Subcriteria"]] = relationship(
+        "Subcriteria",
+        order_by="Subcriteria.criteria_index",
+        collection_class=ordering_list("criteria_index", count_from=1),
+        passive_deletes="all",
+    )
     index = Column(Integer())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 
@@ -54,11 +61,17 @@ class Subcriteria(BaseModel):
         ForeignKey("criteria.criteria_id"),
         nullable=True,
     )
+    criteria = relationship("Criteria", back_populates="subcriteria")
     name = Column(String())
     template_name = Column(String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
-    themes: Mapped[List["Theme"]] = relationship("Theme")
+    themes: Mapped[List["Theme"]] = relationship(
+        "Theme",
+        order_by="Theme.subcriteria_index",
+        collection_class=ordering_list("subcriteria_index", count_from=1),
+        passive_deletes="all",
+    )
     criteria_index = Column(Integer())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
 

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% set pageHeading %}
+    {% if form.subcriteria_id.data %}Update{% else %}Create{% endif %}&nbsp;Subcriteria
+{% endset %}
+
+{% from "macros/wtfToGovUk.html" import input %}
+{% from "macros/wtfToGovUk.html" import yes_no %}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+{%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
+            <form method="POST">
+                <div class="govuk-form-group">
+                    <h3 class="govuk-heading-m">Subcriteria Name</h3>
+                    {{ form.hidden_tag() }}
+                    {{ input(form.name) }}
+                </div>
+                {{ govukButton({"text": "Save"}) }}
+            </form>
+        </div>
+    </div>
+    {% if form.subcriteria_id.data %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h3 class="govuk-heading-m">Themes</h3>
+                {{
+                    govukButton({
+                        "text": "Add Themes",
+                        "href": "" ,
+                        "classes": "govuk-button--secondary"
+                    })
+                }}
+                <ul class="app-task-list__items">
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endblock content %}
