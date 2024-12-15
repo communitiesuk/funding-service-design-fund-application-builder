@@ -20,10 +20,12 @@ from flask import url_for
 from fsd_utils.authentication.decorators import login_requested
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
+from app.blueprints.fund_builder.forms.criteria import CriteriaForm
 from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm
 from app.blueprints.fund_builder.forms.round import get_datetime
 from app.blueprints.fund_builder.forms.section import SectionForm
+from app.blueprints.fund_builder.forms.subcriteria import SubcriteriaForm
 from app.db.models.fund import Fund
 from app.db.models.fund import FundingType
 from app.db.models.round import Round
@@ -32,14 +34,20 @@ from app.db.queries.application import clone_single_round
 from app.db.queries.application import delete_form_from_section
 from app.db.queries.application import delete_section_from_round
 from app.db.queries.application import get_all_template_forms
+from app.db.queries.application import get_criteria_by_id
 from app.db.queries.application import get_form_by_id
 from app.db.queries.application import get_section_by_id
+from app.db.queries.application import get_subcriteria_by_id
+from app.db.queries.application import insert_new_criteria
 from app.db.queries.application import insert_new_section
+from app.db.queries.application import insert_new_subcriteria
 from app.db.queries.application import move_form_down
 from app.db.queries.application import move_form_up
 from app.db.queries.application import move_section_down
 from app.db.queries.application import move_section_up
+from app.db.queries.application import update_criteria
 from app.db.queries.application import update_section
+from app.db.queries.application import update_subcriteria
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
@@ -87,6 +95,148 @@ def login():
 @build_fund_bp.route("/dashboard", methods=["GET"])
 def dashboard():
     return render_template("index.html")
+
+
+@build_fund_bp.route("/fund/round/<round_id>/criteria", methods=["GET", "POST"])
+def criteria(round_id):
+    round_obj = get_round_by_id(round_id)
+    fund_obj = get_fund_by_id(round_obj.fund_id)
+    form: CriteriaForm = CriteriaForm()
+    form.round_id.data = round_id
+    params = {
+        "round_id": str(round_id),
+    }
+    existing_criteria = None
+
+    if request.args.get("action") == "remove":
+        # to do: remove criteria
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+    if request.args.get("action") == "move_up":
+        # to do: move_up criteria
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+    if request.args.get("action") == "move_down":
+        # to do: move_down criteria
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+
+    if form.validate_on_submit():
+        if form.criteria_id.data:
+            update_criteria(
+                form.criteria_id.data,
+                {
+                    "name": form.name.data,
+                    "weighting": form.weighting.data,
+                },
+            )
+        else:
+            insert_new_criteria(
+                {
+                    "round_id": form.round_id.data,
+                    "name": form.name.data,
+                    "weighting": form.weighting.data,
+                    "index": max(len(round_obj.criteria) + 1, 1),
+                }
+            )
+
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_obj.round_id))
+
+    if criteria_id := request.args.get("criteria_id"):
+        existing_criteria = get_criteria_by_id(criteria_id)
+        form.criteria_id.data = criteria_id
+        form.name.data = existing_criteria.name
+        form.weighting.data = existing_criteria.weighting
+        params["criteria"] = existing_criteria
+
+    params["breadcrumb_items"] = [
+        {
+            "text": "Home",
+            "href": url_for(BUILD_FUND_BP_DASHBOARD),
+        },
+        {
+            "text": fund_obj.name_json["en"],
+            "href": url_for("build_fund_bp.view_fund", fund_id=fund_obj.fund_id),
+        },
+        {
+            "text": round_obj.title_json["en"],
+            "href": url_for("build_fund_bp.build_application", fund_id=fund_obj.fund_id, round_id=round_obj.round_id),
+        },
+        {
+            "text": existing_criteria.name if existing_criteria else "Add Criteria",
+            "href": "#",
+        },
+    ]
+
+    return render_template("criteria.html", form=form, **params)
+
+
+@build_fund_bp.route("/criteria/<criteria_id>/subcriteria", methods=["GET", "POST"])
+def subcriteria(criteria_id):
+    criteria = get_criteria_by_id(criteria_id)
+    form: SubcriteriaForm = SubcriteriaForm()
+    form.criteria_id.data = criteria_id
+    params = {
+        "criteria_id": str(criteria_id),
+    }
+    existing_subcriteria = None
+
+    if request.args.get("action") == "remove":
+        # to do: remove criteria
+        return redirect(url_for("build_fund_bp.build_application", round_id=criteria.round_id))
+    if request.args.get("action") == "move_up":
+        # to do: move_up criteria
+        return redirect(url_for("build_fund_bp.build_application", round_id=criteria.round_id))
+    if request.args.get("action") == "move_down":
+        # to do: move_down criteria
+        return redirect(url_for("build_fund_bp.build_application", round_id=criteria.round_id))
+
+    if form.validate_on_submit():
+        if form.subcriteria_id.data:
+            update_subcriteria(
+                form.subcriteria_id.data,
+                {"name": form.name.data},
+            )
+        else:
+            insert_new_subcriteria(
+                {
+                    "criteria_id": form.criteria_id.data,
+                    "name": form.name.data,
+                    "criteria_index": max(len(criteria.subcriteria) + 1, 1),
+                }
+            )
+
+        return redirect(url_for("build_fund_bp.build_application", round_id=criteria.round_id))
+
+    if subcriteria_id := request.args.get("subcriteria_id"):
+        existing_subcriteria = get_subcriteria_by_id(subcriteria_id)
+        form.subcriteria_id.data = subcriteria_id
+        form.name.data = existing_subcriteria.name
+        params["subcriteria"] = existing_subcriteria
+
+    params["breadcrumb_items"] = [
+        {
+            "text": "Home",
+            "href": url_for(BUILD_FUND_BP_DASHBOARD),
+        },
+        {
+            "text": criteria.round.fund.name_json["en"],
+            "href": url_for("build_fund_bp.view_fund", fund_id=criteria.round.fund_id),
+        },
+        {
+            "text": criteria.round.title_json["en"],
+            "href": url_for(
+                "build_fund_bp.build_application", fund_id=criteria.round.fund_id, round_id=criteria.round_id
+            ),
+        },
+        {
+            "text": criteria.name,
+            "href": url_for("build_fund_bp.criteria", round_id=criteria.round_id, criteria_id=criteria.criteria_id),
+        },
+        {
+            "text": existing_subcriteria.name if existing_subcriteria else "Add Subcriteria",
+            "href": "#",
+        },
+    ]
+
+    return render_template("subcriteria.html", form=form, **params)
 
 
 @build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])

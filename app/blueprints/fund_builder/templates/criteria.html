@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% set pageHeading %}
+    {% if form.criteria_id.data %}Update{% else %}Create{% endif %}&nbsp;Criteria
+{% endset %}
+
+{% from "macros/wtfToGovUk.html" import input %}
+{% from "macros/wtfToGovUk.html" import yes_no %}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+{%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
+            <form method="POST">
+                <div class="govuk-form-group">
+                    <h3 class="govuk-heading-m">Criteria Name</h3>
+                    {{ form.hidden_tag() }}
+                    {{ input(form.name) }}
+                    {{ input(form.weighting) }}
+                </div>
+                {{ govukButton({"text": "Save"}) }}
+            </form>
+        </div>
+    </div>
+    {% if form.criteria_id.data %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h3 class="govuk-heading-m">Subcriteria of this criteria</h3>
+                {{
+                    govukButton({
+                        "text": "Add Subcriteria",
+                        "href": url_for("build_fund_bp.subcriteria", criteria_id=criteria.criteria_id),
+                        "classes": "govuk-button--secondary"
+                    })
+                }}
+                <ul class="app-task-list__items">
+                    {% for subcriteria in criteria.subcriteria %}
+                        <li>
+                            <span class="app-task-list__task-name">
+                                <h3 class="govuk-heading-m">{{ subcriteria.criteria_index }}. {{ subcriteria.name }}</h3>
+                            </span>
+                            <span class="app-task-list__task-actions">
+                                <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.subcriteria", criteria_id=criteria.criteria_id, subcriteria_id=subcriteria.subcriteria_id) }}'>Edit</a>&nbsp;
+                                <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.subcriteria", criteria_id=criteria.criteria_id, subcriteria_id=subcriteria.subcriteria_id, action="remove") }}'>Remove</a>&nbsp;
+                                {% if subcriteria.criteria_index > 1 %}
+                                    <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.subcriteria", criteria_id=criteria.criteria_id, index=subcriteria.criteria_index, action="move_up") }}'>Move up</a>&nbsp;
+                                {% endif %}
+                                {% if subcriteria.criteria_index < criteria.subcriteria | length %}
+                                    <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.subcriteria", criteria_id=criteria.criteria_id, index=subcriteria.criteria_index, action="move_down") }}'> Move down</a>
+                                {% endif %}
+                            </span>
+                            <ul class="app-task-list__items">
+                                {% for theme in subcriteria.themes %}
+                                    <li class="app-task-list__item task-list__new-design">
+                                        <span class="app-task-list__task-name">
+                                            <h3 class="govuk-body">
+                                                {{ subcriteria.criteria_index }}.&nbsp;{{ theme.subcriteria_index }}.&nbsp;{{ theme.name }}
+                                            </h3>
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+{% endblock content %}
