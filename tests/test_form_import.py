@@ -22,12 +22,12 @@ from tests.unit_test_data import test_form_json_condition_org_type_c
     "input_condition,exp_result",
     [
         (
-                test_form_json_condition_org_type_a,
-                test_condition_org_type_a,
+            test_form_json_condition_org_type_a,
+            test_condition_org_type_a,
         ),
         (
-                test_form_json_condition_org_type_c,
-                test_condition_org_type_c,
+            test_form_json_condition_org_type_c,
+            test_condition_org_type_c,
         ),
     ],
 )
@@ -102,28 +102,28 @@ def test_add_conditions_to_components(mocker, input_page, input_conditions, exp_
     "input_page, input_conditions, exp_condition_count",
     [
         (
-                [
-                    {"path": "/path-1", "next": [{"path": "next-a", "condition": "condition-a"}]},
-                    {"path": "/path-2", "next": [{"path": "next-a", "condition": "condition-a"}]},
-                    {"path": "/path-3", "next": [{"path": "next-a", "condition": "condition-a"}]}
-                ],
-                [
-                    asdict(
-                        Condition(
-                            name="condition-a",
-                            display_name="condition a",
-                            destination_page_path="page-b",
-                            value=ConditionValue(
-                                name="condition a",
-                                conditions=[
-                                    SubCondition(field={"name": "c1"}, operator="is", value={}, coordinator=None),
-                                    SubCondition(field={"name": "c1"}, operator="is", value={}, coordinator="or"),
-                                ],
-                            ),
-                        )
+            [
+                {"path": "/path-1", "next": [{"path": "next-a", "condition": "condition-a"}]},
+                {"path": "/path-2", "next": [{"path": "next-a", "condition": "condition-a"}]},
+                {"path": "/path-3", "next": [{"path": "next-a", "condition": "condition-a"}]},
+            ],
+            [
+                asdict(
+                    Condition(
+                        name="condition-a",
+                        display_name="condition a",
+                        destination_page_path="page-b",
+                        value=ConditionValue(
+                            name="condition a",
+                            conditions=[
+                                SubCondition(field={"name": "c1"}, operator="is", value={}, coordinator=None),
+                                SubCondition(field={"name": "c1"}, operator="is", value={}, coordinator="or"),
+                            ],
+                        ),
                     )
-                ],
-                1,
+                )
+            ],
+            1,
         ),
     ],
 )
@@ -134,8 +134,8 @@ def test_same_condition_used_in_different_pages(mocker, input_page, input_condit
 
     # Set up other necessary mocks and test data
     with mock.patch(
-            "app.import_config.load_form_json._build_condition",
-            return_value=Condition(name=None, display_name=None, destination_page_path=None, value=None),
+        "app.import_config.load_form_json._build_condition",
+        return_value=Condition(name=None, display_name=None, destination_page_path=None, value=None),
     ):
         for page in input_page:
             add_conditions_to_components(None, page, input_conditions, page_id=None)

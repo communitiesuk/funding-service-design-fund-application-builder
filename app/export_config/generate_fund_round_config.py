@@ -188,6 +188,3 @@ def generate_config_for_round(round_id, base_output_dir=None):
         base_output_dir,
     )
     return fund_config, round_config
-
-
-

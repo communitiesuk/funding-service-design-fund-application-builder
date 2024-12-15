@@ -1,6 +1,7 @@
 import re
 from dataclasses import asdict
 from dataclasses import is_dataclass
+
 from wtforms.validators import ValidationError
 
 from app.db.models import Page
@@ -39,6 +40,7 @@ def get_all_pages_in_parent_form(db, page_id):
 
     return page_ids
 
+
 # This formatter will read all the errors and then convert them to the required format to support error-summary display
 def error_formatter(errors):
     error = None
@@ -46,13 +48,13 @@ def error_formatter(errors):
         errorsList = []
         for field, errors in errors.items():
             if isinstance(errors, list):
-                errorsList.extend([{'text': err, 'href': f'#{field}'} for err in errors])
+                errorsList.extend([{"text": err, "href": f"#{field}"} for err in errors])
             elif isinstance(errors, dict):
                 # Check if any of the datetime fields have errors
-                if any(len(errors.get(key, '')) > 0 for key in ['day', 'month', 'years', 'hour', 'minute']):
-                    errorsList.append({'text': "Enter valid datetime", 'href': f'#{field}'})
+                if any(len(errors.get(key, "")) > 0 for key in ["day", "month", "years", "hour", "minute"]):
+                    errorsList.append({"text": "Enter valid datetime", "href": f"#{field}"})
         if errorsList:
-            error = {'titleText': "There is a problem", 'errorList': errorsList}
+            error = {"titleText": "There is a problem", "errorList": errorsList}
     return error
 
 
@@ -61,5 +63,5 @@ def no_spaces_between_letters(form, field):
     # Regular expression to check for spaces between letters
     if not field.data:
         return
-    if re.search(r'\b\w+\s+\w+\b', field.data):  # Matches sequences with spaces in between
+    if re.search(r"\b\w+\s+\w+\b", field.data):  # Matches sequences with spaces in between
         raise ValidationError("Spaces between letters are not allowed.")
