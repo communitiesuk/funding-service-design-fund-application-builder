@@ -66,7 +66,6 @@ READ_ONLY_COMPONENTS = [
 
 @dataclass
 class Section(BaseModel):
-
     round_id = Column(
         UUID(as_uuid=True),
         ForeignKey("round.round_id"),
@@ -102,7 +101,6 @@ class Section(BaseModel):
 
 @dataclass
 class Form(BaseModel):
-
     section_id = Column(
         UUID(as_uuid=True),
         ForeignKey("section.section_id"),
@@ -156,7 +154,6 @@ class FormSection(BaseModel):
 
 @dataclass
 class Page(BaseModel):
-
     form_id = Column(
         UUID(as_uuid=True),
         ForeignKey("form.form_id"),
@@ -188,6 +185,7 @@ class Page(BaseModel):
         ForeignKey("formsection.form_section_id"),
         nullable=True,
     )
+    form = relationship("Form", back_populates="pages")
     form_section_id: Mapped[int | None] = mapped_column(ForeignKey(FormSection.form_section_id))
     formsection: Mapped[FormSection | None] = relationship()
 
@@ -225,7 +223,6 @@ class Lizt(BaseModel):
 
 @dataclass
 class Component(BaseModel):
-
     component_id = Column(
         UUID(as_uuid=True),
         primary_key=True,
@@ -236,6 +233,7 @@ class Component(BaseModel):
         ForeignKey("page.page_id"),
         nullable=True,  # will be null where this is a template and not linked to a page
     )
+    page = relationship("Page", back_populates="components")
     theme_id = Column(
         UUID(as_uuid=True),
         ForeignKey("theme.theme_id"),
@@ -257,7 +255,8 @@ class Component(BaseModel):
     conditions = Column(JSON(none_as_null=True))
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     runner_component_name = Column(
-        String(), nullable=True  # None for display only fields
+        String(),
+        nullable=True,  # None for display only fields
     )  # TODO add validation to make sure it's only letters, numbers and _
     list_id = Column(
         UUID(as_uuid=True),
