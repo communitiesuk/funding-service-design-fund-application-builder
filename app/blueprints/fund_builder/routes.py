@@ -26,28 +26,45 @@ from app.blueprints.fund_builder.forms.round import RoundForm
 from app.blueprints.fund_builder.forms.round import get_datetime
 from app.blueprints.fund_builder.forms.section import SectionForm
 from app.blueprints.fund_builder.forms.subcriteria import SubcriteriaForm
+from app.blueprints.fund_builder.forms.theme import ThemeForm
 from app.db.models.fund import Fund
 from app.db.models.fund import FundingType
 from app.db.models.round import Round
+from app.db.queries.application import assign_components_to_theme
 from app.db.queries.application import clone_single_form
 from app.db.queries.application import clone_single_round
+from app.db.queries.application import delete_component_from_theme
+from app.db.queries.application import delete_criteria_from_round
 from app.db.queries.application import delete_form_from_section
 from app.db.queries.application import delete_section_from_round
+from app.db.queries.application import delete_subcriteria_from_criteria
+from app.db.queries.application import delete_theme_from_subcriteria
 from app.db.queries.application import get_all_template_forms
 from app.db.queries.application import get_criteria_by_id
 from app.db.queries.application import get_form_by_id
 from app.db.queries.application import get_section_by_id
 from app.db.queries.application import get_subcriteria_by_id
+from app.db.queries.application import get_theme_by_id
 from app.db.queries.application import insert_new_criteria
 from app.db.queries.application import insert_new_section
 from app.db.queries.application import insert_new_subcriteria
+from app.db.queries.application import insert_new_theme
+from app.db.queries.application import move_component_down
+from app.db.queries.application import move_component_up
+from app.db.queries.application import move_criteria_down
+from app.db.queries.application import move_criteria_up
 from app.db.queries.application import move_form_down
 from app.db.queries.application import move_form_up
 from app.db.queries.application import move_section_down
 from app.db.queries.application import move_section_up
+from app.db.queries.application import move_subcriteria_down
+from app.db.queries.application import move_subcriteria_up
+from app.db.queries.application import move_theme_down
+from app.db.queries.application import move_theme_up
 from app.db.queries.application import update_criteria
 from app.db.queries.application import update_section
 from app.db.queries.application import update_subcriteria
+from app.db.queries.application import update_theme
 from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
@@ -109,14 +126,22 @@ def criteria(round_id):
     existing_criteria = None
 
     if request.args.get("action") == "remove":
-        # to do: remove criteria
-        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+        delete_criteria_from_round(criteria_id=request.args.get("criteria_id"), round_id=round_id)
+
+        # send them where they came from
+        return redirect(request.referrer)
+
     if request.args.get("action") == "move_up":
-        # to do: move_up criteria
-        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+        move_criteria_up(round_id=round_id, index_to_move_up=int(request.args.get("index")))
+
+        # send them where they came from
+        return redirect(request.referrer)
+
     if request.args.get("action") == "move_down":
-        # to do: move_down criteria
-        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+        move_criteria_down(round_id=round_id, index_to_move_down=int(request.args.get("index")))
+
+        # send them where they came from
+        return redirect(request.referrer)
 
     if form.validate_on_submit():
         if form.criteria_id.data:
@@ -137,7 +162,8 @@ def criteria(round_id):
                 }
             )
 
-        return redirect(url_for("build_fund_bp.build_application", round_id=round_obj.round_id))
+        # send them where they came from
+        return redirect(request.referrer)
 
     if criteria_id := request.args.get("criteria_id"):
         existing_criteria = get_criteria_by_id(criteria_id)
@@ -179,14 +205,22 @@ def subcriteria(criteria_id):
     existing_subcriteria = None
 
     if request.args.get("action") == "remove":
-        # to do: remove criteria
-        return redirect(url_for("build_fund_bp.build_application", round_id=criteria.round_id))
+        delete_subcriteria_from_criteria(subcriteria_id=request.args.get("subcriteria_id"), criteria_id=criteria_id)
+
+        # send them where they came from
+        return redirect(request.referrer)
+
     if request.args.get("action") == "move_up":
-        # to do: move_up criteria
-        return redirect(url_for("build_fund_bp.build_application", round_id=criteria.round_id))
+        move_subcriteria_up(criteria_id=criteria_id, index_to_move_up=int(request.args.get("index")))
+
+        # send them where they came from
+        return redirect(request.referrer)
+
     if request.args.get("action") == "move_down":
-        # to do: move_down criteria
-        return redirect(url_for("build_fund_bp.build_application", round_id=criteria.round_id))
+        move_subcriteria_down(criteria_id=criteria_id, index_to_move_down=int(request.args.get("index")))
+
+        # send them where they came from
+        return redirect(request.referrer)
 
     if form.validate_on_submit():
         if form.subcriteria_id.data:
@@ -203,7 +237,8 @@ def subcriteria(criteria_id):
                 }
             )
 
-        return redirect(url_for("build_fund_bp.build_application", round_id=criteria.round_id))
+        # send them where they came from
+        return redirect(request.referrer)
 
     if subcriteria_id := request.args.get("subcriteria_id"):
         existing_subcriteria = get_subcriteria_by_id(subcriteria_id)
@@ -237,6 +272,104 @@ def subcriteria(criteria_id):
     ]
 
     return render_template("subcriteria.html", form=form, **params)
+
+
+@build_fund_bp.route("/subcriteria/<subcriteria_id>/theme", methods=["GET", "POST"])
+def theme(subcriteria_id):
+    subcriteria = get_subcriteria_by_id(subcriteria_id)
+    form: ThemeForm = ThemeForm()
+    form.subcriteria_id.data = subcriteria_id
+    params = {
+        "subcriteria_id": str(subcriteria_id),
+    }
+    existing_theme = None
+
+    if request.args.get("action") == "remove":
+        delete_theme_from_subcriteria(theme_id=request.args.get("theme_id"), subcriteria_id=subcriteria_id)
+
+        # send them where they came from
+        return redirect(request.referrer)
+
+    if request.args.get("action") == "move_up":
+        move_theme_up(subcriteria_id=subcriteria_id, index_to_move_up=int(request.args.get("index")))
+
+        # send them where they came from
+        return redirect(request.referrer)
+
+    if request.args.get("action") == "move_down":
+        move_theme_down(subcriteria_id=subcriteria_id, index_to_move_down=int(request.args.get("index")))
+
+        # send them where they came from
+        return redirect(request.referrer)
+
+    if form.validate_on_submit():
+        if form.theme_id.data:
+            update_theme(
+                form.theme_id.data,
+                {"name": form.name.data},
+            )
+        else:
+            insert_new_theme(
+                {
+                    "subcriteria_id": form.subcriteria_id.data,
+                    "name": form.name.data,
+                    "subcriteria_index": max(len(subcriteria.themes) + 1, 1),
+                }
+            )
+
+        # send them where they came from
+        return redirect(request.referrer)
+
+    if theme_id := request.args.get("theme_id"):
+        existing_theme = get_theme_by_id(theme_id)
+        form.theme_id.data = theme_id
+        form.name.data = existing_theme.name
+        params["theme"] = existing_theme
+        params["available_template_forms"] = [
+            {"text": f"{f.template_name} - {f.name_in_apply_json['en']}", "value": str(f.form_id)}
+            for f in get_all_template_forms()
+        ]
+
+    params["breadcrumb_items"] = [
+        {
+            "text": "Home",
+            "href": url_for(BUILD_FUND_BP_DASHBOARD),
+        },
+        {
+            "text": subcriteria.criteria.round.fund.name_json["en"],
+            "href": url_for("build_fund_bp.view_fund", fund_id=subcriteria.criteria.round.fund_id),
+        },
+        {
+            "text": subcriteria.criteria.round.title_json["en"],
+            "href": url_for(
+                "build_fund_bp.build_application",
+                fund_id=subcriteria.criteria.round.fund_id,
+                round_id=subcriteria.criteria.round_id,
+            ),
+        },
+        {
+            "text": subcriteria.criteria.name,
+            "href": url_for(
+                "build_fund_bp.criteria",
+                round_id=subcriteria.criteria.round_id,
+                criteria_id=subcriteria.criteria_id,
+            ),
+        },
+        {
+            "text": subcriteria.name,
+            "href": url_for(
+                "build_fund_bp.subcriteria",
+                subcriteria_id=subcriteria.subcriteria_id,
+                criteria_id=subcriteria.criteria_id,
+            ),
+        },
+        {
+            "text": existing_theme.name if existing_theme else "Add Theme",
+            "href": "#",
+        },
+    ]
+
+    return render_template("theme.html", form=form, **params)
 
 
 @build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])
@@ -319,6 +452,28 @@ def configure_forms_in_section(round_id, section_id):
         clone_single_form(form_id=template_id, new_section_id=section_id, section_index=new_section_index)
 
     return redirect(url_for("build_fund_bp.section", round_id=round_id, section_id=section_id))
+
+
+@build_fund_bp.route("/theme/<theme_id>/forms", methods=["POST", "GET"])
+def configure_forms_in_theme(theme_id):
+    theme = get_theme_by_id(theme_id=theme_id)
+    if request.method == "GET":
+        if request.args.get("action") == "remove":
+            component_id = request.args.get("component_id")
+            delete_component_from_theme(theme_id=theme_id, component_id=component_id)
+        if request.args.get("action") == "move_up":
+            move_component_up(theme_id=theme_id, index_to_move_up=int(request.args.get("index")))
+        if request.args.get("action") == "move_down":
+            move_component_down(theme_id=theme_id, index_to_move_down=int(request.args.get("index")))
+
+        # send them where they came from
+        return redirect(request.referrer)
+
+    # if request.method == "POST":
+    template_id = request.form.get("template_id")
+    assign_components_to_theme(template_id, theme)
+
+    return redirect(url_for("build_fund_bp.theme", subcriteria_id=theme.subcriteria_id, theme_id=theme_id))
 
 
 def all_funds_as_govuk_select_items(all_funds: list) -> list:
@@ -810,7 +965,7 @@ def create_export_files(round_id):
     generate_form_jsons_for_round(round_id, base_output_dir)
     generate_all_round_html(round_id, base_output_dir)
     fund_config, round_config = generate_config_for_round(round_id, base_output_dir)
-    generate_assessment_config_for_round(fund_config, round_config, base_output_dir)
+    generate_assessment_config_for_round(round_config, base_output_dir)
     output_zip_path = create_export_zip(
         directory_to_zip=base_output_dir, zip_file_name=round_short_name, random_post_fix=random_post_fix
     )

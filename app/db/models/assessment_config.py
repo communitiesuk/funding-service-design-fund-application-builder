@@ -88,10 +88,16 @@ class Theme(BaseModel):
         ForeignKey("subcriteria.subcriteria_id"),
         nullable=True,
     )
+    subcriteria = relationship("Subcriteria", back_populates="themes")
     name = Column(String())
     template_name = Column("Template Name", String(), nullable=True)
     is_template = Column("is_template", Boolean, default=False, nullable=False)
     audit_info = Column("audit_info", JSON(none_as_null=True))
-    components: Mapped[List["Component"]] = relationship("Component")
+    components: Mapped[List["Component"]] = relationship(
+        "Component",
+        order_by="Component.theme_index",
+        collection_class=ordering_list("theme_index", count_from=1),
+        passive_deletes="all",
+    )
     subcriteria_index = Column(Integer())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
