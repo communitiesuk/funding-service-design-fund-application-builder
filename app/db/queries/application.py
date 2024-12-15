@@ -1,3 +1,4 @@
+from itertools import chain
 from uuid import uuid4
 
 from sqlalchemy import delete
@@ -9,6 +10,10 @@ from app.db.models import FormSection
 from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models import Section
+from app.db.models.application_config import ComponentType
+from app.db.models.assessment_config import Criteria
+from app.db.models.assessment_config import Subcriteria
+from app.db.models.assessment_config import Theme
 from app.db.models.round import Round
 from app.db.queries.round import get_round_by_id
 
@@ -20,6 +25,18 @@ def get_all_template_sections() -> list[Section]:
 def get_section_by_id(section_id) -> Section:
     s = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
     return s
+
+
+def get_criteria_by_id(criteria_id) -> Criteria:
+    return db.session.query(Criteria).where(Criteria.criteria_id == criteria_id).one_or_none()
+
+
+def get_subcriteria_by_id(subcriteria_id) -> Subcriteria:
+    return db.session.query(Subcriteria).where(Subcriteria.subcriteria_id == subcriteria_id).one_or_none()
+
+
+def get_theme_by_id(theme_id) -> Theme:
+    return db.session.query(Theme).where(Theme.theme_id == theme_id).one_or_none()
 
 
 def get_all_template_forms() -> list[Form]:
@@ -150,7 +167,6 @@ def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> For
     cloned_pages = []
     cloned_components = []
     for page_to_clone in form_to_clone.pages:
-
         cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=clone.form_id)
         cloned_pages.append(cloned_page)
         cloned_components.extend(_initiate_cloned_components_for_page(page_to_clone.components, cloned_page.page_id))
@@ -161,12 +177,29 @@ def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> For
     return clone
 
 
+def assign_components_to_theme(form_id: str, theme: Theme):
+    form: Form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
+    new_theme_index = max(len(theme.components) + 1, 1)
+    components = list(chain.from_iterable([page.components for page in form.pages]))
+    for component in components:
+        if component.theme_id is not None:
+            continue
+
+        if component.type in [ComponentType.PARA, ComponentType.HTML]:
+            continue
+
+        component.theme_id = theme.theme_id
+        component.theme_index = new_theme_index
+        new_theme_index += 1
+
+    db.session.commit()
+
+
 def _initiate_cloned_components_for_page(
     components_to_clone: list[Component], new_page_id: str = None, new_theme_id: str = None
 ):
     cloned_components = []
     for component_to_clone in components_to_clone:
-
         cloned_component = _initiate_cloned_component(
             component_to_clone, new_page_id=new_page_id, new_theme_id=None
         )  # TODO how should themes work when cloning?
@@ -268,6 +301,61 @@ def insert_new_section(new_section_config):
     return section
 
 
+def insert_new_criteria(new_criteria_config):
+    criteria = Criteria(
+        criteria_id=uuid4(),
+        round_id=new_criteria_config.get("round_id", None),
+        name=new_criteria_config.get("name"),
+        weighting=new_criteria_config.get("weighting"),
+        template_name=new_criteria_config.get("template_name", None),
+        is_template=new_criteria_config.get("is_template", False),
+        source_template_id=new_criteria_config.get("source_template_id", None),
+        audit_info=new_criteria_config.get("audit_info", {}),
+        index=new_criteria_config.get("index"),
+    )
+
+    db.session.add(criteria)
+    db.session.commit()
+
+    return criteria
+
+
+def insert_new_subcriteria(new_subcriteria_config):
+    subcriteria = Subcriteria(
+        subcriteria_id=uuid4(),
+        criteria_id=new_subcriteria_config.get("criteria_id"),
+        name=new_subcriteria_config.get("name"),
+        template_name=new_subcriteria_config.get("template_name", None),
+        is_template=new_subcriteria_config.get("is_template", False),
+        source_template_id=new_subcriteria_config.get("source_template_id", None),
+        audit_info=new_subcriteria_config.get("audit_info", {}),
+        criteria_index=new_subcriteria_config.get("criteria_index"),
+    )
+
+    db.session.add(subcriteria)
+    db.session.commit()
+
+    return subcriteria
+
+
+def insert_new_theme(new_theme_config):
+    theme = Theme(
+        theme_id=uuid4(),
+        subcriteria_id=new_theme_config.get("subcriteria_id"),
+        name=new_theme_config.get("name"),
+        template_name=new_theme_config.get("template_name", None),
+        is_template=new_theme_config.get("is_template", False),
+        source_template_id=new_theme_config.get("source_template_id", None),
+        audit_info=new_theme_config.get("audit_info", {}),
+        subcriteria_index=new_theme_config.get("subcriteria_index"),
+    )
+
+    db.session.add(theme)
+    db.session.commit()
+
+    return theme
+
+
 def update_section(section_id, new_section_config):
     section = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
     if section:
@@ -281,6 +369,48 @@ def update_section(section_id, new_section_config):
 
         db.session.commit()
     return section
+
+
+def update_criteria(criteria_id, new_criteria_config):
+    criteria = db.session.query(Criteria).where(Criteria.criteria_id == criteria_id).one_or_none()
+    if criteria:
+        allowed_keys = ["round_id", "name", "weighting", "is_template", "audit_info", "index"]
+
+        for key, value in new_criteria_config.items():
+            if key in allowed_keys:
+                setattr(criteria, key, value)
+
+        db.session.commit()
+
+    return criteria
+
+
+def update_subcriteria(subcriteria_id, new_subcriteria_config):
+    subcriteria = db.session.query(Subcriteria).where(Subcriteria.subcriteria_id == subcriteria_id).one_or_none()
+    if subcriteria:
+        allowed_keys = ["name", "is_template", "audit_info", "criteria_index"]
+
+        for key, value in new_subcriteria_config.items():
+            if key in allowed_keys:
+                setattr(subcriteria, key, value)
+
+        db.session.commit()
+
+    return subcriteria
+
+
+def update_theme(theme_id, new_theme_config):
+    theme = db.session.query(Theme).where(Theme.theme_id == theme_id).one_or_none()
+    if theme:
+        allowed_keys = ["name", "is_template", "audit_info", "subcriteria_index"]
+
+        for key, value in new_theme_config.items():
+            if key in allowed_keys:
+                setattr(theme, key, value)
+
+        db.session.commit()
+
+    return theme
 
 
 def delete_section_from_round(round_id, section_id, cascade: bool = False):
@@ -417,6 +547,55 @@ def delete_form_from_section(section_id, form_id, cascade: bool = False):
     delete_form(form_id=form_id, cascade=cascade)
     section = get_section_by_id(section_id=section_id)
     section.forms.reorder()
+    db.session.commit()
+
+
+def delete_criteria_from_round(criteria_id, round_id):
+    round = db.session.query(Round).where(Round.round_id == round_id).one_or_none()
+    criteria = db.session.query(Criteria).where(Criteria.criteria_id == criteria_id).one_or_none()
+
+    # cascade delete subscriteria attached to scriteria
+    for subcriteria in criteria.subcriteria:
+        delete_subcriteria_from_criteria(subcriteria_id=subcriteria.subcriteria_id, criteria_id=criteria.criteria_id)
+
+    db.session.delete(criteria)
+    round.criteria.reorder()
+    db.session.commit()
+
+
+def delete_subcriteria_from_criteria(subcriteria_id, criteria_id):
+    criteria = db.session.query(Criteria).where(Criteria.criteria_id == criteria_id).one_or_none()
+    subcriteria = db.session.query(Subcriteria).where(Subcriteria.subcriteria_id == subcriteria_id).one_or_none()
+
+    # cascade delete themes attached to subscriteria
+    for theme in subcriteria.themes:
+        delete_theme_from_subcriteria(theme_id=theme.theme_id, subcriteria_id=subcriteria_id)
+
+    db.session.delete(subcriteria)
+    criteria.subcriteria.reorder()
+    db.session.commit()
+
+
+def delete_theme_from_subcriteria(theme_id, subcriteria_id):
+    subcriteria = db.session.query(Subcriteria).where(Subcriteria.subcriteria_id == subcriteria_id).one_or_none()
+    theme = db.session.query(Theme).where(Theme.theme_id == theme_id).one_or_none()
+
+    # detach components from theme
+    for component in theme.components:
+        delete_component_from_theme(component_id=component.component_id, theme_id=theme.theme_id)
+
+    db.session.delete(theme)
+    subcriteria.themes.reorder()
+    db.session.commit()
+
+
+def delete_component_from_theme(component_id, theme_id):
+    theme = get_theme_by_id(theme_id=theme_id)
+    component = get_component_by_id(component_id=component_id)
+    component.theme_id = None
+    component.theme_index = None
+    theme.components.reorder()
+
     db.session.commit()
 
 
@@ -741,6 +920,72 @@ def move_form_up(section_id, form_index_to_move_up: int):
     list_index_to_move_up = form_index_to_move_up - 1  # Need the 0-based index inside the list
 
     section.forms = swap_elements_in_list(section.forms, list_index_to_move_up, list_index_to_move_up - 1)
+    db.session.commit()
+
+
+def move_component_up(theme_id, index_to_move_up: int):
+    theme: Theme = get_theme_by_id(theme_id)
+    list_index_to_move_up = index_to_move_up - 1  # Need the 0-based index inside the list
+
+    theme.components = swap_elements_in_list(theme.components, list_index_to_move_up, list_index_to_move_up - 1)
+    db.session.commit()
+
+
+def move_component_down(theme_id, index_to_move_down: int):
+    theme: Theme = get_theme_by_id(theme_id)
+    list_index_to_move_down = index_to_move_down - 1  # Need the 0-based index inside the list
+
+    theme.components = swap_elements_in_list(theme.components, list_index_to_move_down, list_index_to_move_down + 1)
+    db.session.commit()
+
+
+def move_theme_up(subcriteria_id, index_to_move_up: int):
+    subcriteria: Subcriteria = get_subcriteria_by_id(subcriteria_id)
+    list_index_to_move_up = index_to_move_up - 1  # Need the 0-based index inside the list
+
+    subcriteria.themes = swap_elements_in_list(subcriteria.themes, list_index_to_move_up, list_index_to_move_up - 1)
+    db.session.commit()
+
+
+def move_theme_down(subcriteria_id, index_to_move_down: int):
+    subcriteria: Subcriteria = get_subcriteria_by_id(subcriteria_id)
+    list_index_to_move_down = index_to_move_down - 1  # Need the 0-based index inside the list
+
+    subcriteria.themes = swap_elements_in_list(subcriteria.themes, list_index_to_move_down, list_index_to_move_down + 1)
+    db.session.commit()
+
+
+def move_subcriteria_up(criteria_id, index_to_move_up: int):
+    criteria: Criteria = get_criteria_by_id(criteria_id)
+    list_index_to_move_up = index_to_move_up - 1  # Need the 0-based index inside the list
+
+    criteria.subcriteria = swap_elements_in_list(criteria.subcriteria, list_index_to_move_up, list_index_to_move_up - 1)
+    db.session.commit()
+
+
+def move_subcriteria_down(criteria_id, index_to_move_down: int):
+    criteria: Criteria = get_criteria_by_id(criteria_id)
+    list_index_to_move_down = index_to_move_down - 1  # Need the 0-based index inside the list
+
+    criteria.subcriteria = swap_elements_in_list(
+        criteria.subcriteria, list_index_to_move_down, list_index_to_move_down + 1
+    )
+    db.session.commit()
+
+
+def move_criteria_up(round_id, index_to_move_up: int):
+    round: Round = get_round_by_id(round_id)
+    list_index_to_move_up = index_to_move_up - 1  # Need the 0-based index inside the list
+
+    round.criteria = swap_elements_in_list(round.criteria, list_index_to_move_up, list_index_to_move_up - 1)
+    db.session.commit()
+
+
+def move_criteria_down(round_id, index_to_move_down: int):
+    round: Round = get_round_by_id(round_id)
+    list_index_to_move_down = index_to_move_down - 1  # Need the 0-based index inside the list
+
+    round.criteria = swap_elements_in_list(round.criteria, list_index_to_move_down, list_index_to_move_down + 1)
     db.session.commit()
 
 

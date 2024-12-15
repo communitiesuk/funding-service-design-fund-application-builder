@@ -22,15 +22,17 @@
     "classes": "govuk-button--secondary"
     })
     }}
-    <ul class="app-task-list__items">
-        {{ govukButton({
-                "text": "Add Section",
-                "href": url_for("build_fund_bp.section", round_id=round.round_id) ,
-        "classes": "govuk-button--secondary"
+    <h1 class="govuk-heading-l">Application</h1>
+    {{
+        govukButton({
+            "text": "Add Section",
+            "href": url_for("build_fund_bp.section", round_id=round.round_id) ,
+            "classes": "govuk-button--secondary"
         })
-        }}
+    }}
+    <ul class="app-task-list__items">
         {% for section in round.sections %}
-        <li class="">
+            <li class="">
                 <span class="app-task-list__task-name">
                     <h3 class="govuk-heading-m">{{ section.index }}. {{ section.name_in_apply_json["en"] }}</h3>
                 </span>
@@ -58,6 +60,71 @@
                                 <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.preview_form", form_id=form.form_id) }}'>Preview</a>&nbsp;
                             </span>
                         </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+    <h1 id="assessment" class="govuk-heading-l">Assessment</h1>
+    {{
+        govukButton({
+            "text": "Add Criteria",
+            "href": url_for("build_fund_bp.criteria", round_id=round.round_id) ,
+            "classes": "govuk-button--secondary"
+        })
+    }}
+    <ul class="app-task-list__items">
+        {% for criteria in round.criteria %}
+            <li>
+                <span class="app-task-list__task-name">
+                    <h3 class="govuk-heading-m">
+                        <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.criteria", round_id=round.round_id, criteria_id=criteria.criteria_id) }}'>
+                            {{ criteria.index }}. {{ criteria.name }}
+                        </a>
+                    </h3>
+                </span>
+                <span class="app-task-list__task-actions">
+                    <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.criteria", round_id=round.round_id, criteria_id=criteria.criteria_id, action="remove") }}'>Remove</a>&nbsp;
+                    {% if criteria.index > 1 %}
+                        <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.criteria", round_id=round.round_id, index=criteria.index, action="move_up") }}'>Move up</a>&nbsp;
+                    {% endif %}
+                    {% if criteria.index < round.criteria | length %}
+                        <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.criteria", round_id=round.round_id, index=criteria.index, action="move_down") }}'> Move down</a>
+                    {% endif %}
+                </span>
+                <ul class="app-task-list__items">
+                    {% for subcriteria in criteria.subcriteria %}
+                        <li class="app-task-list__item task-list__new-design">
+                            <span class="app-task-list__task-name">
+                                <h3 class="govuk-body">
+                                    <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.subcriteria", criteria_id=criteria.criteria_id, subcriteria_id=subcriteria.subcriteria_id) }}'>
+                                        <b>{{ criteria.index }}.&nbsp;{{ subcriteria.criteria_index }}.&nbsp;{{ subcriteria.name }}</b>
+                                    </a>
+                                </h3>
+                            </span>
+                        </li>
+                        {% for theme in subcriteria.themes %}
+                            <li class="app-task-list__item task-list__new-design">
+                                <span class="app-task-list__task-name">
+                                    <h3 class="govuk-body">
+                                        <a class="" href='{{ url_for("build_fund_bp.theme", theme_id=theme.theme_id, subcriteria_id=subcriteria.subcriteria_id) }}'>
+                                            {{ criteria.index }}.&nbsp;{{ subcriteria.criteria_index }}.&nbsp;{{ theme.subcriteria_index }}.&nbsp;{{ theme.name }}
+                                        </a>
+                                    </h3>
+                                </span>
+                            </li>
+                            {% for component in theme.components %}
+                                <li class="app-task-list__item task-list__new-design">
+                                    <span class="app-task-list__task-name">
+                                        <h3 class="govuk-body">
+                                            {{ criteria.index }}.&nbsp;{{ subcriteria.criteria_index }}.&nbsp;{{ theme.subcriteria_index }}.&nbsp;{{ component.theme_index }}.&nbsp;
+                                            {{ component.runner_component_name }}&nbsp;-&nbsp;
+                                            {{ (component.title[:50] + '...') if component.title and component.title|length > 50 else component.title }}
+                                        </h3>
+                                    </span>
+                                </li>
+                            {% endfor %}
+                        {% endfor %}
                     {% endfor %}
                 </ul>
             </li>

@@ -38,6 +38,7 @@ class Round(BaseModel):
         ForeignKey("fund.fund_id"),
         nullable=False,
     )
+    fund = relationship("Fund", back_populates="rounds")
     title_json = Column(JSON(none_as_null=True), nullable=False, unique=False)
     short_name = Column(db.String(), nullable=False, unique=False)
     opens = Column(DateTime())
@@ -57,7 +58,12 @@ class Round(BaseModel):
         collection_class=ordering_list("index", count_from=1),
         passive_deletes="all",
     )
-    criteria: Mapped[list["Criteria"]] = relationship("Criteria")
+    criteria: Mapped[list["Criteria"]] = relationship(
+        "Criteria",
+        order_by="Criteria.index",
+        collection_class=ordering_list("index", count_from=1),
+        passive_deletes="all",
+    )
     # several other fields to add
     application_reminder_sent = Column(Boolean, default=False, nullable=False)
     contact_us_banner_json = Column(JSON(none_as_null=True), nullable=True, unique=False)
