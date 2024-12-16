@@ -46,7 +46,7 @@ force_single_line = "true"
 dev = [
     "beautifulsoup4==4.12.3",
     "black==24.8.0",
-    "debugpy==1.8.2",
+    "debugpy==1.8.9",
     "djlint==1.34.1",
     "flake8-pyproject==1.2.3",
     "flake8==7.1.1",
