@@ -254,49 +254,41 @@ def fund(fund_id=None):
     else:
         form = FundForm()
 
-    error = {}
     if form.validate_on_submit():
-        is_short_name_available = False
-        if form.data and form.data['short_name']:
-            fund_data = get_fund_by_short_name(form.data['short_name'])
-            is_short_name_available = fund_data and str(fund_data.fund_id) != fund_id
-        if not is_short_name_available:
-            if fund_id:
-                fund.name_json["en"] = form.name_en.data
-                fund.name_json["cy"] = form.name_cy.data
-                fund.title_json["en"] = form.title_en.data
-                fund.title_json["cy"] = form.title_cy.data
-                fund.description_json["en"] = form.description_en.data
-                fund.description_json["cy"] = form.description_cy.data
-                fund.welsh_available = form.welsh_available.data == "true"
-                fund.short_name = form.short_name.data
-                fund.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
-                fund.funding_type = form.funding_type.data
-                fund.ggis_scheme_reference_number = (
-                    form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
-                )
-                update_fund(fund)
-                flash(f"Updated fund {form.title_en.data}")
-                return redirect(url_for("build_fund_bp.view_fund", fund_id=fund.fund_id))
-
-            new_fund = Fund(
-                name_json={"en": form.name_en.data},
-                title_json={"en": form.title_en.data},
-                description_json={"en": form.description_en.data},
-                welsh_available=form.welsh_available.data == "true",
-                short_name=form.short_name.data,
-                audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-                funding_type=FundingType(form.funding_type.data),
-                ggis_scheme_reference_number=(
-                    form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
-                ),
+        if fund_id:
+            fund.name_json["en"] = form.name_en.data
+            fund.name_json["cy"] = form.name_cy.data
+            fund.title_json["en"] = form.title_en.data
+            fund.title_json["cy"] = form.title_cy.data
+            fund.description_json["en"] = form.description_en.data
+            fund.description_json["cy"] = form.description_cy.data
+            fund.welsh_available = form.welsh_available.data == "true"
+            fund.short_name = form.short_name.data
+            fund.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
+            fund.funding_type = form.funding_type.data
+            fund.ggis_scheme_reference_number = (
+                form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
             )
-            add_fund(new_fund)
-            flash(f"Created fund {form.name_en.data}")
-            return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
-        error = {**error,
-                 'short_name': [f'Given fund short name already exists.']}
-    error = error_formatter(form.errors, error)
+            update_fund(fund)
+            flash(f"Updated fund {form.title_en.data}")
+            return redirect(url_for("build_fund_bp.view_fund", fund_id=fund.fund_id))
+
+        new_fund = Fund(
+            name_json={"en": form.name_en.data},
+            title_json={"en": form.title_en.data},
+            description_json={"en": form.description_en.data},
+            welsh_available=form.welsh_available.data == "true",
+            short_name=form.short_name.data,
+            audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+            funding_type=FundingType(form.funding_type.data),
+            ggis_scheme_reference_number=(
+                form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
+            ),
+        )
+        add_fund(new_fund)
+        flash(f"Created fund {form.name_en.data}")
+        return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
+    error = error_formatter(form.errors)
     return render_template("fund.html", form=form, fund_id=fund_id, error=error)
 
 
@@ -310,30 +302,20 @@ def round(round_id=None):
     form = RoundForm()
     params = {"all_funds": all_funds_as_govuk_select_items(get_all_funds())}
     params["selected_fund_id"] = request.form.get("fund_id", None)
-    error = {}
     if round_id:
         round = get_round_by_id(round_id)
         form = populate_form_with_round_data(round)
     if form.validate_on_submit():
-        is_short_name_available = False
-        if form.data and form.data['short_name'] and form.data['fund_id']:
-            rond_data = get_round_by_short_name_and_fund_id(form.data['fund_id'],
-                                                            form.data['short_name'])
-            is_short_name_available = rond_data and str(rond_data.round_id) != round_id
-        if not is_short_name_available:
-            if round_id:
-                update_existing_round(round, form)
-                flash(f"Updated round {round.title_json['en']}")
-                return redirect(url_for("build_fund_bp.view_fund", fund_id=round.fund_id))
-            create_new_round(form)
-            flash(f"Created round {form.title_en.data}")
-            return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
-        fund = get_fund_by_id(form.data['fund_id'])
-        error = {**error,
-                 'short_name': [f'Given short name already exists in the fund {fund.title_json.get("en")}.']}
+        if round_id:
+            update_existing_round(round, form)
+            flash(f"Updated round {round.title_json['en']}")
+            return redirect(url_for("build_fund_bp.view_fund", fund_id=round.fund_id))
+        create_new_round(form)
+        flash(f"Created round {form.title_en.data}")
+        return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
     params["round_id"] = round_id
     params["form"] = form
-    error = error_formatter(params["form"].errors, error)
+    error = error_formatter(params["form"].errors)
     return render_template("round.html", **params, error=error)
 
 
@@ -358,6 +340,7 @@ def populate_form_with_round_data(round):
     """
     round_data = {
         "fund_id": round.fund_id,
+        "round_id": round.round_id,
         "title_en": round.title_json.get("en", ""),
         "title_cy": round.title_json.get("cy", ""),
         "short_name": round.short_name,

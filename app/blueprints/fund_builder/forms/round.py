@@ -14,6 +14,8 @@ from wtforms.validators import DataRequired
 from wtforms.validators import Length
 from wtforms.validators import ValidationError
 
+from app.db.queries.fund import get_fund_by_id
+from app.db.queries.round import get_round_by_short_name_and_fund_id
 from app.shared.helpers import no_spaces_between_letters
 
 
@@ -56,6 +58,14 @@ def validate_flexible_url(form, field):
 
     if not re.match(pattern, field.data, re.IGNORECASE):
         raise ValidationError("Invalid URL. Please enter a valid web address.")
+
+
+def validate_unique_round_short_name(form, field):
+    if form.data and field.data and form.data.get('fund_id'):
+        rond_data = get_round_by_short_name_and_fund_id(form.data.get('fund_id'), field.data)
+        if rond_data and str(rond_data.round_id) != form.data.get('round_id'):
+            fund_data = get_fund_by_id(form.data.get('fund_id'))
+            raise ValidationError(f'Given short name already exists in the fund {fund_data.title_json.get("en")}.')
 
 
 def get_datetime(form_field):
@@ -128,7 +138,7 @@ class RoundForm(FlaskForm):
     short_name = StringField(
         "Short name",
         description="Choose a unique short name with 6 or fewer characters",
-        validators=[DataRequired(), Length(max=6), no_spaces_between_letters],
+        validators=[DataRequired(), Length(max=6), no_spaces_between_letters, validate_unique_round_short_name],
     )
     opens = FormField(DateInputForm, label="Opens")
     deadline = FormField(DateInputForm, label="Deadline")
