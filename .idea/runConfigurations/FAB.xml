@@ -5,12 +5,14 @@
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
     <envs>
+      <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="AUTHENTICATOR_HOST" value="https://authenticator.levellingup.gov.localhost:4004" />
       <env name="DATABASE_URL" value="postgresql://postgres:password@localhost:5432/fab_store" />
       <env name="FLASK_DEBUG" value="0" />
       <env name="FLASK_ENV" value="development" />
       <env name="FORM_RUNNER_EXTERNAL_HOST" value="http://localhost:3009" />
       <env name="FORM_RUNNER_INTERNAL_HOST" value="http://localhost:3009" />
-      <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="RSA256_PUBLIC_KEY_BASE64" value="&quot;LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZU1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTUFEQ0JpQUtCZ0hHYnRGMXlWR1crckNBRk9JZGFrVVZ3Q2Z1dgp4SEUzOGxFL2kwS1dwTXdkU0haRkZMWW5IakJWT09oMTVFaWl6WXphNEZUSlRNdkwyRTRRckxwcVlqNktFNnR2CkhyaHlQL041ZnlwU3p0OHZDajlzcFo4KzBrRnVjVzl6eU1rUHVEaXNZdG1rV0dkeEJta2QzZ3RZcDNtT0k1M1YKVkRnS2J0b0lGVTNzSWs1TkFnTUJBQUU9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==&quot;" />
       <env name="SECRET_KEY" value="local" />
     </envs>
     <option name="SDK_HOME" value="" />
@@ -21,7 +23,7 @@
     <option name="ADD_SOURCE_ROOTS" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="flask" />
-    <option name="PARAMETERS" value="run --port 3020 --cert=$PROJECT_DIR$/../../../../fund_projects/funding-service-design-docker-runner/certs/cert.pem --key=$PROJECT_DIR$/../../../../fund_projects/funding-service-design-docker-runner/certs/key.pem" />
+    <option name="PARAMETERS" value="run --port 3011 --cert=$PROJECT_DIR$/../../certs/cert.pem --key=$PROJECT_DIR$/../../certs/key.pem" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="true" />
