@@ -43,15 +43,15 @@ def get_all_pages_in_parent_form(db, page_id):
 
 # This formatter will read all the errors and then convert them to the required format to support error-summary display
 def error_formatter(form):
-    errorsList = []
+    errors_list = []
     for field, error_messages in form.errors.items():
         field_name = getattr(form, field).label.text
         if isinstance(error_messages, list):
-            errorsList.extend({"text": f"{field_name}: {err}", "href": f"#{field}"} for err in error_messages)
+            errors_list.extend({"text": f"{field_name}: {err}", "href": f"#{field}"} for err in error_messages)
         elif isinstance(error_messages, dict) and any(error_messages.get(k) for k in ["day", "month", "years", "hour", "minute"]):
-            errorsList.append({"text": f"{field_name}: Enter valid datetime", "href": f"#{field}"})
-    if errorsList:
-        return {"titleText": "There is a problem", "errorList": errorsList}
+            errors_list.append({"text": f"{field_name}: Enter valid datetime", "href": f"#{field}"})
+    if errors_list:
+        return {"titleText": "There is a problem", "errorList": errors_list}
     return None
 
 

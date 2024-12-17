@@ -196,17 +196,24 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
         "guidance_url": "http://example.com/guidance",
     }
 
+    error_html = '<a href="#short_name">Short name: Given short name already exists in the fund funding to improve testing.</a>'
+
+    # Test works fine with first round
     response = submit_form(flask_test_client, "/round", new_round_data)
     assert response.status_code == 200
+    assert error_html not in response.data.decode('utf-8'), "Error HTML found in response"
+
+    # Test works fine with second round but with different short name
     new_round_data = {**new_round_data, 'short_name': 'NR1234'}
     response = submit_form(flask_test_client, "/round", new_round_data)
     assert response.status_code == 200
+    assert error_html not in response.data.decode('utf-8'), "Error HTML found in response"
+
+    # Test doesn't work with third round with same short name as firsrt
     new_round_data = {**new_round_data, 'short_name': 'NR123'}
     response = submit_form(flask_test_client, "/round", new_round_data)
     assert response.status_code == 200
-    html = response.data.decode('utf-8')
-    assert  '<a href="#short_name">Short name: Given short name already exists in the fund funding to improve testing.</a>' in html, "Not having the fund round short name already exists error"
-
+    assert error_html in response.data.decode('utf-8'), "Error HTML not found in response"
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_new_round(flask_test_client, seed_dynamic_data):
