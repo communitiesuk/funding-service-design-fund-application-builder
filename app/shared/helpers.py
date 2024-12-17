@@ -43,21 +43,17 @@ def get_all_pages_in_parent_form(db, page_id):
 
 # This formatter will read all the errors and then convert them to the required format to support error-summary display
 def error_formatter(form):
-    errors = form.errors
-    error = None
-    if errors:
-        errorsList = []
-        for field, errors in errors.items():
-            field_name = getattr(form, field).label.text
-            if isinstance(errors, list):
-                errorsList.extend([{"text": f"{field_name}: {err}", "href": f"#{field}"} for err in errors])
-            elif isinstance(errors, dict):
-                # Check if any of the datetime fields have errors
-                if any(len(errors.get(key, "")) > 0 for key in ["day", "month", "years", "hour", "minute"]):
-                    errorsList.append({"text": f"{field_name}: Enter valid datetime", "href": f"#{field}"})
-        if errorsList:
-            error = {"titleText": "There is a problem", "errorList": errorsList}
-    return error
+    errorsList = []
+    for field, error_messages in form.errors.items():
+        field_name = getattr(form, field).label.text
+        if isinstance(error_messages, list):
+            errorsList.extend({"text": f"{field_name}: {err}", "href": f"#{field}"} for err in error_messages)
+        elif isinstance(error_messages, dict) and any(error_messages.get(k) for k in ["day", "month", "years", "hour", "minute"]):
+            errorsList.append({"text": f"{field_name}: Enter valid datetime", "href": f"#{field}"})
+    if errorsList:
+        return {"titleText": "There is a problem", "errorList": errorsList}
+    return None
+
 
 
 # Custom validator to check for spaces between letters

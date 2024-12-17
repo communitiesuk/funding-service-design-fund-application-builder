@@ -110,7 +110,7 @@ def test_create_fund_with_existing_short_name(flask_test_client):
     response = submit_form(flask_test_client, "/fund", create_data)
     assert response.status_code == 200
     html = response.data.decode('utf-8')
-    assert  '<a href="#short_name">Given fund short name already exists.</a>' in html, "Not having the fund short name already exists error"
+    assert  '<a href="#short_name">Short name: Given fund short name already exists.</a>' in html, "Not having the fund short name already exists error"
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
@@ -205,7 +205,7 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
     response = submit_form(flask_test_client, "/round", new_round_data)
     assert response.status_code == 200
     html = response.data.decode('utf-8')
-    assert  '<a href="#short_name">Given short name already exists in the fund funding to improve testing.</a>' in html, "Not having the fund round short name already exists error"
+    assert  '<a href="#short_name">Short name: Given short name already exists in the fund funding to improve testing.</a>' in html, "Not having the fund round short name already exists error"
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
