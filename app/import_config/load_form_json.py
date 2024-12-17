@@ -289,7 +289,7 @@ def insert_form_as_template(form, template_name=None, filename=None):
             "is_template": True,
             "audit_info": None,
             "section_index": None,
-            "runner_publish_name": human_to_kebab_case(filename).lower(),
+            "runner_publish_name": human_to_kebab_case(filename.split(".")[0]).lower(),
             "source_template_id": None,
             "form_json": form,
         }
