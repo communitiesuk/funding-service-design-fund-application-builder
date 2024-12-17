@@ -475,9 +475,7 @@ def configure_forms_in_theme(theme_id):
         if request.args.get("action") == "move_down":
             move_component_down(theme_id=theme_id, index_to_move_down=int(request.args.get("index")))
 
-        return redirect(
-            url_for("build_fund_bp.theme", subcriteria_id=theme.subcriteria_id, theme_id=theme_id) + "#components"
-        )
+        return redirect(url_for("build_fund_bp.theme", subcriteria_id=theme.subcriteria_id, theme_id=theme_id))
 
     # if request.method == "POST":
     template_id = request.form.get("template_id")

@@ -10,6 +10,7 @@ from app.db.models import FormSection
 from app.db.models import Lizt
 from app.db.models import Page
 from app.db.models import Section
+from app.db.models.application_config import ComponentType
 from app.db.models.assessment_config import Criteria
 from app.db.models.assessment_config import Subcriteria
 from app.db.models.assessment_config import Theme
@@ -187,6 +188,9 @@ def assign_components_to_theme(form_id: str, theme: Theme):
     components = list(chain.from_iterable([page.components for page in form.pages]))
     for component in components:
         if component.theme_id is not None:
+            continue
+
+        if component.type in [ComponentType.PARA, ComponentType.HTML]:
             continue
 
         component.theme_id = theme.theme_id
