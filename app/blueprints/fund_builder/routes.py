@@ -40,11 +40,11 @@ from app.db.queries.application import move_form_up
 from app.db.queries.application import move_section_down
 from app.db.queries.application import move_section_up
 from app.db.queries.application import update_section
-from app.db.queries.fund import add_fund, get_fund_by_short_name
+from app.db.queries.fund import add_fund
 from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.fund import update_fund
-from app.db.queries.round import add_round, get_round_by_short_name_and_fund_id
+from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
 from app.db.queries.round import update_round
 from app.export_config.generate_all_questions import print_html
@@ -288,6 +288,7 @@ def fund(fund_id=None):
         add_fund(new_fund)
         flash(f"Created fund {form.name_en.data}")
         return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
+
     error = error_formatter(form)
     return render_template("fund.html", form=form, fund_id=fund_id, error=error)
 
@@ -302,9 +303,11 @@ def round(round_id=None):
     form = RoundForm()
     params = {"all_funds": all_funds_as_govuk_select_items(get_all_funds())}
     params["selected_fund_id"] = request.form.get("fund_id", None)
+
     if round_id:
         round = get_round_by_id(round_id)
         form = populate_form_with_round_data(round)
+
     if form.validate_on_submit():
         if round_id:
             update_existing_round(round, form)
@@ -313,8 +316,10 @@ def round(round_id=None):
         create_new_round(form)
         flash(f"Created round {form.title_en.data}")
         return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
+
     params["round_id"] = round_id
     params["form"] = form
+
     error = error_formatter(params["form"])
     return render_template("round.html", **params, error=error)
 
@@ -395,19 +400,19 @@ def populate_form_with_round_data(round):
         "is_feedback_survey_optional": (
             "true"
             if round.feedback_survey_config
-               and round.feedback_survey_config.get("is_feedback_survey_optional", "") == "true"
+            and round.feedback_survey_config.get("is_feedback_survey_optional", "") == "true"
             else "false"
         ),
         "is_section_feedback_optional": (
             "true"
             if round.feedback_survey_config
-               and round.feedback_survey_config.get("is_section_feedback_optional", "") == "true"
+            and round.feedback_survey_config.get("is_section_feedback_optional", "") == "true"
             else "false"
         ),
         "is_research_survey_optional": (
             "true"
             if round.feedback_survey_config
-               and round.feedback_survey_config.get("is_research_survey_optional", "") == "true"
+            and round.feedback_survey_config.get("is_research_survey_optional", "") == "true"
             else "false"
         ),
         "eligibility_config": (
