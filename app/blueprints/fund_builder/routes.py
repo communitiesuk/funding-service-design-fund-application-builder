@@ -119,6 +119,7 @@ def criteria(round_id):
     round_obj = get_round_by_id(round_id)
     fund_obj = get_fund_by_id(round_obj.fund_id)
     form: CriteriaForm = CriteriaForm()
+    form.is_template.data = "false"
     form.round_id.data = round_id
     params = {
         "round_id": str(round_id),
@@ -147,6 +148,7 @@ def criteria(round_id):
                 {
                     "name": form.name.data,
                     "weighting": form.weighting.data,
+                    "is_template": False if form.is_template.data == "false" else True,
                 },
             )
         else:
@@ -155,6 +157,7 @@ def criteria(round_id):
                     "round_id": form.round_id.data,
                     "name": form.name.data,
                     "weighting": form.weighting.data,
+                    "is_template": False if form.is_template.data == "false" else True,
                     "index": max(len(round_obj.criteria) + 1, 1),
                 }
             )
@@ -166,6 +169,7 @@ def criteria(round_id):
         form.criteria_id.data = criteria_id
         form.name.data = existing_criteria.name
         form.weighting.data = existing_criteria.weighting
+        form.is_template.data = "true" if existing_criteria.is_template else "false"
         params["criteria"] = existing_criteria
 
     params["breadcrumb_items"] = [

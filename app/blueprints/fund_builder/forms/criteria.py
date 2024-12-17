@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
+from wtforms import RadioField
 from wtforms import StringField
 from wtforms.validators import DataRequired
 
@@ -9,3 +10,4 @@ class CriteriaForm(FlaskForm):
     criteria_id = HiddenField("Criteria ID")
     name = StringField("Name", validators=[DataRequired()])
     weighting = StringField("Weighting", validators=[DataRequired()])
+    is_template = RadioField("Is scored", choices=[("true", "Yes"), ("false", "No")], default="false")

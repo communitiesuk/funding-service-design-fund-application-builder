@@ -18,6 +18,7 @@
                     {{ form.hidden_tag() }}
                     {{ input(form.name) }}
                     {{ input(form.weighting) }}
+                    {{ yes_no(form.is_template) }}
                 </div>
                 {{ govukButton({"text": "Save"}) }}
             </form>
