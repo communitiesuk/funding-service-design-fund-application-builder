@@ -550,6 +550,25 @@ def delete_form_from_section(section_id, form_id, cascade: bool = False):
     db.session.commit()
 
 
+def delete_form(form_id, cascade: bool = False):
+    """Deletes a form. If cascade==True, cascades this delete down through the hierarchy to
+    pages within this form and then components on those pages. It DOES NOT update the section_index
+    property of remaining forms. If you want this functionality, call #delete_form_from_section() instead.
+
+    Args:
+        form_id (UUID): ID of the form to delete
+        cascade (bool, optional): Whether to cascade the delete down the hierarchy. Defaults to False.
+
+    """
+    form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
+    if cascade:
+        _delete_all_components_in_pages(page_ids=[p.page_id for p in form.pages])
+        _delete_all_pages_in_forms(form_ids=[form_id])
+    db.session.delete(form)
+    db.session.commit()
+    return form
+
+
 def delete_criteria_from_round(criteria_id, round_id):
     round = db.session.query(Round).where(Round.round_id == round_id).one_or_none()
     criteria = db.session.query(Criteria).where(Criteria.criteria_id == criteria_id).one_or_none()
@@ -597,25 +616,6 @@ def delete_component_from_theme(component_id, theme_id):
     theme.components.reorder()
 
     db.session.commit()
-
-
-def delete_form(form_id, cascade: bool = False):
-    """Deletes a form. If cascade==True, cascades this delete down through the hierarchy to
-    pages within this form and then components on those pages. It DOES NOT update the section_index
-    property of remaining forms. If you want this functionality, call #delete_form_from_section() instead.
-
-    Args:
-        form_id (UUID): ID of the form to delete
-        cascade (bool, optional): Whether to cascade the delete down the hierarchy. Defaults to False.
-
-    """
-    form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    if cascade:
-        _delete_all_components_in_pages(page_ids=[p.page_id for p in form.pages])
-        _delete_all_pages_in_forms(form_ids=[form_id])
-    db.session.delete(form)
-    db.session.commit()
-    return form
 
 
 # CRUD PAGE

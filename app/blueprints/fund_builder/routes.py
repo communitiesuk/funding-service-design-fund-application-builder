@@ -114,6 +114,88 @@ def dashboard():
     return render_template("index.html")
 
 
+@build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])
+def section(round_id):
+    round_obj = get_round_by_id(round_id)
+    fund_obj = get_fund_by_id(round_obj.fund_id)
+    form: SectionForm = SectionForm()
+    form.round_id.data = round_id
+    params = {
+        "round_id": str(round_id),
+    }
+    existing_section = None
+    # TODO there must be a better way than a pile of ifs...
+    if request.args.get("action") == "remove":
+        delete_section_from_round(round_id=round_id, section_id=request.args.get("section_id"), cascade=True)
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+    if request.args.get("action") == "move_up":
+        move_section_up(round_id=round_id, section_index_to_move_up=int(request.args.get("index")))
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+    if request.args.get("action") == "move_down":
+        move_section_down(round_id=round_id, section_index_to_move_down=int(request.args.get("index")))
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
+    if form.validate_on_submit():
+        count_existing_sections = len(round_obj.sections)
+        if form.section_id.data:
+            update_section(
+                form.section_id.data,
+                {
+                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
+                },
+            )
+        else:
+            insert_new_section(
+                {
+                    "round_id": form.round_id.data,
+                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
+                    "index": max(count_existing_sections + 1, 1),
+                }
+            )
+
+        # flash(f"Saved section {form.name_in_apply_en.data}")
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_obj.round_id))
+    if section_id := request.args.get("section_id"):
+        existing_section = get_section_by_id(section_id)
+        form.section_id.data = section_id
+        form.name_in_apply_en.data = existing_section.name_in_apply_json["en"]
+        params["forms_in_section"] = existing_section.forms
+        params["available_template_forms"] = [
+            {"text": f"{f.template_name} - {f.name_in_apply_json['en']}", "value": str(f.form_id)}
+            for f in get_all_template_forms()
+        ]
+
+    params["breadcrumb_items"] = [
+        {"text": "Home", "href": url_for(BUILD_FUND_BP_DASHBOARD)},
+        {"text": fund_obj.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund_obj.fund_id)},
+        {
+            "text": round_obj.title_json["en"],
+            "href": url_for("build_fund_bp.build_application", fund_id=fund_obj.fund_id, round_id=round_obj.round_id),
+        },
+        {"text": existing_section.name_in_apply_json["en"] if existing_section else "Add Section", "href": "#"},
+    ]
+    return render_template("section.html", form=form, **params)
+
+
+@build_fund_bp.route("/fund/round/<round_id>/section/<section_id>/forms", methods=["POST", "GET"])
+def configure_forms_in_section(round_id, section_id):
+    if request.method == "GET":
+        if request.args.get("action") == "remove":
+            form_id = request.args.get("form_id")
+            delete_form_from_section(section_id=section_id, form_id=form_id, cascade=True)
+        if request.args.get("action") == "move_up":
+            move_form_up(section_id=section_id, form_index_to_move_up=int(request.args.get("index")))
+        if request.args.get("action") == "move_down":
+            move_form_down(section_id=section_id, form_index_to_move_down=int(request.args.get("index")))
+
+    if request.method == "POST":
+        template_id = request.form.get("template_id")
+        section = get_section_by_id(section_id=section_id)
+        new_section_index = max(len(section.forms) + 1, 1)
+        clone_single_form(form_id=template_id, new_section_id=section_id, section_index=new_section_index)
+
+    return redirect(url_for("build_fund_bp.section", round_id=round_id, section_id=section_id))
+
+
 @build_fund_bp.route("/fund/round/<round_id>/criteria", methods=["GET", "POST"])
 def criteria(round_id):
     round_obj = get_round_by_id(round_id)
@@ -381,88 +463,6 @@ def theme(subcriteria_id):
     return render_template("theme.html", form=form, **params)
 
 
-@build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])
-def section(round_id):
-    round_obj = get_round_by_id(round_id)
-    fund_obj = get_fund_by_id(round_obj.fund_id)
-    form: SectionForm = SectionForm()
-    form.round_id.data = round_id
-    params = {
-        "round_id": str(round_id),
-    }
-    existing_section = None
-    # TODO there must be a better way than a pile of ifs...
-    if request.args.get("action") == "remove":
-        delete_section_from_round(round_id=round_id, section_id=request.args.get("section_id"), cascade=True)
-        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
-    if request.args.get("action") == "move_up":
-        move_section_up(round_id=round_id, section_index_to_move_up=int(request.args.get("index")))
-        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
-    if request.args.get("action") == "move_down":
-        move_section_down(round_id=round_id, section_index_to_move_down=int(request.args.get("index")))
-        return redirect(url_for("build_fund_bp.build_application", round_id=round_id))
-    if form.validate_on_submit():
-        count_existing_sections = len(round_obj.sections)
-        if form.section_id.data:
-            update_section(
-                form.section_id.data,
-                {
-                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
-                },
-            )
-        else:
-            insert_new_section(
-                {
-                    "round_id": form.round_id.data,
-                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
-                    "index": max(count_existing_sections + 1, 1),
-                }
-            )
-
-        # flash(f"Saved section {form.name_in_apply_en.data}")
-        return redirect(url_for("build_fund_bp.build_application", round_id=round_obj.round_id))
-    if section_id := request.args.get("section_id"):
-        existing_section = get_section_by_id(section_id)
-        form.section_id.data = section_id
-        form.name_in_apply_en.data = existing_section.name_in_apply_json["en"]
-        params["forms_in_section"] = existing_section.forms
-        params["available_template_forms"] = [
-            {"text": f"{f.template_name} - {f.name_in_apply_json['en']}", "value": str(f.form_id)}
-            for f in get_all_template_forms()
-        ]
-
-    params["breadcrumb_items"] = [
-        {"text": "Home", "href": url_for(BUILD_FUND_BP_DASHBOARD)},
-        {"text": fund_obj.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund_obj.fund_id)},
-        {
-            "text": round_obj.title_json["en"],
-            "href": url_for("build_fund_bp.build_application", fund_id=fund_obj.fund_id, round_id=round_obj.round_id),
-        },
-        {"text": existing_section.name_in_apply_json["en"] if existing_section else "Add Section", "href": "#"},
-    ]
-    return render_template("section.html", form=form, **params)
-
-
-@build_fund_bp.route("/fund/round/<round_id>/section/<section_id>/forms", methods=["POST", "GET"])
-def configure_forms_in_section(round_id, section_id):
-    if request.method == "GET":
-        if request.args.get("action") == "remove":
-            form_id = request.args.get("form_id")
-            delete_form_from_section(section_id=section_id, form_id=form_id, cascade=True)
-        if request.args.get("action") == "move_up":
-            move_form_up(section_id=section_id, form_index_to_move_up=int(request.args.get("index")))
-        if request.args.get("action") == "move_down":
-            move_form_down(section_id=section_id, form_index_to_move_down=int(request.args.get("index")))
-
-    if request.method == "POST":
-        template_id = request.form.get("template_id")
-        section = get_section_by_id(section_id=section_id)
-        new_section_index = max(len(section.forms) + 1, 1)
-        clone_single_form(form_id=template_id, new_section_id=section_id, section_index=new_section_index)
-
-    return redirect(url_for("build_fund_bp.section", round_id=round_id, section_id=section_id))
-
-
 @build_fund_bp.route("/theme/<theme_id>/forms", methods=["POST", "GET"])
 def configure_forms_in_theme(theme_id):
     theme = get_theme_by_id(theme_id=theme_id)
@@ -533,7 +533,9 @@ def build_application(round_id):
 @build_fund_bp.route("/fund/<fund_id>/round/<round_id>/clone")
 def clone_round(round_id, fund_id):
     cloned = clone_single_round(
-        round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0, 999)}"  # nosec B311
+        round_id=round_id,
+        new_fund_id=fund_id,
+        new_short_name=f"R-C{randint(0, 999)}",  # nosec B311
     )
     flash(f"Cloned new round: {cloned.short_name}")
 
