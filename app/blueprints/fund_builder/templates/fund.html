@@ -21,17 +21,16 @@
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <form method="POST">
-
                     {{ form.hidden_tag()}}
 
+                    {{yes_no(form.welsh_available)}}
                     {{input(form.name_en)}}
-                    {{input(form.name_cy)}}
+                    {{input(form.name_cy, classes="welsh-field")}}
                     {{input(form.title_en)}}
-                    {{input(form.title_cy)}}
+                    {{input(form.title_cy, classes="welsh-field")}}
                     {{input(form.short_name)}}
                     {{multilineinput(form.description_en)}}
-                    {{multilineinput(form.description_cy)}}
-                    {{yes_no(form.welsh_available)}}
+                    {{multilineinput(form.description_cy, classes="welsh-field")}}
                     {{radios_from_enum(form.funding_type)}}
                     {{input(form.ggis_scheme_reference_number)}}
                     <div class="govuk-!-margin-top-6">
@@ -44,4 +43,31 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleWelshFields() {
+    const welshAvailable = document.querySelector('input[name="welsh_available"]:checked').value;
+    const welshFields = document.querySelectorAll('.welsh-field');
+
+    welshFields.forEach(field => {
+        const fieldContainer = field.closest('.govuk-form-group');
+        if (welshAvailable === 'true') {
+            fieldContainer.style.display = 'block';
+        } else {
+            fieldContainer.style.display = 'none';
+        }
+    });
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleWelshFields();
+
+    // Add change event listeners to radio buttons
+    const radios = document.querySelectorAll('input[name="welsh_available"]');
+    radios.forEach(radio => {
+        radio.addEventListener('change', toggleWelshFields);
+    });
+});
+</script>
 {% endblock content %}

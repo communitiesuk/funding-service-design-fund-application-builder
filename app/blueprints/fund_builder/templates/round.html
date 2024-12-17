@@ -12,12 +12,10 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         {% if error %}
-            {{
-            govukErrorSummary({
+            {{ govukErrorSummary({
                 "titleText": error.titleText,
                 "errorList": error.errorList
-            })
-            }}
+            }) }}
         {% endif %}
         <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
         <div class="govuk-form-group">
@@ -29,17 +27,17 @@
                             "id": form.fund_id.id,
                             "name": form.fund_id.name,
                             "label": {
-                            "text": form.fund_id.label
+                                "text": form.fund_id.label
                             },
                             "items": all_funds,
-                            "value":selected_fund_id,
+                            "value": selected_fund_id,
                             "errorMessage": {
                                 "text": form.fund_id.errors[0] if form.fund_id.errors else ""
                             } if form.fund_id.errors else None
                         })}}
                     {% endif %}
                     {{input(form.title_en)}}
-                    {{input(form.title_cy)}}
+                    {{input(form.title_cy, classes="welsh-field")}}
                     {{input(form.short_name)}}
                     {{dateinput(form.opens)}}
                     {{dateinput(form.deadline)}}
@@ -49,7 +47,7 @@
                     {{input(form.prospectus_link)}}
                     {{input(form.privacy_notice_link)}}
                     {{ multilineinput(form.contact_us_banner_en) }}
-                    {{ multilineinput(form.contact_us_banner_cy) }}
+                    {{ multilineinput(form.contact_us_banner_cy, classes="welsh-field") }}
                     {{ yes_no(form.reference_contact_page_over_email) }}
                     {{ input(form.contact_email) }}
                     {{ input(form.contact_phone) }}
@@ -57,11 +55,11 @@
                     {{ input(form.support_times) }}
                     {{ input(form.support_days) }}
                     {{ multilineinput(form.instructions_en) }}
-                    {{ multilineinput(form.instructions_cy) }}
+                    {{ multilineinput(form.instructions_cy, classes="welsh-field") }}
                     {{input(form.feedback_link)}}
                     {{ input(form.project_name_field_id) }}
                     {{ multilineinput(form.application_guidance_en) }}
-                    {{ multilineinput(form.application_guidance_cy) }}
+                    {{ multilineinput(form.application_guidance_cy, classes="welsh-field") }}
                     {{ input(form.guidance_url) }}
                     {{ yes_no(form.application_fields_download_available) }}
                     {{ yes_no(form.display_logo_on_pdf_exports) }}
@@ -75,13 +73,42 @@
                     {{ yes_no(form.is_research_survey_optional) }}
                     {{ yes_no(form.eligibility_config) }}
                     {{ multilineinput(form.eoi_decision_schema_en) }}
-                    {{ multilineinput(form.eoi_decision_schema_cy) }}
+                    {{ multilineinput(form.eoi_decision_schema_cy, classes="welsh-field") }}
                     {{ govukButton({
-                    "text": "Save"
+                        "text": "Save"
                     }) }}
                 </form>
             </fieldset>
         </div>
     </div>
 </div>
+
+<script>
+// Store Welsh availability mapping passed from the route handler
+const welshAvailability = {{ welsh_availability | safe }};
+
+function toggleWelshFields() {
+    const fundSelect = document.querySelector('#fund_id');
+    const isWelshAvailable = welshAvailability[fundSelect.value];
+    const welshFields = document.querySelectorAll('.welsh-field');
+
+    welshFields.forEach(field => {
+        const fieldContainer = field.closest('.govuk-form-group');
+        if (isWelshAvailable) {
+            fieldContainer.style.display = 'block';
+        } else {
+            fieldContainer.style.display = 'none';
+        }
+    });
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleWelshFields();
+
+    // Add change event listener to fund select
+    const fundSelect = document.querySelector('#fund_id');
+    fundSelect.addEventListener('change', toggleWelshFields);
+});
+</script>
 {% endblock content %}
