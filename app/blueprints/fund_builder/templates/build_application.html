@@ -73,6 +73,13 @@
             "classes": "govuk-button--secondary"
         })
     }}
+    {{
+        govukButton({
+            "text": "Auto-generate",
+            "href": url_for("build_fund_bp.auto_generate_assessment_config", round_id=round.round_id) ,
+            "classes": "govuk-button--secondary"
+        })
+    }}
     <ul class="app-task-list__items">
         {% for criteria in round.criteria %}
             <li>

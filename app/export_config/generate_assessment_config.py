@@ -215,13 +215,10 @@ def generate_assessment_config_for_round(round_config, base_output_dir):
     round_id = round_config["id"]
     round = db.session.query(Round).filter(Round.round_id == round_id).one_or_none()
 
-    unscored_criteria = ["unscored", "declarations"]
     unscored = []
     scored = []
     for criteria in round.criteria:
         criteria_slug_name = human_to_kebab_case(criteria.name)
-        is_unscored = criteria_slug_name in unscored_criteria
-
         export_subcrieria = []
         for subcriteria in criteria.subcriteria:
             export_theme = []
@@ -260,10 +257,10 @@ def generate_assessment_config_for_round(round_config, base_output_dir):
             "sub_criteria": export_subcrieria,
         }
 
-        if is_unscored:
-            unscored.append(export_crieria)
-        else:
+        if criteria.is_template:
             scored.append(export_crieria)
+        else:
+            unscored.append(export_crieria)
 
     helpers.write_config(unscored, "unscored", round.short_name, "assessment", base_output_dir)
     helpers.write_config(scored, "scored", round.short_name, "assessment", base_output_dir)

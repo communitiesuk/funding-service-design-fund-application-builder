@@ -484,6 +484,49 @@ def configure_forms_in_theme(theme_id):
     return redirect(url_for("build_fund_bp.theme", subcriteria_id=theme.subcriteria_id, theme_id=theme_id))
 
 
+@build_fund_bp.route("/fund/round/<round_id>/auto-generate-assessment-config", methods=["POST", "GET"])
+def auto_generate_assessment_config(round_id):
+    round_obj = get_round_by_id(round_id)
+
+    if len(round_obj.criteria) > 0:
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id) + "#assessment")
+
+    # Create Unscored criteria - add all to it
+    unscored_criteria = insert_new_criteria(
+        {
+            "round_id": round_obj.round_id,
+            "name": "Unscored",
+            "weighting": 0.5,
+            "is_template": False,
+            "index": 1,
+        }
+    )
+
+    for section in round_obj.sections:
+        subcriteria = insert_new_subcriteria(
+            {
+                "criteria_id": unscored_criteria.criteria_id,
+                "name": section.name_in_apply_json["en"],
+                "criteria_index": max(len(unscored_criteria.subcriteria) + 1, 1),
+            }
+        )
+
+        for form in section.forms:
+            theme = insert_new_theme(
+                {
+                    "subcriteria_id": subcriteria.subcriteria_id,
+                    "name": form.name_in_apply_json["en"],
+                    "subcriteria_index": max(len(subcriteria.themes) + 1, 1),
+                }
+            )
+
+            assign_components_to_theme(form.source_template_id, theme)
+
+
+    return redirect(url_for("build_fund_bp.build_application", round_id=round_id) + "#assessment")
+
+
+
 def all_funds_as_govuk_select_items(all_funds: list) -> list:
     """
     Reformats a list of funds into a list of display/value items that can be passed to a govUk select macro
