@@ -128,20 +128,17 @@ def criteria(round_id):
     if request.args.get("action") == "remove":
         delete_criteria_from_round(criteria_id=request.args.get("criteria_id"), round_id=round_id)
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id) + "#assessment")
 
     if request.args.get("action") == "move_up":
         move_criteria_up(round_id=round_id, index_to_move_up=int(request.args.get("index")))
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id) + "#assessment")
 
     if request.args.get("action") == "move_down":
         move_criteria_down(round_id=round_id, index_to_move_down=int(request.args.get("index")))
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id) + "#assessment")
 
     if form.validate_on_submit():
         if form.criteria_id.data:
@@ -162,8 +159,7 @@ def criteria(round_id):
                 }
             )
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(url_for("build_fund_bp.build_application", round_id=round_id) + "#assessment")
 
     if criteria_id := request.args.get("criteria_id"):
         existing_criteria = get_criteria_by_id(criteria_id)
@@ -207,20 +203,23 @@ def subcriteria(criteria_id):
     if request.args.get("action") == "remove":
         delete_subcriteria_from_criteria(subcriteria_id=request.args.get("subcriteria_id"), criteria_id=criteria_id)
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(
+            url_for("build_fund_bp.criteria", round_id=criteria.round_id, criteria_id=criteria_id) + "#subcriteria"
+        )
 
     if request.args.get("action") == "move_up":
         move_subcriteria_up(criteria_id=criteria_id, index_to_move_up=int(request.args.get("index")))
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(
+            url_for("build_fund_bp.criteria", round_id=criteria.round_id, criteria_id=criteria_id) + "#subcriteria"
+        )
 
     if request.args.get("action") == "move_down":
         move_subcriteria_down(criteria_id=criteria_id, index_to_move_down=int(request.args.get("index")))
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(
+            url_for("build_fund_bp.criteria", round_id=criteria.round_id, criteria_id=criteria_id) + "#subcriteria"
+        )
 
     if form.validate_on_submit():
         if form.subcriteria_id.data:
@@ -237,8 +236,7 @@ def subcriteria(criteria_id):
                 }
             )
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(url_for("build_fund_bp.criteria", round_id=criteria.round_id, criteria_id=criteria_id))
 
     if subcriteria_id := request.args.get("subcriteria_id"):
         existing_subcriteria = get_subcriteria_by_id(subcriteria_id)
@@ -287,20 +285,26 @@ def theme(subcriteria_id):
     if request.args.get("action") == "remove":
         delete_theme_from_subcriteria(theme_id=request.args.get("theme_id"), subcriteria_id=subcriteria_id)
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(
+            url_for("build_fund_bp.subcriteria", criteria_id=subcriteria.criteria_id, subcriteria_id=subcriteria_id)
+            + "#themes"
+        )
 
     if request.args.get("action") == "move_up":
         move_theme_up(subcriteria_id=subcriteria_id, index_to_move_up=int(request.args.get("index")))
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(
+            url_for("build_fund_bp.subcriteria", criteria_id=subcriteria.criteria_id, subcriteria_id=subcriteria_id)
+            + "#themes"
+        )
 
     if request.args.get("action") == "move_down":
         move_theme_down(subcriteria_id=subcriteria_id, index_to_move_down=int(request.args.get("index")))
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(
+            url_for("build_fund_bp.subcriteria", criteria_id=subcriteria.criteria_id, subcriteria_id=subcriteria_id)
+            + "#themes"
+        )
 
     if form.validate_on_submit():
         if form.theme_id.data:
@@ -317,8 +321,9 @@ def theme(subcriteria_id):
                 }
             )
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(
+            url_for("build_fund_bp.subcriteria", criteria_id=subcriteria.criteria_id, subcriteria_id=subcriteria_id)
+        )
 
     if theme_id := request.args.get("theme_id"):
         existing_theme = get_theme_by_id(theme_id)
@@ -466,8 +471,9 @@ def configure_forms_in_theme(theme_id):
         if request.args.get("action") == "move_down":
             move_component_down(theme_id=theme_id, index_to_move_down=int(request.args.get("index")))
 
-        # send them where they came from
-        return redirect(request.referrer)
+        return redirect(
+            url_for("build_fund_bp.theme", subcriteria_id=theme.subcriteria_id, theme_id=theme_id) + "#components"
+        )
 
     # if request.method == "POST":
     template_id = request.form.get("template_id")
