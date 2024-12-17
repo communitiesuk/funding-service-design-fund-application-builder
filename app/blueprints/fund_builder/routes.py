@@ -345,6 +345,7 @@ def populate_form_with_round_data(round):
     """
     round_data = {
         "fund_id": round.fund_id,
+        "round_id": round.round_id,
         "title_en": round.title_json.get("en", ""),
         "title_cy": round.title_json.get("cy", ""),
         "short_name": round.short_name,

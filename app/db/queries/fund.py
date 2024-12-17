@@ -35,3 +35,7 @@ def get_fund_by_id(id: str) -> Fund:
     if not fund:
         raise ValueError(f"Fund with id {id} not found")
     return fund
+
+
+def get_fund_by_short_name(short_name: str) -> Fund:
+    return db.session.query(Fund).filter_by(short_name=short_name).first()

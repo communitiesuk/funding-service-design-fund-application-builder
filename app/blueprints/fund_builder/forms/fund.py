@@ -5,11 +5,19 @@ from wtforms import HiddenField
 from wtforms import RadioField
 from wtforms import StringField
 from wtforms import TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 from wtforms.validators import Length
 
 from app.db.models.fund import FundingType
+from app.db.queries.fund import get_fund_by_short_name
 from app.shared.helpers import no_spaces_between_letters
+
+
+def validate_unique_fund_short_name(form, field):
+    if field.data and form.data:
+        fund_data = get_fund_by_short_name(field.data)
+        if fund_data and str(fund_data.fund_id) != form.data.get('fund_id'):
+            raise ValidationError('Given fund short name already exists.')
 
 
 class GovUkRadioEnumField(RadioField):
@@ -37,7 +45,8 @@ class FundForm(FlaskForm):
     name_cy = StringField("Name (Welsh)", description="Leave blank for English-only funds")
     title_en = StringField("Title (English)", validators=[DataRequired()])
     title_cy = StringField("Title (Welsh)", description="Leave blank for English-only funds")
-    short_name = StringField("Short name", validators=[DataRequired(), Length(max=10), no_spaces_between_letters])
+    short_name = StringField("Short name", validators=[DataRequired(), Length(max=10), no_spaces_between_letters,
+                                                       validate_unique_fund_short_name])
     description_en = TextAreaField("Description", validators=[DataRequired()])
     description_cy = TextAreaField("Description (Welsh)", description="Leave blank for English-only funds")
     welsh_available = RadioField("Welsh available", choices=[("true", "Yes"), ("false", "No")], default="false")
