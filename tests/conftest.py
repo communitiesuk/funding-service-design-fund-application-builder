@@ -43,6 +43,23 @@ def seed_dynamic_data(request, app, clear_test_data, _db, enable_preserve_test_d
     _db.session.commit()
 
 
+@pytest.fixture(scope="function")
+def clean_db(app, _db):
+    """Ensures a clean database before each test runs"""
+    with app.app_context():
+        # Rollback any existing transactions
+        _db.session.rollback()
+        # Disable foreign key constraints
+        _db.session.execute(text("SET session_replication_role = replica"))
+        # Clear all tables
+        for table in reversed(_db.metadata.sorted_tables):
+            _db.session.execute(table.delete())
+        # Re-enable foreign key constraints
+        _db.session.execute(text("SET session_replication_role = DEFAULT"))
+        _db.session.commit()
+    yield _db
+
+
 @pytest.fixture(scope="session")
 def app():
     app = create_app()
