@@ -25,7 +25,7 @@
     {% if form.subcriteria_id.data %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                <h3 class="govuk-heading-m">Themes of this subcriteria</h3>
+                <h3 id="themes" class="govuk-heading-m">Themes of this subcriteria</h3>
                 {{
                     govukButton({
                         "text": "Add Themes",
@@ -37,10 +37,13 @@
                     {% for theme in subcriteria.themes %}
                         <li>
                             <span class="app-task-list__task-name">
-                                <h3 class="govuk-heading-m">{{ subcriteria.criteria.index }}.&nbsp;{{ subcriteria.criteria_index }}.&nbsp;{{ theme.subcriteria_index }}.&nbsp;{{ theme.name }}</h3>
+                                <h3 class="govuk-heading-m">
+                                    <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.theme", theme_id=theme.theme_id, subcriteria_id=subcriteria.subcriteria_id) }}'>
+                                        {{ subcriteria.criteria.index }}.&nbsp;{{ subcriteria.criteria_index }}.&nbsp;{{ theme.subcriteria_index }}.&nbsp;{{ theme.name }}
+                                    </a>
+                                </h3>
                             </span>
                             <span class="app-task-list__task-actions">
-                                <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.theme", theme_id=theme.theme_id, subcriteria_id=subcriteria.subcriteria_id) }}'>Edit</a>&nbsp;
                                 <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.theme", theme_id=theme.theme_id, subcriteria_id=subcriteria.subcriteria_id, action="remove") }}'>Remove</a>&nbsp;
                                 {% if theme.subcriteria_index > 1 %}
                                     <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.theme", subcriteria_id=subcriteria.subcriteria_id, index=theme.subcriteria_index, action="move_up") }}'>Move up</a>&nbsp;
@@ -58,15 +61,6 @@
                                                 {{ component.runner_component_name }}&nbsp;-&nbsp;
                                                 {{ (component.title[:50] + '...') if component.title and component.title|length > 50 else component.title }}
                                             </h3>
-                                        </span>
-                                        <span class="app-task-list__task-actions">
-                                            <a class="govuk-link--no-visited-state" href="{{ url_for('build_fund_bp.configure_forms_in_theme', component_id=component.component_id, theme_id=theme.theme_id, action='remove') }}">Remove</a>&nbsp;
-                                            {% if component.theme_index > 1 %}
-                                                <a class="govuk-link--no-visited-state" href="{{ url_for('build_fund_bp.configure_forms_in_theme', theme_id=theme.theme_id, index=component.theme_index, action='move_up') }}">Move up</a>&nbsp;
-                                            {% endif %}
-                                            {% if component.theme_index < theme.components | length %}
-                                                <a class="govuk-link--no-visited-state" href="{{ url_for('build_fund_bp.configure_forms_in_theme', theme_id=theme.theme_id, index=component.theme_index, action='move_down') }}"> Move down</a>
-                                            {% endif %}
                                         </span>
                                     </li>
                                 {% endfor %}
