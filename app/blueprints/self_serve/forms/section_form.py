@@ -1,12 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import IntegerField
-from wtforms import SelectMultipleField
-from wtforms import StringField
+from wtforms import IntegerField, SelectMultipleField, StringField
 from wtforms.validators import InputRequired
 
 
 class SectionForm(FlaskForm):
-
     id = StringField(
         label="Section ID",
         validators=[InputRequired(message="Supply a unique ID")],

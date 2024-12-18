@@ -1,12 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import HiddenField
-from wtforms import SelectMultipleField
-from wtforms import StringField
+from wtforms import HiddenField, SelectMultipleField, StringField
 from wtforms.validators import InputRequired
 
 
 class FormForm(FlaskForm):
-
     id = HiddenField()
     builder_display_name = StringField(
         label="Display Name in this tool",

@@ -2,8 +2,7 @@ from flask import current_app
 from sqlalchemy import select
 
 from app.db import db
-from app.db.models.fund import Fund
-from app.db.models.fund import Organisation
+from app.db.models.fund import Fund, Organisation
 
 
 def add_organisation(organisation: Organisation) -> Organisation:

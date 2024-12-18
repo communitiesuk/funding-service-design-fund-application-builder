@@ -4,14 +4,10 @@ from enum import Enum
 from typing import List
 
 from flask_sqlalchemy.model import DefaultMeta
-from sqlalchemy import Column
-from sqlalchemy import ForeignKey
-from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, ForeignKey
+from sqlalchemy.dialects.postgresql import ENUM, JSON, UUID
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.types import Boolean
 
 from app.db import db

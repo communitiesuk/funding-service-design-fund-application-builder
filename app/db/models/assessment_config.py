@@ -3,15 +3,9 @@ from dataclasses import dataclass
 from typing import List
 
 from flask_sqlalchemy.model import DefaultMeta
-from sqlalchemy import Column
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.dialects.postgresql import REAL
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.dialects.postgresql import JSON, REAL, UUID
+from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.types import Boolean
 
 from app.db import db

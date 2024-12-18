@@ -1,8 +1,5 @@
-from dataclasses import asdict
-from dataclasses import dataclass
-from dataclasses import field
-from typing import Dict
-from typing import Optional
+from dataclasses import asdict, dataclass, field
+from typing import Dict, Optional
 
 from app.db.models.fund import FundingType
 

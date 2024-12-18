@@ -3,22 +3,21 @@ from uuid import uuid4
 import pytest
 
 from app.blueprints.fund_builder.routes import clone_single_round
-from app.db.models import Component
-from app.db.models import ComponentType
-from app.db.models import Page
-from app.db.models.application_config import Form
-from app.db.models.application_config import Section
+from app.db.models import Component, ComponentType, Page
+from app.db.models.application_config import Form, Section
 from app.db.models.round import Round
-from app.db.queries.application import _fix_cloned_default_pages
-from app.db.queries.application import _initiate_cloned_component
-from app.db.queries.application import _initiate_cloned_form
-from app.db.queries.application import _initiate_cloned_page
-from app.db.queries.application import _initiate_cloned_section
-from app.db.queries.application import clone_multiple_components
-from app.db.queries.application import clone_single_component
-from app.db.queries.application import clone_single_form
-from app.db.queries.application import clone_single_page
-from app.db.queries.application import clone_single_section
+from app.db.queries.application import (
+    _fix_cloned_default_pages,
+    _initiate_cloned_component,
+    _initiate_cloned_form,
+    _initiate_cloned_page,
+    _initiate_cloned_section,
+    clone_multiple_components,
+    clone_single_component,
+    clone_single_form,
+    clone_single_page,
+    clone_single_section,
+)
 
 
 @pytest.fixture
@@ -280,7 +279,6 @@ def test_clone_multiple_components(seed_dynamic_data, _db):
     }
 )
 def test_clone_page_no_components(seed_dynamic_data, _db):
-
     old_id = seed_dynamic_data["pages"][0].page_id
 
     # check initial page exists
@@ -306,7 +304,6 @@ page_id = uuid4()
 
 
 def test_fix_clone_default_pages():
-
     original_pages = [
         Page(page_id=uuid4(), is_template=True),
         Page(page_id=uuid4(), is_template=True),
@@ -398,7 +395,6 @@ def test_fix_clone_default_pages():
     }
 )
 def test_clone_page_with_components(seed_dynamic_data, _db):
-
     old_page_id = seed_dynamic_data["pages"][0].page_id
     old_component_ids = [str(c.component_id) for c in seed_dynamic_data["components"]]
 
@@ -828,21 +824,21 @@ def test_clone_round(seed_dynamic_data, _db):
 
     # assert cloned sections are different (ids)
     assert len(cloned_sections) == len(old_section_ids)
-    assert all([s.section_id != old_id for s, old_id in zip(cloned_sections, old_section_ids)])
+    assert all([s.section_id != old_id for s, old_id in zip(cloned_sections, old_section_ids, strict=False)])
 
     # assert cloned forms are different (ids)
     assert len(cloned_forms) == len(old_form_ids)
-    assert all([f.form_id != old_id for f, old_id in zip(cloned_forms, old_form_ids)])
+    assert all([f.form_id != old_id for f, old_id in zip(cloned_forms, old_form_ids, strict=False)])
 
     # assert cloned pages are different (ids)
     assert len(cloned_pages) == len(old_page_ids)
-    assert all([p.page_id != old_id for p, old_id in zip(cloned_pages, old_page_ids)])
+    assert all([p.page_id != old_id for p, old_id in zip(cloned_pages, old_page_ids, strict=False)])
     for p in cloned_pages:
         assert p.default_next_page_id not in old_page_ids
 
     # assert cloned components are different (ids)
     cloned_components = _db.session.query(Component).filter(Component.page_id.in_(cloned_page_ids)).all()
-    assert all([c.component_id != old_id for c, old_id in zip(cloned_components, old_component_ids)])
+    assert all([c.component_id != old_id for c, old_id in zip(cloned_components, old_component_ids, strict=False)])
 
     # Check cloned round has a different base path
     old_round = _db.session.query(Round).where(Round.round_id == round_id).one()

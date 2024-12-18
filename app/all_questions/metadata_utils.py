@@ -2,15 +2,16 @@ import copy
 import fnmatch
 from typing import Tuple
 
-from bs4 import BeautifulSoup
-from bs4 import NavigableString
+from bs4 import BeautifulSoup, NavigableString
 
-from app.all_questions.read_forms import build_section_header
-from app.all_questions.read_forms import determine_display_value_for_condition
-from app.all_questions.read_forms import determine_if_just_html_page
-from app.all_questions.read_forms import increment_lowest_in_hierarchy
-from app.all_questions.read_forms import remove_lowest_in_hierarchy
-from app.all_questions.read_forms import strip_leading_numbers
+from app.all_questions.read_forms import (
+    build_section_header,
+    determine_display_value_for_condition,
+    determine_if_just_html_page,
+    increment_lowest_in_hierarchy,
+    remove_lowest_in_hierarchy,
+    strip_leading_numbers,
+)
 
 FIELD_TYPES_WITH_MAX_WORDS = ["freetextfield", "multilinetextfield"]
 
@@ -249,7 +250,7 @@ def update_wording_for_multi_input_fields(text: list) -> list:
 def determine_title_and_text_for_component(
     component: dict,
     include_html_components: bool = True,
-    form_lists: list = [],
+    form_lists: list = None,
     is_child: bool = False,
 ) -> Tuple[str, list]:
     """Determines the title and text to display for an individual component.
@@ -265,6 +266,8 @@ def determine_title_and_text_for_component(
     Returns:
         Tuple[str, list]: First item is the title, second is the text to display
     """
+    if form_lists is None:
+        form_lists = []
     title: str = component["title"] if "title" in component else None
     text = []
     # skip details, eg about-your-org-cyp GNpQfE
@@ -319,9 +322,9 @@ def determine_title_and_text_for_component(
 def build_components_from_page(
     full_page_json: dict,
     include_html_components: bool = True,
-    form_lists: list = [],
-    form_conditions: list = [],
-    index_of_printed_headers: dict = {},
+    form_lists: list = None,
+    form_conditions: list = None,
+    index_of_printed_headers: dict = None,
     lang: str = "en",
 ) -> list:
     """Builds a list of the components to display from this page, including their title and text, and
@@ -348,6 +351,12 @@ def build_components_from_page(
             ```
     """
     # Find out which components in this page determine, through conditions, where we go next
+    if index_of_printed_headers is None:
+        index_of_printed_headers = {}
+    if form_conditions is None:
+        form_conditions = []
+    if form_lists is None:
+        form_lists = []
     components_with_conditions = []
     for condition in form_conditions:
         components_with_conditions.extend([value["field"]["name"] for value in condition["value"]["conditions"]])

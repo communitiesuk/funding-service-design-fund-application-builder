@@ -1,13 +1,11 @@
-from unittest.mock import MagicMock
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from flask import current_app
 from wtforms.validators import ValidationError
 
 from app.blueprints.fund_builder.forms.round import validate_json_field
-from app.db.models import Fund
-from app.db.models import Round
+from app.db.models import Fund, Round
 from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
@@ -340,7 +338,6 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
 
 @pytest.mark.parametrize("input_json_string", [(None), (""), ("{}"), (""), ("{}"), ('{"1":"2"}')])
 def test_validate_json_input_valid(input_json_string):
-
     field = MagicMock()
     field.data = input_json_string
     validate_json_field(None, field)
@@ -354,7 +351,6 @@ def test_validate_json_input_valid(input_json_string):
     ],
 )
 def test_validate_json_input_invalid(input_json_string, exp_error_msg):
-
     field = MagicMock()
     field.data = input_json_string
     with pytest.raises(ValidationError) as error:

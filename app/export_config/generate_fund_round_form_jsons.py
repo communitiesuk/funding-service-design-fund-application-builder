@@ -5,8 +5,7 @@ from flask import current_app
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_form import build_form_json
-from app.export_config.helpers import validate_json
-from app.export_config.helpers import write_config
+from app.export_config.helpers import validate_json, write_config
 
 form_schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",

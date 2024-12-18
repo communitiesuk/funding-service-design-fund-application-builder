@@ -7,46 +7,43 @@ from datetime import datetime
 from random import randint
 
 import requests
-from flask import Blueprint
-from flask import Response
-from flask import after_this_request
-from flask import flash
-from flask import g
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import send_file
-from flask import url_for
+from flask import (
+    Blueprint,
+    Response,
+    after_this_request,
+    flash,
+    g,
+    redirect,
+    render_template,
+    request,
+    send_file,
+    url_for,
+)
 from fsd_utils.authentication.decorators import login_requested
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.fund_builder.forms.fund import FundForm
-from app.blueprints.fund_builder.forms.round import RoundForm
-from app.blueprints.fund_builder.forms.round import get_datetime
+from app.blueprints.fund_builder.forms.round import RoundForm, get_datetime
 from app.blueprints.fund_builder.forms.section import SectionForm
-from app.db.models.fund import Fund
-from app.db.models.fund import FundingType
+from app.db.models.fund import Fund, FundingType
 from app.db.models.round import Round
-from app.db.queries.application import clone_single_form
-from app.db.queries.application import clone_single_round
-from app.db.queries.application import delete_form_from_section
-from app.db.queries.application import delete_section_from_round
-from app.db.queries.application import get_all_template_forms
-from app.db.queries.application import get_form_by_id
-from app.db.queries.application import get_section_by_id
-from app.db.queries.application import insert_new_section
-from app.db.queries.application import move_form_down
-from app.db.queries.application import move_form_up
-from app.db.queries.application import move_section_down
-from app.db.queries.application import move_section_up
-from app.db.queries.application import update_section
-from app.db.queries.fund import add_fund
-from app.db.queries.fund import get_all_funds
-from app.db.queries.fund import get_fund_by_id
-from app.db.queries.fund import update_fund
-from app.db.queries.round import add_round
-from app.db.queries.round import get_round_by_id
-from app.db.queries.round import update_round
+from app.db.queries.application import (
+    clone_single_form,
+    clone_single_round,
+    delete_form_from_section,
+    delete_section_from_round,
+    get_all_template_forms,
+    get_form_by_id,
+    get_section_by_id,
+    insert_new_section,
+    move_form_down,
+    move_form_up,
+    move_section_down,
+    move_section_up,
+    update_section,
+)
+from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
+from app.db.queries.round import add_round, get_round_by_id, update_round
 from app.export_config.generate_all_questions import print_html
 from app.export_config.generate_assessment_config import (
     generate_assessment_config_for_round,
@@ -220,7 +217,9 @@ def build_application(round_id):
 @build_fund_bp.route("/fund/<fund_id>/round/<round_id>/clone")
 def clone_round(round_id, fund_id):
     cloned = clone_single_round(
-        round_id=round_id, new_fund_id=fund_id, new_short_name=f"R-C{randint(0, 999)}"  # nosec B311
+        round_id=round_id,
+        new_fund_id=fund_id,
+        new_short_name=f"R-C{randint(0, 999)}",  # nosec B311
     )
     flash(f"Cloned new round: {cloned.short_name}")
 

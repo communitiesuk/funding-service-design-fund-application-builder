@@ -5,23 +5,21 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.db.models import ComponentType
-from app.db.models.application_config import Component
-from app.db.models.application_config import Form
-from app.db.models.application_config import Lizt
-from app.db.models.application_config import Page
-from app.db.models.application_config import Section
-from app.db.queries.application import delete_component
-from app.db.queries.application import delete_form
-from app.db.queries.application import delete_page
-from app.db.queries.application import delete_section
-from app.db.queries.application import insert_new_component
-from app.db.queries.application import insert_new_form
-from app.db.queries.application import insert_new_page
-from app.db.queries.application import insert_new_section
-from app.db.queries.application import update_component
-from app.db.queries.application import update_form
-from app.db.queries.application import update_page
-from app.db.queries.application import update_section
+from app.db.models.application_config import Component, Form, Lizt, Page, Section
+from app.db.queries.application import (
+    delete_component,
+    delete_form,
+    delete_page,
+    delete_section,
+    insert_new_component,
+    insert_new_form,
+    insert_new_page,
+    insert_new_section,
+    update_component,
+    update_form,
+    update_page,
+    update_section,
+)
 
 new_template_section_config = {
     "round_id": uuid.uuid4(),
@@ -302,7 +300,6 @@ new_template_page_config = {
 
 
 def test_insert_new_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-
     new_form_config["section_id"] = None
     new_form = insert_new_form(new_form_config)
 

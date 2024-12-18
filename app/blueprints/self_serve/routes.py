@@ -1,23 +1,19 @@
 import json
 import os
 
-from flask import Blueprint
-from flask import Response
-from flask import flash
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import url_for
+from flask import Blueprint, Response, flash, redirect, render_template, request, url_for
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
-from app.blueprints.self_serve.data.data_access import get_all_components
-from app.blueprints.self_serve.data.data_access import get_component_by_name
-from app.blueprints.self_serve.data.data_access import get_pages_to_display_in_builder
-from app.blueprints.self_serve.data.data_access import get_saved_forms
-from app.blueprints.self_serve.data.data_access import save_template_component
-from app.blueprints.self_serve.data.data_access import save_template_form
-from app.blueprints.self_serve.data.data_access import save_template_page
-from app.blueprints.self_serve.data.data_access import save_template_section
+from app.blueprints.self_serve.data.data_access import (
+    get_all_components,
+    get_component_by_name,
+    get_pages_to_display_in_builder,
+    get_saved_forms,
+    save_template_component,
+    save_template_form,
+    save_template_page,
+    save_template_section,
+)
 from app.blueprints.self_serve.forms.form_form import FormForm
 from app.blueprints.self_serve.forms.page_form import PageForm
 from app.blueprints.self_serve.forms.question_form import QuestionForm

@@ -1,6 +1,5 @@
 import re
-from dataclasses import asdict
-from dataclasses import is_dataclass
+from dataclasses import asdict, is_dataclass
 
 from wtforms.validators import ValidationError
 
@@ -53,7 +52,6 @@ def error_formatter(form):
     if errors_list:
         return {"titleText": "There is a problem", "errorList": errors_list}
     return None
-
 
 
 # Custom validator to check for spaces between letters

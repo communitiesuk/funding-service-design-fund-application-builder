@@ -1,12 +1,8 @@
 from enum import Enum
 
 from flask_wtf import FlaskForm
-from wtforms import HiddenField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms.validators import DataRequired, ValidationError
-from wtforms.validators import Length
+from wtforms import HiddenField, RadioField, StringField, TextAreaField
+from wtforms.validators import DataRequired, Length, ValidationError
 
 from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_short_name

@@ -12,8 +12,10 @@ from invoke import task  # noqa:E402
 from app import app  # noqa: E402
 from app.import_config.load_form_json import load_form_jsons  # noqa: E402
 
-from .test_data import init_salmon_fishing_fund  # noqa:E402
-from .test_data import insert_test_data  # noqa:E402
+from .test_data import (
+    init_salmon_fishing_fund,  # noqa:E402
+    insert_test_data,  # noqa:E402
+)
 
 
 @task
@@ -24,9 +26,7 @@ def recreate_local_dbs(c):
 
     """
 
-    from sqlalchemy_utils.functions import create_database
-    from sqlalchemy_utils.functions import database_exists
-    from sqlalchemy_utils.functions import drop_database
+    from sqlalchemy_utils.functions import create_database, database_exists, drop_database
 
     db_uri = getenv(
         "DATABASE_URL",
