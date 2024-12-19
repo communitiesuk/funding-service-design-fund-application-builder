@@ -87,3 +87,8 @@ def view_sections():
 def view_questions():
     forms = get_all_components()
     return forms
+
+
+@dev_bp.route("/test-sentry")
+def test_sentry():
+    raise Exception("This is a test exception for Sentry")  # NOSONAR
