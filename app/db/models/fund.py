@@ -6,6 +6,7 @@ from typing import List
 from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
+from sqlalchemy import inspect
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.dialects.postgresql import UUID
@@ -78,3 +79,6 @@ class Fund(BaseModel):
     owner_organisation: Mapped["Organisation"] = relationship("Organisation", back_populates="funds")
     funding_type = Column(ENUM(FundingType), nullable=False, unique=False)
     ggis_scheme_reference_number = Column("ggis_scheme_reference_number", db.String(255), nullable=True, unique=False)
+
+    def as_dict(self):
+        return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}
