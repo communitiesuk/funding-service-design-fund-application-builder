@@ -5,11 +5,11 @@ air = Airium()
 
 # Define start and end html
 BOILERPLATE_START = """
-{% extends "base.html" %}
+{% extends "apply/base.html" %}
 {%- from 'govuk_frontend_jinja/components/inset-text/macro.html' import govukInsetText -%}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 
-{% from "partials/file-formats.html" import file_formats %}
+{% from "apply/partials/file-formats.html" import file_formats %}
 {% set pageHeading %}{% trans %}Full list of application questions{% endtrans %}{% endset %}
 {% block content %}
 <div class="govuk-grid-row">

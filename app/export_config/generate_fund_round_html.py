@@ -8,11 +8,11 @@ from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import write_config
 
 frontend_html_prefix = """
-{% extends "base.html" %}
+{% extends "apply/base.html" %}
 {%- from 'govuk_frontend_jinja/components/inset-text/macro.html' import govukInsetText -%}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 
-{% from "partials/file-formats.html" import file_formats %}
+{% from "apply/partials/file-formats.html" import file_formats %}
 {% set pageHeading %}{% trans %}Full list of application questions{% endtrans %}{% endset %}
 {% block content %}
 <div class="govuk-grid-row">
@@ -70,4 +70,10 @@ def generate_all_round_html(round_id, base_output_dir=None):
     html_content = frontend_html_prefix
     html_content += print_html(print_data)
     html_content += frontend_html_suffix
-    write_config(html_content, f"{fund.short_name.casefold()}_{round.short_name.casefold()}", round.short_name, "html", base_output_dir)
+    write_config(
+        html_content,
+        f"{fund.short_name.casefold()}_{round.short_name.casefold()}",
+        round.short_name,
+        "html",
+        base_output_dir,
+    )
