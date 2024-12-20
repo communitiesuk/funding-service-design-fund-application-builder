@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% set pageHeading %}
+    {% if form.subcriteria_id.data %}Update{% else %}Create{% endif %}&nbsp;Theme
+{% endset %}
+
+{% from "macros/wtfToGovUk.html" import input %}
+{% from "macros/wtfToGovUk.html" import yes_no %}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+{%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
+            <form method="POST">
+                <div class="govuk-form-group">
+                    <h3 class="govuk-heading-m">Theme Name</h3>
+                    {{ form.hidden_tag() }}
+                    {{ input(form.name) }}
+                </div>
+                {{ govukButton({"text": "Save"}) }}
+            </form>
+        </div>
+    </div>
+    {% if form.theme_id.data %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <span class="app-task-list__task-name">
+                    <h3 class="govuk-heading-m">Components of this theme's forms</h3>
+                </span>
+                <ul class="app-task-list__items">
+                    {% for component in theme.components %}
+                        <li class="app-task-list__item task-list__new-design">
+                            <span class="app-task-list__task-name">
+                                <h3 class="govuk-body">
+                                    {{ theme.subcriteria.criteria.index }}.&nbsp;{{ theme.subcriteria_index }}.&nbsp;{{ component.theme_index }}.&nbsp;
+                                    {{ component.runner_component_name }}&nbsp;-&nbsp;
+                                    {{ (component.title[:50] + '...') if component.title and component.title|length > 50 else component.title }}
+                                </h3>
+                            </span>
+                            <span class="app-task-list__task-actions">
+                                <a class="govuk-link--no-visited-state" href="{{ url_for('build_fund_bp.configure_forms_in_theme', component_id=component.component_id, theme_id=form.theme_id.data, action='remove') }}">Remove</a>&nbsp;
+                                {% if component.theme_index > 1 %}
+                                    <a class="govuk-link--no-visited-state" href="{{ url_for('build_fund_bp.configure_forms_in_theme', theme_id=form.theme_id.data, index=component.theme_index, action='move_up') }}">Move up</a>&nbsp;
+                                {% endif %}
+                                {% if component.theme_index < theme.components | length %}
+                                    <a class="govuk-link--no-visited-state" href="{{ url_for('build_fund_bp.configure_forms_in_theme', theme_id=form.theme_id.data, index=component.theme_index, action='move_down') }}"> Move down</a>
+                                {% endif %}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <h3 class="govuk-heading-m">Add Form From Template</h3>
+                <form method="POST" action="{{ url_for('build_fund_bp.configure_forms_in_theme', theme_id=form.theme_id.data) }}">
+                    {{
+                        govukSelect({
+                            "id": "template_id",
+                            "name": "template_id",
+                            "label": {
+                                "text": "Create form from template"
+                            },
+                            "items": available_template_forms
+                        })
+                    }}
+                    {{ govukButton({"text": "Add"}) }}
+                </form>
+            </div>
+        </div>
+    {% endif %}
+{% endblock content %}
