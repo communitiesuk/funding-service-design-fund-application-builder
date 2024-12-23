@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import render_template
+from fsd_utils import init_sentry
 from fsd_utils.authentication.decorators import SupportedApp
 from fsd_utils.authentication.decorators import check_internal_user
 from fsd_utils.authentication.decorators import login_required
@@ -33,7 +34,7 @@ def protect_private_routes(flask_app: Flask) -> Flask:
 
 
 def create_app() -> Flask:
-
+    init_sentry()
     flask_app = Flask("__name__", static_url_path="/assets")
     flask_app.register_blueprint(self_serve_bp)
     flask_app.register_blueprint(dev_bp)
