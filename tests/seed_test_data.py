@@ -83,7 +83,7 @@ def init_salmon_fishing_fund():
         organisation_id=organisation_uuid,
         name="Department for Fishing",
         short_name="DF",
-        logo_uri="http://www.google.com",
+        logo_uri="http://www.google.com",  # NOSONAR
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
     )
 
@@ -95,7 +95,7 @@ def init_salmon_fishing_fund():
             "en": "A £10m fund to improve access to salmon fishing facilities across the devolved nations."
         },
         welsh_available=False,
-        short_name=f"SFF{randint(0,999)}",
+        short_name=f"SFF{randint(0,999)}",  # NOSONAR
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
         ggis_scheme_reference_number="G1-SCH-0000092414",
@@ -367,7 +367,7 @@ def init_unit_test_data() -> dict:
         organisation_id=organisation_uuid,
         name=f"Ministry of Testing - {str(organisation_uuid)[:5]}",
         short_name=f"MoT-{str(organisation_uuid)[:5]}",
-        logo_uri="http://www.google.com",
+        logo_uri="http://www.google.com",  # NOSONAR
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
     )
 
@@ -377,7 +377,7 @@ def init_unit_test_data() -> dict:
         title_json={"en": "funding to improve testing"},
         description_json={"en": "A £10m fund to improve testing across the devolved nations."},
         welsh_available=False,
-        short_name=f"UTF{randint(0,999)}",
+        short_name=f"UTF{randint(0,999)}",  # NOSONAR
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
         ggis_scheme_reference_number="G3-SCH-0000092414",
@@ -388,22 +388,22 @@ def init_unit_test_data() -> dict:
         fund_id=f.fund_id,
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
         title_json={"en": "round the first"},
-        short_name=f"UTR{randint(0,999)}",
+        short_name=f"UTR{randint(0,999)}",  # NOSONAR
         opens=datetime.now(),
         deadline=datetime.now(),
         assessment_start=datetime.now(),
         reminder_date=datetime.now(),
         assessment_deadline=datetime.now(),
-        prospectus_link="http://www.google.com",
-        privacy_notice_link="http://www.google.com",
+        prospectus_link="http://www.google.com",  # NOSONAR
+        privacy_notice_link="http://www.google.com",  # NOSONAR
         contact_email="test@test.com",
         contact_phone="0123334444",
         contact_textphone="0123334444",
         support_times="9am to 5pm",
         support_days="Monday to Friday",
-        feedback_link="http://www.google.com",
+        feedback_link="http://www.google.com",  # NOSONAR
         project_name_field_id="12312312312",
-        guidance_url="http://www.google.com",
+        guidance_url="http://www.google.com",  # NOSONAR
         feedback_survey_config={
             "has_feedback_survey": False,
             "has_section_feedback": False,
@@ -415,20 +415,6 @@ def init_unit_test_data() -> dict:
         eligibility_config={"has_eligibility": False},
         eoi_decision_schema={"en": {"valid": True}, "cy": {"valid": False}},
     )
-    # r2: Round = Round(
-    #     round_id=uuid4(),
-    #     fund_id=f.fund_id,
-    #     audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-    #     title_json={"en": "round the second"},
-    #     short_name=f"UTR{randint(0,999)}",
-    #     opens=datetime.now(),
-    #     deadline=datetime.now(),
-    #     assessment_start=datetime.now(),
-    #     reminder_date=datetime.now(),
-    #     assessment_deadline=datetime.now(),
-    #     prospectus_link="http://www.google.com",
-    #     privacy_notice_link="http://www.google.com",
-    # )
 
     s1: Section = Section(
         section_id=uuid4(), index=1, round_id=r.round_id, name_in_apply_json={"en": "Organisation Information"}

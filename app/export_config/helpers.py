@@ -1,4 +1,3 @@
-import json
 import os
 from string import Template
 
@@ -6,10 +5,16 @@ import jsonschema
 from flask import current_app
 from jsonschema import validate
 
-from app.blueprints.self_serve.routes import human_to_kebab_case
-from app.blueprints.self_serve.routes import human_to_snake_case
 from app.shared.helpers import convert_to_dict
 from config import Config
+
+
+def human_to_kebab_case(string: str) -> str | None:
+    return string.replace(" ", "-").strip().lower() if string else None
+
+
+def human_to_snake_case(string: str) -> str | None:
+    return string.replace(" ", "_").strip().lower() if string else None
 
 
 def write_config(config, filename, round_short_name, config_type, base_output_dir=None):
@@ -25,7 +30,7 @@ def write_config(config, filename, round_short_name, config_type, base_output_di
         # Ensure the filename ends with .json
         if not filename.endswith(".json"):
             if any(
-                    filename.endswith(ext) for ext in [".py", ".html", ".txt", ".csv"]
+                filename.endswith(ext) for ext in [".py", ".html", ".txt", ".csv"]
             ):  # Add other file types as needed
                 raise ValueError(f"Invalid file type for form_json: {filename}")
             filename = f"{filename}.json"

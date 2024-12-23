@@ -6,8 +6,8 @@ from sqlalchemy import text
 
 from app.create_app import create_app
 from config import Config
-from tasks.test_data import init_unit_test_data
-from tasks.test_data import insert_test_data
+from tests.seed_test_data import init_unit_test_data
+from tests.seed_test_data import insert_test_data
 
 pytest_plugins = ["fsd_test_utils.fixtures.db_fixtures"]
 

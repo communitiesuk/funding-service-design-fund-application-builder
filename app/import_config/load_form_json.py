@@ -9,7 +9,7 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from app.db.queries.application import insert_form_section
 from app.db.queries.application import insert_list
-from app.export_config.generate_form import human_to_kebab_case
+from app.export_config.helpers import human_to_kebab_case
 
 sys.path.insert(1, ".")
 from dataclasses import asdict  # noqa:E402

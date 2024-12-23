@@ -11,9 +11,7 @@ from jinja2 import ChoiceLoader
 from jinja2 import PackageLoader
 from jinja2 import PrefixLoader
 
-from app.blueprints.dev.routes import dev_bp
 from app.blueprints.fund_builder.routes import build_fund_bp
-from app.blueprints.self_serve.routes import self_serve_bp
 from app.blueprints.templates.routes import template_bp
 
 PUBLIC_ROUTES = [
@@ -36,8 +34,6 @@ def protect_private_routes(flask_app: Flask) -> Flask:
 def create_app() -> Flask:
     init_sentry()
     flask_app = Flask("__name__", static_url_path="/assets")
-    flask_app.register_blueprint(self_serve_bp)
-    flask_app.register_blueprint(dev_bp)
     flask_app.register_blueprint(build_fund_bp)
     flask_app.register_blueprint(template_bp)
 

@@ -1,5 +1,0 @@
-This folder contains the original demo/prototype version of the FAB tool (drag and drop to build up pages, forms, sections). It has not yet been updated to work withe DB entities, this will be the subject of a future ticket.
-
-Everything uses the data structures in the [data](/app/blueprints/self_serve/data/) folder.
-
-Some of the underlying functions (eg. generating form json) have been updated to work with the DB entities, so may not work entirely at the moment in the drag and drop interface.
