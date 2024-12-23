@@ -83,7 +83,7 @@ def login():
 
 @build_fund_bp.route("/dashboard", methods=["GET"])
 def dashboard():
-    return render_template("index.html")
+    return render_template("dashboard.html")
 
 
 @build_fund_bp.route("/fund/round/<round_id>/section", methods=["GET", "POST"])
