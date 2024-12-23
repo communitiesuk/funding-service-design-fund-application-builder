@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 
 
@@ -47,3 +49,25 @@ def test_dashboard_forbidden_for_external_user(flask_test_client):
     response = flask_test_client.get("/dashboard")
     assert response.status_code == 403
     assert b"You do not have permission to access this page" in response.data
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_internal_server_error(flask_test_client):
+    """
+    Tests that a 500 internal server error returns the custom 500 page.
+    """
+    # Temporarily disable exception propagation so the custom 500 handler is used
+    old_prop_setting = flask_test_client.application.config["PROPAGATE_EXCEPTIONS"]
+    flask_test_client.application.config["PROPAGATE_EXCEPTIONS"] = False
+
+    try:
+        with patch("app.blueprints.index.routes.get_form_by_id") as mock_get_form_by_id:
+            mock_get_form_by_id.side_effect = Exception("Trigger 500 error")
+            response = flask_test_client.get("/preview/9999")
+
+        assert response.status_code == 500
+        assert b"Sorry, there is a problem with the service" in response.data
+
+    finally:
+        # Restore the original setting
+        flask_test_client.application.config["PROPAGATE_EXCEPTIONS"] = old_prop_setting

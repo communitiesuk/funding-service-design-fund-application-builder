@@ -73,6 +73,10 @@ def create_app() -> Flask:
     def forbidden_error(error):
         return render_template("403.html"), 403
 
+    @flask_app.errorhandler(500)
+    def internal_server_error(e):
+        return render_template("500.html"), 500
+
     health = Healthcheck(flask_app)
     health.add_check(FlaskRunningChecker())
 
