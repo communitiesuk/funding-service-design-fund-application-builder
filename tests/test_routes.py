@@ -1,7 +1,6 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-from flask import current_app
 from wtforms.validators import ValidationError
 
 from app.blueprints.fund_builder.forms.round import validate_json_field
@@ -10,38 +9,6 @@ from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
-
-
-@pytest.fixture
-def set_auth_cookie(flask_test_client):
-    # This fixture sets the authentication cookie on every test.
-    user_token_cookie_name = current_app.config.get("FSD_USER_TOKEN_COOKIE_NAME", "fsd_user_token")
-    flask_test_client.set_cookie(key=user_token_cookie_name, value="dummy_jwt_token")
-    yield
-
-
-@pytest.fixture
-def patch_validate_token_rs256_internal_user():
-    # This fixture patches validate_token_rs256 for all tests automatically.
-    with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
-        mock_validate_token_rs256.return_value = {
-            "accountId": "test-account-id",
-            "roles": [],
-            "email": "test@communities.gov.uk",
-        }
-        yield mock_validate_token_rs256
-
-
-@pytest.fixture
-def patch_validate_token_rs256_external_user():
-    # This fixture patches validate_token_rs256 for all tests automatically.
-    with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
-        mock_validate_token_rs256.return_value = {
-            "accountId": "test-account-id",
-            "roles": [],
-            "email": "test@gmail.com",
-        }
-        yield mock_validate_token_rs256
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")

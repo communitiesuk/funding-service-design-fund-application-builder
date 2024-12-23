@@ -1,6 +1,8 @@
 import shutil
+from unittest.mock import patch
 
 import pytest
+from flask import current_app
 from flask_migrate import upgrade
 from sqlalchemy import text
 
@@ -71,3 +73,35 @@ def flask_test_client():
         upgrade()
         with app_context.app.test_client() as test_client:
             yield test_client
+
+
+@pytest.fixture
+def set_auth_cookie(flask_test_client):
+    # This fixture sets the authentication cookie on every test.
+    user_token_cookie_name = current_app.config.get("FSD_USER_TOKEN_COOKIE_NAME", "fsd_user_token")
+    flask_test_client.set_cookie(key=user_token_cookie_name, value="dummy_jwt_token")
+    yield
+
+
+@pytest.fixture
+def patch_validate_token_rs256_internal_user():
+    # This fixture patches validate_token_rs256 for all tests automatically.
+    with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
+        mock_validate_token_rs256.return_value = {
+            "accountId": "test-account-id",
+            "roles": [],
+            "email": "test@communities.gov.uk",
+        }
+        yield mock_validate_token_rs256
+
+
+@pytest.fixture
+def patch_validate_token_rs256_external_user():
+    # This fixture patches validate_token_rs256 for all tests automatically.
+    with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
+        mock_validate_token_rs256.return_value = {
+            "accountId": "test-account-id",
+            "roles": [],
+            "email": "test@gmail.com",
+        }
+        yield mock_validate_token_rs256
