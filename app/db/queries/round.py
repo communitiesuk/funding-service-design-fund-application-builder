@@ -8,13 +8,13 @@ from app.db.models.round import Round
 def add_round(round: Round) -> Round:
     db.session.add(round)
     db.session.commit()
-    current_app.logger.info(f"Round added with round_id: '{round.round_id}.")
+    current_app.logger.info("Round added with round_id: '{round_id}'.", extra=dict(round_id=round.round_id))
     return round
 
 
 def update_round(round: Round) -> Round:
     db.session.commit()
-    current_app.logger.info(f"Round updated with round_id: '{round.round_id}.")
+    current_app.logger.info("Round updated with round_id: '{round_id}'.", extra=dict(round_id=round.round_id))
     return round
 
 

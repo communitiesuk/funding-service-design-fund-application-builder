@@ -18,7 +18,7 @@ def validate_json_field(form, field):
     try:
         json.loads(str_content)
     except Exception as ex:
-        raise ValidationError(f"Content is not valid JSON. Underlying error: [{str(ex)}]")
+        raise ValidationError(f"Content is not valid JSON. Underlying error: [{str(ex)}]") from ex
 
 
 def validate_flexible_url(form, field):
@@ -69,8 +69,8 @@ def get_datetime(form_field):
     try:
         form_field_datetime = datetime.datetime(year, month, day, hour=hour, minute=minute).strftime("%m-%d-%Y %H:%M")
         return form_field_datetime
-    except ValueError:
-        raise ValidationError(f"Invalid date entered for {form_field}")
+    except ValueError as ex:
+        raise ValidationError(f"Invalid date entered for {form_field}") from ex
 
 
 class DateInputForm(Form):
@@ -85,38 +85,38 @@ class DateInputForm(Form):
             day = int(field.data)
             if day < 1 or day > 31:
                 raise ValidationError("Day must be between 1 and 31 inclusive.")
-        except ValueError:
-            raise ValidationError("Invalid Day")
+        except ValueError as ex:
+            raise ValidationError("Invalid Day") from ex
 
     def validate_month(self, field):
         try:
             month = int(field.data)
             if month < 1 or month > 12:
                 raise ValidationError("Month must be between 1 and 12")
-        except ValueError:
-            raise ValidationError("Invalid month")
+        except ValueError as ex:
+            raise ValidationError("Invalid month") from ex
 
     def validate_year(self, field):
         try:
             int(field.data)
-        except ValueError:
-            raise ValidationError("Invalid Year")
+        except ValueError as ex:
+            raise ValidationError("Invalid Year") from ex
 
     def validate_hour(self, field):
         try:
             hour = int(field.data)
             if hour < 0 or hour > 23:
                 raise ValidationError("Hour must be between 0 and 23 inclusive.")
-        except ValueError:
-            raise ValidationError("Invalid Day")
+        except ValueError as ex:
+            raise ValidationError("Invalid Day") from ex
 
     def validate_minute(self, field):
         try:
             minute = int(field.data)
             if minute < 0 or minute >= 60:
                 raise ValidationError("Minute must be between 0 and 59 inclusive.")
-        except ValueError:
-            raise ValidationError("Invalid Day")
+        except ValueError as ex:
+            raise ValidationError("Invalid Day") from ex
 
 
 class RoundForm(FlaskForm):
