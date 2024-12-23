@@ -1,16 +1,7 @@
 from uuid import uuid4
 
-from app.db.models import Component
-from app.db.models import ComponentType
-from app.db.models import Criteria
-from app.db.models import Form
-from app.db.models import Lizt
-from app.db.models import Page
-from app.db.models import Section
-from app.db.models import Subcriteria
-from app.db.models import Theme
-from app.shared.data_classes import Condition
-from app.shared.data_classes import ConditionValue
+from app.db.models import Component, ComponentType, Criteria, Form, Lizt, Page, Section, Subcriteria, Theme
+from app.shared.data_classes import Condition, ConditionValue
 
 form_1_id = uuid4()
 page_1_id = uuid4()

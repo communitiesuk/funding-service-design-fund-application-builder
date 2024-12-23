@@ -1,21 +1,18 @@
 import json
 
-from flask import Blueprint
-from flask import redirect
-from flask import render_template
-from flask import request
-from flask import url_for
+from flask import Blueprint, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
-from app.blueprints.fund_builder.forms.templates import TemplateFormForm
-from app.blueprints.fund_builder.forms.templates import TemplateUploadForm
+from app.blueprints.fund_builder.forms.templates import TemplateFormForm, TemplateUploadForm
 from app.db.models.application_config import Form
-from app.db.queries.application import delete_form
-from app.db.queries.application import get_all_template_forms
-from app.db.queries.application import get_all_template_sections
-from app.db.queries.application import get_form_by_id
-from app.db.queries.application import get_form_by_template_name
-from app.db.queries.application import update_form
+from app.db.queries.application import (
+    delete_form,
+    get_all_template_forms,
+    get_all_template_sections,
+    get_form_by_id,
+    get_form_by_template_name,
+    update_form,
+)
 from app.shared.helpers import error_formatter
 
 # Blueprint for routes used by FAB PoC to manage templates

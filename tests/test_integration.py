@@ -5,15 +5,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Component
-from app.db.models import ComponentType
-from app.db.models import Form
-from app.db.models import FormSection
-from app.db.models import Fund
-from app.db.models import Lizt
-from app.db.models import Page
-from app.db.models import Round
-from app.db.models import Section
+from app.db.models import Component, ComponentType, Form, FormSection, Fund, Lizt, Page, Round, Section
 from app.db.queries.application import get_component_by_id
 from app.db.queries.fund import get_fund_by_id
 from app.export_config.generate_assessment_config import build_assessment_config
@@ -22,14 +14,11 @@ from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
 from app.import_config.load_form_json import load_form_jsons
-from app.shared.data_classes import Condition
-from app.shared.data_classes import ConditionValue
-from tests.seed_test_data import BASIC_FUND_INFO
-from tests.seed_test_data import BASIC_ROUND_INFO
+from app.shared.data_classes import Condition, ConditionValue
+from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 
 
 def test_build_form_json_no_conditions(seed_dynamic_data):
-
     f: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
     form: Form = f.rounds[0].sections[0].forms[0]
 
@@ -203,7 +192,6 @@ page_2_id = uuid4()
     }
 )
 def test_build_form_json_with_conditions(seed_dynamic_data):
-
     f: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
     form: Form = f.rounds[0].sections[0].forms[0]
 
@@ -233,7 +221,6 @@ def test_build_form_json_with_conditions(seed_dynamic_data):
 
 # TODO this fails with components from a template (branching logic)
 def test_build_assessment_config_no_branching(seed_dynamic_data):
-
     f: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
     criteria = f.rounds[0].criteria[0]
     result = build_assessment_config(criteria_list=[criteria])
@@ -276,7 +263,6 @@ list_id = uuid4()
     }
 )
 def test_list_relationship(seed_dynamic_data):
-
     result = get_component_by_id(seed_dynamic_data["components"][0].component_id)
     assert result
     assert result.list_id == list_id
@@ -434,7 +420,6 @@ def test_generate_config_for_round_valid_input(
 
     # check that content of each page (including page[components] and page[next] within form[pages] is the same
     for input_page in input_form["pages"]:
-
         # find page in output pages
         output_page = next((p for p in output_form["pages"] if p["path"] == input_page["path"]), None)
         assert input_page["path"] == output_page["path"]

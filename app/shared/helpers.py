@@ -1,6 +1,5 @@
 import re
-from dataclasses import asdict
-from dataclasses import is_dataclass
+from dataclasses import asdict, is_dataclass
 
 from wtforms.validators import ValidationError
 
@@ -48,12 +47,13 @@ def error_formatter(form):
         field_name = getattr(form, field).label.text
         if isinstance(error_messages, list):
             errors_list.extend({"text": f"{field_name}: {err}", "href": f"#{field}"} for err in error_messages)
-        elif isinstance(error_messages, dict) and any(error_messages.get(k) for k in ["day", "month", "years", "hour", "minute"]):
+        elif isinstance(error_messages, dict) and any(
+            error_messages.get(k) for k in ["day", "month", "years", "hour", "minute"]
+        ):
             errors_list.append({"text": f"{field_name}: Enter valid datetime", "href": f"#{field}"})
     if errors_list:
         return {"titleText": "There is a problem", "errorList": errors_list}
     return None
-
 
 
 # Custom validator to check for spaces between letters

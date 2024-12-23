@@ -6,11 +6,7 @@ import click
 
 from app.all_questions.metadata_utils import form_json_to_assessment_display_types
 from app.db import db
-from app.db.models import Component
-from app.db.models import Criteria
-from app.db.models import Section
-from app.db.models import Subcriteria
-from app.db.models import Theme
+from app.db.models import Component, Criteria, Section, Subcriteria, Theme
 from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.queries.application import get_form_for_component
 from app.export_config import helpers

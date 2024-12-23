@@ -4,28 +4,21 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Form
-from app.db.models import Fund
-from app.db.models import Organisation
-from app.db.models import Round
-from app.db.models import Section
+from app.db.models import Form, Fund, Organisation, Round, Section
 from app.db.models.fund import FundingType
-from app.db.queries.application import delete_form_from_section
-from app.db.queries.application import delete_section_from_round
-from app.db.queries.application import get_section_by_id
-from app.db.queries.application import move_form_down
-from app.db.queries.application import move_form_up
-from app.db.queries.application import move_section_down
-from app.db.queries.application import move_section_up
-from app.db.queries.application import swap_elements_in_list
-from app.db.queries.fund import add_fund
-from app.db.queries.fund import add_organisation
-from app.db.queries.fund import get_all_funds
-from app.db.queries.fund import get_fund_by_id
-from app.db.queries.round import add_round
-from app.db.queries.round import get_round_by_id
-from tests.seed_test_data import BASIC_FUND_INFO
-from tests.seed_test_data import BASIC_ROUND_INFO
+from app.db.queries.application import (
+    delete_form_from_section,
+    delete_section_from_round,
+    get_section_by_id,
+    move_form_down,
+    move_form_up,
+    move_section_down,
+    move_section_up,
+    swap_elements_in_list,
+)
+from app.db.queries.fund import add_fund, add_organisation, get_all_funds, get_fund_by_id
+from app.db.queries.round import add_round, get_round_by_id
+from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 
 
 def test_add_organisation(flask_test_client, _db, clear_test_data):
@@ -219,7 +212,6 @@ fund_id = uuid4()
     }
 )
 def test_get_round_by_id(seed_dynamic_data):
-
     result: Round = get_round_by_id(seed_dynamic_data["rounds"][0].round_id)
     assert result.title_json["en"] == "round the first"
 

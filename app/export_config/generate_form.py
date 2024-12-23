@@ -1,15 +1,11 @@
 import copy
 from dataclasses import asdict
 
-from app.db.models import Component
-from app.db.models import Form
-from app.db.models import Page
-from app.db.models.application_config import READ_ONLY_COMPONENTS
-from app.db.models.application_config import ComponentType
+from app.db.models import Component, Form, Page
+from app.db.models.application_config import READ_ONLY_COMPONENTS, ComponentType
 from app.db.queries.application import get_list_by_id
 from app.export_config.helpers import human_to_kebab_case
-from app.shared.data_classes import ConditionValue
-from app.shared.data_classes import FormSection
+from app.shared.data_classes import ConditionValue, FormSection
 
 BASIC_FORM_STRUCTURE = {
     "startPage": None,
@@ -228,7 +224,6 @@ def build_lists(pages: list[dict]) -> list:
 
 
 def _find_page_by_controller(pages, controller_name) -> dict:
-
     return next((p for p in pages if p.controller and p.controller.endswith(controller_name)), None)
 
 
