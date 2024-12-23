@@ -24,8 +24,8 @@ from app.db.queries.fund import get_all_funds
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import add_round
 from app.db.queries.round import get_round_by_id
-from tasks.test_data import BASIC_FUND_INFO
-from tasks.test_data import BASIC_ROUND_INFO
+from tests.seed_test_data import BASIC_FUND_INFO
+from tests.seed_test_data import BASIC_ROUND_INFO
 
 
 def test_add_organisation(flask_test_client, _db, clear_test_data):
