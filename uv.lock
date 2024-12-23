@@ -319,15 +319,15 @@ sdist = { url = "https://files.pythonhosted.org/packages/e5/66/9bfd2d69fb4479d38
 
 [[package]]
 name = "debugpy"
-version = "1.8.9"
+version = "1.8.11"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/88/92/15b454c516c4c53cc8c03967e4be12b65a1ea36db3bb4513a7453f75c8d8/debugpy-1.8.9.zip", hash = "sha256:1339e14c7d980407248f09824d1b25ff5c5616651689f1e0f0e51bdead3ea13e", size = 4921695 }
+sdist = { url = "https://files.pythonhosted.org/packages/bc/e7/666f4c9b0e24796af50aadc28d36d21c2e01e831a934535f956e09b3650c/debugpy-1.8.11.tar.gz", hash = "sha256:6ad2688b69235c43b020e04fecccdf6a96c8943ca9c2fb340b8adc103c655e57", size = 1640124 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d0/2e/92fda96b1b773e454daae3e2962726dd9f7aedb1f26d7f2ca353d91a930b/debugpy-1.8.9-cp310-cp310-macosx_14_0_x86_64.whl", hash = "sha256:cfe1e6c6ad7178265f74981edf1154ffce97b69005212fbc90ca22ddfe3d017e", size = 2080529 },
-    { url = "https://files.pythonhosted.org/packages/87/c0/d13cdbae394c7ae65ef93d7ccde2ff364445248e367bda93fc0650c08849/debugpy-1.8.9-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ada7fb65102a4d2c9ab62e8908e9e9f12aed9d76ef44880367bc9308ebe49a0f", size = 3565151 },
-    { url = "https://files.pythonhosted.org/packages/23/40/237c0a7a68cb982dcced4a0199b7c464630f75b9280d6bebde32490135d1/debugpy-1.8.9-cp310-cp310-win32.whl", hash = "sha256:c36856343cbaa448171cba62a721531e10e7ffb0abff838004701454149bc037", size = 5117068 },
-    { url = "https://files.pythonhosted.org/packages/00/89/e0be9f01ee461e3369dde418492244acb1b67adaf04cb5ea98f1380ab101/debugpy-1.8.9-cp310-cp310-win_amd64.whl", hash = "sha256:17c5e0297678442511cf00a745c9709e928ea4ca263d764e90d233208889a19e", size = 5149364 },
-    { url = "https://files.pythonhosted.org/packages/2d/23/3f5804202da11c950dc0caae4a62d0c9aadabdb2daeb5f7aa09838647b5d/debugpy-1.8.9-py2.py3-none-any.whl", hash = "sha256:cc37a6c9987ad743d9c3a14fa1b1a14b7e4e6041f9dd0c8abf8895fe7a97b899", size = 5166094 },
+    { url = "https://files.pythonhosted.org/packages/26/e6/4cf7422eaa591b4c7d6a9fde224095dac25283fdd99d90164f28714242b0/debugpy-1.8.11-cp310-cp310-macosx_14_0_x86_64.whl", hash = "sha256:2b26fefc4e31ff85593d68b9022e35e8925714a10ab4858fb1b577a8a48cb8cd", size = 2075100 },
+    { url = "https://files.pythonhosted.org/packages/83/3a/e163de1df5995d95760a4d748b02fbefb1c1bf19e915b664017c40435dbf/debugpy-1.8.11-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:61bc8b3b265e6949855300e84dc93d02d7a3a637f2aec6d382afd4ceb9120c9f", size = 3559724 },
+    { url = "https://files.pythonhosted.org/packages/27/6c/327e19fd1bf428a1efe1a6f97b306689c54c2cebcf871b66674ead718756/debugpy-1.8.11-cp310-cp310-win32.whl", hash = "sha256:c928bbf47f65288574b78518449edaa46c82572d340e2750889bbf8cd92f3737", size = 5178068 },
+    { url = "https://files.pythonhosted.org/packages/49/80/359ff8aa388f0bd4a48f0fa9ce3606396d576657ac149c6fba3cc7de8adb/debugpy-1.8.11-cp310-cp310-win_amd64.whl", hash = "sha256:8da1db4ca4f22583e834dcabdc7832e56fe16275253ee53ba66627b86e304da1", size = 5210109 },
+    { url = "https://files.pythonhosted.org/packages/77/0a/d29a5aacf47b4383ed569b8478c02d59ee3a01ad91224d2cff8562410e43/debugpy-1.8.11-py2.py3-none-any.whl", hash = "sha256:0e22f846f4211383e6a416d04b4c13ed174d24cc5d43f5fd52e7821d0ebc8920", size = 5226874 },
 ]
 
 [[package]]
@@ -603,7 +603,7 @@ requires-dist = [
 dev = [
     { name = "beautifulsoup4", specifier = "==4.12.3" },
     { name = "black", specifier = "==24.8.0" },
-    { name = "debugpy", specifier = "==1.8.9" },
+    { name = "debugpy", specifier = "==1.8.11" },
     { name = "djlint", specifier = "==1.34.1" },
     { name = "flake8", specifier = "==7.1.1" },
     { name = "flake8-pyproject", specifier = "==1.2.3" },
