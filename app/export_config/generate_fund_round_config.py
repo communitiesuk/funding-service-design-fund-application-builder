@@ -3,15 +3,11 @@ import copy
 from flask import current_app
 
 from app.db import db
-from app.db.models import Form
-from app.db.models import Section
+from app.db.models import Form, Section
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.helpers import write_config
-from app.shared.data_classes import FundExport
-from app.shared.data_classes import FundSectionForm
-from app.shared.data_classes import FundSectionSection
-from app.shared.data_classes import RoundExport
+from app.shared.data_classes import FundExport, FundSectionForm, FundSectionSection, RoundExport
 
 # TODO : The Round path might be better as a placeholder to avoid conflict in the actual fund store.
 # Decide on this further down the line.
@@ -36,7 +32,6 @@ TEMPLATE_FUND_ROUND_EXPORT = {"sections_config": [], "fund_config": {}, "round_c
 
 
 def generate_application_display_config(round_id):
-
     ordered_sections = []
     # get round
     round = get_round_by_id(round_id)
@@ -47,7 +42,7 @@ def generate_application_display_config(round_id):
     TEMPLATE_FUND_ROUND_EXPORT["base_path"] = round_base_path
     "sort by Section.index"
     sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
-    current_app.logger.info(f"Generating application display config for round {round_id}")
+    current_app.logger.info("Generating application display config for round {round_id}", extra=dict(round_id=round_id))
 
     for original_section in sections:
         section = copy.deepcopy(original_section)
@@ -89,7 +84,7 @@ def generate_fund_config(round_id):
     round = get_round_by_id(round_id)
     fund_id = round.fund_id
     fund = get_fund_by_id(fund_id)
-    current_app.logger.info(f"Generating fund config for fund {fund_id}")
+    current_app.logger.info("Generating fund config for fund {fund_id}", extra=dict(fund_id=fund_id))
 
     fund_export = FundExport(
         id=str(fund.fund_id),
@@ -109,7 +104,7 @@ def generate_fund_config(round_id):
 
 def generate_round_config(round_id):
     round = get_round_by_id(round_id)
-    current_app.logger.info(f"Generating round config for round {round_id}")
+    current_app.logger.info("Generating round config for round {round_id}", extra=dict(round_id=round_id))
 
     round_export = RoundExport(
         id=str(round.round_id),

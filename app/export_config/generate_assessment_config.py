@@ -6,11 +6,7 @@ import click
 
 from app.all_questions.metadata_utils import form_json_to_assessment_display_types
 from app.db import db
-from app.db.models import Component
-from app.db.models import Criteria
-from app.db.models import Section
-from app.db.models import Subcriteria
-from app.db.models import Theme
+from app.db.models import Component, Criteria, Section, Subcriteria, Theme
 from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.queries.application import get_form_for_component
 from app.export_config import helpers
@@ -212,7 +208,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
 
     unscored = []
     sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
-    for i, section in enumerate(sections, start=1):
+    for _i, section in enumerate(sections, start=1):
         criteria = {
             "id": helpers.human_to_kebab_case(section.name_in_apply_json["en"]),
             "name": section.name_in_apply_json["en"],

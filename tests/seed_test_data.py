@@ -3,21 +3,22 @@ from datetime import datetime
 from random import randint
 from uuid import uuid4
 
-from app.db.models import Component
-from app.db.models import ComponentType
-from app.db.models import Criteria
-from app.db.models import Form
-from app.db.models import Fund
-from app.db.models import Lizt
-from app.db.models import Organisation
-from app.db.models import Page
-from app.db.models import Round
-from app.db.models import Section
-from app.db.models import Subcriteria
-from app.db.models import Theme
+from app.db.models import (
+    Component,
+    ComponentType,
+    Criteria,
+    Form,
+    Fund,
+    Lizt,
+    Organisation,
+    Page,
+    Round,
+    Section,
+    Subcriteria,
+    Theme,
+)
 from app.db.models.fund import FundingType
-from app.shared.data_classes import Condition
-from app.shared.data_classes import ConditionValue
+from app.shared.data_classes import Condition, ConditionValue
 
 BASIC_FUND_INFO = {
     "name_json": {"en": "Unit Test Fund"},
@@ -498,7 +499,9 @@ def add_default_page_paths(db, default_next_page_config):
     db.session.commit()
 
 
-def insert_test_data(db, test_data={}):
+def insert_test_data(db, test_data=None):
+    if test_data is None:
+        test_data = {}
     db.session.bulk_save_objects(test_data.get("organisations", []))
     db.session.commit()
     db.session.bulk_save_objects(test_data.get("funds", []))

@@ -1,9 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import FileField
-from wtforms import HiddenField
-from wtforms import StringField
-from wtforms.validators import DataRequired
-from wtforms.validators import Regexp
+from wtforms import FileField, HiddenField, StringField
+from wtforms.validators import DataRequired, Regexp
 
 
 class TemplateUploadForm(FlaskForm):
@@ -12,7 +9,6 @@ class TemplateUploadForm(FlaskForm):
 
 
 class TemplateFormForm(FlaskForm):
-
     form_id = HiddenField()
 
     template_name = StringField(

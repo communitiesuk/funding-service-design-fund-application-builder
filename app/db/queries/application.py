@@ -3,12 +3,7 @@ from uuid import uuid4
 from sqlalchemy import delete
 
 from app.db import db
-from app.db.models import Component
-from app.db.models import Form
-from app.db.models import FormSection
-from app.db.models import Lizt
-from app.db.models import Page
-from app.db.models import Section
+from app.db.models import Component, Form, FormSection, Lizt, Page, Section
 from app.db.models.round import Round
 from app.db.queries.round import get_round_by_id
 
@@ -150,7 +145,6 @@ def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> For
     cloned_pages = []
     cloned_components = []
     for page_to_clone in form_to_clone.pages:
-
         cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=clone.form_id)
         cloned_pages.append(cloned_page)
         cloned_components.extend(_initiate_cloned_components_for_page(page_to_clone.components, cloned_page.page_id))
@@ -166,7 +160,6 @@ def _initiate_cloned_components_for_page(
 ):
     cloned_components = []
     for component_to_clone in components_to_clone:
-
         cloned_component = _initiate_cloned_component(
             component_to_clone, new_page_id=new_page_id, new_theme_id=None
         )  # TODO how should themes work when cloning?

@@ -54,7 +54,7 @@ def generate_all_round_html(round_id, base_output_dir=None):
     """
     if not round_id:
         raise ValueError("Round ID is required to generate HTML.")
-    current_app.logger.info(f"Generating HTML for round {round_id}.")
+    current_app.logger.info("Generating HTML for round {round_id}", extra=dict(round_id=round_id))
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     sections_in_round = round.sections

@@ -6,19 +6,10 @@ from enum import Enum
 from typing import List
 
 from flask_sqlalchemy.model import DefaultMeta
-from sqlalchemy import Column
-from sqlalchemy import ForeignKey
-from sqlalchemy import Index
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import inspect
-from sqlalchemy.dialects.postgresql import ENUM
-from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, ForeignKey, Index, Integer, String, inspect
+from sqlalchemy.dialects.postgresql import ENUM, JSON, UUID
 from sqlalchemy.ext.orderinglist import ordering_list
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import Boolean
 
 from app.db import db
@@ -66,7 +57,6 @@ READ_ONLY_COMPONENTS = [
 
 @dataclass
 class Section(BaseModel):
-
     round_id = Column(
         UUID(as_uuid=True),
         ForeignKey("round.round_id"),
@@ -102,7 +92,6 @@ class Section(BaseModel):
 
 @dataclass
 class Form(BaseModel):
-
     section_id = Column(
         UUID(as_uuid=True),
         ForeignKey("section.section_id"),
@@ -156,7 +145,6 @@ class FormSection(BaseModel):
 
 @dataclass
 class Page(BaseModel):
-
     form_id = Column(
         UUID(as_uuid=True),
         ForeignKey("form.form_id"),
@@ -225,7 +213,6 @@ class Lizt(BaseModel):
 
 @dataclass
 class Component(BaseModel):
-
     component_id = Column(
         UUID(as_uuid=True),
         primary_key=True,
@@ -257,7 +244,8 @@ class Component(BaseModel):
     conditions = Column(JSON(none_as_null=True))
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     runner_component_name = Column(
-        String(), nullable=True  # None for display only fields
+        String(),
+        nullable=True,  # None for display only fields
     )  # TODO add validation to make sure it's only letters, numbers and _
     list_id = Column(
         UUID(as_uuid=True),

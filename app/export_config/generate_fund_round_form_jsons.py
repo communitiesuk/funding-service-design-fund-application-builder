@@ -5,8 +5,7 @@ from flask import current_app
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_form import build_form_json
-from app.export_config.helpers import validate_json
-from app.export_config.helpers import write_config
+from app.export_config.helpers import validate_json, write_config
 
 form_schema = {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -91,7 +90,7 @@ def generate_form_jsons_for_round(round_id, base_output_dir=None):
         raise ValueError("Round ID is required to generate form JSONs.")
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
-    current_app.logger.info(f"Generating form JSONs for round {round_id}.")
+    current_app.logger.info("Generating form JSONs for round {round_id}", extra=dict(round_id=round_id))
     for section in round.sections:
         for form in section.forms:
             result = build_form_json(form=form, fund_title=fund.title_json["en"])
@@ -100,4 +99,4 @@ def generate_form_jsons_for_round(round_id, base_output_dir=None):
             if valid_json:
                 write_config(form_json, form.runner_publish_name, round.short_name, "form_json", base_output_dir)
             else:
-                current_app.logger.error(f"Form JSON for {form.runner_publish_name} is invalid.")
+                current_app.logger.error("Form JSON for {runner_publish_name} is invalid.", extra=dict(runner_publish_name=form.runner_publish_name))

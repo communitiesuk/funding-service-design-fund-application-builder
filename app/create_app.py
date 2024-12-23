@@ -1,15 +1,10 @@
-from flask import Flask
-from flask import render_template
+from flask import Flask, render_template
 from fsd_utils import init_sentry
-from fsd_utils.authentication.decorators import SupportedApp
-from fsd_utils.authentication.decorators import check_internal_user
-from fsd_utils.authentication.decorators import login_required
+from fsd_utils.authentication.decorators import SupportedApp, check_internal_user, login_required
 from fsd_utils.healthchecks.checkers import FlaskRunningChecker
 from fsd_utils.healthchecks.healthcheck import Healthcheck
 from fsd_utils.logging import logging
-from jinja2 import ChoiceLoader
-from jinja2 import PackageLoader
-from jinja2 import PrefixLoader
+from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 
 from app.blueprints.fund_builder.routes import build_fund_bp
 from app.blueprints.templates.routes import template_bp
@@ -43,8 +38,7 @@ def create_app() -> Flask:
 
     flask_app.static_folder = "app/static/dist"
 
-    from app.db import db
-    from app.db import migrate
+    from app.db import db, migrate
 
     # Bind SQLAlchemy ORM to Flask app
     db.init_app(flask_app)

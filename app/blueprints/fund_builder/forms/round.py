@@ -2,17 +2,9 @@ import datetime
 import json
 import re
 
-from flask_wtf import FlaskForm
-from flask_wtf import Form
-from wtforms import FormField
-from wtforms import HiddenField
-from wtforms import RadioField
-from wtforms import StringField
-from wtforms import TextAreaField
-from wtforms import URLField
-from wtforms.validators import DataRequired
-from wtforms.validators import Length
-from wtforms.validators import ValidationError
+from flask_wtf import FlaskForm, Form
+from wtforms import FormField, HiddenField, RadioField, StringField, TextAreaField, URLField
+from wtforms.validators import DataRequired, Length, ValidationError
 
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_short_name_and_fund_id
@@ -26,7 +18,7 @@ def validate_json_field(form, field):
     try:
         json.loads(str_content)
     except Exception as ex:
-        raise ValidationError(f"Content is not valid JSON. Underlying error: [{str(ex)}]")
+        raise ValidationError(f"Content is not valid JSON. Underlying error: [{str(ex)}]") from ex
 
 
 def validate_flexible_url(form, field):
@@ -61,10 +53,10 @@ def validate_flexible_url(form, field):
 
 
 def validate_unique_round_short_name(form, field):
-    if form.data and field.data and form.data.get('fund_id'):
-        rond_data = get_round_by_short_name_and_fund_id(form.data.get('fund_id'), field.data)
-        if rond_data and str(rond_data.round_id) != form.data.get('round_id'):
-            fund_data = get_fund_by_id(form.data.get('fund_id'))
+    if form.data and field.data and form.data.get("fund_id"):
+        rond_data = get_round_by_short_name_and_fund_id(form.data.get("fund_id"), field.data)
+        if rond_data and str(rond_data.round_id) != form.data.get("round_id"):
+            fund_data = get_fund_by_id(form.data.get("fund_id"))
             raise ValidationError(f'Given short name already exists in the fund {fund_data.title_json.get("en")}.')
 
 
@@ -77,8 +69,8 @@ def get_datetime(form_field):
     try:
         form_field_datetime = datetime.datetime(year, month, day, hour=hour, minute=minute).strftime("%m-%d-%Y %H:%M")
         return form_field_datetime
-    except ValueError:
-        raise ValidationError(f"Invalid date entered for {form_field}")
+    except ValueError as ex:
+        raise ValidationError(f"Invalid date entered for {form_field}") from ex
 
 
 class DateInputForm(Form):
@@ -93,42 +85,41 @@ class DateInputForm(Form):
             day = int(field.data)
             if day < 1 or day > 31:
                 raise ValidationError("Day must be between 1 and 31 inclusive.")
-        except ValueError:
-            raise ValidationError("Invalid Day")
+        except ValueError as ex:
+            raise ValidationError("Invalid Day") from ex
 
     def validate_month(self, field):
         try:
             month = int(field.data)
             if month < 1 or month > 12:
                 raise ValidationError("Month must be between 1 and 12")
-        except ValueError:
-            raise ValidationError("Invalid month")
+        except ValueError as ex:
+            raise ValidationError("Invalid month") from ex
 
     def validate_year(self, field):
         try:
             int(field.data)
-        except ValueError:
-            raise ValidationError("Invalid Year")
+        except ValueError as ex:
+            raise ValidationError("Invalid Year") from ex
 
     def validate_hour(self, field):
         try:
             hour = int(field.data)
             if hour < 0 or hour > 23:
                 raise ValidationError("Hour must be between 0 and 23 inclusive.")
-        except ValueError:
-            raise ValidationError("Invalid Day")
+        except ValueError as ex:
+            raise ValidationError("Invalid Day") from ex
 
     def validate_minute(self, field):
         try:
             minute = int(field.data)
             if minute < 0 or minute >= 60:
                 raise ValidationError("Minute must be between 0 and 59 inclusive.")
-        except ValueError:
-            raise ValidationError("Invalid Day")
+        except ValueError as ex:
+            raise ValidationError("Invalid Day") from ex
 
 
 class RoundForm(FlaskForm):
-
     JSON_FIELD_HINT = "Valid json format, using double quotes, lowercase true/false"
 
     round_id = HiddenField("Round ID")

@@ -1,13 +1,11 @@
-from unittest.mock import MagicMock
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from flask import current_app
 from wtforms.validators import ValidationError
 
 from app.blueprints.fund_builder.forms.round import validate_json_field
-from app.db.models import Fund
-from app.db.models import Round
+from app.db.models import Fund, Round
 from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
@@ -109,8 +107,10 @@ def test_create_fund_with_existing_short_name(flask_test_client):
     }
     response = submit_form(flask_test_client, "/fund", create_data)
     assert response.status_code == 200
-    html = response.data.decode('utf-8')
-    assert  '<a href="#short_name">Short name: Given fund short name already exists.</a>' in html, "Not having the fund short name already exists error"
+    html = response.data.decode("utf-8")
+    assert (
+        '<a href="#short_name">Short name: Given fund short name already exists.</a>' in html
+    ), "Not having the fund short name already exists error"
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
@@ -146,6 +146,7 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
             assert updated_fund.funding_type.value == value
         elif key != "submit":
             assert updated_fund.__getattribute__(key) == value
+
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_data):
@@ -196,24 +197,27 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
         "guidance_url": "http://example.com/guidance",
     }
 
-    error_html = '<a href="#short_name">Short name: Given short name already exists in the fund funding to improve testing.</a>'
+    error_html = (
+        '<a href="#short_name">Short name: Given short name already exists in the fund funding to improve testing.</a>'
+    )
 
     # Test works fine with first round
     response = submit_form(flask_test_client, "/round", new_round_data)
     assert response.status_code == 200
-    assert error_html not in response.data.decode('utf-8'), "Error HTML found in response"
+    assert error_html not in response.data.decode("utf-8"), "Error HTML found in response"
 
     # Test works fine with second round but with different short name
-    new_round_data = {**new_round_data, 'short_name': 'NR1234'}
+    new_round_data = {**new_round_data, "short_name": "NR1234"}
     response = submit_form(flask_test_client, "/round", new_round_data)
     assert response.status_code == 200
-    assert error_html not in response.data.decode('utf-8'), "Error HTML found in response"
+    assert error_html not in response.data.decode("utf-8"), "Error HTML found in response"
 
     # Test doesn't work with third round with same short name as firsrt
-    new_round_data = {**new_round_data, 'short_name': 'NR123'}
+    new_round_data = {**new_round_data, "short_name": "NR123"}
     response = submit_form(flask_test_client, "/round", new_round_data)
     assert response.status_code == 200
-    assert error_html in response.data.decode('utf-8'), "Error HTML not found in response"
+    assert error_html in response.data.decode("utf-8"), "Error HTML not found in response"
+
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_new_round(flask_test_client, seed_dynamic_data):
@@ -340,7 +344,6 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
 
 @pytest.mark.parametrize("input_json_string", [(None), (""), ("{}"), (""), ("{}"), ('{"1":"2"}')])
 def test_validate_json_input_valid(input_json_string):
-
     field = MagicMock()
     field.data = input_json_string
     validate_json_field(None, field)
@@ -354,7 +357,6 @@ def test_validate_json_input_valid(input_json_string):
     ],
 )
 def test_validate_json_input_invalid(input_json_string, exp_error_msg):
-
     field = MagicMock()
     field.data = input_json_string
     with pytest.raises(ValidationError) as error:

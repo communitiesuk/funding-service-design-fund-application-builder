@@ -2,24 +2,14 @@ import uuid
 from dataclasses import dataclass
 
 from flask_sqlalchemy.model import DefaultMeta
-from sqlalchemy import Column
-from sqlalchemy import DateTime
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import Sequence
-from sqlalchemy import String
-from sqlalchemy import UniqueConstraint
-from sqlalchemy import inspect
-from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Sequence, String, UniqueConstraint, inspect
+from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.ext.orderinglist import ordering_list
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.types import Boolean
 
 from app.db import db
-from app.db.models import Criteria
-from app.db.models import Section
+from app.db.models import Criteria, Section
 
 BaseModel: DefaultMeta = db.Model
 

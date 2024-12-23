@@ -54,7 +54,6 @@ def build_govuk_assets(static_dist_root="app/static/dist"):
     cwd = os.getcwd()
     os.chdir(DIST_PATH)
     for css_file in glob.glob("*.css"):
-
         # Read in the file
         with open(css_file, "r") as file:
             filedata = file.read()
