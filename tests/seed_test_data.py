@@ -499,7 +499,9 @@ def add_default_page_paths(db, default_next_page_config):
     db.session.commit()
 
 
-def insert_test_data(db, test_data={}):
+def insert_test_data(db, test_data=None):
+    if test_data is None:
+        test_data = {}
     db.session.bulk_save_objects(test_data.get("organisations", []))
     db.session.commit()
     db.session.bulk_save_objects(test_data.get("funds", []))

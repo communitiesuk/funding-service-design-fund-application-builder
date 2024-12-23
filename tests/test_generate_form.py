@@ -259,9 +259,9 @@ id2 = uuid4()
         ),
     ],
 )
-def test_build_conditions(
-    input_component, exp_results, ids=["single condition", "2 conditions", "single condition with coordinator"]
-):
+def test_build_conditions(input_component, exp_results, ids=None):
+    if ids is None:
+        ids = ["single condition", "2 conditions", "single condition with coordinator"]
     results = build_conditions(input_component)
     assert results == exp_results
 
