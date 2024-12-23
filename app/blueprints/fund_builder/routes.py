@@ -22,10 +22,8 @@ from flask import (
 from fsd_utils.authentication.decorators import login_requested
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
-from app.blueprints.fund_builder.forms.fund import FundForm
 from app.blueprints.fund_builder.forms.round import RoundForm, get_datetime
 from app.blueprints.fund_builder.forms.section import SectionForm
-from app.db.models.fund import Fund, FundingType
 from app.db.models.round import Round
 from app.db.queries.application import (
     clone_single_form,
@@ -42,7 +40,7 @@ from app.db.queries.application import (
     move_section_up,
     update_section,
 )
-from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
+from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import add_round, get_round_by_id, update_round
 from app.export_config.generate_all_questions import print_html
 from app.export_config.generate_assessment_config import (
@@ -138,7 +136,7 @@ def section(round_id):
 
     params["breadcrumb_items"] = [
         {"text": "Home", "href": url_for(BUILD_FUND_BP_DASHBOARD)},
-        {"text": fund_obj.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund_obj.fund_id)},
+        {"text": fund_obj.name_json["en"], "href": url_for("fund_bp.view_fund", fund_id=fund_obj.fund_id)},
         {
             "text": round_obj.title_json["en"],
             "href": url_for("build_fund_bp.build_application", fund_id=fund_obj.fund_id, round_id=round_obj.round_id),
@@ -176,29 +174,6 @@ def all_funds_as_govuk_select_items(all_funds: list) -> list:
     return [{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds]
 
 
-@build_fund_bp.route("/fund/view", methods=["GET", "POST"])
-def view_fund():
-    """
-    Renders a template providing a drop down list of funds. If a fund is selected, renders its config info
-    """
-    params = {"all_funds": all_funds_as_govuk_select_items(get_all_funds())}
-    fund = None
-    if request.method == "POST":
-        fund_id = request.form.get("fund_id")
-    else:
-        fund_id = request.args.get("fund_id")
-    if fund_id:
-        fund = get_fund_by_id(fund_id)
-        params["fund"] = fund
-        params["selected_fund_id"] = fund_id
-    params["breadcrumb_items"] = [
-        {"text": "Home", "href": url_for(BUILD_FUND_BP_DASHBOARD)},
-        {"text": fund.title_json["en"] if fund else "Manage Application Configuration", "href": "#"},
-    ]
-
-    return render_template("fund_config.html", **params)
-
-
 @build_fund_bp.route("/fund/round/<round_id>/application_config")
 def build_application(round_id):
     """
@@ -208,7 +183,7 @@ def build_application(round_id):
     fund = get_fund_by_id(round.fund_id)
     breadcrumb_items = [
         {"text": "Home", "href": url_for(BUILD_FUND_BP_DASHBOARD)},
-        {"text": fund.name_json["en"], "href": url_for("build_fund_bp.view_fund", fund_id=fund.fund_id)},
+        {"text": fund.name_json["en"], "href": url_for("fund_bp.view_fund", fund_id=fund.fund_id)},
         {"text": round.title_json["en"], "href": "#"},
     ]
     return render_template("build_application.html", round=round, fund=fund, breadcrumb_items=breadcrumb_items)
@@ -223,73 +198,7 @@ def clone_round(round_id, fund_id):
     )
     flash(f"Cloned new round: {cloned.short_name}")
 
-    return redirect(url_for("build_fund_bp.view_fund", fund_id=fund_id))
-
-
-@build_fund_bp.route("/fund", methods=["GET", "POST"])
-@build_fund_bp.route("/fund/<fund_id>", methods=["GET", "POST"])
-def fund(fund_id=None):
-    """
-    Renders a template to allow a user to add or update a fund, when saved validates the form data and saves to DB
-    """
-    if fund_id:
-        fund = get_fund_by_id(fund_id)
-        fund_data = {
-            "fund_id": fund.fund_id,
-            "name_en": fund.name_json.get("en", ""),
-            "name_cy": fund.name_json.get("cy", ""),
-            "title_en": fund.title_json.get("en", ""),
-            "title_cy": fund.title_json.get("cy", ""),
-            "short_name": fund.short_name,
-            "description_en": fund.description_json.get("en", ""),
-            "description_cy": fund.description_json.get("cy", ""),
-            "welsh_available": "true" if fund.welsh_available else "false",
-            "funding_type": fund.funding_type.value,
-            "ggis_scheme_reference_number": (
-                fund.ggis_scheme_reference_number if fund.ggis_scheme_reference_number else ""
-            ),
-        }
-        form = FundForm(data=fund_data)
-    else:
-        form = FundForm()
-
-    if form.validate_on_submit():
-        if fund_id:
-            fund.name_json["en"] = form.name_en.data
-            fund.name_json["cy"] = form.name_cy.data
-            fund.title_json["en"] = form.title_en.data
-            fund.title_json["cy"] = form.title_cy.data
-            fund.description_json["en"] = form.description_en.data
-            fund.description_json["cy"] = form.description_cy.data
-            fund.welsh_available = form.welsh_available.data == "true"
-            fund.short_name = form.short_name.data
-            fund.audit_info = {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "update"}
-            fund.funding_type = form.funding_type.data
-            fund.ggis_scheme_reference_number = (
-                form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
-            )
-            update_fund(fund)
-            flash(f"Updated fund {form.title_en.data}")
-            return redirect(url_for("build_fund_bp.view_fund", fund_id=fund.fund_id))
-
-        new_fund = Fund(
-            name_json={"en": form.name_en.data},
-            title_json={"en": form.title_en.data},
-            description_json={"en": form.description_en.data},
-            welsh_available=form.welsh_available.data == "true",
-            short_name=form.short_name.data,
-            audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
-            funding_type=FundingType(form.funding_type.data),
-            ggis_scheme_reference_number=(
-                form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
-            ),
-        )
-        add_fund(new_fund)
-        flash(f"Created fund {form.name_en.data}")
-        return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
-
-    error = error_formatter(form)
-    return render_template("fund.html", form=form, fund_id=fund_id, error=error)
+    return redirect(url_for("fund_bp.view_fund", fund_id=fund_id))
 
 
 @build_fund_bp.route("/round", methods=["GET", "POST"])
@@ -313,7 +222,7 @@ def round(round_id=None):
         if round_id:
             update_existing_round(round, form)
             flash(f"Updated round {round.title_json['en']}")
-            return redirect(url_for("build_fund_bp.view_fund", fund_id=round.fund_id))
+            return redirect(url_for("fund_bp.view_fund", fund_id=round.fund_id))
         create_new_round(form)
         flash(f"Created round {form.title_en.data}")
         return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
