@@ -7,6 +7,7 @@ from app.db.models import Page
 from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.models.application_config import ComponentType
 from app.db.queries.application import get_list_by_id
+from app.export_config.helpers import human_to_kebab_case
 from app.shared.data_classes import ConditionValue
 from app.shared.data_classes import FormSection
 
@@ -266,14 +267,6 @@ def build_start_page(content: str, form: Form) -> dict:
         }
     )
     return start_page
-
-
-def human_to_kebab_case(word: str) -> str | None:
-    """
-    Converts the supplied string into all lower case, and replaces spaces with hyphens
-    """
-    if word:
-        return word.replace(" ", "-").strip().lower()
 
 
 def build_form_json(form: Form, fund_title: str = None) -> dict:
