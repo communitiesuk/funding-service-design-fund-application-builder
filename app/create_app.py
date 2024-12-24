@@ -8,14 +8,14 @@ from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 
 from app.blueprints.application.routes import application_bp
 from app.blueprints.fund.routes import fund_bp
-from app.blueprints.fund_builder.routes import build_fund_bp
+from app.blueprints.index.routes import index_bp
 from app.blueprints.round.routes import round_bp
 from app.blueprints.template.routes import template_bp
 
 PUBLIC_ROUTES = [
     "static",
-    "build_fund_bp.index",
-    "build_fund_bp.login",
+    "index_bp.index",
+    "index_bp.login",
 ]
 
 
@@ -32,7 +32,7 @@ def protect_private_routes(flask_app: Flask) -> Flask:
 def create_app() -> Flask:
     init_sentry()
     flask_app = Flask("__name__", static_url_path="/assets")
-    flask_app.register_blueprint(build_fund_bp)
+    flask_app.register_blueprint(index_bp)
     flask_app.register_blueprint(fund_bp)
     flask_app.register_blueprint(round_bp)
     flask_app.register_blueprint(application_bp)

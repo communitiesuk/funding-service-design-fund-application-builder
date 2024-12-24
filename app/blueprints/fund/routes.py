@@ -10,12 +10,12 @@ from flask import (
 )
 
 from app.blueprints.fund.forms import FundForm
-from app.blueprints.fund_builder.routes import all_funds_as_govuk_select_items
+from app.blueprints.index.routes import all_funds_as_govuk_select_items
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
 from app.shared.helpers import error_formatter
 
-BUILD_FUND_BP_DASHBOARD = "build_fund_bp.dashboard"
+INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
 # Blueprint for routes used by v1 of FAB - using the DB
 fund_bp = Blueprint(
@@ -42,7 +42,7 @@ def view_fund():
         params["fund"] = fund
         params["selected_fund_id"] = fund_id
     params["breadcrumb_items"] = [
-        {"text": "Home", "href": url_for(BUILD_FUND_BP_DASHBOARD)},
+        {"text": "Home", "href": url_for(INDEX_BP_DASHBOARD)},
         {"text": fund.title_json["en"] if fund else "Manage Application Configuration", "href": "#"},
     ]
 
@@ -109,7 +109,7 @@ def fund(fund_id=None):
         )
         add_fund(new_fund)
         flash(f"Created fund {form.name_en.data}")
-        return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
+        return redirect(url_for(INDEX_BP_DASHBOARD))
 
     error = error_formatter(form)
     return render_template("fund.html", form=form, fund_id=fund_id, error=error)

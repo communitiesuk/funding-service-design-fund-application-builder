@@ -11,7 +11,7 @@ from flask import (
     url_for,
 )
 
-from app.blueprints.fund_builder.routes import all_funds_as_govuk_select_items
+from app.blueprints.index.routes import all_funds_as_govuk_select_items
 from app.blueprints.round.forms import RoundForm, get_datetime
 from app.db.models.round import Round
 from app.db.queries.clone import clone_single_round
@@ -19,7 +19,7 @@ from app.db.queries.fund import get_all_funds
 from app.db.queries.round import add_round, get_round_by_id, update_round
 from app.shared.helpers import error_formatter
 
-BUILD_FUND_BP_DASHBOARD = "build_fund_bp.dashboard"
+INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
 # Blueprint for routes used by v1 of FAB - using the DB
 round_bp = Blueprint(
@@ -66,7 +66,7 @@ def round(round_id=None):
             return redirect(url_for("fund_bp.view_fund", fund_id=round.fund_id))
         create_new_round(form)
         flash(f"Created round {form.title_en.data}")
-        return redirect(url_for(BUILD_FUND_BP_DASHBOARD))
+        return redirect(url_for(INDEX_BP_DASHBOARD))
 
     params["round_id"] = round_id
     params["form"] = form

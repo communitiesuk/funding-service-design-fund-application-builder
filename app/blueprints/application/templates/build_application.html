@@ -54,8 +54,8 @@
                             </span>
                             <span class="app-task-list__task-actions">
                                 <a class="govuk-link--no-visited-state" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, form_id=form.form_id) }}">View</a>&nbsp;
-                                <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.download_form_json", form_id=form.form_id) }}'>Download</a>&nbsp;
-                                <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.preview_form", form_id=form.form_id) }}'>Preview</a>&nbsp;
+                                <a class="govuk-link--no-visited-state" href='{{ url_for("index_bp.download_form_json", form_id=form.form_id) }}'>Download</a>&nbsp;
+                                <a class="govuk-link--no-visited-state" href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>Preview</a>&nbsp;
                             </span>
                         </li>
                     {% endfor %}

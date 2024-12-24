@@ -16,31 +16,31 @@ from app.db.queries.application import get_form_by_id
 from app.export_config.generate_form import build_form_json
 from config import Config
 
-BUILD_FUND_BP_DASHBOARD = "build_fund_bp.dashboard"
+INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
 # Blueprint for routes used by v1 of FAB - using the DB
-build_fund_bp = Blueprint(
-    "build_fund_bp",
+index_bp = Blueprint(
+    "index_bp",
     __name__,
     url_prefix="/",
     template_folder="templates",
 )
 
 
-@build_fund_bp.route("/")
+@index_bp.route("/")
 @login_requested
 def index():
     if not g.is_authenticated:
-        return redirect(url_for("build_fund_bp.login"))
-    return redirect(url_for("build_fund_bp.dashboard"))
+        return redirect(url_for("index_bp.login"))
+    return redirect(url_for("index_bp.dashboard"))
 
 
-@build_fund_bp.route("/login", methods=["GET"])
+@index_bp.route("/login", methods=["GET"])
 def login():
     return render_template("login.html")
 
 
-@build_fund_bp.route("/dashboard", methods=["GET"])
+@index_bp.route("/dashboard", methods=["GET"])
 def dashboard():
     return render_template("dashboard.html")
 
@@ -53,7 +53,7 @@ def all_funds_as_govuk_select_items(all_funds: list) -> list:
     return [{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds]
 
 
-@build_fund_bp.route("/preview/<form_id>", methods=["GET"])
+@index_bp.route("/preview/<form_id>", methods=["GET"])
 def preview_form(form_id):
     """
     Generates the form json for a chosen form, does not persist this, but publishes it to the form runner using the
@@ -74,7 +74,7 @@ def preview_form(form_id):
     return redirect(f"{Config.FORM_RUNNER_URL_REDIRECT}/{form_id}")
 
 
-@build_fund_bp.route("/download/<form_id>", methods=["GET"])
+@index_bp.route("/download/<form_id>", methods=["GET"])
 def download_form_json(form_id):
     """
     Generates form json for the selected form and returns it as a file download
