@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from app.blueprints.fund_builder.routes import create_export_zip
+from app.blueprints.application.routes import create_export_zip
 from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,

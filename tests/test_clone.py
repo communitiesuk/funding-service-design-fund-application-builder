@@ -2,11 +2,10 @@ from uuid import uuid4
 
 import pytest
 
-from app.blueprints.fund_builder.routes import clone_single_round
 from app.db.models import Component, ComponentType, Page
 from app.db.models.application_config import Form, Section
 from app.db.models.round import Round
-from app.db.queries.application import (
+from app.db.queries.clone import (
     _fix_cloned_default_pages,
     _initiate_cloned_component,
     _initiate_cloned_form,
@@ -16,6 +15,7 @@ from app.db.queries.application import (
     clone_single_component,
     clone_single_form,
     clone_single_page,
+    clone_single_round,
     clone_single_section,
 )
 
@@ -23,7 +23,7 @@ from app.db.queries.application import (
 @pytest.fixture
 def mock_new_uuid(mocker):
     new_id = uuid4()
-    mocker.patch("app.db.queries.application.uuid4", return_value=new_id)
+    mocker.patch("app.db.queries.clone.uuid4", return_value=new_id)
     yield new_id
 
 

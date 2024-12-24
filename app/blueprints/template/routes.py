@@ -3,7 +3,7 @@ import json
 from flask import Blueprint, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
-from app.blueprints.fund_builder.forms.templates import TemplateFormForm, TemplateUploadForm
+from app.blueprints.template.forms import TemplateFormForm, TemplateUploadForm
 from app.db.models.application_config import Form
 from app.db.queries.application import (
     delete_form,
@@ -19,7 +19,7 @@ from app.shared.helpers import error_formatter
 template_bp = Blueprint(
     "template_bp",
     __name__,
-    url_prefix="/templates",
+    url_prefix="/template",
     template_folder="templates",
 )
 
@@ -36,7 +36,7 @@ def _build_rows(forms: list[Form]) -> list[dict]:
         row = [
             {
                 "html": "<a class='govuk-link--no-visited-state' "
-                f"href='{url_for('build_fund_bp.preview_form', form_id=form.form_id)}'>{form.template_name}</a>"
+                f"href='{url_for('index_bp.preview_form', form_id=form.form_id)}'>{form.template_name}</a>"
             },
             {"text": form.name_in_apply_json["en"]},
             {"text": form.runner_publish_name},
@@ -62,7 +62,7 @@ def view_templates():
         "form_template_rows": _build_rows(forms),
         "uploadform": form,
         "breadcrumb_items": [
-            {"text": "Home", "href": url_for("build_fund_bp.dashboard")},
+            {"text": "Home", "href": url_for("index_bp.dashboard")},
             {"text": "Manage Templates", "href": "#"},
         ],
     }
@@ -97,7 +97,7 @@ def edit_form_template(form_id):
     template_form = TemplateFormForm()
     params = {
         "breadcrumb_items": [
-            {"text": "Home", "href": url_for("build_fund_bp.dashboard")},
+            {"text": "Home", "href": url_for("index_bp.dashboard")},
             {"text": "Manage Templates", "href": url_for("template_bp.view_templates")},
             {"text": "Rename Template", "href": "#"},
         ],
