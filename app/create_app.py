@@ -8,6 +8,7 @@ from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 
 from app.blueprints.fund.routes import fund_bp
 from app.blueprints.fund_builder.routes import build_fund_bp
+from app.blueprints.round.routes import round_bp
 from app.blueprints.templates.routes import template_bp
 
 PUBLIC_ROUTES = [
@@ -31,6 +32,7 @@ def create_app() -> Flask:
     init_sentry()
     flask_app = Flask("__name__", static_url_path="/assets")
     flask_app.register_blueprint(fund_bp)
+    flask_app.register_blueprint(round_bp)
     flask_app.register_blueprint(build_fund_bp)
     flask_app.register_blueprint(template_bp)
 

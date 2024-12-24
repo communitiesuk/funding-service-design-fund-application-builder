@@ -369,11 +369,11 @@
                                             "classes": "govuk-button--secondary"
                                             })  + govukButton({
                                                 "text": "Clone this round",
-                                                "href": url_for("build_fund_bp.clone_round", round_id=round.round_id, fund_id=fund.fund_id),
+                                                "href": url_for("round_bp.clone_round", round_id=round.round_id, fund_id=fund.fund_id),
                                                 "classes": "govuk-button--secondary"
                                                 }) + govukButton({
                                                     "text": "Edit Round",
-                                                    "href": url_for("build_fund_bp.round", round_id=round.round_id),
+                                                    "href": url_for("round_bp.round", round_id=round.round_id),
                                                     "classes": "govuk-button--secondary"
                                                 })
 

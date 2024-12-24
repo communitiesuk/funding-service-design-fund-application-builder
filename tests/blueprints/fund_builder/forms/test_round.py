@@ -1,7 +1,7 @@
 import pytest
 from wtforms.validators import ValidationError
 
-from app.blueprints.fund_builder.forms.round import validate_flexible_url
+from app.blueprints.round.forms import validate_flexible_url
 
 
 class MockField:

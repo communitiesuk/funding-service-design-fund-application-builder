@@ -2,7 +2,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.blueprints.fund_builder.routes import clone_single_round
+from app.blueprints.round.routes import clone_single_round
 from app.db.models import Component, ComponentType, Page
 from app.db.models.application_config import Form, Section
 from app.db.models.round import Round
