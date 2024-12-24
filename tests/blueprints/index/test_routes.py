@@ -1,31 +1,4 @@
-from unittest.mock import MagicMock
-
 import pytest
-from wtforms.validators import ValidationError
-
-from app.blueprints.round.forms import validate_json_field
-
-
-@pytest.mark.parametrize("input_json_string", [(None), (""), ("{}"), (""), ("{}"), ('{"1":"2"}')])
-def test_validate_json_input_valid(input_json_string):
-    field = MagicMock()
-    field.data = input_json_string
-    validate_json_field(None, field)
-
-
-@pytest.mark.parametrize(
-    "input_json_string, exp_error_msg",
-    [
-        ('{"1":', "Expecting value: line 1 column 6 (char 5)]"),
-        ('{"1":"quotes not closed}', "Unterminated string starting at: line 1 column 6 (char 5)"),
-    ],
-)
-def test_validate_json_input_invalid(input_json_string, exp_error_msg):
-    field = MagicMock()
-    field.data = input_json_string
-    with pytest.raises(ValidationError) as error:
-        validate_json_field(None, field)
-    assert exp_error_msg in str(error)
 
 
 def test_index_redirects_to_login_for_unauthenticated_user(flask_test_client):
