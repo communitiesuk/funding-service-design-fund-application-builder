@@ -37,14 +37,14 @@
                                 </span>
                                 <span class="app-task-list__task-actions">
                                     <a class="govuk-link--no-visited-state"
-                                       href="{{ url_for('build_fund_bp.configure_forms_in_section', round_id=round_id, section_id=app_form.section_id, form_id=app_form.form_id, action='remove') }}">Remove</a>&nbsp;
+                                       href="{{ url_for('application_bp.configure_forms_in_section', round_id=round_id, section_id=app_form.section_id, form_id=app_form.form_id, action='remove') }}">Remove</a>&nbsp;
                                     {% if app_form.section_index > 1 %}
                                         <a class="govuk-link--no-visited-state"
-                                           href="{{ url_for('build_fund_bp.configure_forms_in_section', round_id=round_id, section_id=app_form.section_id, index=app_form.section_index, action='move_up') }}">Move up</a>&nbsp;
+                                           href="{{ url_for('application_bp.configure_forms_in_section', round_id=round_id, section_id=app_form.section_id, index=app_form.section_index, action='move_up') }}">Move up</a>&nbsp;
                                     {% endif %}
                                     {% if app_form.section_index < forms_in_section | length %}
                                         <a class="govuk-link--no-visited-state"
-                                           href="{{ url_for('build_fund_bp.configure_forms_in_section', round_id=round_id, section_id=app_form.section_id, index=app_form.section_index, action='move_down') }}"> Move down</a>
+                                           href="{{ url_for('application_bp.configure_forms_in_section', round_id=round_id, section_id=app_form.section_id, index=app_form.section_index, action='move_down') }}"> Move down</a>
                                     {% endif %}
                                 </span>
                             </li>
@@ -52,7 +52,7 @@
                     </ul>
                     <h3 class="govuk-heading-m">Add Form From Template</h3>
                     <form method="POST"
-                          action="{{ url_for('build_fund_bp.configure_forms_in_section', round_id=round_id,section_id=form.section_id.data) }}">
+                          action="{{ url_for('application_bp.configure_forms_in_section', round_id=round_id,section_id=form.section_id.data) }}">
                         {{ govukSelect({
                                                 "id": "template_id",
                                                 "name": "template_id",

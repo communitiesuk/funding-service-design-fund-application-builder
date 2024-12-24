@@ -6,6 +6,7 @@ from fsd_utils.healthchecks.healthcheck import Healthcheck
 from fsd_utils.logging import logging
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 
+from app.blueprints.application.routes import application_bp
 from app.blueprints.fund.routes import fund_bp
 from app.blueprints.fund_builder.routes import build_fund_bp
 from app.blueprints.round.routes import round_bp
@@ -31,9 +32,10 @@ def protect_private_routes(flask_app: Flask) -> Flask:
 def create_app() -> Flask:
     init_sentry()
     flask_app = Flask("__name__", static_url_path="/assets")
+    flask_app.register_blueprint(build_fund_bp)
     flask_app.register_blueprint(fund_bp)
     flask_app.register_blueprint(round_bp)
-    flask_app.register_blueprint(build_fund_bp)
+    flask_app.register_blueprint(application_bp)
     flask_app.register_blueprint(template_bp)
 
     protect_private_routes(flask_app)
