@@ -3,7 +3,7 @@ import json
 from flask import Blueprint, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
-from app.blueprints.fund_builder.forms.templates import TemplateFormForm, TemplateUploadForm
+from app.blueprints.template.forms import TemplateFormForm, TemplateUploadForm
 from app.db.models.application_config import Form
 from app.db.queries.application import (
     delete_form,
@@ -19,7 +19,7 @@ from app.shared.helpers import error_formatter
 template_bp = Blueprint(
     "template_bp",
     __name__,
-    url_prefix="/templates",
+    url_prefix="/template",
     template_folder="templates",
 )
 

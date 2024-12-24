@@ -10,7 +10,7 @@ from app.blueprints.application.routes import application_bp
 from app.blueprints.fund.routes import fund_bp
 from app.blueprints.fund_builder.routes import build_fund_bp
 from app.blueprints.round.routes import round_bp
-from app.blueprints.templates.routes import template_bp
+from app.blueprints.template.routes import template_bp
 
 PUBLIC_ROUTES = [
     "static",
