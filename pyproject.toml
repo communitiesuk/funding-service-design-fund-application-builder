@@ -65,5 +65,5 @@ dev = [
     "pytest-mock==3.14.0",
     "pytest==8.3.4",
     "python-dotenv==1.0.1",
-    "ruff==0.8.3",
+    "ruff==0.8.4",
 ]
