@@ -16,7 +16,6 @@ from flask import (
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.application.forms import SectionForm
 from app.db.queries.application import (
-    clone_single_form,
     delete_form_from_section,
     delete_section_from_round,
     get_all_template_forms,
@@ -29,6 +28,7 @@ from app.db.queries.application import (
     move_section_up,
     update_section,
 )
+from app.db.queries.clone import clone_single_form
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_all_questions import print_html

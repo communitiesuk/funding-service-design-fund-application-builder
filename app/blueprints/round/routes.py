@@ -14,7 +14,7 @@ from flask import (
 from app.blueprints.fund_builder.routes import all_funds_as_govuk_select_items
 from app.blueprints.round.forms import RoundForm, get_datetime
 from app.db.models.round import Round
-from app.db.queries.application import clone_single_round
+from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds
 from app.db.queries.round import add_round, get_round_by_id, update_round
 from app.shared.helpers import error_formatter
