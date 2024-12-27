@@ -400,7 +400,7 @@ def test_section_sorting_move_down(seed_dynamic_data, _db, index_to_move, exp_ne
     assert section_that_moves_up.index == index_to_move + 1
     section_id_that_moves_up = section_that_moves_up.section_id
 
-    move_section_down(round_id=round_id, section_index_to_move_down=index_to_move)
+    move_section_down(round_id=round_id, section_id=section_to_move_down.section_id)
 
     updated_round = get_round_by_id(round_id)
     # total sections shouldn't change
@@ -468,7 +468,7 @@ def test_move_section_up(seed_dynamic_data, _db, index_to_move, exp_new_index):
     id_that_gets_moved_down = section_that_gets_moved_down.section_id
     assert section_that_gets_moved_down.index == index_to_move - 1
 
-    move_section_up(round_id=round_id, section_index_to_move_up=index_to_move)
+    move_section_up(round_id=round_id, section_id=id_to_move)
 
     updated_round = get_round_by_id(round_id)
     assert len(updated_round.sections) == 3

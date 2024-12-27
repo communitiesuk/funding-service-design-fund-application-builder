@@ -38,10 +38,10 @@
                     <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section", round_id=round.round_id, section_id=section.section_id) }}'>Edit</a>&nbsp;
                     <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section",round_id=round.round_id, section_id=section.section_id, action="remove") }}'>Remove</a>&nbsp;
                     {% if section.index > 1 %}
-                        <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section",round_id=round.round_id, index=section.index, action="move_up") }}'>Move up</a>&nbsp;
+                        <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section",round_id=round.round_id, section_id=section.section_id, action="move_up") }}'>Move up</a>&nbsp;
                     {% endif %}
                     {% if section.index < round.sections | length %}
-                        <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section",round_id=round.round_id, index=section.index, action="move_down") }}'> Move down</a>
+                        <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section",round_id=round.round_id, section_id=section.section_id, action="move_down") }}'> Move down</a>
                     {% endif %}
                 </span>
                 <ul class="app-task-list__items">

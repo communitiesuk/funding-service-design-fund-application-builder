@@ -69,10 +69,10 @@ def section(round_id):
         delete_section_from_round(round_id=round_id, section_id=request.args.get("section_id"), cascade=True)
         return redirect(url_for("application_bp.build_application", round_id=round_id))
     if request.args.get("action") == "move_up":
-        move_section_up(round_id=round_id, section_index_to_move_up=int(request.args.get("index")))
+        move_section_up(round_id=round_id, section_id=int(request.args.get("section_id")))
         return redirect(url_for("application_bp.build_application", round_id=round_id))
     if request.args.get("action") == "move_down":
-        move_section_down(round_id=round_id, section_index_to_move_down=int(request.args.get("index")))
+        move_section_down(round_id=round_id, section_id=int(request.args.get("section_id")))
         return redirect(url_for("application_bp.build_application", round_id=round_id))
     if form.validate_on_submit():
         count_existing_sections = len(round_obj.sections)

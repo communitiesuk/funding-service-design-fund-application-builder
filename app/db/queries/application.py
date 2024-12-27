@@ -4,7 +4,6 @@ from sqlalchemy import delete
 
 from app.db import db
 from app.db.models import Component, Form, FormSection, Lizt, Page, Section
-from app.db.models.round import Round
 from app.db.queries.round import get_round_by_id
 
 
@@ -448,7 +447,7 @@ def swap_elements_in_list(containing_list: list, index_a: int, index_b: int) -> 
     return containing_list
 
 
-def move_section_down(round_id, section_index_to_move_down: int):
+def move_section_down(round_id, section_id):
     """Moves a section one place down in the ordered list of sections in a round.
     In this case down means visually down, so the index number will increase by 1.
 
@@ -466,40 +465,28 @@ def move_section_down(round_id, section_index_to_move_down: int):
 
     Args:
         round_id (UUID): Round ID to move this section within
-        section_index_to_move_down (int): Current Section.index value of the section to move
+        section_id (UUID): ID of the section to move down
     """
-    round: Round = get_round_by_id(round_id)
-    list_index_to_move_down = section_index_to_move_down - 1  # Need the 0-based index inside the list
-    round.sections = swap_elements_in_list(round.sections, list_index_to_move_down, list_index_to_move_down + 1)
+    round = get_round_by_id(round_id)
+    section = get_section_by_id(section_id)
+    list_index = section.index - 1  # Convert from 1-based to 0-based index
+    round.sections = swap_elements_in_list(round.sections, list_index, list_index + 1)
     db.session.commit()
 
 
-def move_section_up(round_id, section_index_to_move_up: int):
+def move_section_up(round_id, section_id):
     """Moves a section one place up in the ordered list of sections in a round.
     In this case up means visually up, so the index number will decrease by 1.
 
-
-    Element | Section.index | Index in list
-        A   |   1           |   0
-        B   |   2           |   1
-        C   |   3           |   2
-
-    Then move B up, which results in A moving down
-
-    Element | Section.index | Index in list
-        B   |   1           |   0
-        A   |   2           |   1
-        C   |   3           |   2
-
     Args:
         round_id (UUID): Round ID to move this section within
-        section_index_to_move_up (int): Current Section.index value of the section to move
+        section_id (UUID): ID of the section to move up
     """
 
-    round: Round = get_round_by_id(round_id)
-    list_index_to_move_up = section_index_to_move_up - 1  # Need the 0-based index inside the list
-    round.sections = swap_elements_in_list(round.sections, list_index_to_move_up, list_index_to_move_up - 1)
-
+    round = get_round_by_id(round_id)
+    section = get_section_by_id(section_id)
+    list_index = section.index - 1  # Convert from 1-based to 0-based index
+    round.sections = swap_elements_in_list(round.sections, list_index, list_index - 1)
     db.session.commit()
 
 
