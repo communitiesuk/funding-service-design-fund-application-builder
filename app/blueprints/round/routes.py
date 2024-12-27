@@ -26,23 +26,12 @@ INDEX_BP_DASHBOARD = "index_bp.dashboard"
 round_bp = Blueprint(
     "round_bp",
     __name__,
-    url_prefix="/round",
+    url_prefix="/rounds",
     template_folder="templates",
 )
 
 
-@round_bp.route("/<round_id>/clone")
-def clone_round(round_id, fund_id):
-    cloned = clone_single_round(
-        round_id=round_id,
-        new_fund_id=fund_id,
-        new_short_name=f"R-C{randint(0, 999)}",  # NOSONAR
-    )
-    flash(f"Cloned new round: {cloned.short_name}")
-    return redirect(url_for("fund_bp.view_fund", fund_id=fund_id))
-
-
-@round_bp.route("", methods=["GET", "POST"])
+@round_bp.route("/create", methods=["GET", "POST"])
 @round_bp.route("/<round_id>", methods=["GET", "POST"])
 def round(round_id=None):
     """
@@ -74,3 +63,14 @@ def round(round_id=None):
     error = error_formatter(params["form"])
 
     return render_template("round.html", **params, error=error)
+
+
+@round_bp.route("/<round_id>/clone")
+def clone_round(round_id, fund_id):
+    cloned = clone_single_round(
+        round_id=round_id,
+        new_fund_id=fund_id,
+        new_short_name=f"R-C{randint(0, 999)}",  # NOSONAR
+    )
+    flash(f"Cloned new round: {cloned.short_name}")
+    return redirect(url_for("fund_bp.view_fund", fund_id=fund_id))

@@ -8,7 +8,7 @@ from tests.helpers import submit_form
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_data):
     """
-    Tests that a round can be successfully created using the /round route
+    Tests that a round can be successfully created using the /rounds/create route
     Verifies that the created round has the correct attributes
     """
     test_fund = seed_dynamic_data["funds"][0]
@@ -59,19 +59,19 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
     )
 
     # Test works fine with first round
-    response = submit_form(flask_test_client, "/round", new_round_data)
+    response = submit_form(flask_test_client, "/rounds/create", new_round_data)
     assert response.status_code == 200
     assert error_html not in response.data.decode("utf-8"), "Error HTML found in response"
 
     # Test works fine with second round but with different short name
     new_round_data = {**new_round_data, "short_name": "NR1234"}
-    response = submit_form(flask_test_client, "/round", new_round_data)
+    response = submit_form(flask_test_client, "/rounds/create", new_round_data)
     assert response.status_code == 200
     assert error_html not in response.data.decode("utf-8"), "Error HTML found in response"
 
     # Test doesn't work with third round with same short name as firsrt
     new_round_data = {**new_round_data, "short_name": "NR123"}
-    response = submit_form(flask_test_client, "/round", new_round_data)
+    response = submit_form(flask_test_client, "/rounds/create", new_round_data)
     assert response.status_code == 200
     assert error_html in response.data.decode("utf-8"), "Error HTML not found in response"
 
@@ -79,7 +79,7 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_new_round(flask_test_client, seed_dynamic_data):
     """
-    Tests that a round can be successfully created using the /round route
+    Tests that a round can be successfully created using the /rounds/create route
     Verifies that the created round has the correct attributes
     """
     test_fund = seed_dynamic_data["funds"][0]
@@ -125,7 +125,7 @@ def test_create_new_round(flask_test_client, seed_dynamic_data):
         "guidance_url": "http://example.com/guidance",
     }
 
-    response = submit_form(flask_test_client, "/round", new_round_data)
+    response = submit_form(flask_test_client, "/rounds/create", new_round_data)
     assert response.status_code == 200
 
     new_round = Round.query.filter_by(short_name="NR123").first()
@@ -137,7 +137,7 @@ def test_create_new_round(flask_test_client, seed_dynamic_data):
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_update_existing_round(flask_test_client, seed_dynamic_data):
     """
-    Tests that a round can be successfully updated using the /round/<round_id> route
+    Tests that a round can be successfully updated using the /rounds/<round_id> route
     Verifies that the updated round has the correct attributes
     """
     update_round_data = {
@@ -183,7 +183,7 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
     }
 
     test_round = seed_dynamic_data["rounds"][0]
-    response = submit_form(flask_test_client, f"/round/{test_round.round_id}", update_round_data)
+    response = submit_form(flask_test_client, f"/rounds/{test_round.round_id}", update_round_data)
     assert response.status_code == 200
 
     updated_round = get_round_by_id(test_round.round_id)
