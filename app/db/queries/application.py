@@ -490,7 +490,7 @@ def move_section_up(round_id, section_id):
     db.session.commit()
 
 
-def move_form_down(section_id, form_index_to_move_down: int):
+def move_form_down(section_id, form_id):
     """Moves a form one place down in the ordered list of forms in a section.
     In this case down means visually down, so the index number will increase by 1.
 
@@ -508,16 +508,16 @@ def move_form_down(section_id, form_index_to_move_down: int):
 
     Args:
         section_id (UUID): Section ID to move this form within
-        form_index_to_move_down (int): Current Form.section_index value of the form to move
+        form_id (UUID): ID of the form to move down
     """
-    section: Section = get_section_by_id(section_id)
-    list_index_to_move_down = form_index_to_move_down - 1  # Need the 0-based index inside the list
-
-    section.forms = swap_elements_in_list(section.forms, list_index_to_move_down, list_index_to_move_down + 1)
+    section = get_section_by_id(section_id)
+    form = get_form_by_id(form_id)
+    list_index = form.section_index - 1  # Convert from 1-based to 0-based index
+    section.forms = swap_elements_in_list(section.forms, list_index, list_index + 1)
     db.session.commit()
 
 
-def move_form_up(section_id, form_index_to_move_up: int):
+def move_form_up(section_id, form_id):
     """Moves a form one place up in the ordered list of forms in a section.
     In this case up means visually up, so the index number will decrease by 1.
 
@@ -536,13 +536,13 @@ def move_form_up(section_id, form_index_to_move_up: int):
 
     Args:
         section_id (UUID): Section ID to move this form within
-        form_index_to_move_up (int): Current Form.section_index value of the form to up
+        form_id (UUID): ID of the form to move up
     """
 
-    section: Section = get_section_by_id(section_id)
-    list_index_to_move_up = form_index_to_move_up - 1  # Need the 0-based index inside the list
-
-    section.forms = swap_elements_in_list(section.forms, list_index_to_move_up, list_index_to_move_up - 1)
+    section = get_section_by_id(section_id)
+    form = get_form_by_id(form_id)
+    list_index = form.section_index - 1  # Convert from 1-based to 0-based index
+    section.forms = swap_elements_in_list(section.forms, list_index, list_index - 1)
     db.session.commit()
 
 

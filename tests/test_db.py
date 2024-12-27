@@ -508,7 +508,7 @@ def test_move_form_up(seed_dynamic_data, _db, index_to_move, exp_new_index):
     id_to_move_down = section.forms[index_to_move - 2].form_id
     assert section.forms[index_to_move - 2].section_index == exp_new_index
 
-    move_form_up(section_id, index_to_move)
+    move_form_up(section_id, id_to_move_up)
 
     updated_section = get_section_by_id(section_id)
     assert len(updated_section.forms) == 3
@@ -542,7 +542,7 @@ def test_move_form_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
     id_to_move_up = section.forms[index_to_move].form_id
     assert section.forms[index_to_move].section_index == index_to_move + 1
 
-    move_form_down(section_id, index_to_move)
+    move_form_down(section_id, id_to_move_down)
 
     updated_section = get_section_by_id(section_id)
     assert len(updated_section.forms) == 3
