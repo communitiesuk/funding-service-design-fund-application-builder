@@ -12,21 +12,21 @@
     </div>
     {{ govukButton({
         "text": "View All Questions",
-        "href": url_for("build_fund_bp.view_all_questions", round_id=round.round_id) ,
-    "classes": "govuk-button--secondary"
+        "href": url_for("application_bp.view_all_questions", round_id=round.round_id) ,
+        "classes": "govuk-button--secondary"
     })
     }}
     {{ govukButton({
         "text": "Create export files for round",
-        "href": url_for("build_fund_bp.create_export_files", round_id=round.round_id) ,
-    "classes": "govuk-button--secondary"
+        "href": url_for("application_bp.create_export_files", round_id=round.round_id) ,
+        "classes": "govuk-button--secondary"
     })
     }}
     <ul class="app-task-list__items">
         {{ govukButton({
-                "text": "Add Section",
-                "href": url_for("build_fund_bp.section", round_id=round.round_id) ,
-        "classes": "govuk-button--secondary"
+            "text": "Add Section",
+            "href": url_for("application_bp.section", round_id=round.round_id),
+            "classes": "govuk-button--secondary"
         })
         }}
         {% for section in round.sections %}
@@ -35,13 +35,13 @@
                     <h3 class="govuk-heading-m">{{ section.index }}. {{ section.name_in_apply_json["en"] }}</h3>
                 </span>
                 <span class="app-task-list__task-actions">
-                    <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.section", round_id=round.round_id, section_id=section.section_id) }}'>Edit</a>&nbsp;
-                    <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.section",round_id=round.round_id, section_id=section.section_id, action="remove") }}'>Remove</a>&nbsp;
+                    <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section", round_id=round.round_id, section_id=section.section_id) }}'>Edit</a>&nbsp;
+                    <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.delete_section",round_id=round.round_id, section_id=section.section_id) }}'>Remove</a>&nbsp;
                     {% if section.index > 1 %}
-                        <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.section",round_id=round.round_id, index=section.index, action="move_up") }}'>Move up</a>&nbsp;
+                        <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.move_section_up_route",round_id=round.round_id, section_id=section.section_id) }}'>Move up</a>&nbsp;
                     {% endif %}
                     {% if section.index < round.sections | length %}
-                        <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.section",round_id=round.round_id, index=section.index, action="move_down") }}'> Move down</a>
+                        <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.move_section_down_route",round_id=round.round_id, section_id=section.section_id) }}'> Move down</a>
                     {% endif %}
                 </span>
                 <ul class="app-task-list__items">
@@ -53,9 +53,9 @@
                                 </h3>
                             </span>
                             <span class="app-task-list__task-actions">
-                                <a class="govuk-link--no-visited-state" href="{{ url_for('build_fund_bp.view_form_questions', round_id=round.round_id, form_id=form.form_id) }}">View</a>&nbsp;
-                                <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.download_form_json", form_id=form.form_id) }}'>Download</a>&nbsp;
-                                <a class="govuk-link--no-visited-state" href='{{ url_for("build_fund_bp.preview_form", form_id=form.form_id) }}'>Preview</a>&nbsp;
+                                <a class="govuk-link--no-visited-state" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View</a>&nbsp;
+                                <a class="govuk-link--no-visited-state" href='{{ url_for("index_bp.download_form_json", form_id=form.form_id) }}'>Download</a>&nbsp;
+                                <a class="govuk-link--no-visited-state" href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>Preview</a>&nbsp;
                             </span>
                         </li>
                     {% endfor %}
