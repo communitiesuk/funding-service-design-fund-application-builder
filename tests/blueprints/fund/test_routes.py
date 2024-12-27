@@ -9,7 +9,7 @@ from tests.helpers import submit_form
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_fund(flask_test_client):
     """
-    Tests that a fund can be successfully created using the /fund route
+    Tests that a fund can be successfully created using the /funds/create route
     Verifies that the created fund has the correct attributes
     """
     create_data = {
@@ -22,7 +22,7 @@ def test_create_fund(flask_test_client):
         "ggis_scheme_reference_number": "G1-SCH-0000092415",
     }
 
-    response = submit_form(flask_test_client, "/fund", create_data)
+    response = submit_form(flask_test_client, "/funds/create", create_data)
     assert response.status_code == 200
     created_fund = Fund.query.filter_by(short_name="NF5432").first()
     assert created_fund is not None
@@ -44,7 +44,7 @@ def test_create_fund(flask_test_client):
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_fund_with_existing_short_name(flask_test_client):
     """
-    Tests that a fund can be successfully created using the /fund route
+    Tests that a fund can be successfully created using the /funds/create route
     Verifies that the created fund has the correct attributes
     """
     create_data = {
@@ -56,7 +56,7 @@ def test_create_fund_with_existing_short_name(flask_test_client):
         "funding_type": FundingType.COMPETITIVE.value,
         "ggis_scheme_reference_number": "G1-SCH-0000092415",
     }
-    response = submit_form(flask_test_client, "/fund", create_data)
+    response = submit_form(flask_test_client, "/funds/create", create_data)
     assert response.status_code == 200
     create_data = {
         "name_en": "New Fund 3",
@@ -67,7 +67,7 @@ def test_create_fund_with_existing_short_name(flask_test_client):
         "funding_type": FundingType.COMPETITIVE.value,
         "ggis_scheme_reference_number": "G1-SCH-0000092415",
     }
-    response = submit_form(flask_test_client, "/fund", create_data)
+    response = submit_form(flask_test_client, "/funds/create", create_data)
     assert response.status_code == 200
     html = response.data.decode("utf-8")
     assert (
@@ -78,7 +78,7 @@ def test_create_fund_with_existing_short_name(flask_test_client):
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_update_fund(flask_test_client, seed_dynamic_data):
     """
-    Tests that a fund can be successfully updated using the /fund/<fund_id> route
+    Tests that a fund can be successfully updated using the /funds/<fund_id> route
     Verifies that the updated fund has the correct attributes
     """
     update_data = {
@@ -93,7 +93,7 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
     }
 
     test_fund = seed_dynamic_data["funds"][0]
-    response = submit_form(flask_test_client, f"/fund/{test_fund.fund_id}", update_data)
+    response = submit_form(flask_test_client, f"/funds/{test_fund.fund_id}", update_data)
     assert response.status_code == 200
 
     updated_fund = get_fund_by_id(test_fund.fund_id)

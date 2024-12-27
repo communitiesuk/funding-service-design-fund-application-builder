@@ -20,7 +20,7 @@ INDEX_BP_DASHBOARD = "index_bp.dashboard"
 fund_bp = Blueprint(
     "fund_bp",
     __name__,
-    url_prefix="/fund",
+    url_prefix="/funds",
     template_folder="templates",
 )
 
@@ -48,7 +48,7 @@ def view_fund():
     return render_template("fund_config.html", **params)
 
 
-@fund_bp.route("", methods=["GET", "POST"])
+@fund_bp.route("/create", methods=["GET", "POST"])
 @fund_bp.route("/<fund_id>", methods=["GET", "POST"])
 def fund(fund_id=None):
     """
