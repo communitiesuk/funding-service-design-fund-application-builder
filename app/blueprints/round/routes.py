@@ -11,13 +11,12 @@ from flask import (
     url_for,
 )
 
-from app.blueprints.index.routes import all_funds_as_govuk_select_items
 from app.blueprints.round.forms import RoundForm, get_datetime
 from app.db.models.round import Round
 from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds
 from app.db.queries.round import add_round, get_round_by_id, update_round
-from app.shared.helpers import error_formatter
+from app.shared.helpers import all_funds_as_govuk_select_items, error_formatter
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 

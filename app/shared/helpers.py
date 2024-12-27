@@ -63,3 +63,11 @@ def no_spaces_between_letters(form, field):
         return
     if re.search(r"\b\w+\s+\w+\b", field.data):  # Matches sequences with spaces in between
         raise ValidationError("Spaces between letters are not allowed.")
+
+
+def all_funds_as_govuk_select_items(all_funds: list) -> list:
+    """
+    Reformats a list of funds into a list of display/value items that can be passed to a govUk select macro
+    in the html
+    """
+    return [{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds]

@@ -45,14 +45,6 @@ def dashboard():
     return render_template("dashboard.html")
 
 
-def all_funds_as_govuk_select_items(all_funds: list) -> list:
-    """
-    Reformats a list of funds into a list of display/value items that can be passed to a govUk select macro
-    in the html
-    """
-    return [{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds]
-
-
 @index_bp.route("/preview/<form_id>", methods=["GET"])
 def preview_form(form_id):
     """

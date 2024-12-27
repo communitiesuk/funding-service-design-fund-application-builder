@@ -10,10 +10,9 @@ from flask import (
 )
 
 from app.blueprints.fund.forms import FundForm
-from app.blueprints.index.routes import all_funds_as_govuk_select_items
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
-from app.shared.helpers import error_formatter
+from app.shared.helpers import all_funds_as_govuk_select_items, error_formatter
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
