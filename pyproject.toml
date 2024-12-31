@@ -9,7 +9,7 @@ requires-python = "~=3.10.0"
 dependencies = [
     "airium==0.2.6",
     "flask-babel==4.0.0",
-    "flask-compress==1.15",
+    "flask-compress==1.17",
     "flask-migrate==4.0.7",
     "flask-sqlalchemy==3.1.1",
     "flask-talisman==1.1.0",
