@@ -34,12 +34,9 @@
 {% endblock footer %}
 
 {% block bodyEnd %}
-
-
-    {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
-        <script type="module" src="{{ url_for('static', filename='govuk-frontend/govuk-frontend-5.4.0.min.js') }}"></script>
-        <script type="module">
-          import { initAll } from "{{ url_for('static', filename='govuk-frontend/govuk-frontend-5.4.0.min.js') }}"
-          initAll()
-        </script>
+  <script type="module" src="{{ url_for('static', filename='govuk-frontend/govuk-frontend-5.6.0.min.js') }}"></script>
+  <script type="module">
+    import { initAll } from "{{ url_for('static', filename='govuk-frontend/govuk-frontend-5.6.0.min.js') }}"
+    initAll()
+  </script>
 {% endblock bodyEnd %}

@@ -8,7 +8,7 @@ import zipfile
 def build_govuk_assets(static_dist_root="app/static/dist"):
     DIST_ROOT = "./" + static_dist_root
     GOVUK_DIR = "/govuk-frontend"
-    GOVUK_URL = "https://github.com/alphagov/govuk-frontend/releases/download/v5.4.0/release-v5.4.0.zip"
+    GOVUK_URL = "https://github.com/alphagov/govuk-frontend/releases/download/v5.6.0/release-v5.6.0.zip"
     ZIP_FILE = "./govuk_frontend.zip"
     DIST_PATH = DIST_ROOT + GOVUK_DIR
     ASSETS_DIR = "/assets"
