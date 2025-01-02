@@ -1,6 +1,6 @@
 {% extends "govuk_frontend_jinja/template.html" %}
 {% from "govuk_frontend_jinja/components/breadcrumbs/macro.html" import govukBreadcrumbs %}
-{% set assetPath = url_for('static', filename='').rstrip('/') %}
+{% set assetPath = url_for("static", filename="").rstrip("/") %}
 
 {% block pageTitle %}Fund Application Builder{% endblock pageTitle %}
 
@@ -10,10 +10,15 @@
 
 {% block header %}
   {{ govukHeader({
-    'useTudorCrown': 'yes',
-    'serviceName': 'Fund Application Builder',
-    'serviceUrl': url_for('index_bp.index'),
+    "useTudorCrown": "yes",
+    "serviceName": "Fund Application Builder",
+    "serviceUrl": url_for("index_bp.index"),
   }) }}
+
+  {# Only show the custom navigation if showNavigationBar is set #}
+  {% if showNavigationBar %}
+    {% include "navigation.html" %}
+  {% endif %}
 {% endblock header %}
 
 {% block main %}
@@ -21,9 +26,10 @@
   {% block beforeContent %}{% endblock beforeContent %}
   <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
 
-{{ govukBreadcrumbs({
-  "items": breadcrumb_items
-}) }}
+    {{ govukBreadcrumbs({
+      "items": breadcrumb_items
+    }) }}
+
     {% block content %}{% endblock content %}
   </main>
 </div>
