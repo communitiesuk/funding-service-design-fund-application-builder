@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass
 from enum import Enum
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column, ForeignKey
@@ -12,7 +12,8 @@ from sqlalchemy.types import Boolean
 
 from app.db import db
 
-from .round import Round
+if TYPE_CHECKING:
+    from .round import Round
 
 BaseModel: DefaultMeta = db.Model
 
@@ -74,3 +75,5 @@ class Fund(BaseModel):
     owner_organisation: Mapped["Organisation"] = relationship("Organisation", back_populates="funds")
     funding_type = Column(ENUM(FundingType), nullable=False, unique=False)
     ggis_scheme_reference_number = Column("ggis_scheme_reference_number", db.String(255), nullable=True, unique=False)
+
+    rounds: Mapped[List["Round"]] = relationship("Round", back_populates="fund", passive_deletes="all")
