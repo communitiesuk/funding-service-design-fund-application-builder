@@ -1,8 +1,30 @@
 import pytest
+from flask import url_for
 
 from app.db.models import Round
 from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_select_fund(flask_test_client, seed_dynamic_data):
+    """
+    Test the /rounds/select-fund route to ensure a user cannot proceed without selecting a fund
+    and is redirected to /rounds/create if a valid fund is selected.
+    """
+    # Attempt to submit without choosing a fund
+    with pytest.raises(ValueError, match="Fund ID is required to create a round"):
+        flask_test_client.post("/rounds/select-fund", data={"fund_id": ""}, follow_redirects=True)
+
+    # Submit with a valid fund
+    test_fund = seed_dynamic_data["funds"][0]
+    response = flask_test_client.post(
+        "/rounds/select-fund", data={"fund_id": str(test_fund.fund_id)}, follow_redirects=False
+    )
+
+    # Should redirect to /rounds/create?fund_id=...
+    assert response.status_code == 302
+    assert url_for("round_bp.create_round", fund_id=test_fund.fund_id) in response.location
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
@@ -44,7 +66,6 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
         "prospectus_link": "http://example.com/prospectus",
         "privacy_notice_link": "http://example.com/privacy",
         "contact_email": "contact@example.com",
-        "submit": "Submit",
         "contact_phone": "1234567890",
         "contact_textphone": "0987654321",
         "support_times": "9am - 5pm",
@@ -57,21 +78,22 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
     error_html = (
         '<a href="#short_name">Short name: Given short name already exists in the fund funding to improve testing.</a>'
     )
+    url = f"/rounds/create?fund_id={test_fund.fund_id}"
 
     # Test works fine with first round
-    response = submit_form(flask_test_client, "/rounds/create", new_round_data)
+    response = submit_form(flask_test_client, url, new_round_data)
     assert response.status_code == 200
     assert error_html not in response.data.decode("utf-8"), "Error HTML found in response"
 
     # Test works fine with second round but with different short name
-    new_round_data = {**new_round_data, "short_name": "NR1234"}
-    response = submit_form(flask_test_client, "/rounds/create", new_round_data)
+    new_round_data["short_name"] = "NR1234"
+    response = submit_form(flask_test_client, url, new_round_data)
     assert response.status_code == 200
     assert error_html not in response.data.decode("utf-8"), "Error HTML found in response"
 
-    # Test doesn't work with third round with same short name as firsrt
-    new_round_data = {**new_round_data, "short_name": "NR123"}
-    response = submit_form(flask_test_client, "/rounds/create", new_round_data)
+    # Test doesn't work with third round with same short name as first
+    new_round_data["short_name"] = "NR123"
+    response = submit_form(flask_test_client, url, new_round_data)
     assert response.status_code == 200
     assert error_html in response.data.decode("utf-8"), "Error HTML not found in response"
 
@@ -115,7 +137,6 @@ def test_create_new_round(flask_test_client, seed_dynamic_data):
         "prospectus_link": "http://example.com/prospectus",
         "privacy_notice_link": "http://example.com/privacy",
         "contact_email": "contact@example.com",
-        "submit": "Submit",
         "contact_phone": "1234567890",
         "contact_textphone": "0987654321",
         "support_times": "9am - 5pm",
@@ -125,7 +146,7 @@ def test_create_new_round(flask_test_client, seed_dynamic_data):
         "guidance_url": "http://example.com/guidance",
     }
 
-    response = submit_form(flask_test_client, "/rounds/create", new_round_data)
+    response = submit_form(flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}", new_round_data)
     assert response.status_code == 200
 
     new_round = Round.query.filter_by(short_name="NR123").first()
@@ -141,6 +162,7 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
     Verifies that the updated round has the correct attributes
     """
     update_round_data = {
+        "fund_id": seed_dynamic_data["funds"][0].fund_id,
         "title_en": "Updated Round",
         "short_name": "UR123",
         "opens-day": "01",
@@ -171,7 +193,6 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
         "prospectus_link": "http://example.com/updated_prospectus",
         "privacy_notice_link": "http://example.com/updated_privacy",
         "contact_email": "updated_contact@example.com",
-        "submit": "Submit",
         "contact_phone": "1234567890",
         "contact_textphone": "0987654321",
         "support_times": "9am - 5pm",
