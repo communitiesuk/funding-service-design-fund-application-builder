@@ -406,7 +406,7 @@ wheels = [
 
 [[package]]
 name = "flask-compress"
-version = "1.15"
+version = "1.17"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "brotli", marker = "platform_python_implementation != 'PyPy'" },
@@ -415,9 +415,9 @@ dependencies = [
     { name = "zstandard" },
     { name = "zstandard", extra = ["cffi"], marker = "platform_python_implementation == 'PyPy'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f2/03/fde640d5eeb4db20e7932c7a7e538db4493e81a79f4dab642484e35f5df0/flask_compress-1.15.tar.gz", hash = "sha256:b7b66cd5d08fc46bbcc71561e13ca64321590b0ca4c172f8001bf5374f8f5c58", size = 13944 }
+sdist = { url = "https://files.pythonhosted.org/packages/cc/1f/260db5a4517d59bfde7b4a0d71052df68fb84983bda9231100e3b80f5989/flask_compress-1.17.tar.gz", hash = "sha256:1ebb112b129ea7c9e7d6ee6d5cc0d64f226cbc50c4daddf1a58b9bd02253fbd8", size = 15733 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/27/c8/1efd52b8f6b6b9372515c1b33c5609d9188c4326ad7fa28f2663601eb2ae/Flask_Compress-1.15-py3-none-any.whl", hash = "sha256:5d6efe3584c89516c3ab9d94adabe08c218517b957a9bd5cd0c3955dd3834c51", size = 8594 },
+    { url = "https://files.pythonhosted.org/packages/f7/54/ff08f947d07c0a8a5d8f1c8e57b142c97748ca912b259db6467ab35983cd/Flask_Compress-1.17-py3-none-any.whl", hash = "sha256:415131f197c41109f08e8fdfc3a6628d83d81680fb5ecd0b3a97410e02397b20", size = 8723 },
 ]
 
 [[package]]
@@ -530,7 +530,7 @@ requires-dist = [
     { name = "airium", specifier = "==0.2.6" },
     { name = "flask", specifier = "==3.0.3" },
     { name = "flask-babel", specifier = "==4.0.0" },
-    { name = "flask-compress", specifier = "==1.15" },
+    { name = "flask-compress", specifier = "==1.17" },
     { name = "flask-migrate", specifier = "==4.0.7" },
     { name = "flask-sqlalchemy", specifier = "==3.1.1" },
     { name = "flask-talisman", specifier = "==1.1.0" },
