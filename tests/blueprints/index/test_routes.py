@@ -38,7 +38,7 @@ def test_dashboard_renders_for_internal_user(flask_test_client):
     """
     response = flask_test_client.get("/dashboard")
     assert response.status_code == 200
-    assert b"What do you want to do?" in response.data
+    assert b"Creating a new grant application" in response.data
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_external_user")
