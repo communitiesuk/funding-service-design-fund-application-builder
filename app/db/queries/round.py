@@ -29,6 +29,6 @@ def get_round_by_short_name_and_fund_id(fund_id: str, short_name: str) -> Round:
     return db.session.query(Round).filter_by(fund_id=fund_id, short_name=short_name).first()
 
 
-def get_all_rounds() -> list:
+def get_all_rounds() -> list[Round]:
     stmt = select(Round).order_by(Round.short_name)
     return db.session.scalars(stmt).all()
