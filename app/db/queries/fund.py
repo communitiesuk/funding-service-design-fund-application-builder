@@ -24,7 +24,7 @@ def update_fund(fund: Fund) -> Fund:
     return fund
 
 
-def get_all_funds() -> list:
+def get_all_funds() -> list[Fund]:
     stmt = select(Fund).order_by(Fund.short_name)
     return db.session.scalars(stmt).all()
 
