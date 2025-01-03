@@ -1,5 +1,6 @@
 import uuid
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 from flask_sqlalchemy.model import DefaultMeta
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Sequence, String, UniqueConstraint, inspect
@@ -10,6 +11,9 @@ from sqlalchemy.types import Boolean
 
 from app.db import db
 from app.db.models import Criteria, Section
+
+if TYPE_CHECKING:
+    from .fund import Fund
 
 BaseModel: DefaultMeta = db.Model
 
@@ -75,6 +79,8 @@ class Round(BaseModel):
         Integer,
         server_default=base_path_seq.next_value(),
     )
+
+    fund: Mapped["Fund"] = relationship("Fund", back_populates="rounds")
 
     def __repr__(self):
         return f"Round({self.short_name} - {self.title_json['en']}, Sections: {self.sections})"
