@@ -1,10 +1,13 @@
+{% extends "base.html" %}
+{% set showNavigationBar = True %}
+{% set active_item_identifier = "templates" %}
+
 {% from "macros/wtfToGovUk.html" import input %}
 {%- from "govuk_frontend_jinja/components/file-upload/macro.html" import govukFileUpload -%}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 
-{% extends "base.html" %}
 {% set pageHeading %}
     Manage Templates
 {% endset %}

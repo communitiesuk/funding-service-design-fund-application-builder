@@ -1,0 +1,32 @@
+{# navigation.html #}
+{% from "govuk_frontend_jinja/components/service-navigation/macro.html" import govukServiceNavigation %}
+
+{% set nav_items = [
+  {
+    "text": "Home",
+    "href": url_for("index_bp.dashboard"),
+    "current": active_item_identifier == "home"
+  },
+  {
+    "text": "Grants",
+    "href": "#",
+    "current": active_item_identifier == "grants"
+  },
+  {
+    "text": "Applications",
+    "href": "#",
+    "current": active_item_identifier == "applications"
+  },
+  {
+    "text": "Templates",
+    "href": url_for("template_bp.view_templates"),
+    "current": active_item_identifier == "templates"
+  }
+] %}
+
+{{ govukServiceNavigation({
+  "serviceName": "Fund Application Builder",
+  "serviceUrl": url_for("index_bp.index"),
+  "navigation": nav_items,
+  "classes": "govuk-!-margin-bottom-0"
+}) }}
