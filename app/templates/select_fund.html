@@ -1,10 +1,16 @@
 {% extends "base.html" %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/select/macro.html" import govukSelect %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% block content %}
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-full">
+    {{ govukBackLink({
+      "text": "Back",
+      "href": url_for("index_bp.dashboard")
+    }) }}
+
     <h1 class="govuk-heading-l">Select a fund</h1>
     <p class="govuk-body">Select or add a new fund for this application</p>
 
