@@ -40,11 +40,6 @@ def view_fund():
         fund = get_fund_by_id(fund_id)
         params["fund"] = fund
         params["selected_fund_id"] = fund_id
-    params["breadcrumb_items"] = [
-        {"text": "Home", "href": url_for(INDEX_BP_DASHBOARD)},
-        {"text": fund.title_json["en"] if fund else "Manage Application Configuration", "href": "#"},
-    ]
-
     return render_template("fund_config.html", **params)
 
 

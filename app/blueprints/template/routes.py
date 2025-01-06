@@ -33,10 +33,6 @@ def view_templates():
         "forms": forms,
         "form_template_rows": build_rows(forms),
         "uploadform": form,
-        "breadcrumb_items": [
-            {"text": "Home", "href": url_for("index_bp.dashboard")},
-            {"text": "Manage Templates", "href": "#"},
-        ],
     }
     if form.validate_on_submit():
         template_name = form.template_name.data
@@ -82,14 +78,7 @@ def edit_template(form_id):
     template_form.template_name.data = existing_form.template_name
     template_form.tasklist_name.data = existing_form.name_in_apply_json["en"]
     template_form.url_path.data = existing_form.runner_publish_name
-    params = {
-        "breadcrumb_items": [
-            {"text": "Home", "href": url_for("index_bp.dashboard")},
-            {"text": "Manage Templates", "href": url_for("template_bp.view_templates")},
-            {"text": "Edit Template", "href": "#"},
-        ],
-        "template_form": template_form,
-    }
+    params = {"template_form": template_form}
     error = error_formatter(template_form)
     return render_template(
         "edit_form_template.html",

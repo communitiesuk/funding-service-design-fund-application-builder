@@ -26,11 +26,6 @@
 <div class="govuk-width-container {{ containerClasses }}">
   {% block beforeContent %}{% endblock beforeContent %}
   <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
-
-    {{ govukBreadcrumbs({
-      "items": breadcrumb_items
-    }) }}
-
     {% block content %}{% endblock content %}
   </main>
 </div>
