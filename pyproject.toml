@@ -8,24 +8,16 @@ license = "MIT License"
 requires-python = "~=3.10.0"
 dependencies = [
     "airium==0.2.6",
-    "flask-babel==4.0.0",
-    "flask-compress==1.15",
     "flask-migrate==4.0.7",
     "flask-sqlalchemy==3.1.1",
-    "flask-talisman==1.1.0",
     "flask-wtf==1.2.2",
     "flask==3.0.3",
     "funding-service-design-utils==5.2.0",
     "govuk-frontend-jinja==3.4.0",
     "jsonschema==4.23.0",
-    "marshmallow-sqlalchemy==1.0.0",
-    "openpyxl==3.1.5",
-    "pandas==2.2.3",
     "psycopg2-binary==2.9.10",
     "requests==2.32.3",
     "sentry-sdk==2.10.0",
-    "sqlalchemy-json==0.7.0",
-    "sqlalchemy-utils==0.41.2",
     "sqlalchemy[mypy]==2.0.36",
 ]
 
