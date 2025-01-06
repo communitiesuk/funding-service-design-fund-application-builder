@@ -30,7 +30,7 @@ round_bp = Blueprint(
 )
 
 
-@round_bp.route("/select-fund", methods=["GET", "POST"])  # NOSONAR
+@round_bp.route("/select-grant", methods=["GET", "POST"])  # NOSONAR
 def select_fund():
     """
     Intermediary page to select a Fund before creating a Round.
@@ -40,7 +40,7 @@ def select_fund():
         if not fund_id:
             raise ValueError("Fund ID is required to create a round")
         return redirect(url_for("round_bp.create_round", fund_id=fund_id))
-    fund_dropdown_items = [{"value": "", "text": "Select a fund"}]
+    fund_dropdown_items = [{"value": "", "text": "Select a grant"}]
     for fund in get_all_funds():
         fund_dropdown_items.append(
             {"value": str(fund.fund_id), "text": fund.short_name + " - " + fund.title_json["en"]}

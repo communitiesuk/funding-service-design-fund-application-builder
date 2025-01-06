@@ -54,7 +54,7 @@ application_bp = Blueprint(
 )
 
 
-@application_bp.route("/sections/select-fund", methods=["GET", "POST"])  # NOSONAR
+@application_bp.route("/sections/select-grant", methods=["GET", "POST"])  # NOSONAR
 def select_fund():
     """
     Intermediary page to select a Fund before building an Application.
@@ -64,7 +64,7 @@ def select_fund():
         if not fund_id:
             raise ValueError("Fund ID is required to manage an application")
         return redirect(url_for("application_bp.select_application", fund_id=fund_id))
-    fund_dropdown_items = [{"value": "", "text": "Select a fund"}]
+    fund_dropdown_items = [{"value": "", "text": "Select a grant"}]
     for fund in get_all_funds():
         fund_dropdown_items.append(
             {"value": str(fund.fund_id), "text": fund.short_name + " - " + fund.title_json["en"]}

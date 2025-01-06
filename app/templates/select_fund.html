@@ -11,8 +11,8 @@
       "href": url_for("index_bp.dashboard")
     }) }}
 
-    <h1 class="govuk-heading-l">Select a fund</h1>
-    <p class="govuk-body">Select or add a new fund for this application</p>
+    <h1 class="govuk-heading-l">Select a grant</h1>
+    <p class="govuk-body">Select or add a new grant for this application</p>
 
     <form method="POST">
       {{ govukSelect({
@@ -30,7 +30,7 @@
       }) }}
 
       <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-7">
-        <a href="{{ url_for('fund_bp.fund') }}" class="govuk-link">Add a new fund</a>
+        <a href="{{ url_for('fund_bp.fund') }}" class="govuk-link">Add a new grant</a>
       </p>
 
       <div class="govuk-button-group">

@@ -9,17 +9,17 @@ from tests.helpers import submit_form
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_select_fund(flask_test_client, seed_dynamic_data):
     """
-    Test the /rounds/select-fund route to ensure a user cannot proceed without selecting a fund
+    Test the /rounds/select-grant route to ensure a user cannot proceed without selecting a fund
     and is redirected to /rounds/create if a valid fund is selected.
     """
     # Attempt to submit without choosing a fund
     with pytest.raises(ValueError, match="Fund ID is required to create a round"):
-        flask_test_client.post("/rounds/select-fund", data={"fund_id": ""}, follow_redirects=True)
+        flask_test_client.post("/rounds/select-grant", data={"fund_id": ""}, follow_redirects=True)
 
     # Submit with a valid fund
     test_fund = seed_dynamic_data["funds"][0]
     response = flask_test_client.post(
-        "/rounds/select-fund", data={"fund_id": str(test_fund.fund_id)}, follow_redirects=False
+        "/rounds/select-grant", data={"fund_id": str(test_fund.fund_id)}, follow_redirects=False
     )
 
     # Should redirect to /rounds/create?fund_id=...

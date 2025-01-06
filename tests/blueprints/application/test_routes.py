@@ -5,14 +5,14 @@ from flask import url_for
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_select_fund(flask_test_client, seed_dynamic_data):
     """
-    Test the /rounds/sections/select-fund route to ensure:
+    Test the /rounds/sections/select-grant route to ensure:
       1) A user cannot proceed without selecting a fund,
       2) A valid fund selection redirects to the select_application page.
     """
     # Attempt to submit without a fund selected
     with pytest.raises(ValueError, match="Fund ID is required to manage an application"):
         flask_test_client.post(
-            "/rounds/sections/select-fund",
+            "/rounds/sections/select-grant",
             data={"fund_id": ""},
             follow_redirects=True,
         )
@@ -20,7 +20,7 @@ def test_select_fund(flask_test_client, seed_dynamic_data):
     # Submit with a valid fund
     test_fund = seed_dynamic_data["funds"][0]
     response = flask_test_client.post(
-        "/rounds/sections/select-fund", data={"fund_id": str(test_fund.fund_id)}, follow_redirects=False
+        "/rounds/sections/select-grant", data={"fund_id": str(test_fund.fund_id)}, follow_redirects=False
     )
     assert response.status_code == 302
 
