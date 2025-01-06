@@ -61,12 +61,7 @@ def build_application(round_id):
     """
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
-    breadcrumb_items = [
-        {"text": "Home", "href": url_for(INDEX_BP_DASHBOARD)},
-        {"text": fund.name_json["en"], "href": url_for("fund_bp.view_fund", fund_id=fund.fund_id)},
-        {"text": round.title_json["en"], "href": "#"},
-    ]
-    return render_template("build_application.html", round=round, fund=fund, breadcrumb_items=breadcrumb_items)
+    return render_template("build_application.html", round=round, fund=fund)
 
 
 @application_bp.route("/<round_id>/sections/all-questions", methods=["GET"])
@@ -126,7 +121,6 @@ def create_export_files(round_id):
 @application_bp.route("/<round_id>/sections/<section_id>", methods=["GET", "POST"])
 def section(round_id, section_id=None):
     round_obj = get_round_by_id(round_id)
-    fund_obj = get_fund_by_id(round_obj.fund_id)
     form: SectionForm = SectionForm()
     form.round_id.data = round_id
     params = {
@@ -162,16 +156,6 @@ def section(round_id, section_id=None):
             {"text": f"{f.template_name} - {f.name_in_apply_json['en']}", "value": str(f.form_id)}
             for f in get_all_template_forms()
         ]
-
-    params["breadcrumb_items"] = [
-        {"text": "Home", "href": url_for(INDEX_BP_DASHBOARD)},
-        {"text": fund_obj.name_json["en"], "href": url_for("fund_bp.view_fund", fund_id=fund_obj.fund_id)},
-        {
-            "text": round_obj.title_json["en"],
-            "href": url_for("application_bp.build_application", round_id=round_obj.round_id),
-        },
-        {"text": existing_section.name_in_apply_json["en"] if existing_section else "Add Section", "href": "#"},
-    ]
     return render_template("section.html", form=form, **params)
 
 
