@@ -18,7 +18,10 @@
             }) }}
         {% endif %}
         <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
-        <p class="govuk-body">Fund: {{ fund.title_json["en"] }}</p>
+        <p class="govuk-body govuk-!-margin-bottom-1">Fund: <a href="{{ url_for('fund_bp.fund', fund_id=fund.fund_id) }}" class="govuk-link">{{ fund.title_json["en"] }}</a></p>
+        <p class="govuk-body govuk-!-margin-bottom-7">
+            <a href="{{ url_for('round_bp.select_fund') }}" class="govuk-link">Change fund</a>
+        </p>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <form method="POST">
