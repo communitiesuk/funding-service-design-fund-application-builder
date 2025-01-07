@@ -30,7 +30,7 @@ from app.db.queries.application import (
     update_section,
 )
 from app.db.queries.clone import clone_single_form
-from app.db.queries.fund import get_fund_by_id
+from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_all_questions import print_html
 from app.export_config.generate_assessment_config import (
@@ -52,6 +52,46 @@ application_bp = Blueprint(
     url_prefix="/rounds",
     template_folder="templates",
 )
+
+
+@application_bp.route("/sections/select-grant", methods=["GET", "POST"])  # NOSONAR
+def select_fund():
+    """
+    Intermediary page to select a Fund before building an Application.
+    """
+    if request.method == "POST":
+        fund_id = request.form.get("fund_id")
+        if not fund_id:
+            raise ValueError("Fund ID is required to manage an application")
+        return redirect(url_for("application_bp.select_application", fund_id=fund_id))
+    fund_dropdown_items = [{"value": "", "text": "Select a grant"}]
+    for fund in get_all_funds():
+        fund_dropdown_items.append(
+            {"value": str(fund.fund_id), "text": fund.short_name + " - " + fund.title_json["en"]}
+        )
+    return render_template("select_fund.html", fund_dropdown_items=fund_dropdown_items)
+
+
+@application_bp.route("/sections/select-application", methods=["GET", "POST"])  # NOSONAR
+def select_application():
+    """
+    Intermediary page to select an Application before managing its tasklist.
+    """
+    if request.method == "POST":
+        round_id = request.form.get("round_id")
+        if not round_id:
+            raise ValueError("Round ID is required to manage an application")
+        return redirect(url_for("application_bp.build_application", round_id=round_id))
+    fund_id = request.args.get("fund_id")
+    if not fund_id:
+        raise ValueError("Fund ID is required to manage an application")
+    round_dropdown_items = [{"value": "", "text": "Select an application"}]
+    fund = get_fund_by_id(fund_id)
+    for round_ in fund.rounds:
+        round_dropdown_items.append(
+            {"value": str(round_.round_id), "text": round_.short_name + " - " + round_.title_json["en"]}
+        )
+    return render_template("select_application.html", fund=fund, round_dropdown_items=round_dropdown_items)
 
 
 @application_bp.route("/<round_id>/sections")

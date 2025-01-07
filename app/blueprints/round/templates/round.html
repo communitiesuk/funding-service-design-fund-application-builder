@@ -18,24 +18,15 @@
             }) }}
         {% endif %}
         <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
+        <p class="govuk-body govuk-!-margin-bottom-1">Grant: <a href="{{ url_for('fund_bp.fund', fund_id=fund.fund_id) }}" class="govuk-link">{{ fund.title_json["en"] }}</a></p>
+        <p class="govuk-body govuk-!-margin-bottom-7">
+            <a href="{{ url_for('round_bp.select_fund') }}" class="govuk-link">Change grant</a>
+        </p>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
                 <form method="POST">
                     {{ form.hidden_tag()}}
-                    {% if not round_id %}
-                        {{ govukSelect({
-                            "id": form.fund_id.id,
-                            "name": form.fund_id.name,
-                            "label": {
-                                "text": form.fund_id.label
-                            },
-                            "items": all_funds,
-                            "value": selected_fund_id,
-                            "errorMessage": {
-                                "text": form.fund_id.errors[0] if form.fund_id.errors else ""
-                            } if form.fund_id.errors else None
-                        })}}
-                    {% endif %}
+                    <input type="hidden" name="fund_id" value="{{ fund.fund_id }}" />
                     {{input(form.title_en)}}
                     {{input(form.title_cy, classes="welsh-field")}}
                     {{input(form.short_name)}}
@@ -85,13 +76,10 @@
 
 <script>
 // Store Welsh availability mapping passed from the route handler
-const welshAvailability = {{ welsh_availability | safe }};
+const isWelshAvailable = {{ fund.welsh_available | safe }};
 
 function toggleWelshFields() {
-    const fundSelect = document.querySelector('#fund_id');
-    const isWelshAvailable = welshAvailability[fundSelect.value];
     const welshFields = document.querySelectorAll('.welsh-field');
-
     welshFields.forEach(field => {
         const fieldContainer = field.closest('.govuk-form-group');
         if (isWelshAvailable) {
@@ -105,10 +93,6 @@ function toggleWelshFields() {
 // Run on page load
 document.addEventListener('DOMContentLoaded', function() {
     toggleWelshFields();
-
-    // Add change event listener to fund select
-    const fundSelect = document.querySelector('#fund_id');
-    fundSelect.addEventListener('change', toggleWelshFields);
 });
 </script>
 {% endblock content %}

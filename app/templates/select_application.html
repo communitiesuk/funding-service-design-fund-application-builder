@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
+{% from "govuk_frontend_jinja/components/select/macro.html" import govukSelect %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+
+{% block content %}
+<div class="govuk-grid-row">
+  <div class="govuk-grid-column-full">
+    {{ govukBackLink({
+      "text": "Back",
+      "href": url_for("application_bp.select_fund")
+    }) }}
+
+    <span class="govuk-caption-m">{{ fund.short_name + " - " + fund.title_json["en"] }}</span>
+    <h1 class="govuk-heading-l">Select an application</h1>
+    <p class="govuk-body">Select the application you want to manage or create a new one</p>
+
+    <form method="POST">
+      {{ govukSelect({
+        "id": "round_id",
+        "name": "round_id",
+        "items": round_dropdown_items,
+        "label": "",
+        "attributes": {
+          "required": "required"
+        },
+        "classes": "govuk-!-width-one-half",
+        "formGroup": {
+          "classes": "govuk-!-margin-bottom-3"
+        }
+      }) }}
+
+      <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-7">
+        <a href="{{ url_for('round_bp.create_round', fund_id=fund.fund_id) }}" class="govuk-link">Add a new application</a>
+      </p>
+
+      <div class="govuk-button-group">
+        {{ govukButton({
+          "text": "Continue",
+          "type": "submit"
+        }) }}
+        {{ govukButton({
+          "text": "Cancel",
+          "href": url_for("index_bp.dashboard"),
+          "classes": "govuk-button--secondary"
+        }) }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}
