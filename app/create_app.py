@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+from flask_talisman import Talisman
 from fsd_utils import init_sentry
 from fsd_utils.authentication.decorators import SupportedApp, check_internal_user, login_required
 from fsd_utils.healthchecks.checkers import FlaskRunningChecker
@@ -11,6 +12,7 @@ from app.blueprints.fund.routes import fund_bp
 from app.blueprints.index.routes import index_bp
 from app.blueprints.round.routes import round_bp
 from app.blueprints.template.routes import template_bp
+from config import Config
 
 PUBLIC_ROUTES = [
     "static",
@@ -48,6 +50,7 @@ def create_app() -> Flask:
 
     # Bind SQLAlchemy ORM to Flask app
     db.init_app(flask_app)
+
     # Bind Flask-Migrate db utilities to Flask app
     migrate.init_app(
         flask_app,
@@ -57,6 +60,9 @@ def create_app() -> Flask:
         compare_type=True,
         compare_server_default=True,
     )
+
+    # Configure application security with Talisman
+    Talisman(flask_app, **Config.TALISMAN_SETTINGS)
 
     # Initialise logging
     logging.init_app(flask_app)
