@@ -30,27 +30,19 @@ def view_templates():
     form = TemplateUploadForm()
     params = {
         "generic_table_page": handle_generic_table_page(
-            table_rows=build_rows(forms),
             page_heading="Templates",
             page_description="Follow the step-by-step instructions to create a new grant application.",
-            summary_text="Using templates in applications",
-            summary_description="This is an placeholder which will be added for the template page",
+            detail_text="Using templates in applications",
+            detail_description="This is an placeholder which will be added for the template page",
             button_text="Open template builder",
-            table_caption="",
-            table_heading=[
-                {
-                    "text": "Template Name"
-                },
-                {
-                    "text": "Tasklist Name"
-                },
-                {
-                    "text": "URL Path"
-                },
-                {
-                    "text": "Action"
-                }
-            ]
+            button_url="#",
+            table_header=[
+                {"text": "Template Name"},
+                {"text": "Tasklist Name"},
+                {"text": "URL Path"},
+                {"text": "Action"},
+            ],
+            table_rows=build_rows(forms),
         ),
         "sections": sections,
         "forms": forms,

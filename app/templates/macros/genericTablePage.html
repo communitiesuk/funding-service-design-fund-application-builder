@@ -8,40 +8,34 @@
     {%- from "govuk_frontend_jinja/components/details/macro.html" import govukDetails -%}
 
     <div class="govuk-grid-row">
-        {% if params.generic_table_page.error %}
-            {{ govukErrorSummary({
-            "titleText": params.generic_table_page.error.titleText,
-            "errorList": params.generic_table_page.error.errorList
-            }) }}
-        {% endif %}
         <h1 class="govuk-heading-l">{{ params.generic_table_page.page_heading }}</h1>
         <p class="govuk-body">{{ params.generic_table_page.page_description }}</p>
     </div>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-three-quarters govuk-!-padding-0">
-            {% if params.generic_table_page.detail and params.generic_table_page.detail.summary_text and params.generic_table_page.detail.text %}
+            {% if params.generic_table_page.detail and params.generic_table_page.detail.detail_text and params.generic_table_page.detail.detail_description %}
                 {{ govukDetails({
-              "summaryText": params.generic_table_page.detail.summary_text,
-              "text": params.generic_table_page.detail.text
+              "summaryText": params.generic_table_page.detail.detail_text,
+              "text": params.generic_table_page.detail.detail_description
             }) }}
             {% endif %}
         </div>
         <div class="govuk-grid-column-one-quarter govuk-!-padding-0 govuk-!-text-align-right">
-            {% if params.generic_table_page.button_text %}
+            {% if params.generic_table_page.button and params.generic_table_page.button.button_text and params.generic_table_page.button.button_text %}
                 {{ govukButton({
-                  "text": params.generic_table_page.button_text
+                  "text": params.generic_table_page.button.button_text,
+                  "href": params.generic_table_page.button.button_url
             }) }}
             {% endif %}
         </div>
     </div>
     <div class="govuk-grid-row">
-        {% if params.generic_table_page.table %}
+        {% if params.generic_table_page.table and params.generic_table_page.table.table_header %}
             {{ govukTable({
-                "caption": params.generic_table_page.table.caption,
                 "captionClasses": "govuk-table__caption--m",
                 "firstCellIsHeader": false,
-                "head": params.generic_table_page.table.head,
-                "rows": params.generic_table_page.table.rows
+                "head": params.generic_table_page.table.table_header,
+                "rows": params.generic_table_page.table.table_rows
             }) }}
         {% endif %}
     </div>

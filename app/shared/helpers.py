@@ -1,9 +1,5 @@
-import math
 import re
 from dataclasses import asdict, is_dataclass
-from typing import List
-
-from flask import request
 
 from wtforms.validators import ValidationError
 
@@ -52,7 +48,7 @@ def error_formatter(form):
         if isinstance(error_messages, list):
             errors_list.extend({"text": f"{field_name}: {err}", "href": f"#{field}"} for err in error_messages)
         elif isinstance(error_messages, dict) and any(
-                error_messages.get(k) for k in ["day", "month", "years", "hour", "minute"]
+            error_messages.get(k) for k in ["day", "month", "years", "hour", "minute"]
         ):
             errors_list.append({"text": f"{field_name}: Enter valid datetime", "href": f"#{field}"})
     if errors_list:
@@ -78,14 +74,14 @@ def all_funds_as_govuk_select_items(all_funds: list) -> list:
 
 
 def handle_generic_table_page(
-        page_heading: str,
-        page_description: str = '',
-        summary_text: str = '',
-        summary_description: str = '',
-        button_text: str = '',
-        table_rows: List[dict] = None,
-        table_caption: str = '',
-        table_heading: List[dict] = None,
+    page_heading: str,
+    page_description: str,
+    detail_text: str,
+    detail_description: str,
+    button_text: str,
+    button_url: str,
+    table_header: list[dict],
+    table_rows: list[dict],
 ):
     """
     Handles the rendering of a paginated table with various optional metadata for page layout.
@@ -96,14 +92,14 @@ def handle_generic_table_page(
     descriptions, and buttons.
 
     Args:
-        page_heading (str): The heading for the page. Default to an empty string.
-        page_description (str, optional): The description to display on the page. Default to an empty string.
-        summary_text (str, optional): A summary or introductory text for the page. Default to an empty string.
-        summary_description (str, optional): A description of the summary text. Default to an empty string.
-        button_text (str, optional): The text for a button on the page. Default to an empty string.
-        table_rows (list, optional): A list of table rows to be displayed on the page. Defaults to None.
-        table_caption (str, optional): The caption for the table. Default to an empty string.
-        table_heading (str, optional): The heading of the table, typically the column headers. Defaults to None.
+        page_heading (str): The heading for the page.
+        page_description (str): The description to display on the page.
+        detail_text (str): A detail title or introductory text for the page.
+        detail_description (str): A detail description of the detail title.
+        button_text (str): The text for a button on the page.
+        button_url (str): Button URL for the page.
+        table_header (list): The heading of the table, typically the column headers.
+        table_rows (list): A list of table rows to be displayed on the page.
 
     Returns:
         dict: A dictionary containing all the necessary data for rendering the page, including:
@@ -114,39 +110,17 @@ def handle_generic_table_page(
             - "table": A dictionary with keys "caption", "head", and "rows" (the paginated rows).
     """
 
-    # Validate that page_heading is mandatory
-    if not page_heading:
-        raise ValueError("The page heading parameter is mandatory and cannot be empty.")
-
-    # If summary_text is provided, summary_description must also be provided
-    if summary_text and not summary_description:
-        raise ValueError("If summary text is provided, Summary description must also be provided.")
-
-    # If summary_text is provided, summary_description must also be provided
-    if summary_description and not summary_text:
-        raise ValueError("If summary description is provided, Summary text must also be provided.")
-
-    # If table_rows is provided, table_heading must also be provided
-    if table_rows and not table_heading:
-        raise ValueError("If table rows are provided, Table headers must also be provided.")
-
-    if table_rows is None:
-        table_rows = []
-    if table_heading is None:
-        table_heading = []
-
     genericDataSet = {
         "page_heading": page_heading,
         "page_description": page_description,
         "detail": {
-            "summary_text": summary_text,
-            "text": summary_description,
+            "detail_text": detail_text,
+            "detail_description": detail_description,
         },
-        "button_text": button_text,
-        "table": {
-            "caption": table_caption,
-            "head": table_heading,
-            "rows": table_rows
+        "button": {
+            "button_text": button_text,
+            "button_url": button_url,
         },
+        "table": {"table_header": table_header, "table_rows": table_rows},
     }
     return genericDataSet

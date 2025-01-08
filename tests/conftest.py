@@ -50,22 +50,20 @@ def seed_dynamic_data(request, app, clear_test_data, _db, enable_preserve_test_d
 @pytest.fixture(scope="function")
 def db_with_templates(app, _db):
     """Ensures a clean database but with templates already loaded"""
-    # List of templates to load
-    file_names = ["asset-information.json", "favourite-colours.json", "funding-required-cof-25.json"]
     with app.app_context():
         script_dir = os.path.dirname(__file__)
         test_data_dir = os.path.join(script_dir, "test_data")
 
         form_configs = []
-        for file_name in file_names:
-            file_path = os.path.join(test_data_dir, file_name)
-            if os.path.exists(file_path):
-                with open(file_path, "r") as json_file:
-                    input_form = json.load(json_file)
-                    input_form["filename"] = file_name
-                    form_configs.append(input_form)
+        file_path = os.path.join(test_data_dir, "asset-information.json")
+        if os.path.exists(file_path):
+            with open(file_path, "r") as json_file:
+                input_form = json.load(json_file)
+                input_form["filename"] = "asset-information"
+                form_configs.append(input_form)
         load_form_jsons(form_configs)
     yield _db
+
 
 @pytest.fixture(scope="function")
 def clean_db(app, _db):
