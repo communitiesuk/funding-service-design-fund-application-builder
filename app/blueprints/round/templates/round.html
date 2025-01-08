@@ -74,25 +74,6 @@
     </div>
 </div>
 
-<script>
-// Store Welsh availability mapping passed from the route handler
-const isWelshAvailable = {{ fund.welsh_available | safe }};
-
-function toggleWelshFields() {
-    const welshFields = document.querySelectorAll('.welsh-field');
-    welshFields.forEach(field => {
-        const fieldContainer = field.closest('.govuk-form-group');
-        if (isWelshAvailable) {
-            fieldContainer.style.display = 'block';
-        } else {
-            fieldContainer.style.display = 'none';
-        }
-    });
-}
-
-// Run on page load
-document.addEventListener('DOMContentLoaded', function() {
-    toggleWelshFields();
-});
-</script>
+<div id="round-config" data-welsh-available="{{ fund.welsh_available | string | lower }}"></div>
+<script src="{{ url_for('static', filename='js/create_edit_round.js') }}"></script>
 {% endblock content %}

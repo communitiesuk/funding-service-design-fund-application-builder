@@ -5,6 +5,18 @@ import urllib.request
 import zipfile
 
 
+def copy_static_files(src_subdir, dist_subdir, file_pattern="*.*"):
+    """Generic function to copy static files from src to dist"""
+    src_dir = f"./app/static/src/{src_subdir}"
+    dist_dir = f"./app/static/dist/{src_subdir}"
+
+    if os.path.exists(src_dir):
+        os.makedirs(dist_dir, exist_ok=True)
+        for file in glob.glob(os.path.join(src_dir, file_pattern)):
+            print(f"Copying {file} to {dist_dir}")
+            shutil.copy2(file, dist_dir)
+
+
 def build_govuk_assets(static_dist_root="app/static/dist"):
     DIST_ROOT = "./" + static_dist_root
     GOVUK_DIR = "/govuk-frontend"
@@ -16,7 +28,7 @@ def build_govuk_assets(static_dist_root="app/static/dist"):
 
     # Checks if GovUK Frontend Assets already built
     if os.path.exists(DIST_PATH):
-        print("GovUK Frontend assets already built.If you require a rebuild manually run build.build_govuk_assets")
+        print("GovUK Frontend assets already built. If you require a rebuild manually run build.build_govuk_assets")
         return True
 
     # Download zips from GOVUK_URL
@@ -66,13 +78,6 @@ def build_govuk_assets(static_dist_root="app/static/dist"):
             file.write(filedata)
     os.chdir(cwd)
 
-    # Copy css
-    os.makedirs("./app/static/dist/styles")
-    shutil.copyfile("./app/static/src/styles/fab.css", "./app/static/dist/styles/fab.css")
-
-    # Copy over JS source
-    os.makedirs("./app/static/dist/js")
-
     # Delete temp files
     print("Deleting " + ASSETS_PATH)
     shutil.rmtree(ASSETS_PATH)
@@ -85,6 +90,8 @@ def build_all(static_dist_root="app/static/dist", remove_existing=False):
         if os.path.exists(relative_dist_root):
             shutil.rmtree(relative_dist_root)
     build_govuk_assets(static_dist_root=static_dist_root)
+    copy_static_files("styles", "styles", "*.css")
+    copy_static_files("js", "js", "*.js")
 
 
 if __name__ == "__main__":
