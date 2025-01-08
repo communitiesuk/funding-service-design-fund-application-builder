@@ -55,3 +55,18 @@ def submit_form(flask_test_client, url, data):
     return flask_test_client.post(
         url, data=data, follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
     )
+
+def get(flask_test_client, url):
+    """
+    Get the page with the given url with data.
+
+    Args:
+        flask_test_client: The flask test client to use.
+        url: The url of the form to submit.
+
+    Returns:
+        The response from submitting the form.
+    """
+    return flask_test_client.get(
+        url, follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
+    )

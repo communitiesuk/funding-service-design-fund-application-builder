@@ -7,61 +7,31 @@
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
+{%- from "macros/genericTablePage.html" import govukGenericTableTemplate -%}
 
-{% set pageHeading %}
-    Manage Templates
-{% endset %}
 {% block content %}
-    <div class="govuk-grid-row">
-        {% if error %}
-            {{
-                govukErrorSummary({
-                    "titleText": error.titleText,
-                    "errorList": error.errorList
-                })
-            }}
-        {% endif %}
-        <h1 class="govuk-heading-l">{{pageHeading}}</h1>
-    </div>
-    <div class="govuk-grid-row">
-        {{ govukTable({
-            "caption": "Form Templates",
-            "captionClasses": "govuk-table__caption--m",
-            "firstCellIsHeader": false,
-            "head": [
-                {
-                "text": "Template Name"
-                },
-                {
-                "text": "Tasklist Name"
-                },
-                {
-                "text": "URL Path"
-                },
-                {"text":"Action"}
-            ],
-            "rows": form_template_rows
-        })}}
-    </div>
+    {{ govukGenericTableTemplate({
+        "generic_table_page":generic_table_page
+    }) }}
     <div class="govuk-grid-row">
         <h2 class="govuk-heading-m">Add a Form Template</h2>
         <div class="govuk-form-group">
-                 <div>
-                    {% if uploadform.error %}
-                    <span class ="govuk-error-message">
+            <div>
+                {% if uploadform.error %}
+                    <span class="govuk-error-message">
                         <span class="govuk-visually-hidden">Error:</span>{{ uploadform.error }}
                     </span>
-                    {% endif %}
-                </div>
-                <fieldset class="govuk-fieldset">
-                    <form method="POST" enctype="multipart/form-data">
-                        {{ uploadform.hidden_tag()}}
+                {% endif %}
+            </div>
+            <fieldset class="govuk-fieldset">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ uploadform.hidden_tag() }}
 
-                        {{ input(uploadform.template_name)}}
-                        {{ govukFileUpload(uploadform.file) }}
-                        {{ govukButton({"text": "Add"}) }}
-                    </form>
-                </fieldset>
+                    {{ input(uploadform.template_name) }}
+                    {{ govukFileUpload(uploadform.file) }}
+                    {{ govukButton({"text": "Add"}) }}
+                </form>
+            </fieldset>
         </div>
     </div>
 {% endblock %}
