@@ -34,11 +34,7 @@ class DefaultConfig(object):
     # Content Security Policy
     SECURE_CSP = {
         "default-src": "'self'",
-        "script-src": [
-            "'self'",
-            "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='",
-            "'sha256-0F02u9outG+s4SWeWHc/Pmk8iJNh7GtqrTtLPzkxZ3M='",
-        ],
+        "script-src": ["'self'"],  # Needed to enable nonce
     }
 
     # Talisman Config
@@ -75,7 +71,6 @@ class DefaultConfig(object):
         "content_security_policy": SECURE_CSP,
         "content_security_policy_report_uri": None,
         "content_security_policy_report_only": False,
-        # "content_security_policy_nonce_in": None,
         "referrer_policy": FSD_REFERRER_POLICY,
         "session_cookie_secure": True,
         "session_cookie_http_only": True,

@@ -2,6 +2,8 @@
 {% from "govuk_frontend_jinja/components/breadcrumbs/macro.html" import govukBreadcrumbs %}
 {% set assetPath = url_for("static", filename="").rstrip("/") %}
 
+{% set cspNonce = csp_nonce() %}  {# Used in the base template govuk_frontend_jinja/template.html #}
+
 {% block pageTitle %}Fund Application Builder{% endblock pageTitle %}
 
 {% block head %}
@@ -37,7 +39,7 @@
 
 {% block bodyEnd %}
   <script type="module" src="{{ url_for('static', filename='govuk-frontend/govuk-frontend-5.6.0.min.js') }}"></script>
-  <script type="module">
+  <script type="module" nonce="{{ csp_nonce() }}">
     import { initAll } from "{{ url_for('static', filename='govuk-frontend/govuk-frontend-5.6.0.min.js') }}"
     initAll()
   </script>
