@@ -63,7 +63,11 @@ def create_fund():
         )
         add_fund(new_fund)
         flash(f"Created fund {form.name_en.data}")
-        return redirect(url_for(INDEX_BP_DASHBOARD))
+
+        save_dest = request.args.get("save_dest")
+        if save_dest:
+            return redirect(save_dest)
+        return redirect(url_for("round_bp.create_round", fund_id=new_fund.fund_id))
 
     error = error_formatter(form)
     return render_template("fund.html", form=form, fund_id=None, error=error)
@@ -111,6 +115,10 @@ def edit_fund(fund_id):
         )
         update_fund(fund)
         flash(f"Updated fund {form.name_en.data}")
+
+        save_dest = request.args.get("save_dest")
+        if save_dest:
+            return redirect(save_dest)
         return redirect(url_for("fund_bp.view_fund", fund_id=fund.fund_id))
 
     error = error_formatter(form)

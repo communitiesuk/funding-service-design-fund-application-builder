@@ -22,3 +22,14 @@ document.addEventListener('DOMContentLoaded', function() {
         radio.addEventListener('change', toggleWelshFields);
     });
 });
+
+// Add click event listener to save and return to home link
+document.getElementById('save-return-home').addEventListener('click', function(e) {
+    e.preventDefault();
+    const form = document.querySelector('form');
+    const dashboardUrl = document.getElementById('fund-config').dataset.dashboardUrl;
+    const url = new URL(form.action);
+    url.searchParams.set('save_dest', dashboardUrl);
+    form.action = url.toString();
+    form.submit();
+});

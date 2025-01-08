@@ -108,3 +108,20 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
             assert updated_fund.funding_type.value == value
         elif key != "submit":
             assert updated_fund.__getattribute__(key) == value
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_fund_with_save_dest(flask_test_client):
+    """Tests that save_dest query parameter correctly redirects after fund creation"""
+    create_data = {
+        "name_en": "New Fund",
+        "title_en": "New Fund Title",
+        "description_en": "New Fund Description",
+        "welsh_available": "false",
+        "short_name": "NF5433",
+        "funding_type": FundingType.COMPETITIVE.value,
+        "ggis_scheme_reference_number": "G1-SCH-0000092415",
+    }
+
+    response = submit_form(flask_test_client, "/funds/create?save_dest=/dashboard", create_data)
+    assert response.request.path == "/dashboard"
