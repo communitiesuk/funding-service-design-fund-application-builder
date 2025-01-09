@@ -1,3 +1,5 @@
+import json
+import os
 import shutil
 from unittest.mock import patch
 
@@ -7,6 +9,7 @@ from flask_migrate import upgrade
 from sqlalchemy import text
 
 from app.create_app import create_app
+from app.import_config.load_form_json import load_form_jsons
 from config import Config
 from tests.seed_test_data import init_unit_test_data, insert_test_data
 
@@ -42,6 +45,24 @@ def seed_dynamic_data(request, app, clear_test_data, _db, enable_preserve_test_d
     # reset foreign key checks
     _db.session.execute(text("SET session_replication_role = DEFAULT"))
     _db.session.commit()
+
+
+@pytest.fixture(scope="function")
+def db_with_templates(app, _db):
+    """Ensures a clean database but with templates already loaded"""
+    with app.app_context():
+        script_dir = os.path.dirname(__file__)
+        test_data_dir = os.path.join(script_dir, "test_data")
+
+        form_configs = []
+        file_path = os.path.join(test_data_dir, "asset-information.json")
+        if os.path.exists(file_path):
+            with open(file_path, "r") as json_file:
+                input_form = json.load(json_file)
+                input_form["filename"] = "asset-information"
+                form_configs.append(input_form)
+        load_form_jsons(form_configs)
+    yield _db
 
 
 @pytest.fixture(scope="function")

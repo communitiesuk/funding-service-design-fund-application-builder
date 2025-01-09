@@ -13,6 +13,7 @@ from app.db.queries.application import (
     get_form_by_template_name,
     update_form,
 )
+from app.shared.generic_table_page import GenericTablePage
 from app.shared.helpers import error_formatter
 
 template_bp = Blueprint(
@@ -29,11 +30,26 @@ def view_templates():
     forms = get_all_template_forms()
     form = TemplateUploadForm()
     params = {
+        "generic_table_page": GenericTablePage(
+            page_heading="Templates",
+            page_description="Follow the step-by-step instructions to create a new grant application.",
+            detail_text="Using templates in applications",
+            detail_description="This is an placeholder which will be added for the template page",
+            button_text="Open template builder",
+            button_url="#",
+            table_header=[
+                {"text": "Template Name"},
+                {"text": "Tasklist Name"},
+                {"text": "URL Path"},
+                {"text": "Action"},
+            ],
+            table_rows=build_rows(forms),
+        ).__dict__,
         "sections": sections,
         "forms": forms,
-        "form_template_rows": build_rows(forms),
         "uploadform": form,
     }
+
     if form.validate_on_submit():
         template_name = form.template_name.data
         file = form.file.data
