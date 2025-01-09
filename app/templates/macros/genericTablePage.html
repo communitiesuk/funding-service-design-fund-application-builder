@@ -6,7 +6,15 @@
     {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
     {%- from "govuk_frontend_jinja/components/pagination/macro.html" import govukPagination -%}
     {%- from "govuk_frontend_jinja/components/details/macro.html" import govukDetails -%}
+    {% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="govuk-grid-row">
+                {{ govukNotificationBanner({"html": messages[0],"type": "success"}) }}
+            </div>
+        {% endif %}
+    {% endwith %}
     <div class="govuk-grid-row">
         <h1 class="govuk-heading-l">{{ params.generic_table_page.page_heading }}</h1>
         <p class="govuk-body">{{ params.generic_table_page.page_description }}</p>

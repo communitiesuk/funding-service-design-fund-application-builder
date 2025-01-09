@@ -13,7 +13,8 @@ from app.db.queries.application import (
     get_form_by_template_name,
     update_form,
 )
-from app.shared.helpers import error_formatter, handle_generic_table_page
+from app.shared.generic_table_page import GenericTablePage
+from app.shared.helpers import error_formatter
 
 template_bp = Blueprint(
     "template_bp",
@@ -29,7 +30,7 @@ def view_templates():
     forms = get_all_template_forms()
     form = TemplateUploadForm()
     params = {
-        "generic_table_page": handle_generic_table_page(
+        "generic_table_page": GenericTablePage(
             page_heading="Templates",
             page_description="Follow the step-by-step instructions to create a new grant application.",
             detail_text="Using templates in applications",
@@ -43,7 +44,7 @@ def view_templates():
                 {"text": "Action"},
             ],
             table_rows=build_rows(forms),
-        ),
+        ).__dict__,
         "sections": sections,
         "forms": forms,
         "uploadform": form,
