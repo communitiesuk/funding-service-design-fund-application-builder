@@ -220,3 +220,54 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
         "is_section_feedback_optional": False,
         "is_research_survey_optional": False,
     }
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_round_with_save_dest(flask_test_client, seed_dynamic_data):
+    """Tests that save_dest query parameter correctly redirects after round creation"""
+    test_fund = seed_dynamic_data["funds"][0]
+    new_round_data = {
+        "fund_id": test_fund.fund_id,
+        "title_en": "New Round",
+        "short_name": "NR456",
+        "opens-day": "01",
+        "opens-month": "10",
+        "opens-year": "2024",
+        "opens-hour": "09",
+        "opens-minute": "00",
+        "deadline-day": "01",
+        "deadline-month": "12",
+        "deadline-year": "2024",
+        "deadline-hour": "17",
+        "deadline-minute": "00",
+        "assessment_start-day": "02",
+        "assessment_start-month": "12",
+        "assessment_start-year": "2024",
+        "assessment_start-hour": "09",
+        "assessment_start-minute": "00",
+        "reminder_date-day": "15",
+        "reminder_date-month": "11",
+        "reminder_date-year": "2024",
+        "reminder_date-hour": "09",
+        "reminder_date-minute": "00",
+        "assessment_deadline-day": "15",
+        "assessment_deadline-month": "12",
+        "assessment_deadline-year": "2024",
+        "assessment_deadline-hour": "17",
+        "assessment_deadline-minute": "00",
+        "prospectus_link": "http://example.com/prospectus",
+        "privacy_notice_link": "http://example.com/privacy",
+        "contact_email": "contact@example.com",
+        "contact_phone": "1234567890",
+        "contact_textphone": "0987654321",
+        "support_times": "9am - 5pm",
+        "support_days": "Monday to Friday",
+        "feedback_link": "http://example.com/feedback",
+        "project_name_field_id": 1,
+        "guidance_url": "http://example.com/guidance",
+    }
+
+    response = submit_form(
+        flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}&save_dest=/dashboard", new_round_data
+    )
+    assert response.request.path == "/dashboard"

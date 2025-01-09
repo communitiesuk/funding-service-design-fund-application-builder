@@ -65,15 +65,31 @@
                     {{ yes_no(form.eligibility_config) }}
                     {{ multilineinput(form.eoi_decision_schema_en) }}
                     {{ multilineinput(form.eoi_decision_schema_cy, classes="welsh-field") }}
-                    {{ govukButton({
-                        "text": "Save"
-                    }) }}
+                    <div class="govuk-button-group govuk-!-margin-top-6">
+                        {{ govukButton({
+                            "text": "Save and continue",
+                            "classes": "govuk-button"
+                        }) }}
+
+                        {{ govukButton({
+                            "text": "Cancel",
+                            "classes": "govuk-button govuk-button--secondary",
+                            "href": url_for("index_bp.dashboard")
+                        }) }}
+                    </div>
+
+                    <p class="govuk-body">
+                        <a href="#" class="govuk-link" id="save-return-home">Save and return to home</a>
+                    </p>
                 </form>
             </fieldset>
         </div>
     </div>
 </div>
 
-<div id="round-config" data-welsh-available="{{ fund.welsh_available | string | lower }}"></div>
+<div id="round-config"
+    data-welsh-available="{{ fund.welsh_available | string | lower }}"
+    data-dashboard-url="{{ url_for('index_bp.dashboard') }}">
+</div>
 <script src="{{ url_for('static', filename='js/create_edit_round.js') }}"></script>
 {% endblock content %}
