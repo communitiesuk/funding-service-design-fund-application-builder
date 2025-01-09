@@ -14,7 +14,7 @@ from flask import (
 )
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
-from app.blueprints.application.forms import SectionForm
+from app.blueprints.application.forms import SectionForm, SelectApplicationForm
 from app.blueprints.application.services import create_export_zip
 from app.db.queries.application import (
     delete_form_from_section,
@@ -42,6 +42,7 @@ from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
 from app.export_config.generate_fund_round_html import generate_all_round_html
+from app.shared.forms import SelectFundForm
 from config import Config
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -59,17 +60,18 @@ def select_fund():
     """
     Intermediary page to select a Fund before building an Application.
     """
-    if request.method == "POST":
-        fund_id = request.form.get("fund_id")
-        if not fund_id:
-            raise ValueError("Fund ID is required to manage an application")
-        return redirect(url_for("application_bp.select_application", fund_id=fund_id))
-    fund_dropdown_items = [{"value": "", "text": "Select a grant"}]
+    form = SelectFundForm()
+    choices = [("", "Select a grant")]
     for fund in get_all_funds():
-        fund_dropdown_items.append(
-            {"value": str(fund.fund_id), "text": fund.short_name + " - " + fund.title_json["en"]}
-        )
-    return render_template("select_fund.html", fund_dropdown_items=fund_dropdown_items)
+        choices.append((str(fund.fund_id), fund.short_name + " - " + fund.title_json["en"]))
+    form.fund_id.choices = choices
+    if form.validate_on_submit():
+        return redirect(url_for("application_bp.select_application", fund_id=form.fund_id.data))
+    error = None
+    if form.fund_id.errors:
+        error = {"titleText": "There is a problem", "errorList": [{"text": form.fund_id.errors[0], "href": "#fund_id"}]}
+    select_items = [{"value": value, "text": text} for value, text in choices]
+    return render_template("select_fund.html", form=form, error=error, select_items=select_items)
 
 
 @application_bp.route("/sections/select-application", methods=["GET", "POST"])  # NOSONAR
@@ -77,21 +79,25 @@ def select_application():
     """
     Intermediary page to select an Application before managing its tasklist.
     """
-    if request.method == "POST":
-        round_id = request.form.get("round_id")
-        if not round_id:
-            raise ValueError("Round ID is required to manage an application")
-        return redirect(url_for("application_bp.build_application", round_id=round_id))
     fund_id = request.args.get("fund_id")
     if not fund_id:
         raise ValueError("Fund ID is required to manage an application")
-    round_dropdown_items = [{"value": "", "text": "Select an application"}]
+    form = SelectApplicationForm()
     fund = get_fund_by_id(fund_id)
+    choices = [("", "Select an application")]
     for round_ in fund.rounds:
-        round_dropdown_items.append(
-            {"value": str(round_.round_id), "text": round_.short_name + " - " + round_.title_json["en"]}
-        )
-    return render_template("select_application.html", fund=fund, round_dropdown_items=round_dropdown_items)
+        choices.append((str(round_.round_id), round_.short_name + " - " + round_.title_json["en"]))
+    form.round_id.choices = choices
+    if form.validate_on_submit():
+        return redirect(url_for("application_bp.build_application", round_id=form.round_id.data))
+    error = None
+    if form.round_id.errors:
+        error = {
+            "titleText": "There is a problem",
+            "errorList": [{"text": form.round_id.errors[0], "href": "#round_id"}],
+        }
+    select_items = [{"value": value, "text": text} for value, text in choices]
+    return render_template("select_application.html", form=form, fund=fund, error=error, select_items=select_items)
 
 
 @application_bp.route("/<round_id>/sections")

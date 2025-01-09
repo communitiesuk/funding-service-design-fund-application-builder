@@ -2,6 +2,7 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/select/macro.html" import govukSelect %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
 
 {% block content %}
 <div class="govuk-grid-row">
@@ -11,18 +12,25 @@
       "href": url_for("index_bp.dashboard")
     }) }}
 
+    {% if error %}
+      {{ govukErrorSummary({
+        "titleText": error.titleText,
+        "errorList": error.errorList,
+        "classes": "govuk-!-margin-bottom-4"
+      }) }}
+    {% endif %}
+
     <h1 class="govuk-heading-l">Select a grant</h1>
     <p class="govuk-body">Select or add a new grant for this application</p>
 
     <form method="POST">
+      {{ form.csrf_token }}
       {{ govukSelect({
-        "id": "fund_id",
-        "name": "fund_id",
-        "items": fund_dropdown_items,
+        "id": form.fund_id.id,
+        "name": form.fund_id.name,
+        "items": select_items,
         "label": "",
-        "attributes": {
-          "required": "required"
-        },
+        "errorMessage": {"text": form.fund_id.errors[0]} if form.fund_id.errors else None,
         "classes": "govuk-!-width-one-half",
         "formGroup": {
           "classes": "govuk-!-margin-bottom-3"

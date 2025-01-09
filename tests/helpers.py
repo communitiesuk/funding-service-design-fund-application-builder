@@ -37,7 +37,7 @@ def get_csrf_token(response):
     return response.data.decode().split('name="csrf_token" type="hidden" value="')[1].split('"')[0]
 
 
-def submit_form(flask_test_client, url, data):
+def submit_form(flask_test_client, url, data, follow_redirects=True):
     """
     Submits a form given a flask test client, url, and the form data.
 
@@ -45,6 +45,7 @@ def submit_form(flask_test_client, url, data):
         flask_test_client: The flask test client to use.
         url: The url of the form to submit.
         data: The data to submit on the form.
+        follow_redirects: Whether to follow redirects after form submission.
 
     Returns:
         The response from submitting the form.
@@ -53,5 +54,5 @@ def submit_form(flask_test_client, url, data):
     csrf_token = get_csrf_token(response)
     data["csrf_token"] = csrf_token
     return flask_test_client.post(
-        url, data=data, follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
+        url, data=data, follow_redirects=follow_redirects, headers={"Content-Type": "application/x-www-form-urlencoded"}
     )
