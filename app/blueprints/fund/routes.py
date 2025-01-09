@@ -12,7 +12,7 @@ from flask import (
 from app.blueprints.fund.forms import FundForm
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
-from app.shared.helpers import all_funds_as_govuk_select_items, error_formatter
+from app.shared.helpers import all_funds_as_govuk_select_items, error_formatter, is_safe_url
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
@@ -65,7 +65,7 @@ def create_fund():
         flash(f"Created fund {form.name_en.data}")
 
         save_dest = request.args.get("save_dest")
-        if save_dest:
+        if save_dest and is_safe_url(save_dest):
             return redirect(save_dest)
         return redirect(url_for("round_bp.create_round", fund_id=new_fund.fund_id))
 
@@ -117,7 +117,7 @@ def edit_fund(fund_id):
         flash(f"Updated fund {form.name_en.data}")
 
         save_dest = request.args.get("save_dest")
-        if save_dest:
+        if save_dest and is_safe_url(save_dest):
             return redirect(save_dest)
         return redirect(url_for("fund_bp.view_fund", fund_id=fund.fund_id))
 

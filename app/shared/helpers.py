@@ -71,3 +71,13 @@ def all_funds_as_govuk_select_items(all_funds: list) -> list:
     in the html
     """
     return [{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds]
+
+
+def is_safe_url(url):
+    """
+    Check if a URL is safe to redirect to. Only allows alphanumeric chars, forward slashes, hyphens and underscores.
+    """
+    if not url:
+        return False
+    pattern = r"^/[\w/-]*$"
+    return bool(re.match(pattern, url))
