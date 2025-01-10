@@ -76,6 +76,28 @@ def test_create_fund_with_existing_short_name(flask_test_client):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_view_grant_details(flask_test_client, seed_dynamic_data):
+    """
+    Test to check grant detail route is working as expected.
+    and verify the grant details template is rendered as expected.
+    """
+    invalid_fund_id = "123e4567-e89b-12d3-a456-426614174000"
+    with pytest.raises(ValueError, match=f"Fund with id {invalid_fund_id} not found"):
+        flask_test_client.get(f"/funds/details?grant_id={invalid_fund_id}", follow_redirects=True)
+
+    test_fund = seed_dynamic_data["funds"][0]
+    response = flask_test_client.get(f"/funds/details?grant_id={test_fund.fund_id}", follow_redirects=True)
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+
+    assert f'<h2 class="govuk-heading-m">{test_fund.name_json["en"]}</h2>' in html
+    assert (
+        f'<a class="govuk-link" href="/funds/{test_fund.fund_id}">Change<span class="govuk-visually-hidden"> name</span></a>'  # noqa: E501
+        in html
+    )
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_update_fund(flask_test_client, seed_dynamic_data):
     """
     Tests that a fund can be successfully updated using the /funds/<fund_id> route
