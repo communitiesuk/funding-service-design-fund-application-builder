@@ -15,7 +15,12 @@
     "useTudorCrown": "yes",
     "serviceName": "Fund Application Builder",
     "serviceUrl": url_for("index_bp.index"),
-    "classes": "govuk-header--full-width-border"
+    "navigation": [
+        {
+            "text": "Sign out",
+            "href": g.logout_url
+        }
+    ]  if g.is_authenticated else []
   }) }}
 
   {# Only show the custom navigation if showNavigationBar is set #}

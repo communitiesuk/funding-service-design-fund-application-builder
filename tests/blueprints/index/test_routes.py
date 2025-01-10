@@ -1,6 +1,9 @@
+from html import unescape
 from unittest.mock import patch
 
 import pytest
+
+from config import Config
 
 
 def test_index_redirects_to_login_for_unauthenticated_user(flask_test_client):
@@ -30,6 +33,10 @@ def test_login_renders_for_unauthenticated_user(flask_test_client):
     assert response.status_code == 200
     assert b"Sign in to use FAB" in response.data
 
+    html = response.data.decode("utf-8")
+    assert "Sign out" not in html
+    assert f"{Config.AUTHENTICATOR_HOST}/sessions/sign-out?return_app=fund-application-builder" not in unescape(html)
+
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_dashboard_renders_for_internal_user(flask_test_client):
@@ -39,6 +46,11 @@ def test_dashboard_renders_for_internal_user(flask_test_client):
     response = flask_test_client.get("/dashboard")
     assert response.status_code == 200
     assert b"Creating a new grant application" in response.data
+
+    # Logged in user can see Sign out link
+    html = response.data.decode("utf-8")
+    assert "Sign out" in html
+    assert f"{Config.AUTHENTICATOR_HOST}/sessions/sign-out?return_app=fund-application-builder" in unescape(html)
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_external_user")
