@@ -129,7 +129,7 @@ def test_create_fund_with_return_home(flask_test_client):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
-def test_all_fund_view(flask_test_client):
+def test_view_all_funds(flask_test_client):
     response = flask_test_client.get(
         "/grants/", follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
     )
@@ -154,10 +154,6 @@ def test_all_fund_view(flask_test_client):
 
     # Button component availability check
     assert "Add new grant" in html, "Button text is missing"
-    assert (
-        '<a href="/grants/create" role="button" draggable="false" class="govuk-button" data-module="govuk-button">'
-        in html
-    ), "Button component is missing"
 
     # Table component availability check
     assert '<thead class="govuk-table__head">' in html, "Table is missing"

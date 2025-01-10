@@ -10,7 +10,7 @@ from flask import (
 )
 
 from app.blueprints.fund.forms import FundForm
-from app.blueprints.fund.service import build_fund_rows
+from app.blueprints.fund.services import build_fund_rows
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
 from app.shared.generic_table_page import GenericTablePage
@@ -28,23 +28,21 @@ fund_bp = Blueprint(
 
 
 @fund_bp.route("/", methods=["GET"])
-def view_all_fund():
+def view_all_funds():
     """
     Renders list of grants in the grant page
     """
-    params = {
-        "generic_table_page": GenericTablePage(
-            page_heading="Grants",
-            page_description="View all existing grants or add a new grant.",
-            detail_text="Creating new grants",
-            detail_description="This is an placeholder which will be added for the grants page",
-            button_text="Add new grant",
-            button_url=url_for("fund_bp.create_fund"),
-            table_header=[{"text": "Grant Name"}, {"text": "Description"}, {"text": "Grant Type"}],
-            table_rows=build_fund_rows(get_all_funds()),
-        ).__dict__
-    }
-    return render_template("view_all_fund.html", **params)
+    params = GenericTablePage(
+        page_heading="Grants",
+        page_description="View all existing grants or add a new grant.",
+        detail_text="Creating new grants",
+        detail_description="This is an placeholder which will be added for the grants page",
+        button_text="Add new grant",
+        button_url=url_for("fund_bp.create_fund", action="grants_table"),
+        table_header=[{"text": "Grant Name"}, {"text": "Description"}, {"text": "Grant Type"}],
+        table_rows=build_fund_rows(get_all_funds()),
+    ).__dict__
+    return render_template("view_all_funds.html", **params)
 
 
 @fund_bp.route("/view", methods=["GET", "POST"])
@@ -84,10 +82,21 @@ def create_fund():
             ),
         )
         add_fund(new_fund)
-        flash(f"Created fund {form.name_en.data}")
-        if request.form.get("action") == "return_home":
-            return redirect(url_for(INDEX_BP_DASHBOARD))
-        return redirect(url_for("round_bp.create_round", fund_id=new_fund.fund_id))
+        flash(f"""
+            <h3 class="govuk-notification-banner__heading">New grant added successfully</h3>
+            <p class="govuk-body">
+                <a class="govuk-notification-banner__link" href="#">
+                View {form.name_en.data}
+                </a>
+            </p>
+        """)
+        match request.args.get("action") or request.form.get("action"):
+            case "return_home":
+                return redirect(url_for(INDEX_BP_DASHBOARD))
+            case "grants_table":
+                return redirect(url_for("fund_bp.view_all_funds"))
+            case _:
+                return redirect(url_for("round_bp.create_round", fund_id=new_fund.fund_id))
 
     error = error_formatter(form)
     return render_template("fund.html", form=form, fund_id=None, error=error)

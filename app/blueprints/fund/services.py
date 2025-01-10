@@ -1,5 +1,3 @@
-from flask import url_for
-
 from app.db.models import Fund
 
 
@@ -10,7 +8,7 @@ def build_fund_rows(funds: list[Fund]) -> list[dict]:
             {
                 "html": f"""
                 <a class='govuk-link--no-visited-state'
-                href='{url_for('fund_bp.view_grant_details', grant_id=fund.fund_id)}'>
+                href='#'>
                 {fund.name_json['en']}
                 </a>
                 """
