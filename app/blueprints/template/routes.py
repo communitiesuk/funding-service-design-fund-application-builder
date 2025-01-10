@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, redirect, render_template, url_for
+from flask import Blueprint, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
 from app.blueprints.template.forms import TemplateFormForm, TemplateUploadForm
@@ -29,8 +29,9 @@ def view_templates():
     sections = get_all_template_sections()
     forms = get_all_template_forms()
     form = TemplateUploadForm()
-    params = {
-        "generic_table_page": GenericTablePage(
+    params = {"sections": sections, "forms": forms, "uploadform": form}
+    params.update(
+        GenericTablePage(
             page_heading="Templates",
             page_description="Follow the step-by-step instructions to create a new grant application.",
             detail_text="Using templates in applications",
@@ -44,12 +45,9 @@ def view_templates():
                 {"text": "Action"},
             ],
             table_rows=build_rows(forms),
-        ).__dict__,
-        "sections": sections,
-        "forms": forms,
-        "uploadform": form,
-    }
-
+            current_page=int(request.args.get("page", 1)),
+        ).__dict__
+    )
     if form.validate_on_submit():
         template_name = form.template_name.data
         file = form.file.data

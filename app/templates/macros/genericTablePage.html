@@ -47,5 +47,9 @@
             }) }}
         {% endif %}
     </div>
-
+    <div class="govuk-grid-row">
+        {% if params.generic_table_page.pagination %}
+            {{ govukPagination(params.generic_table_page.pagination) }}
+        {% endif %}
+    </div>
 {% endmacro %}
