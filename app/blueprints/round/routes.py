@@ -64,7 +64,9 @@ def create_round():
     if form.validate_on_submit():
         new_round = create_new_round(form)
         flash(f"Created round {new_round.title_json['en']}")
-        return redirect(url_for(INDEX_BP_DASHBOARD))
+        if request.form.get("action") == "return_home":
+            return redirect(url_for(INDEX_BP_DASHBOARD))
+        return redirect(url_for("application_bp.build_application", round_id=new_round.round_id))
     params = {
         "form": form,
         "fund": fund,
@@ -88,6 +90,8 @@ def edit_round(round_id):
     if form.validate_on_submit():
         update_existing_round(existing_round, form)
         flash(f"Updated round {existing_round.title_json['en']}")
+        if request.form.get("action") == "return_home":
+            return redirect(url_for(INDEX_BP_DASHBOARD))
         return redirect(url_for("fund_bp.view_fund", fund_id=existing_round.fund_id))
     params = {
         "form": form,

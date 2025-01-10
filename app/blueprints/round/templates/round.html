@@ -18,7 +18,7 @@
             }) }}
         {% endif %}
         <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
-        <p class="govuk-body govuk-!-margin-bottom-1">Grant: <a href="{{ url_for('fund_bp.fund', fund_id=fund.fund_id) }}" class="govuk-link">{{ fund.title_json["en"] }}</a></p>
+        <p class="govuk-body govuk-!-margin-bottom-1">Grant: <a href="{{ url_for('fund_bp.edit_fund', fund_id=fund.fund_id) }}" class="govuk-link">{{ fund.title_json["en"] }}</a></p>
         <p class="govuk-body govuk-!-margin-bottom-7">
             <a href="{{ url_for('round_bp.select_fund') }}" class="govuk-link">Change grant</a>
         </p>
@@ -65,15 +65,38 @@
                     {{ yes_no(form.eligibility_config) }}
                     {{ multilineinput(form.eoi_decision_schema_en) }}
                     {{ multilineinput(form.eoi_decision_schema_cy, classes="welsh-field") }}
-                    {{ govukButton({
-                        "text": "Save"
-                    }) }}
+                    <div class="govuk-button-group govuk-!-margin-top-6">
+                        {{ govukButton({
+                            "text": "Save and continue",
+                            "classes": "govuk-button",
+                            "name": "action",
+                            "value": "continue"
+                        }) }}
+
+                        {{ govukButton({
+                            "text": "Cancel",
+                            "classes": "govuk-button govuk-button--secondary",
+                            "href": url_for("index_bp.dashboard")
+                        }) }}
+                    </div>
+
+                    <p class="govuk-body">
+                        {{ govukButton({
+                            "text": "Save and return to home",
+                            "classes": "govuk-button govuk-button--secondary",
+                            "name": "action",
+                            "value": "return_home"
+                        }) }}
+                    </p>
                 </form>
             </fieldset>
         </div>
     </div>
 </div>
 
-<div id="round-config" data-welsh-available="{{ fund.welsh_available | string | lower }}"></div>
+<div id="round-config"
+    data-welsh-available="{{ fund.welsh_available | string | lower }}"
+    data-dashboard-url="{{ url_for('index_bp.dashboard') }}">
+</div>
 <script src="{{ url_for('static', filename='js/create_edit_round.js') }}"></script>
 {% endblock content %}

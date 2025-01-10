@@ -33,16 +33,35 @@
                     {{multilineinput(form.description_cy, classes="welsh-field")}}
                     {{radios_from_enum(form.funding_type)}}
                     {{input(form.ggis_scheme_reference_number)}}
-                    <div class="govuk-!-margin-top-6">
+                    <div class="govuk-button-group govuk-!-margin-top-6">
                         {{ govukButton({
-                            "text": "Save"
+                            "text": "Save and continue",
+                            "classes": "govuk-button",
+                            "name": "action",
+                            "value": "continue"
+                        }) }}
+
+                        {{ govukButton({
+                            "text": "Cancel",
+                            "classes": "govuk-button govuk-button--secondary",
+                            "href": url_for("index_bp.dashboard")
                         }) }}
                     </div>
+
+                    <p class="govuk-body">
+                        {{ govukButton({
+                            "text": "Save and return to home",
+                            "classes": "govuk-button govuk-button--secondary",
+                            "name": "action",
+                            "value": "return_home"
+                        }) }}
+                    </p>
                 </form>
             </fieldset>
         </div>
     </div>
 </div>
 
+<div id="fund-config" data-dashboard-url="{{ url_for('index_bp.dashboard') }}"></div>
 <script src="{{ url_for('static', filename='js/create_edit_fund.js') }}"></script>
 {% endblock content %}
