@@ -43,50 +43,6 @@ def view_fund():
     return render_template("fund_config.html", **params)
 
 
-@fund_bp.route("/details", methods=["GET"])
-def view_grant_details():
-    """
-    Renders grant details page
-    """
-    fund_id = request.args.get("grant_id")
-    fund = get_fund_by_id(fund_id)
-    fields = [
-        {"key": "Grant name", "value": fund.name_json["en"], "visuallyHiddenText": "name"},
-        {"key": "Grant title", "value": fund.title_json["en"], "visuallyHiddenText": "title"},
-        {"key": "Short name", "value": fund.short_name, "visuallyHiddenText": "short name"},
-        {
-            "key": "Funding type",
-            "value": fund.funding_type.get_text_for_display(),
-            "visuallyHiddenText": "funding type",
-        },
-        {"key": "Welsh available", "value": fund.welsh_available, "visuallyHiddenText": "Welsh available"},
-        {"key": "Description", "value": fund.description_json["en"], "visuallyHiddenText": "description"},
-        {
-            "key": "GGIS scheme reference number",
-            "value": fund.ggis_scheme_reference_number,
-            "visuallyHiddenText": "GGIS scheme reference number",
-        },
-    ]
-
-    summary_data = [
-        {
-            "key": {"text": field["key"]},
-            "value": {"text": field["value"]},
-            "actions": {
-                "items": [
-                    {
-                        "href": url_for("fund_bp.edit_fund", fund_id=fund.fund_id),
-                        "text": "Change",
-                        "visuallyHiddenText": field["visuallyHiddenText"],
-                    }
-                ]
-            },
-        }
-        for field in fields
-    ]
-    return render_template("grant_details.html", fund=fund, summary_data=summary_data)
-
-
 @fund_bp.route("/create", methods=["GET", "POST"])
 def create_fund():
     """Creates a new fund"""

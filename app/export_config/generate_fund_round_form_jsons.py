@@ -99,7 +99,4 @@ def generate_form_jsons_for_round(round_id, base_output_dir=None):
             if valid_json:
                 write_config(form_json, form.runner_publish_name, round.short_name, "form_json", base_output_dir)
             else:
-                current_app.logger.error(
-                    "Form JSON for {runner_publish_name} is invalid.",
-                    extra=dict(runner_publish_name=form.runner_publish_name),
-                )
+                current_app.logger.error("Form JSON for {runner_publish_name} is invalid.", extra=dict(runner_publish_name=form.runner_publish_name))
