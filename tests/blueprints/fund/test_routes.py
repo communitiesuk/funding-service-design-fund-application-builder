@@ -111,8 +111,8 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_create_fund_with_save_dest(flask_test_client):
-    """Tests that save_dest query parameter correctly redirects after fund creation"""
+def test_create_fund_with_return_home(flask_test_client):
+    """Tests that 'Save and return home' action correctly redirects to dashboard after fund creation"""
     create_data = {
         "name_en": "New Fund",
         "title_en": "New Fund Title",
@@ -121,7 +121,8 @@ def test_create_fund_with_save_dest(flask_test_client):
         "short_name": "NF5433",
         "funding_type": FundingType.COMPETITIVE.value,
         "ggis_scheme_reference_number": "G1-SCH-0000092415",
+        "action": "return_home",
     }
 
-    response = submit_form(flask_test_client, "/funds/create?save_dest=/dashboard", create_data)
+    response = submit_form(flask_test_client, "/funds/create", create_data)
     assert response.request.path == "/dashboard"

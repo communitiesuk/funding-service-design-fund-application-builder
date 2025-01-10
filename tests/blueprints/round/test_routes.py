@@ -223,8 +223,8 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_create_round_with_save_dest(flask_test_client, seed_dynamic_data):
-    """Tests that save_dest query parameter correctly redirects after round creation"""
+def test_create_round_with_return_home(flask_test_client, seed_dynamic_data):
+    """Tests that 'Save and return home' action correctly redirects to dashboard after round creation"""
     test_fund = seed_dynamic_data["funds"][0]
     new_round_data = {
         "fund_id": test_fund.fund_id,
@@ -265,9 +265,8 @@ def test_create_round_with_save_dest(flask_test_client, seed_dynamic_data):
         "feedback_link": "http://example.com/feedback",
         "project_name_field_id": 1,
         "guidance_url": "http://example.com/guidance",
+        "action": "return_home",
     }
 
-    response = submit_form(
-        flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}&save_dest=/dashboard", new_round_data
-    )
+    response = submit_form(flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}", new_round_data)
     assert response.request.path == "/dashboard"

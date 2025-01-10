@@ -19,7 +19,7 @@ from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.shared.forms import SelectFundForm
-from app.shared.helpers import error_formatter, is_safe_url
+from app.shared.helpers import error_formatter
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
@@ -64,9 +64,8 @@ def create_round():
     if form.validate_on_submit():
         new_round = create_new_round(form)
         flash(f"Created round {new_round.title_json['en']}")
-        save_dest = request.args.get("save_dest")
-        if save_dest and is_safe_url(save_dest):
-            return redirect(save_dest)
+        if request.form.get("action") == "return_home":
+            return redirect(url_for(INDEX_BP_DASHBOARD))
         return redirect(url_for("application_bp.build_application", round_id=new_round.round_id))
     params = {
         "form": form,
@@ -91,9 +90,8 @@ def edit_round(round_id):
     if form.validate_on_submit():
         update_existing_round(existing_round, form)
         flash(f"Updated round {existing_round.title_json['en']}")
-        save_dest = request.args.get("save_dest")
-        if save_dest and is_safe_url(save_dest):
-            return redirect(save_dest)
+        if request.form.get("action") == "return_home":
+            return redirect(url_for(INDEX_BP_DASHBOARD))
         return redirect(url_for("fund_bp.view_fund", fund_id=existing_round.fund_id))
     params = {
         "form": form,

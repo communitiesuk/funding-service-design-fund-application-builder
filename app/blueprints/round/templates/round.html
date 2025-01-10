@@ -68,7 +68,9 @@
                     <div class="govuk-button-group govuk-!-margin-top-6">
                         {{ govukButton({
                             "text": "Save and continue",
-                            "classes": "govuk-button"
+                            "classes": "govuk-button",
+                            "name": "action",
+                            "value": "continue"
                         }) }}
 
                         {{ govukButton({
@@ -79,7 +81,12 @@
                     </div>
 
                     <p class="govuk-body">
-                        <a href="#" class="govuk-link" id="save-return-home">Save and return to home</a>
+                        {{ govukButton({
+                            "text": "Save and return to home",
+                            "classes": "govuk-button govuk-button--secondary",
+                            "name": "action",
+                            "value": "return_home"
+                        }) }}
                     </p>
                 </form>
             </fieldset>
