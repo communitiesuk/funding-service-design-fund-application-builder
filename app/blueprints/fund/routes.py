@@ -41,6 +41,7 @@ def view_all_funds():
         button_url=url_for("fund_bp.create_fund", action="grants_table"),
         table_header=[{"text": "Grant Name"}, {"text": "Description"}, {"text": "Grant Type"}],
         table_rows=build_fund_rows(get_all_funds()),
+        current_page=int(request.args.get("page", 1)),
     ).__dict__
     return render_template("view_all_funds.html", **params)
 
