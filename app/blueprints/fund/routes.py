@@ -10,8 +10,10 @@ from flask import (
 )
 
 from app.blueprints.fund.forms import FundForm
+from app.blueprints.fund.service import build_fund_rows
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
+from app.shared.generic_table_page import GenericTablePage
 from app.shared.helpers import all_funds_as_govuk_select_items, error_formatter
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -20,9 +22,29 @@ INDEX_BP_DASHBOARD = "index_bp.dashboard"
 fund_bp = Blueprint(
     "fund_bp",
     __name__,
-    url_prefix="/funds",
+    url_prefix="/grants",
     template_folder="templates",
 )
+
+
+@fund_bp.route("/", methods=["GET"])
+def view_all_fund():
+    """
+    Renders list of grants in the grant page
+    """
+    params = {
+        "generic_table_page": GenericTablePage(
+            page_heading="Grants",
+            page_description="View all existing grants or add a new grant.",
+            detail_text="Creating new grants",
+            detail_description="This is an placeholder which will be added for the grants page",
+            button_text="Add new grant",
+            button_url=url_for("fund_bp.create_fund"),
+            table_header=[{"text": "Grant Name"}, {"text": "Description"}, {"text": "Grant Type"}],
+            table_rows=build_fund_rows(get_all_funds()),
+        ).__dict__
+    }
+    return render_template("view_all_fund.html", **params)
 
 
 @fund_bp.route("/view", methods=["GET", "POST"])
