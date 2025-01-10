@@ -12,19 +12,21 @@ def test_select_fund(flask_test_client, seed_dynamic_data):
     Test the /rounds/select-grant route to ensure a user cannot proceed without selecting a fund
     and is redirected to /rounds/create if a valid fund is selected.
     """
-    # Attempt to submit without choosing a fund
-    with pytest.raises(ValueError, match="Fund ID is required to create a round"):
-        flask_test_client.post("/rounds/select-grant", data={"fund_id": ""}, follow_redirects=True)
+    url = "/rounds/select-grant"
+
+    # Attempt to submit without a fund selected
+    response = submit_form(flask_test_client, url, {"fund_id": ""})
+    assert response.status_code == 200  # Returns form with errors
+    assert b"There is a problem" in response.data  # Validation error message
 
     # Submit with a valid fund
     test_fund = seed_dynamic_data["funds"][0]
-    response = flask_test_client.post(
-        "/rounds/select-grant", data={"fund_id": str(test_fund.fund_id)}, follow_redirects=False
-    )
-
-    # Should redirect to /rounds/create?fund_id=...
+    response = submit_form(flask_test_client, url, {"fund_id": str(test_fund.fund_id)}, follow_redirects=False)
     assert response.status_code == 302
-    assert url_for("round_bp.create_round", fund_id=test_fund.fund_id) in response.location
+
+    # Confirm redirect to /rounds/create?fund_id=...
+    expected_location = url_for("round_bp.create_round", fund_id=test_fund.fund_id)
+    assert response.location == expected_location
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")

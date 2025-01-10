@@ -2,6 +2,7 @@
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
 {% from "govuk_frontend_jinja/components/select/macro.html" import govukSelect %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
 
 
 {% block content %}
@@ -12,19 +13,26 @@
       "href": url_for("application_bp.select_fund")
     }) }}
 
+    {% if error %}
+      {{ govukErrorSummary({
+        "titleText": error.titleText,
+        "errorList": error.errorList,
+        "classes": "govuk-!-margin-bottom-4"
+      }) }}
+    {% endif %}
+
     <span class="govuk-caption-m">{{ fund.short_name + " - " + fund.title_json["en"] }}</span>
     <h1 class="govuk-heading-l">Select an application</h1>
     <p class="govuk-body">Select the application you want to manage or create a new one</p>
 
     <form method="POST">
+      {{ form.csrf_token }}
       {{ govukSelect({
-        "id": "round_id",
-        "name": "round_id",
-        "items": round_dropdown_items,
+        "id": form.round_id.id,
+        "name": form.round_id.name,
+        "items": select_items,
         "label": "",
-        "attributes": {
-          "required": "required"
-        },
+        "errorMessage": {"text": form.round_id.errors[0]} if form.round_id.errors else None,
         "classes": "govuk-!-width-one-half",
         "formGroup": {
           "classes": "govuk-!-margin-bottom-3"

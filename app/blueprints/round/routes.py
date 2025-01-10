@@ -18,6 +18,7 @@ from app.blueprints.round.services import (
 from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_round_by_id
+from app.shared.forms import SelectFundForm
 from app.shared.helpers import error_formatter
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -35,17 +36,18 @@ def select_fund():
     """
     Intermediary page to select a Fund before creating a Round.
     """
-    if request.method == "POST":
-        fund_id = request.form.get("fund_id")
-        if not fund_id:
-            raise ValueError("Fund ID is required to create a round")
-        return redirect(url_for("round_bp.create_round", fund_id=fund_id))
-    fund_dropdown_items = [{"value": "", "text": "Select a grant"}]
+    form = SelectFundForm()
+    choices = [("", "Select a grant")]
     for fund in get_all_funds():
-        fund_dropdown_items.append(
-            {"value": str(fund.fund_id), "text": fund.short_name + " - " + fund.title_json["en"]}
-        )
-    return render_template("select_fund.html", fund_dropdown_items=fund_dropdown_items)
+        choices.append((str(fund.fund_id), fund.short_name + " - " + fund.title_json["en"]))
+    form.fund_id.choices = choices
+    if form.validate_on_submit():
+        return redirect(url_for("round_bp.create_round", fund_id=form.fund_id.data))
+    error = None
+    if form.fund_id.errors:
+        error = {"titleText": "There is a problem", "errorList": [{"text": form.fund_id.errors[0], "href": "#fund_id"}]}
+    select_items = [{"value": value, "text": text} for value, text in choices]
+    return render_template("select_fund.html", form=form, error=error, select_items=select_items)
 
 
 @round_bp.route("/create", methods=["GET", "POST"])
