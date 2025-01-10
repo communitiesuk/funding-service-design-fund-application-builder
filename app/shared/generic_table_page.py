@@ -12,8 +12,8 @@ class GenericTablePage:
         button_url: str,
         table_header: list[dict],
         table_rows: list[dict],
-        current_page=1,
-        rows_per_page=20,
+        current_page: int = 1,
+        rows_per_page: int = 20,
     ):
         """
         Initializes the GenericTablePage object with the necessary metadata for rendering a generic table page.
@@ -47,12 +47,12 @@ class GenericTablePage:
         }
 
     @staticmethod
-    def pagination(table_rows: list[dict], current_page, rows_per_page):
-        if len(table_rows) < rows_per_page:
-            return [], table_rows
+    def pagination(table_rows: list[dict], current_page: int, rows_per_page: int) -> tuple[dict, list]:
+        if len(table_rows) <= rows_per_page:
+            return {}, table_rows
         # Paginate the data
-        total_pages = len(table_rows)
-        number_of_pages = math.ceil(total_pages / rows_per_page)
+        total_items = len(table_rows)
+        number_of_pages = math.ceil(total_items / rows_per_page)
         start_index = (current_page - 1) * rows_per_page
         end_index = start_index + rows_per_page
         paginated_rows = table_rows[start_index:end_index]

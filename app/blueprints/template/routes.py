@@ -29,10 +29,7 @@ def view_templates():
     sections = get_all_template_sections()
     forms = get_all_template_forms()
     form = TemplateUploadForm()
-    current_page = 1
     params = {"sections": sections, "forms": forms, "uploadform": form}
-    if request and "page" in request.args:  # Check if 'page' is in the query string
-        current_page = int(request.args.get("page", 1))  # Get 'page' or default to 1
     params.update(
         GenericTablePage(
             page_heading="Templates",
@@ -48,7 +45,7 @@ def view_templates():
                 {"text": "Action"},
             ],
             table_rows=build_rows(forms),
-            current_page=current_page,
+            current_page=int(request.args.get("page", 1)),
         ).__dict__
     )
     if form.validate_on_submit():
