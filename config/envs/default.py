@@ -37,6 +37,7 @@ class DefaultConfig(object):
     SECURE_CSP = {
         "default-src": "'self'",
         "script-src": ["'self'"],  # Needed to enable nonce
+        "style-src": ["'self'"],
     }
 
     # Talisman Config
