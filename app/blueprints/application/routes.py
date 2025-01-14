@@ -66,23 +66,7 @@ def select_fund():
         choices.append((str(fund.fund_id), fund.short_name + " - " + fund.title_json["en"]))
     form.fund_id.choices = choices
     if form.validate_on_submit():
-        match request.args.get("action"):
-            case "applications_table":
-                return redirect(
-                    url_for(
-                        "round_bp.create_round",
-                        fund_id=form.fund_id.data,
-                        **({"action": request.args.get("action")} if request.args.get("action") else {}),
-                    )
-                )
-            case _:
-                return redirect(
-                    url_for(
-                        "application_bp.select_application",
-                        fund_id=form.fund_id.data,
-                        **({"action": request.args.get("action")} if request.args.get("action") else {}),
-                    )
-                )
+        return redirect(url_for("application_bp.select_application", fund_id=form.fund_id.data))
     error = None
     if form.fund_id.errors:
         error = {"titleText": "There is a problem", "errorList": [{"text": form.fund_id.errors[0], "href": "#fund_id"}]}
@@ -113,14 +97,7 @@ def select_application():
             "errorList": [{"text": form.round_id.errors[0], "href": "#round_id"}],
         }
     select_items = [{"value": value, "text": text} for value, text in choices]
-    return render_template(
-        "select_application.html",
-        form=form,
-        fund=fund,
-        error=error,
-        select_items=select_items,
-        **({"action": request.args.get("action")} if request.args.get("action") else {}),
-    )
+    return render_template("select_application.html", form=form, fund=fund, error=error, select_items=select_items)
 
 
 @application_bp.route("/<round_id>/sections")

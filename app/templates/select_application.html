@@ -40,7 +40,7 @@
       }) }}
 
       <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-7">
-          <a href="{{ url_for('round_bp.create_round', fund_id=fund.fund_id, **({'action': action} if action else {})) }}" class="govuk-link">Add a new application</a>
+        <a href="{{ url_for('round_bp.create_round', fund_id=fund.fund_id) }}" class="govuk-link">Add a new application</a>
       </p>
 
       <div class="govuk-button-group">

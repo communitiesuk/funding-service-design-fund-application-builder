@@ -9,10 +9,10 @@ from tests.helpers import submit_form
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_select_fund(flask_test_client, seed_dynamic_data):
     """
-    Test the /applications/select-grant route to ensure a user cannot proceed without selecting a fund
-    and is redirected to /applications/create if a valid fund is selected.
+    Test the /rounds/select-grant route to ensure a user cannot proceed without selecting a fund
+    and is redirected to /rounds/create if a valid fund is selected.
     """
-    url = "/applications/select-grant"
+    url = "/rounds/select-grant"
 
     # Attempt to submit without a fund selected
     response = submit_form(flask_test_client, url, {"fund_id": ""})
@@ -24,7 +24,7 @@ def test_select_fund(flask_test_client, seed_dynamic_data):
     response = submit_form(flask_test_client, url, {"fund_id": str(test_fund.fund_id)}, follow_redirects=False)
     assert response.status_code == 302
 
-    # Confirm redirect to /applications/create?fund_id=...
+    # Confirm redirect to /rounds/create?fund_id=...
     expected_location = url_for("round_bp.create_round", fund_id=test_fund.fund_id)
     assert response.location == expected_location
 
@@ -32,7 +32,7 @@ def test_select_fund(flask_test_client, seed_dynamic_data):
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_data):
     """
-    Tests that a round can be successfully created using the /applications/create route
+    Tests that a round can be successfully created using the /rounds/create route
     Verifies that the created round has the correct attributes
     """
     test_fund = seed_dynamic_data["funds"][0]
@@ -80,7 +80,7 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
     error_html = (
         '<a href="#short_name">Short name: Given short name already exists in the fund funding to improve testing.</a>'
     )
-    url = f"/applications/create?fund_id={test_fund.fund_id}"
+    url = f"/rounds/create?fund_id={test_fund.fund_id}"
 
     # Test works fine with first round
     response = submit_form(flask_test_client, url, new_round_data)
@@ -103,7 +103,7 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_new_round(flask_test_client, seed_dynamic_data):
     """
-    Tests that a round can be successfully created using the /applications/create route
+    Tests that a round can be successfully created using the /rounds/create route
     Verifies that the created round has the correct attributes
     """
     test_fund = seed_dynamic_data["funds"][0]
@@ -148,7 +148,7 @@ def test_create_new_round(flask_test_client, seed_dynamic_data):
         "guidance_url": "http://example.com/guidance",
     }
 
-    response = submit_form(flask_test_client, f"/applications/create?fund_id={test_fund.fund_id}", new_round_data)
+    response = submit_form(flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}", new_round_data)
     assert response.status_code == 200
 
     new_round = Round.query.filter_by(short_name="NR123").first()
@@ -160,7 +160,7 @@ def test_create_new_round(flask_test_client, seed_dynamic_data):
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_update_existing_round(flask_test_client, seed_dynamic_data):
     """
-    Tests that a round can be successfully updated using the /applications/<round_id> route
+    Tests that a round can be successfully updated using the /rounds/<round_id> route
     Verifies that the updated round has the correct attributes
     """
     update_round_data = {
@@ -206,7 +206,7 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
     }
 
     test_round = seed_dynamic_data["rounds"][0]
-    response = submit_form(flask_test_client, f"/applications/{test_round.round_id}", update_round_data)
+    response = submit_form(flask_test_client, f"/rounds/{test_round.round_id}", update_round_data)
     assert response.status_code == 200
 
     updated_round = get_round_by_id(test_round.round_id)
@@ -268,14 +268,14 @@ def test_create_round_with_return_home(flask_test_client, seed_dynamic_data):
         "action": "return_home",
     }
 
-    response = submit_form(flask_test_client, f"/applications/create?fund_id={test_fund.fund_id}", new_round_data)
+    response = submit_form(flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}", new_round_data)
     assert response.request.path == "/dashboard"
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_all_applications_page(flask_test_client, seed_dynamic_data):
     response = flask_test_client.get(
-        "/applications", follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
+        "/rounds", follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
     )
 
     assert response.status_code == 200
