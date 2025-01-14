@@ -14,7 +14,9 @@ class DefaultConfig(object):
     FLASK_ENV = CommonConfig.FLASK_ENV
     SECRET_KEY = CommonConfig.SECRET_KEY
 
-    FAB_HOST = getenv("FAB_HOST", "fab:8080/")
+    FUND_APPLICATION_BUILDER_HOST = getenv(
+        "FUND_APPLICATION_BUILDER_HOST", "https://fund-application-builder.levellingup.gov.localhost:3011"
+    )
     FAB_SAVE_PER_PAGE = getenv("FAB_SAVE_PER_PAGE", "dev/save")
     FORM_RUNNER_URL = getenv("FORM_RUNNER_INTERNAL_HOST", "http://form-runner:3009")
     FORM_RUNNER_URL_REDIRECT = getenv("FORM_RUNNER_EXTERNAL_HOST", "http://localhost:3009")
@@ -25,7 +27,7 @@ class DefaultConfig(object):
 
     FSD_USER_TOKEN_COOKIE_NAME = "fsd_user_token"
     AUTHENTICATOR_HOST = getenv("AUTHENTICATOR_HOST", "https://authenticator.levellingup.gov.localhost:4004")
-
+    LOGOUT_URL_OVERRIDE = f"{AUTHENTICATOR_HOST}/sessions/sign-out?return_app=fund-application-builder&return_path=/"  # noqa: E501
     # RSA 256 Keys
     RSA256_PUBLIC_KEY_BASE64 = getenv("RSA256_PUBLIC_KEY_BASE64")
     if RSA256_PUBLIC_KEY_BASE64:
