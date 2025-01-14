@@ -7,15 +7,9 @@
     <div class="govuk-width-container">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
-                {% set html %}
-                    <p class="govuk-notification-banner__body">{{ messages[0] }}</p>
-                {% endset %}
-                {{
-                    govukNotificationBanner({
-                        "html": html,
-                        "type": "success"
-                    })
-                }}
+                <div class="govuk-grid-row">
+                    {{ govukNotificationBanner({"html": messages[0], "type": "success"}) }}
+                </div>
             {% endif %}
         {% endwith %}
         <div class="govuk-grid-row">
