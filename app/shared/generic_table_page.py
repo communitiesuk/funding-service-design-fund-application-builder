@@ -7,13 +7,16 @@ class GenericTablePage:
         page_heading: str,
         page_description: str,
         detail_text: str,
-        detail_description: str,
         button_text: str,
         button_url: str,
         table_header: list[dict],
         table_rows: list[dict],
         current_page: int = 1,
         rows_per_page: int = 20,
+        detail_description: str = None,
+        detail_description_html: str = None,
+        page_description_link_text: str = None,
+        page_description_link_url: str = None,
     ):
         """
         Initializes the GenericTablePage object with the necessary metadata for rendering a generic table page.
@@ -34,9 +37,23 @@ class GenericTablePage:
         self.generic_table_page = {
             "page_heading": page_heading,
             "page_description": page_description,
+            **(
+                {
+                    "link": {
+                        "href": page_description_link_url,
+                        "text": page_description_link_text,
+                    }
+                }
+                if page_description_link_text and page_description_link_url
+                else {}
+            ),
             "detail": {
                 "detail_text": detail_text,
-                "detail_description": detail_description,
+                **(
+                    {"detail_description": detail_description}
+                    if detail_description
+                    else {"detail_description_html": detail_description_html}
+                ),
             },
             "button": {
                 "button_text": button_text,

@@ -49,6 +49,7 @@ variables:
   COOKIE_DOMAIN: ".test.levellingup.gov.uk"
   FLASK_ENV: ${COPILOT_ENVIRONMENT_NAME}
   FORM_RUNNER_EXTERNAL_HOST: "https://forms.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
+  FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
   FORM_RUNNER_INTERNAL_HOST: "http://fsd-form-runner-adapter:3009"
   NOTIFICATION_SERVICE_HOST: http://fsd-notification:8080
   MAINTENANCE_MODE: false
