@@ -49,6 +49,7 @@ jobs:
       app_name: fund-application-builder
       run_db_migrations: true
       image_location: ${{ needs.paketo_build.outputs.image_location }}
+      notify_slack: false
 
   # post_dev_deploy_tests:
   #   needs: dev_deploy
@@ -72,11 +73,14 @@ jobs:
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
       AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_NOTIFICATION_CHANNEL_ID: ${{ secrets.SLACK_NOTIFICATION_CHANNEL_ID }}
     with:
       environment: test
       app_name: fund-application-builder
       run_db_migrations: true
       image_location: ${{ needs.paketo_build.outputs.image_location }}
+      notify_slack: true
 
   # post_test_deploy_tests:
   #   needs: test_deploy
@@ -101,11 +105,14 @@ jobs:
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
       AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_NOTIFICATION_CHANNEL_ID: ${{ secrets.SLACK_NOTIFICATION_CHANNEL_ID }}
     with:
       environment: uat
       app_name: fund-application-builder
       run_db_migrations: true
       image_location: ${{ needs.paketo_build.outputs.image_location }}
+      notify_slack: true
 
   # post_uat_deploy_tests:
   #   needs: uat_deploy
