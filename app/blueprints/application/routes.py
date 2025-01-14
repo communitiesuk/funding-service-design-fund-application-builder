@@ -66,13 +66,23 @@ def select_fund():
         choices.append((str(fund.fund_id), fund.short_name + " - " + fund.title_json["en"]))
     form.fund_id.choices = choices
     if form.validate_on_submit():
-        return redirect(
-            url_for(
-                "application_bp.select_application",
-                fund_id=form.fund_id.data,
-                **({"action": request.args.get("action")} if request.args.get("action") else {}),
-            )
-        )
+        match request.args.get("action"):
+            case "applications_table":
+                return redirect(
+                    url_for(
+                        "round_bp.create_round",
+                        fund_id=form.fund_id.data,
+                        **({"action": request.args.get("action")} if request.args.get("action") else {}),
+                    )
+                )
+            case _:
+                return redirect(
+                    url_for(
+                        "application_bp.select_application",
+                        fund_id=form.fund_id.data,
+                        **({"action": request.args.get("action")} if request.args.get("action") else {}),
+                    )
+                )
     error = None
     if form.fund_id.errors:
         error = {"titleText": "There is a problem", "errorList": [{"text": form.fund_id.errors[0], "href": "#fund_id"}]}
