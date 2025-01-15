@@ -17,13 +17,11 @@
     {% endwith %}
     <div class="govuk-grid-row">
         <h1 class="govuk-heading-l">{{ params.generic_table_page.page_heading }}</h1>
-        <p class="govuk-body">{{ params.generic_table_page.page_description }}</p>
-        {% if params.generic_table_page.link and params.generic_table_page.link.href and params.generic_table_page.link.text %}
-            <p class="govuk-body">
-                <a class="govuk-link"
-                   target="_blank"
-                   href="{{ params.generic_table_page.link.href }}">{{ params.generic_table_page.link.text }}</a>.
-            </p>
+        {% if params.generic_table_page.page_description %}
+            <p class="govuk-body">{{ params.generic_table_page.page_description }}</p>
+        {% endif %}
+        {% if params.generic_table_page.page_description_html %}
+            {{ params.generic_table_page.page_description_html | safe }}
         {% endif %}
     </div>
     <div class="govuk-grid-row">

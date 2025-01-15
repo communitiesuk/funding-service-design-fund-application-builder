@@ -5,7 +5,6 @@ class GenericTablePage:
     def __init__(
         self,
         page_heading: str,
-        page_description: str,
         detail_text: str,
         button_text: str,
         button_url: str,
@@ -13,10 +12,10 @@ class GenericTablePage:
         table_rows: list[dict],
         current_page: int = 1,
         rows_per_page: int = 20,
+        page_description: str = None,
+        page_description_html: str = None,
         detail_description: str = None,
         detail_description_html: str = None,
-        page_description_link_text: str = None,
-        page_description_link_url: str = None,
     ):
         """
         Initializes the GenericTablePage object with the necessary metadata for rendering a generic table page.
@@ -36,16 +35,10 @@ class GenericTablePage:
         pagination, paginated_rows = self.pagination(table_rows, current_page, rows_per_page)
         self.generic_table_page = {
             "page_heading": page_heading,
-            "page_description": page_description,
             **(
-                {
-                    "link": {
-                        "href": page_description_link_url,
-                        "text": page_description_link_text,
-                    }
-                }
-                if page_description_link_text and page_description_link_url
-                else {}
+                {"page_description": page_description}
+                if page_description
+                else {"page_description_html": page_description_html}
             ),
             "detail": {
                 "detail_text": detail_text,

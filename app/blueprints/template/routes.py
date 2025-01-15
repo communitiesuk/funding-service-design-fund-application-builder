@@ -31,22 +31,15 @@ def view_templates():
     forms = get_all_template_forms()
     form = TemplateUploadForm()
     params = {"sections": sections, "forms": forms, "uploadform": form}
-    detail_description_html = """
-    <p>You should use existing templates for standard application questions. For example, all
-    grant applications should collect organisation and risk information in the same way.</p>
-    <p>If your application needs questions specific to the grant, you can create a new template by:</p>
-    <ol>
-      <li>designing the template in Form Designer</li>
-      <li>downloading the template</li>
-      <li>uploading the template to Fund application builder</li>
-    </ol>
-    """
     params.update(
         GenericTablePage(
             page_heading="Templates",
-            page_description="Follow the step-by-step instructions to create a new grant application.",
-            detail_text="Using templates in applications",
-            detail_description_html=detail_description_html,
+            page_description_html=render_template(
+                "partials/view_template_page_description.html",
+                form_designer_href=f"{Config.FORM_DESIGNER_URL_REDIRECT}/app",
+            ),
+            detail_text="Creating new templates",
+            detail_description_html=render_template("partials/view_templates_details_description.html"),
             button_text="Upload template",
             button_url="#",
             table_header=[
@@ -56,10 +49,9 @@ def view_templates():
             ],
             table_rows=build_rows(forms),
             current_page=int(request.args.get("page", 1)),
-            page_description_link_text="Form Designer (opens in a new tab).",
-            page_description_link_url=f"{Config.FORM_RUNNER_URL_REDIRECT}/app",
         ).__dict__
     )
+
     if form.validate_on_submit():
         template_name = form.template_name.data
         file = form.file.data
