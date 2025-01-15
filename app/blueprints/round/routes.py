@@ -34,7 +34,7 @@ round_bp = Blueprint(
 
 
 @round_bp.route("/", methods=["GET"])
-def view_all_applications():
+def view_all_rounds():
     """
     Renders a list of rounds in the application page
     """
@@ -102,7 +102,7 @@ def create_round():
             case "return_home":
                 return redirect(url_for(INDEX_BP_DASHBOARD))
             case "applications_table":
-                return redirect(url_for("round_bp.view_all_applications"))
+                return redirect(url_for("round_bp.view_all_rounds"))
             case _:
                 return redirect(url_for("application_bp.build_application", round_id=new_round.round_id))
     params = {
