@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
 
+from flask import url_for
+
 from app.blueprints.round.forms import get_datetime
 from app.db.models.round import Round
 from app.db.queries.round import add_round, update_round
@@ -16,6 +18,24 @@ def convert_form_data_to_json(data) -> dict:
     if data:
         return json.loads(data)
     return {}
+
+
+def build_round_rows(rounds: list[Round]) -> list[dict]:
+    rows = []
+    for round in rounds:
+        row = [
+            {"html": f"""<a class='govuk-link--no-visited-state' href='#'>{round.title_json["en"]}</a>"""},
+            {"html": f"""{round.fund.title_json["en"]}"""},
+            {
+                "classes": "govuk-!-text-align-right",
+                "html": f"""
+                <a class='govuk-link--no-visited-state govuk-!-text-align-right' href='{
+                    url_for("application_bp.build_application", round_id=round.round_id)
+                }'>Build application</a>""",
+            },
+        ]
+        rows.append(row)
+    return rows
 
 
 def populate_form_with_round_data(round_obj, form_class):

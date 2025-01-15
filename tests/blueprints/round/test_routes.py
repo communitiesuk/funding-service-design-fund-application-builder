@@ -270,3 +270,42 @@ def test_create_round_with_return_home(flask_test_client, seed_dynamic_data):
 
     response = submit_form(flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}", new_round_data)
     assert response.request.path == "/dashboard"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_all_applications_page(flask_test_client, seed_dynamic_data):
+    response = flask_test_client.get(
+        "/rounds", follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
+    )
+
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+
+    # Title component availability check
+    assert '<h1 class="govuk-heading-l">' in html, "Heading title component is missing"
+    assert "Applications" in html, "Heading title is missing"
+
+    # Description component availability check
+    assert '<p class="govuk-body">' in html, "Description component is missing"
+    assert "View existing applications or create a new one." in html, "Description is missing"
+
+    # Detail component availability check
+    assert '<span class="govuk-details__summary-text">' in html, "Detail summary drop down title component is missing"
+    assert "Creating a new grant application" in html, "Detail summary drop down title is missing"
+    assert "Follow the step-by-step instructions to create a new grant application." in html, (
+        "Detail summary description is missing"
+    )
+    assert '<div class="govuk-details__text">' in html, "Detail summary description component is missing"
+
+    # Button component availability check
+    assert "Create new application" in html, "Button text is missing"
+
+    # Table component availability check and data testing
+    assert '<thead class="govuk-table__head">' in html, "Table is missing"
+    assert '<th scope="col" class="govuk-table__header">Application name</th>' in html, (
+        "Application Name header is missing"
+    )
+    assert '<th scope="col" class="govuk-table__header">Grant</th>' in html, "Grant Name header missing"
+    assert "round the first" in html, "Application name is missing"
+    assert "funding to improve testing" in html, "Grant name and table component is missing"
+    assert "Build application" in html, "Build application is not available and table component is missing"
