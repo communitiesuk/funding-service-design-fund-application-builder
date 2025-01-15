@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% set showNavigationBar = True %}
+{% set active_item_identifier = "applications" %}
+
+{%- from "macros/genericTablePage.html" import govukGenericTableTemplate -%}
+
+{% block content %}
+    {{ govukGenericTableTemplate({
+        "generic_table_page": generic_table_page
+    }) }}
+{% endblock content %}

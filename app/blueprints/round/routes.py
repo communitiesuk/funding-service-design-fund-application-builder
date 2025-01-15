@@ -11,14 +11,16 @@ from flask import (
 
 from app.blueprints.round.forms import RoundForm
 from app.blueprints.round.services import (
+    build_round_rows,
     create_new_round,
     populate_form_with_round_data,
     update_existing_round,
 )
 from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
-from app.db.queries.round import get_round_by_id
+from app.db.queries.round import get_all_rounds, get_round_by_id
 from app.shared.forms import SelectFundForm
+from app.shared.generic_table_page import GenericTablePage
 from app.shared.helpers import error_formatter
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -26,9 +28,28 @@ INDEX_BP_DASHBOARD = "index_bp.dashboard"
 round_bp = Blueprint(
     "round_bp",
     __name__,
-    url_prefix="/rounds",
+    url_prefix="/applications",
     template_folder="templates",
 )
+
+
+@round_bp.route("/", methods=["GET"])
+def view_all_applications():
+    """
+    Renders a list of rounds in the application page
+    """
+    params = GenericTablePage(
+        page_heading="Applications",
+        page_description="View existing applications or create a new one.",
+        detail_text="Creating a new grant application",
+        detail_description="Follow the step-by-step instructions to create a new grant application.",
+        button_text="Create new application",
+        button_url=url_for("application_bp.select_fund", action="applications_table"),
+        table_header=[{"text": "Application name"}, {"text": "Grant"}, {"text": ""}],
+        table_rows=build_round_rows(get_all_rounds()),
+        current_page=int(request.args.get("page", 1)),
+    ).__dict__
+    return render_template("view_all_rounds.html", **params)
 
 
 @round_bp.route("/select-grant", methods=["GET", "POST"])  # NOSONAR
@@ -63,10 +84,21 @@ def create_round():
     fund = get_fund_by_id(fund_id)
     if form.validate_on_submit():
         new_round = create_new_round(form)
-        flash(f"Created round {new_round.title_json['en']}")
-        if request.form.get("action") == "return_home":
-            return redirect(url_for(INDEX_BP_DASHBOARD))
-        return redirect(url_for("application_bp.build_application", round_id=new_round.round_id))
+        flash(f"""
+            <h3 class="govuk-notification-banner__heading">New application created successfully</h3>
+            <p class="govuk-body">
+                <a class="govuk-notification-banner__link" href="#">
+                View {new_round.title_json["en"]}
+                </a>
+            </p>
+        """)
+        match request.args.get("action") or request.form.get("action"):
+            case "return_home":
+                return redirect(url_for(INDEX_BP_DASHBOARD))
+            case "applications_table":
+                return redirect(url_for("round_bp.view_all_applications"))
+            case _:
+                return redirect(url_for("application_bp.build_application", round_id=new_round.round_id))
     params = {
         "form": form,
         "fund": fund,
