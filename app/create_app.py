@@ -61,6 +61,11 @@ def create_app() -> Flask:
         compare_server_default=True,
     )
 
+    if flask_app.config["FLASK_ENV"] == "development":
+        from flask_debugtoolbar import DebugToolbarExtension
+
+        DebugToolbarExtension(flask_app)
+
     # Configure application security with Talisman
     Talisman(flask_app, **Config.TALISMAN_SETTINGS)
 
