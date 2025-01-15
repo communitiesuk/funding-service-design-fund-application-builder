@@ -71,7 +71,9 @@ def select_fund():
     if form.fund_id.errors:
         error = {"titleText": "There is a problem", "errorList": [{"text": form.fund_id.errors[0], "href": "#fund_id"}]}
     select_items = [{"value": value, "text": text} for value, text in choices]
-    return render_template("select_fund.html", form=form, error=error, select_items=select_items)
+    return render_template(
+        "select_fund.html", form=form, error=error, select_items=select_items, back_link=url_for("index_bp.dashboard")
+    )
 
 
 @application_bp.route("/sections/select-application", methods=["GET", "POST"])  # NOSONAR

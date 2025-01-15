@@ -6,12 +6,11 @@
 
 {% block content %}
 <div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
-    {{ govukBackLink({
+    <div class="govuk-grid-column-full">
+        {{ govukBackLink({
       "text": "Back",
-      "href": url_for("index_bp.dashboard")
+      "href": back_link
     }) }}
-
     {% if error %}
       {{ govukErrorSummary({
         "titleText": error.titleText,
@@ -48,7 +47,7 @@
         }) }}
         {{ govukButton({
           "text": "Cancel",
-          "href": url_for("index_bp.dashboard"),
+          "href": back_link,
           "classes": "govuk-button--secondary"
         }) }}
       </div>

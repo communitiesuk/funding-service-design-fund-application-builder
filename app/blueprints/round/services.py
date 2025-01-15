@@ -24,13 +24,14 @@ def build_round_rows(rounds: list[Round]) -> list[dict]:
     rows = []
     for round in rounds:
         row = [
-            {"html": f"""<a class='govuk-link--no-visited-state 'href='#'>{round.title_json["en"]}</a>"""},
+            {"html": f"""<a class='govuk-link--no-visited-state' href='#'>{round.title_json["en"]}</a>"""},
             {"html": f"""{round.fund.title_json["en"]}"""},
             {
+                "classes": "govuk-!-text-align-right",
                 "html": f"""
-                <a class='govuk-link--no-visited-state 'href='{
+                <a class='govuk-link--no-visited-state govuk-!-text-align-right' href='{
                     url_for("application_bp.build_application", round_id=round.round_id)
-                }'>Build application</a>"""
+                }'>Build application</a>""",
             },
         ]
         rows.append(row)
