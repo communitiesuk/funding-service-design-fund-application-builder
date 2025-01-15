@@ -19,7 +19,10 @@ class DefaultConfig(object):
     )
     FAB_SAVE_PER_PAGE = getenv("FAB_SAVE_PER_PAGE", "dev/save")
     FORM_RUNNER_URL = getenv("FORM_RUNNER_INTERNAL_HOST", "http://form-runner:3009")
-    FORM_RUNNER_URL_REDIRECT = getenv("FORM_RUNNER_EXTERNAL_HOST", "http://localhost:3009")
+    FORM_RUNNER_URL_REDIRECT = getenv("FORM_RUNNER_EXTERNAL_HOST", "https://form-runner.levellingup.gov.localhost:3009")
+    FORM_DESIGNER_URL_REDIRECT = getenv(
+        "FORM_DESIGNER_EXTERNAL_HOST", "https://form-designer.levellingup.gov.localhost:3000"
+    )
     SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URL")
 
     TEMP_FILE_PATH = Path("/tmp")

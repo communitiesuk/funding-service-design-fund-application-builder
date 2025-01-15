@@ -18,12 +18,9 @@ def build_rows(forms: list[Form]) -> list[dict]:
                 f"href='{url_for('index_bp.preview_form', form_id=form.form_id)}'>{form.template_name}</a>"
             },
             {"text": form.name_in_apply_json["en"]},
-            {"text": form.runner_publish_name},
             {
                 "html": "<a class='govuk-link--no-visited-state' href='"
-                f"{url_for('template_bp.edit_template', form_id=form.form_id)}'>Edit</a> &nbsp;"
-                "<a class='govuk-link--no-visited-state' href='"
-                f"{url_for('template_bp.delete_template', form_id=form.form_id)}'>Delete</a>"
+                f"{url_for('template_bp.edit_template', form_id=form.form_id)}'>Edit details</a>"
             },
         ]
         rows.append(row)
