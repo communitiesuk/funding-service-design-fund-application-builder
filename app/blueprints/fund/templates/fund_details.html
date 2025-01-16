@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{%- from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList -%}
+{% set showNavigationBar = True %}
+{% set active_item_identifier = "grants" %}
+{% block content %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ govukBackLink({
+          "text": "Back",
+          "href": url_for("fund_bp.view_all_funds")
+        }) }}
+        <h2 class="govuk-heading-l">{{ fund.name_json["en"] }}</h2>
+        {{ govukSummaryList({
+            "classes": "govuk-!-margin-bottom-9",
+                "rows": [
+                    {
+                        "key": {"text": "Grant name"},
+                        "value": {"text": fund.name_json["en"]},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.name_en.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "Name english",
+                                }
+                            ]
+                        },
+                    },
+                    {
+                        "key": {"text": "Grant name (Welsh)"},
+                        "value": {"text": fund.name_json["cy"]},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.name_cy.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "Name welsh",
+                                }
+                            ]
+                        },
+                    } if fund.welsh_available else {},
+                    {
+                        "key": {"text": "Short name"},
+                        "value": {"text": fund.short_name},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.short_name.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "short name",
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "key": {"text": "Application heading"},
+                        "value": {"text": "Apply for " + fund.title_json["en"]},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.title_en.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "title english",
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "key": {"text": "Application heading (Welsh)"},
+                        "value": {"text": "Apply for " + fund.title_json["cy"] if fund.title_json["cy"] else ""},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.title_cy.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "title welsh",
+                                }
+                            ]
+                        },
+                    } if fund.welsh_available else {},
+                    {
+                        "key": {"text": "Funding type"},
+                        "value": {"text": fund.funding_type.get_text_for_display()},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.funding_type.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "funding type",
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "key": {"text": "Welsh available"},
+                        "value": {"text": "Yes" if fund.welsh_available else "No"},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.welsh_available.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "welsh available",
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "key": {"text": "Description"},
+                        "value": {"text": fund.description_json["en"]},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.description_en.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "description english",
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "key": {"text": "Description (Welsh)"},
+                        "value": {"text": fund.description_json["cy"]},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.description_cy.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "description welsh",
+                                }
+                            ]
+                        }
+                    } if fund.welsh_available else {},
+                    {
+                        "key": {"text": "GGIS scheme reference number"},
+                        "value": {"text": fund.ggis_scheme_reference_number},
+                        "actions": {
+                            "items": [
+                                {
+                                    "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.ggis_scheme_reference_number.id),
+                                    "text": "Change",
+                                    "classes": "govuk-link--no-visited-state",
+                                    "visuallyHiddenText": "GGIS scheme reference number",
+                                }
+                            ]
+                        }
+                    },
+                ]
+        }) }}
+    </div>
+</div>
+{% endblock content %}

@@ -64,6 +64,16 @@ def view_fund():
     return render_template("fund_config.html", **params)
 
 
+@fund_bp.route("/<uuid:fund_id>", methods=["GET"])
+def view_fund_details(fund_id):
+    """
+    Renders grant details page
+    """
+    form = FundForm()
+    fund = get_fund_by_id(fund_id)
+    return render_template("fund_details.html", form=form, fund=fund)
+
+
 @fund_bp.route("/create", methods=["GET", "POST"])
 def create_fund():
     """Creates a new fund"""
@@ -103,7 +113,7 @@ def create_fund():
     return render_template("fund.html", form=form, fund_id=None, error=error)
 
 
-@fund_bp.route("/<fund_id>", methods=["GET", "POST"])
+@fund_bp.route("/<uuid:fund_id>/edit", methods=["GET", "POST"])
 def edit_fund(fund_id):
     """Updates an existing fund"""
     fund = get_fund_by_id(fund_id)
@@ -146,7 +156,7 @@ def edit_fund(fund_id):
         update_fund(fund)
         if request.form.get("action") == "return_home":
             return redirect(url_for(INDEX_BP_DASHBOARD))
-        return redirect(url_for("fund_bp.view_fund", fund_id=fund.fund_id))
+        return redirect(url_for("fund_bp.view_fund_details", fund_id=fund.fund_id))
 
     error = error_formatter(form)
     return render_template("fund.html", form=form, fund_id=fund_id, error=error)

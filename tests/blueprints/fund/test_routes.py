@@ -70,9 +70,9 @@ def test_create_fund_with_existing_short_name(flask_test_client):
     response = submit_form(flask_test_client, "/grants/create", create_data)
     assert response.status_code == 200
     html = response.data.decode("utf-8")
-    assert (
-        '<a href="#short_name">Short name: Given fund short name already exists.</a>' in html
-    ), "Not having the fund short name already exists error"
+    assert '<a href="#short_name">Short name: Given fund short name already exists.</a>' in html, (
+        "Not having the fund short name already exists error"
+    )
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
@@ -93,7 +93,7 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
     }
 
     test_fund = seed_dynamic_data["funds"][0]
-    response = submit_form(flask_test_client, f"/grants/{test_fund.fund_id}", update_data)
+    response = submit_form(flask_test_client, f"/grants/{test_fund.fund_id}/edit", update_data)
     assert response.status_code == 200
 
     updated_fund = get_fund_by_id(test_fund.fund_id)
@@ -129,7 +129,7 @@ def test_create_fund_with_return_home(flask_test_client):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
-def test_view_all_funds(flask_test_client):
+def test_view_all_funds(flask_test_client, seed_dynamic_data):
     response = flask_test_client.get(
         "/grants/", follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
     )
@@ -147,9 +147,9 @@ def test_view_all_funds(flask_test_client):
     # Detail component availability check
     assert '<span class="govuk-details__summary-text">' in html, "Detail summary drop down title component is missing"
     assert "Creating new grants" in html, "Detail summary drop down title is missing"
-    assert (
-        "This is an placeholder which will be added for the grants page" in html
-    ), "Detail summary description is missing"
+    assert "This is an placeholder which will be added for the grants page" in html, (
+        "Detail summary description is missing"
+    )
     assert '<div class="govuk-details__text">' in html, "Detail summary description component is missing"
 
     # Button component availability check
@@ -164,3 +164,31 @@ def test_view_all_funds(flask_test_client):
     assert "<a class='govuk-link--no-visited-state'" in html, "Grant view link is missing"
     assert '<td class="govuk-table__cell">New Fund Description</td>' in html, "Fund Description is missing"
     assert '<td class="govuk-table__cell">Competitive</td>' in html, "Grant type is missing"
+
+    # fetch test data and check the link to grant details link
+    test_fund = seed_dynamic_data["funds"][0]
+    assert f"/grants/{test_fund.fund_id}" in html
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_view_grant_details(flask_test_client, seed_dynamic_data):
+    """
+    Test to check grant detail route is working as expected.
+    and verify the grant details template is rendered as expected.
+    """
+    invalid_fund_id = "123e4567-e89b-12d3-a456-426614174000"
+    with pytest.raises(ValueError, match=f"Fund with id {invalid_fund_id} not found"):
+        flask_test_client.get(f"/grants/{invalid_fund_id}", follow_redirects=True)
+
+    test_fund = seed_dynamic_data["funds"][0]
+    response = flask_test_client.get(f"/grants/{test_fund.fund_id}", follow_redirects=True)
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+    assert f'<h2 class="govuk-heading-l">{test_fund.name_json["en"]}</h2>' in html
+    assert (
+        f'<a class="govuk-link govuk-link--no-visited-state" href="/grants/{test_fund.fund_id}/edit#name_en">Change<span class="govuk-visually-hidden"> Name english</span></a>'  # noqa: E501
+        in html
+    )
+    assert '<a href="/grants/" class="govuk-back-link">Back</a>' in html
+
+    assert '<dt class="govuk-summary-list__key"> Grant name (Welsh)</dt>' not in html
