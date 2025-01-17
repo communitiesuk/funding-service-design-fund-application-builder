@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from app.shared.generic_table_page import GenericTablePage
+from app.shared.table_pagination import GovUKTableAndPagination
 
 MORE_THAN_DEFAULT_START_FIRST_PAGE = """
 {"items": [{"number": 1, "href": "?page=1", "current": true},
@@ -72,7 +72,7 @@ def generate_data(rows) -> list[dict]:
     ],
 )
 def test_pagination_with_less_than_pagination_default(pagination_scenario):
-    gpt = GenericTablePage(
+    gpt = GovUKTableAndPagination(
         table_header=[
             {"text": "Template Name"},
             {"text": "Tasklist Name"},
@@ -84,38 +84,38 @@ def test_pagination_with_less_than_pagination_default(pagination_scenario):
     ).__dict__
 
     if pagination_scenario["expected_pagination"] is None:  # no pagination scenarios
-        assert "pagination" not in gpt["generic_table_page"], "Pagination not available"
-        assert len(gpt["generic_table_page"]["table"]["table_rows"]) == pagination_scenario["table_row_count"], (
+        assert "pagination" not in gpt["table_pagination_page"], "Pagination not available"
+        assert len(gpt["table_pagination_page"]["table"]["table_rows"]) == pagination_scenario["table_row_count"], (
             "Invalid table row count"
         )
     else:
-        assert "pagination" in gpt["generic_table_page"], "Pagination not available"
-        assert gpt["generic_table_page"]["pagination"] == json.loads(pagination_scenario["expected_pagination"]), (
+        assert "pagination" in gpt["table_pagination_page"], "Pagination not available"
+        assert gpt["table_pagination_page"]["pagination"] == json.loads(pagination_scenario["expected_pagination"]), (
             "Pagination invalid"
         )
         # check table data row data after pagination
         match pagination_scenario["current_page"]:
             case 1:
-                assert len(gpt["generic_table_page"]["table"]["table_rows"]) == 20, "Invalid table row count"
-                assert "form_id=1" in str(gpt["generic_table_page"]["table"]["table_rows"][0][0]), (
+                assert len(gpt["table_pagination_page"]["table"]["table_rows"]) == 20, "Invalid table row count"
+                assert "form_id=1" in str(gpt["table_pagination_page"]["table"]["table_rows"][0][0]), (
                     "Not starting from correct first data"
                 )
-                assert "form_id=20" in str(gpt["generic_table_page"]["table"]["table_rows"][19][0]), (
+                assert "form_id=20" in str(gpt["table_pagination_page"]["table"]["table_rows"][19][0]), (
                     "Not ending from correct last data"
                 )
             case 2:
-                assert len(gpt["generic_table_page"]["table"]["table_rows"]) == 20, "Invalid table row count"
-                assert "form_id=21" in str(gpt["generic_table_page"]["table"]["table_rows"][0][0]), (
+                assert len(gpt["table_pagination_page"]["table"]["table_rows"]) == 20, "Invalid table row count"
+                assert "form_id=21" in str(gpt["table_pagination_page"]["table"]["table_rows"][0][0]), (
                     "Not starting from correct first data"
                 )
-                assert "form_id=40" in str(gpt["generic_table_page"]["table"]["table_rows"][19][0]), (
+                assert "form_id=40" in str(gpt["table_pagination_page"]["table"]["table_rows"][19][0]), (
                     "Not ending from correct last data"
                 )
             case 3:
-                assert len(gpt["generic_table_page"]["table"]["table_rows"]) == 5, "Invalid table row count"
-                assert "form_id=41" in str(gpt["generic_table_page"]["table"]["table_rows"][0][0]), (
+                assert len(gpt["table_pagination_page"]["table"]["table_rows"]) == 5, "Invalid table row count"
+                assert "form_id=41" in str(gpt["table_pagination_page"]["table"]["table_rows"][0][0]), (
                     "Not starting from correct first data"
                 )
-                assert "form_id=45" in str(gpt["generic_table_page"]["table"]["table_rows"][4][0]), (
+                assert "form_id=45" in str(gpt["table_pagination_page"]["table"]["table_rows"][4][0]), (
                     "Not ending from correct last data"
                 )

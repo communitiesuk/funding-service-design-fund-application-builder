@@ -12,8 +12,8 @@ from app.blueprints.fund.forms import FundForm
 from app.blueprints.fund.services import build_fund_rows
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
-from app.shared.generic_table_page import GenericTablePage
 from app.shared.helpers import all_funds_as_govuk_select_items, error_formatter, flash_message
+from app.shared.table_pagination import GovUKTableAndPagination
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
@@ -31,7 +31,7 @@ def view_all_funds():
     """
     Renders list of grants in the grant page
     """
-    params = GenericTablePage(
+    params = GovUKTableAndPagination(
         table_header=[{"text": "Grant Name"}, {"text": "Description"}, {"text": "Grant Type"}],
         table_rows=build_fund_rows(get_all_funds()),
         current_page=int(request.args.get("page", 1)),

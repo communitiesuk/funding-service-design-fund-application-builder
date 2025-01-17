@@ -1,4 +1,4 @@
-{% macro govukGenericTableTemplate(params) %}
+{% macro govukTablePagination(params) %}
 
     {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
     {%- from "govuk_frontend_jinja/components/pagination/macro.html" import govukPagination -%}
@@ -8,15 +8,15 @@
             {{ govukTable({
                 "captionClasses": "govuk-table__caption--m",
                 "firstCellIsHeader": false,
-                "head": params.generic_table_page.table.table_header,
-                "rows": params.generic_table_page.table.table_rows
+                "head": params.table_pagination_page.table.table_header,
+                "rows": params.table_pagination_page.table.table_rows
             }) }}
         </div>
     </div>
-    {% if params.generic_table_page.pagination %}
+    {% if params.table_pagination_page.pagination %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
-                {{ govukPagination(params.generic_table_page.pagination) }}
+                {{ govukPagination(params.table_pagination_page.pagination) }}
             </div>
         </div>
     {% endif %}

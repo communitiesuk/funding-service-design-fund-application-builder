@@ -1,7 +1,7 @@
 import math
 
 
-class GenericTablePage:
+class GovUKTableAndPagination:
     def __init__(
         self,
         table_header: list[dict],
@@ -10,7 +10,8 @@ class GenericTablePage:
         rows_per_page: int = 20,
     ):
         """
-        Initializes the GenericTablePage object with the necessary metadata for rendering a generic table page.
+        Initializes the GovUKTableAndPagination object with the necessary metadata for rendering a generic GovUK table
+        with pagination.
 
         Args:
             table_header (list): The heading of the table, typically the column headers.
@@ -19,7 +20,7 @@ class GenericTablePage:
             rows_per_page (int): The number of rows to display per page. Default to 20.
         """
         pagination, paginated_rows = self.pagination(table_rows, current_page, rows_per_page)
-        self.generic_table_page = {
+        self.table_pagination_page = {
             "table": {"table_header": table_header, "table_rows": paginated_rows},
             **({"pagination": pagination} if bool(pagination) else {}),
         }

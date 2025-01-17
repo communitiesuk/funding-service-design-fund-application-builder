@@ -20,8 +20,8 @@ from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_all_rounds, get_round_by_id
 from app.shared.forms import SelectFundForm
-from app.shared.generic_table_page import GenericTablePage
 from app.shared.helpers import error_formatter, flash_message
+from app.shared.table_pagination import GovUKTableAndPagination
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
@@ -38,7 +38,7 @@ def view_all_rounds():
     """
     Renders a list of rounds in the application page
     """
-    params = GenericTablePage(
+    params = GovUKTableAndPagination(
         table_header=[{"text": "Application name"}, {"text": "Grant"}, {"text": ""}],
         table_rows=build_round_rows(get_all_rounds()),
         current_page=int(request.args.get("page", 1)),

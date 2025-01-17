@@ -3,7 +3,7 @@
 {% set showNavigationBar = True %}
 {% set active_item_identifier = "applications" %}
 
-{%- from "macros/genericTablePage.html" import govukGenericTableTemplate -%}
+{%- from "macros/tablePagination.html" import govukTablePagination -%}
 {% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
@@ -33,7 +33,7 @@
             }) }}
         </div>
     </div>
-    {{ govukGenericTableTemplate({
-        "generic_table_page": generic_table_page
+    {{ govukTablePagination({
+        "table_pagination_page": table_pagination_page
     }) }}
 {% endblock content %}

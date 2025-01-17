@@ -4,7 +4,7 @@
 
 {% from "macros/wtfToGovUk.html" import input %}
 {%- from "govuk_frontend_jinja/components/file-upload/macro.html" import govukFileUpload -%}
-{%- from "macros/genericTablePage.html" import govukGenericTableTemplate -%}
+{%- from "macros/tablePagination.html" import govukTablePagination -%}
 {% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 {%- from "govuk_frontend_jinja/components/details/macro.html" import govukDetails -%}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
@@ -59,8 +59,8 @@
             }) }}
         </div>
     </div>
-    {{ govukGenericTableTemplate({
-        "generic_table_page": generic_table_page
+    {{ govukTablePagination({
+        "table_pagination_page": table_pagination_page
     }) }}
 
 {% endblock %}

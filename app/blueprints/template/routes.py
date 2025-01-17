@@ -13,8 +13,8 @@ from app.db.queries.application import (
     get_form_by_template_name,
     update_form,
 )
-from app.shared.generic_table_page import GenericTablePage
 from app.shared.helpers import error_formatter
+from app.shared.table_pagination import GovUKTableAndPagination
 
 template_bp = Blueprint(
     "template_bp",
@@ -32,7 +32,7 @@ def view_templates():
     form_designer_url = current_app.config["FORM_DESIGNER_URL_REDIRECT"] + "/app"
     params = {"sections": sections, "forms": forms, "uploadform": form}
     params.update(
-        GenericTablePage(
+        GovUKTableAndPagination(
             table_header=[
                 {"text": "Template name"},
                 {"text": "Task name"},
