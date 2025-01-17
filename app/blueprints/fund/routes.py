@@ -94,7 +94,7 @@ def create_fund():
         add_fund(new_fund)
         flash_message(
             message="New grant added successfully",
-            href="#",
+            href=url_for("fund_bp.view_fund_details", fund_id=new_fund.fund_id),
             href_display_name=form.name_en.data,
         )
         match request.args.get("action") or request.form.get("action"):
