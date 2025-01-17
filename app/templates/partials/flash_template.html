@@ -1,0 +1,15 @@
+<h3 class="govuk-notification-banner__heading">{{ message }}</h3>
+{%- if href_display_name and href %}
+<p class="govuk-body">
+    <a class="govuk-notification-banner__link" href="{{ href }}">
+        View {{ href_display_name }}
+    </a>
+</p>
+{%- endif %}
+{%- if next_href and next_href_display_name %}
+    <p class="govuk-body">
+        <a class="govuk-notification-banner__link" href="{{ next_href }}">
+            Next step: {{ next_href_display_name }}
+        </a>
+    </p>
+{%- endif %}
