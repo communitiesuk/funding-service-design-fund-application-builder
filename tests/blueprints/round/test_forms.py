@@ -20,7 +20,7 @@ class MockField:
         ("sub.google.com", True),
         ("google.co.uk", True),
         # URLs with schemes
-        ("http://google.com", True),  # NOSONAR
+        ("http://google.com", True),
         ("https://google.com", True),
         ("https://www.google.com", True),
         # URLs with paths
@@ -30,20 +30,20 @@ class MockField:
         ("google.com/path#fragment", True),
         # URLs with ports
         ("google.com:8080", True),
-        ("http://google.com:8080", True),  # NOSONAR
+        ("http://google.com:8080", True),
         # Complex URLs
         ("https://sub.domain.google.co.uk:8080/path/to/resource?query=value#fragment", True),
         # Invalid URLs
         ("", True),  # Empty string is allowed by the validator
         ("not_a_url", False),
-        ("http://", False),  # NOSONAR
-        ("http://.com", False),  # NOSONAR
+        ("http://", False),
+        ("http://.com", False),
         (".com", False),
-        ("http://google", False),  # Missing TLD  # NOSONAR
-        ("http://google.", False),  # NOSONAR
-        ("http://-google.com", False),  # Invalid domain start  # NOSONAR
-        ("http://google-.com", False),  # Invalid domain end  # NOSONAR
-        ("http://goo gle.com", False),  # Contains space  # NOSONAR
+        ("http://google", False),  # Missing TLD
+        ("http://google.", False),
+        ("http://-google.com", False),  # Invalid domain start
+        ("http://google-.com", False),  # Invalid domain end
+        ("http://goo gle.com", False),  # Contains space
         ("javascript:alert(1)", False),  # JavaScript URL
         ("file:///etc/passwd", False),  # File URL
     ],

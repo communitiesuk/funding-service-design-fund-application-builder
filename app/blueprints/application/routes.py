@@ -55,7 +55,7 @@ application_bp = Blueprint(
 )
 
 
-@application_bp.route("/sections/select-grant", methods=["GET", "POST"])  # NOSONAR
+@application_bp.route("/sections/select-grant", methods=["GET", "POST"])
 def select_fund():
     """
     Intermediary page to select a Fund before building an Application.
@@ -76,7 +76,7 @@ def select_fund():
     )
 
 
-@application_bp.route("/sections/select-application", methods=["GET", "POST"])  # NOSONAR
+@application_bp.route("/sections/select-application", methods=["GET", "POST"])
 def select_application():
     """
     Intermediary page to select an Application before managing its tasklist.

@@ -52,7 +52,7 @@ def view_all_rounds():
     return render_template("view_all_rounds.html", **params)
 
 
-@round_bp.route("/select-grant", methods=["GET", "POST"])  # NOSONAR
+@round_bp.route("/select-grant", methods=["GET", "POST"])
 def select_fund():
     """
     Intermediary page to select a Fund before creating a Round.
@@ -119,7 +119,7 @@ def create_round():
     return render_template("round.html", **params, error=error)
 
 
-@round_bp.route("/<round_id>", methods=["GET", "POST"])  # NOSONAR
+@round_bp.route("/<round_id>", methods=["GET", "POST"])
 def edit_round(round_id):
     """
     Edit an existing round.
@@ -153,7 +153,7 @@ def clone_round(round_id, fund_id):
     cloned = clone_single_round(
         round_id=round_id,
         new_fund_id=fund_id,
-        new_short_name=f"R-C{randint(0, 999)}",  # NOSONAR
+        new_short_name=f"R-C{randint(0, 999)}",
     )
     flash(f"Cloned new round: {cloned.short_name}")
     return redirect(url_for("fund_bp.view_fund", fund_id=fund_id))
