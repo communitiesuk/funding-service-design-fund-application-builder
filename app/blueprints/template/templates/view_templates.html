@@ -4,12 +4,61 @@
 
 {% from "macros/wtfToGovUk.html" import input %}
 {%- from "govuk_frontend_jinja/components/file-upload/macro.html" import govukFileUpload -%}
-{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
-{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
-{%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 {%- from "macros/genericTablePage.html" import govukGenericTableTemplate -%}
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
+{%- from "govuk_frontend_jinja/components/details/macro.html" import govukDetails -%}
+{%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+
 
 {% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="govuk-grid-row">
+                {{ govukNotificationBanner({"html": messages[0],"type": "success"}) }}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">Templates</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <p class="govuk-body">
+                View existing templates or upload a new template you have created using
+                <br>
+                <a class="govuk-link"
+                   target="_blank"
+                   href="{{ config.FORM_DESIGNER_URL_REDIRECT }}/app">Form Designer (opens in a new tab)</a>.
+            </p>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        {% set detailsHTML %}
+            <p class="govuk-body">You should use existing templates for standard application questions. For example, all
+                grant applications should collect organisation and risk information in the same way.</p>
+            <p class="govuk-body">If your application needs questions specific to the grant, you can create a new template by:</p>
+            <ol>
+                <li>designing the template in Form Designer</li>
+                <li>downloading the template</li>
+                <li>uploading the template to Fund application builder</li>
+            </ol>
+        {% endset %}
+        <div class="govuk-grid-column-three-quarters">
+            {{ govukDetails({
+                "summaryText": "Creating new templates",
+                "html": detailsHTML
+            }) }}
+        </div>
+        <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+            {{ govukButton({
+                "text": "Upload template",
+                "href": "#"
+            }) }}
+        </div>
+    </div>
     {{ govukGenericTableTemplate({
         "generic_table_page": generic_table_page
     }) }}

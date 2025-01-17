@@ -4,8 +4,35 @@
 {% set active_item_identifier = "applications" %}
 
 {%- from "macros/genericTablePage.html" import govukGenericTableTemplate -%}
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
+{%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+
 
 {% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="govuk-grid-row">
+                {{ govukNotificationBanner({"html": messages[0],"type": "success"}) }}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">Applications</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <p class="govuk-body">View existing applications or create a new one.</p>
+        </div>
+        <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+            {{ govukButton({
+                "text": "Create new application",
+                "href": url_for("round_bp.select_fund", action="applications_table")
+            }) }}
+        </div>
+    </div>
     {{ govukGenericTableTemplate({
         "generic_table_page": generic_table_page
     }) }}
