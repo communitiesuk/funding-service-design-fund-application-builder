@@ -11,15 +11,14 @@
               "text": "Back",
               "href": url_for("template_bp.view_templates")
             }) }}
-            <h2 class="govuk-heading-l">{{ form.template_name }}
-                <p class="govuk-body">
-                    <a class='govuk-link--no-visited-state'
-                       target="_blank"
-                       href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
-                        Preview template (Opens in a new tab)
-                    </a>
-                </p>
-            </h2>
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-2">{{ form.template_name }}</h2>
+            <p class="govuk-body govuk-!-margin-bottom-7">
+                <a class='govuk-link govuk-link--no-visited-state'
+                   target="_blank"
+                   href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
+                    Preview template (opens in a new tab)
+                </a>
+            </p>
 
             {{ govukSummaryList({
                 "classes": "govuk-!-margin-bottom-1",
@@ -29,7 +28,11 @@
                         "value": {"text": form.template_name},
                         "actions": {
                             "items": [
-                                {"href": "#", "text": "Change"}
+                                {
+                                "classes": "govuk-link--no-visited-state",
+                                "href": "#",
+                                "text": "Change"
+                                }
                             ]
                         }
                     },
@@ -38,7 +41,11 @@
                         "value": {"text": form.name_in_apply_json["en"]},
                         "actions": {
                             "items": [
-                                {"href": "#", "text": "Change"}
+                                {
+                                "classes": "govuk-link--no-visited-state",
+                                "href": "#",
+                                "text": "Change"
+                                }
                             ]
                         }
                     },
@@ -47,14 +54,18 @@
                         "value": {"text": form.runner_publish_name},
                         "actions": {
                             "items": [
-                                {"href": "#", "text": "Change"}
+                                {
+                                "classes": "govuk-link--no-visited-state",
+                                "href": "#",
+                                 "text": "Change"
+                                 }
                             ]
                         }
                     }
                     ]
             }) }}
-            <p class="govuk-body">
-                <a class='govuk-link--no-visited-state'
+            <p class="govuk-body govuk-!-margin-top-8">
+                <a class='govuk-link govuk-link--no-visited-state'
                    href='#'>View template questions</a>
             </p>
         </div>

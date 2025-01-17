@@ -79,9 +79,6 @@ def view_templates():
 
 @template_bp.route("/<uuid:form_id>", methods=["GET"])
 def template_details(form_id):
-    """
-    Renders template details page
-    """
     form = get_form_by_id(form_id)
     return render_template("template_details.html", form=form)
 

@@ -62,7 +62,7 @@ def test_template_details_view(flask_test_client, seed_dynamic_data):
 
     # Title component availability check
     assert '<a href="/templates" class="govuk-back-link">Back</a>' in html, "Back button is missing"
-    assert "Preview template (Opens in a new tab)" in html, "Preview template is missing"
+    assert "Preview template (opens in a new tab)" in html, "Preview template is missing"
     assert f"/preview/{form.form_id}" in html, "Preview link is missing"
 
     # table titles
@@ -74,7 +74,7 @@ def test_template_details_view(flask_test_client, seed_dynamic_data):
     assert "About your organization template" in html, "Template name is missing"
     assert "About your organisation" in html, "Task title is missing"
     assert "about-your-org" in html, "Template JSON name is missing"
-    assert '<a class="govuk-link" href="#">Change</a>' in html, "Change action is missing"
+    assert '<a class="govuk-link govuk-link--no-visited-state" href="#">Change</a>' in html, "Change action is missing"
 
     # Detail component availability check
     assert "View template questions" in html, "View template questions is missing"
