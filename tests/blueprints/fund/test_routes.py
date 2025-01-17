@@ -144,14 +144,6 @@ def test_view_all_funds(flask_test_client, seed_dynamic_data):
     assert '<p class="govuk-body">' in html, "Description component is missing"
     assert "View all existing grants or add a new grant." in html, "Description is missing"
 
-    # Detail component availability check
-    assert '<span class="govuk-details__summary-text">' in html, "Detail summary drop down title component is missing"
-    assert "Creating new grants" in html, "Detail summary drop down title is missing"
-    assert "This is an placeholder which will be added for the grants page" in html, (
-        "Detail summary description is missing"
-    )
-    assert '<div class="govuk-details__text">' in html, "Detail summary description component is missing"
-
     # Button component availability check
     assert "Add new grant" in html, "Button text is missing"
 

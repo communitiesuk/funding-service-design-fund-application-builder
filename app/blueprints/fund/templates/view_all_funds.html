@@ -3,10 +3,37 @@
 {% set showNavigationBar = True %}
 {% set active_item_identifier = "grants" %}
 
-{%- from "macros/genericTablePage.html" import govukGenericTableTemplate -%}
+{%- from "macros/tablePagination.html" import govukTablePagination -%}
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
+{%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+
 
 {% block content %}
-    {{ govukGenericTableTemplate({
-        "generic_table_page": generic_table_page
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="govuk-grid-row">
+                {{ govukNotificationBanner({"html": messages[0],"type": "success"}) }}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">Grants</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <p class="govuk-body">View all existing grants or add a new grant.</p>
+        </div>
+        <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+            {{ govukButton({
+                "text": "Add new grant",
+                "href": url_for("fund_bp.create_fund", action="grants_table")
+            }) }}
+        </div>
+    </div>
+    {{ govukTablePagination({
+        "table_pagination_page": table_pagination_page
     }) }}
 {% endblock content %}

@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, redirect, render_template, request, url_for
 from werkzeug.utils import secure_filename
 
 from app.blueprints.template.forms import TemplateFormForm, TemplateUploadForm
@@ -13,9 +13,8 @@ from app.db.queries.application import (
     get_form_by_template_name,
     update_form,
 )
-from app.shared.generic_table_page import GenericTablePage
 from app.shared.helpers import error_formatter
-from config import Config
+from app.shared.table_pagination import GovUKTableAndPagination
 
 template_bp = Blueprint(
     "template_bp",
@@ -30,18 +29,10 @@ def view_templates():
     sections = get_all_template_sections()
     forms = get_all_template_forms()
     form = TemplateUploadForm()
+    form_designer_url = current_app.config["FORM_DESIGNER_URL_REDIRECT"] + "/app"
     params = {"sections": sections, "forms": forms, "uploadform": form}
     params.update(
-        GenericTablePage(
-            page_heading="Templates",
-            page_description_html=render_template(
-                "partials/view_template_page_description.html",
-                form_designer_href=f"{Config.FORM_DESIGNER_URL_REDIRECT}/app",
-            ),
-            detail_text="Creating new templates",
-            detail_description_html=render_template("partials/view_templates_details_description.html"),
-            button_text="Upload template",
-            button_url="#",
+        GovUKTableAndPagination(
             table_header=[
                 {"text": "Template name"},
                 {"text": "Task name"},
@@ -57,7 +48,11 @@ def view_templates():
         file = form.file.data
         if get_form_by_template_name(template_name):
             form.error = "Template name already exists"
-            return render_template("view_templates.html", **params)
+            return render_template(
+                "view_templates.html",
+                **params,
+                form_designer_url=form_designer_url,
+            )
 
         if file:
             try:
@@ -68,14 +63,18 @@ def view_templates():
             except Exception as e:
                 print(e)
                 form.error = "Invalid file: Please upload valid JSON file"
-                return render_template("view_templates.html", **params)
+                return render_template(
+                    "view_templates.html",
+                    **params,
+                    form_designer_url=form_designer_url,
+                )
 
         return redirect(url_for("template_bp.view_templates"))
 
     error = None
     if "uploadform" in params:
         error = error_formatter(params["uploadform"])
-    return render_template("view_templates.html", **params, error=error)
+    return render_template("view_templates.html", **params, error=error, form_designer_url=form_designer_url)
 
 
 @template_bp.route("/<form_id>", methods=["GET", "POST"])
