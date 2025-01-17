@@ -9,7 +9,8 @@ from flask import (
     url_for,
 )
 
-from app.blueprints.round.forms import RoundForm
+from app.blueprints.fund.forms import FundForm
+from app.blueprints.round.forms import CloneRoundForm, RoundForm
 from app.blueprints.round.services import (
     build_round_rows,
     create_new_round,
@@ -108,7 +109,7 @@ def create_round():
     return render_template("round.html", **params, error=error)
 
 
-@round_bp.route("/<round_id>", methods=["GET", "POST"])
+@round_bp.route("/<round_id>/edit", methods=["GET", "POST"])
 def edit_round(round_id):
     """
     Edit an existing round.
@@ -124,7 +125,7 @@ def edit_round(round_id):
         flash(f"Updated round {existing_round.title_json['en']}")
         if request.form.get("action") == "return_home":
             return redirect(url_for(INDEX_BP_DASHBOARD))
-        return redirect(url_for("fund_bp.view_fund", fund_id=existing_round.fund_id))
+        return redirect(url_for("round_bp.round_details", round_id=existing_round.round_id))
     params = {
         "form": form,
         "fund": get_fund_by_id(existing_round.fund_id),
@@ -134,15 +135,31 @@ def edit_round(round_id):
     return render_template("round.html", **params, error=error)
 
 
-@round_bp.route("/<round_id>/clone")
-def clone_round(round_id, fund_id):
+@round_bp.route("/<round_id>/clone", methods=["POST"])
+def clone_round(round_id):
     """
     Clone an existing round.
     """
-    cloned = clone_single_round(
-        round_id=round_id,
-        new_fund_id=fund_id,
-        new_short_name=f"R-C{randint(0, 999)}",
+    form = CloneRoundForm()
+    msg = "Error copying application"
+    if form.validate_on_submit():
+        cloned = clone_single_round(
+            round_id=round_id,
+            new_fund_id=form.fund_id.data,
+            new_short_name=f"R-C{randint(0, 999)}",
+        )
+        round_id = cloned.round_id
+        msg = "Application copied successfully"
+    flash(msg)
+    return redirect(url_for("round_bp.round_details", round_id=round_id))
+
+
+@round_bp.route("/<round_id>")
+def round_details(round_id):
+    form = RoundForm()
+    fund_round = get_round_by_id(round_id)
+    cloned_form = CloneRoundForm(data={"fund_id": fund_round.fund_id})
+    fund_form = FundForm()
+    return render_template(
+        "round_details.html", form=form, fund_form=fund_form, round=fund_round, cloned_form=cloned_form
     )
-    flash(f"Cloned new round: {cloned.short_name}")
-    return redirect(url_for("fund_bp.view_fund", fund_id=fund_id))

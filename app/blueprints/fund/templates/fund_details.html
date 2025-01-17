@@ -15,7 +15,7 @@
             "classes": "govuk-!-margin-bottom-9",
                 "rows": [
                     {
-                        "key": {"text": "Grant name"},
+                        "key": {"text": form.name_en.label},
                         "value": {"text": fund.name_json["en"]},
                         "actions": {
                             "items": [
@@ -29,7 +29,7 @@
                         },
                     },
                     {
-                        "key": {"text": "Grant name (Welsh)"},
+                        "key": {"text": form.name_cy.label},
                         "value": {"text": fund.name_json["cy"]},
                         "actions": {
                             "items": [
@@ -43,7 +43,7 @@
                         },
                     } if fund.welsh_available else {},
                     {
-                        "key": {"text": "Short name"},
+                        "key": {"text": form.short_name.label},
                         "value": {"text": fund.short_name},
                         "actions": {
                             "items": [
@@ -57,7 +57,7 @@
                         }
                     },
                     {
-                        "key": {"text": "Application heading"},
+                        "key": {"text": form.title_en.label},
                         "value": {"text": "Apply for " + fund.title_json["en"]},
                         "actions": {
                             "items": [
@@ -65,13 +65,13 @@
                                     "href": url_for(endpoint="fund_bp.edit_fund", fund_id=fund.fund_id, _anchor=form.title_en.id),
                                     "text": "Change",
                                     "classes": "govuk-link--no-visited-state",
-                                    "visuallyHiddenText": "title english",
+                                    "visuallyHiddenText": "english title",
                                 }
                             ]
                         }
                     },
                     {
-                        "key": {"text": "Application heading (Welsh)"},
+                        "key": {"text": form.title_cy.label},
                         "value": {"text": "Apply for " + fund.title_json["cy"] if fund.title_json["cy"] else ""},
                         "actions": {
                             "items": [
@@ -85,7 +85,7 @@
                         },
                     } if fund.welsh_available else {},
                     {
-                        "key": {"text": "Funding type"},
+                        "key": {"text": form.funding_type.label},
                         "value": {"text": fund.funding_type.get_text_for_display()},
                         "actions": {
                             "items": [
@@ -99,7 +99,7 @@
                         }
                     },
                     {
-                        "key": {"text": "Welsh available"},
+                        "key": {"text": form.welsh_available.label},
                         "value": {"text": "Yes" if fund.welsh_available else "No"},
                         "actions": {
                             "items": [
@@ -113,7 +113,7 @@
                         }
                     },
                     {
-                        "key": {"text": "Description"},
+                        "key": {"text": form.description_en.label},
                         "value": {"text": fund.description_json["en"]},
                         "actions": {
                             "items": [
@@ -127,7 +127,7 @@
                         }
                     },
                     {
-                        "key": {"text": "Description (Welsh)"},
+                        "key": {"text": form.description_cy.label},
                         "value": {"text": fund.description_json["cy"]},
                         "actions": {
                             "items": [
@@ -141,7 +141,7 @@
                         }
                     } if fund.welsh_available else {},
                     {
-                        "key": {"text": "GGIS scheme reference number"},
+                        "key": {"text": form.ggis_scheme_reference_number.label},
                         "value": {"text": fund.ggis_scheme_reference_number},
                         "actions": {
                             "items": [

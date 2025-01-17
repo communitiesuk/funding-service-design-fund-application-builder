@@ -24,7 +24,11 @@ def build_round_rows(rounds: list[Round]) -> list[dict]:
     rows = []
     for round in rounds:
         row = [
-            {"html": f"""<a class='govuk-link--no-visited-state' href='#'>{round.title_json["en"]}</a>"""},
+            {
+                "html": f"""<a class='govuk-link--no-visited-state'
+                href='{url_for("round_bp.round_details", round_id=round.round_id)}'>
+                {round.title_json["en"]}</a>"""  # noqa: E501
+            },
             {"html": f"""{round.fund.title_json["en"]}"""},
             {
                 "classes": "govuk-!-text-align-right",

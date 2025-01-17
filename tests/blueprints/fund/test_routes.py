@@ -163,7 +163,7 @@ def test_view_all_funds(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_view_grant_details(flask_test_client, seed_dynamic_data):
+def test_view_fund_details(flask_test_client, seed_dynamic_data):
     """
     Test to check grant detail route is working as expected.
     and verify the grant details template is rendered as expected.
@@ -178,8 +178,8 @@ def test_view_grant_details(flask_test_client, seed_dynamic_data):
     html = response.data.decode("utf-8")
     assert f'<h2 class="govuk-heading-l">{test_fund.name_json["en"]}</h2>' in html
     assert (
-        f'<a class="govuk-link govuk-link--no-visited-state" href="/grants/{test_fund.fund_id}/edit#name_en">Change<span class="govuk-visually-hidden"> Name english</span></a>'  # noqa: E501
-        in html
+        f'<a class="govuk-link govuk-link--no-visited-state" href="/grants/{test_fund.fund_id}/edit#name_en">Change'
+        f'<span class="govuk-visually-hidden"> Name english</span></a>' in html  # noqa: E501
     )
     assert '<a href="/grants/" class="govuk-back-link">Back</a>' in html
 

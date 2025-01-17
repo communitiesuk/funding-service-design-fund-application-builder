@@ -37,15 +37,15 @@ class GovUkRadioEnumField(RadioField):
 
 class FundForm(FlaskForm):
     fund_id = HiddenField("Fund ID")
-    name_en = StringField("Name (English)", validators=[DataRequired()])
-    name_cy = StringField("Name (Welsh)")
-    title_en = StringField("Title (English)", validators=[DataRequired()])
-    title_cy = StringField("Title (Welsh)")
+    name_en = StringField("Grant name", validators=[DataRequired()])
+    name_cy = StringField("Grant name (Welsh)")
+    title_en = StringField("Application heading", validators=[DataRequired()])
+    title_cy = StringField("Application heading (Welsh)")
     short_name = StringField(
         "Short name",
         validators=[DataRequired(), Length(max=10), no_spaces_between_letters, validate_unique_fund_short_name],
     )
-    description_en = TextAreaField("Description (English)", validators=[DataRequired()])
+    description_en = TextAreaField("Description", validators=[DataRequired()])
     description_cy = TextAreaField("Description (Welsh)")
     welsh_available = RadioField("Welsh available", choices=[("true", "Yes"), ("false", "No")], default="false")
     funding_type = GovUkRadioEnumField(label="Funding type", source_enum=FundingType)
