@@ -21,7 +21,7 @@ from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_all_rounds, get_round_by_id
 from app.shared.forms import SelectFundForm
 from app.shared.generic_table_page import GenericTablePage
-from app.shared.helpers import error_formatter
+from app.shared.helpers import error_formatter, flash_message
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
@@ -95,14 +95,9 @@ def create_round():
     fund = get_fund_by_id(fund_id)
     if form.validate_on_submit():
         new_round = create_new_round(form)
-        flash(f"""
-            <h3 class="govuk-notification-banner__heading">New application created successfully</h3>
-            <p class="govuk-body">
-                <a class="govuk-notification-banner__link" href="#">
-                View {new_round.title_json["en"]}
-                </a>
-            </p>
-        """)
+        flash_message(
+            message="New application created successfully", href="#", href_display_name=new_round.title_json["en"]
+        )
         match request.args.get("action") or request.form.get("action"):
             case "return_home":
                 return redirect(url_for(INDEX_BP_DASHBOARD))

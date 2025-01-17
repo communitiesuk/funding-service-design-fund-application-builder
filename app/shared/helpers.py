@@ -1,6 +1,7 @@
 import re
 from dataclasses import asdict, is_dataclass
 
+from flask import flash, render_template
 from wtforms.validators import ValidationError
 
 from app.db.models import Page
@@ -71,3 +72,35 @@ def all_funds_as_govuk_select_items(all_funds: list) -> list:
     in the html
     """
     return [{"text": f"{f.short_name} - {f.name_json['en']}", "value": str(f.fund_id)} for f in all_funds]
+
+
+def flash_message(
+    message: str,
+    href: str = None,
+    href_display_name: str = None,
+    next_href: str = None,
+    next_href_display_name: str = None,
+):
+    """
+    Displays custom flash message.
+    This function renders an HTML template for a flash message and displays it using Flask's `flash` function.
+    Args:
+        message (str): The main message to be displayed in the flash notification.
+        href (str): The URL for the primary hyperlink.
+        href_display_name (str): The display text for the primary hyperlink.
+
+        next_href (str, optional): The URL for the secondary hyperlink.
+        next_href_display_name (str, optional): The display text for the secondary hyperlink.
+
+    Example:
+        ```python
+        flash_message(
+            message="Your changes were saved successfully",
+            href="/dashboard",
+            href_display_name="Go to Dashboard",
+            next_href="/settings",
+            next_href_display_name="Edit Settings"
+        )
+        ```
+    """
+    flash(render_template("partials/flash_template.html", **locals()))

@@ -2,7 +2,6 @@ from datetime import datetime
 
 from flask import (
     Blueprint,
-    flash,
     redirect,
     render_template,
     request,
@@ -14,7 +13,7 @@ from app.blueprints.fund.services import build_fund_rows
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
 from app.shared.generic_table_page import GenericTablePage
-from app.shared.helpers import all_funds_as_govuk_select_items, error_formatter
+from app.shared.helpers import all_funds_as_govuk_select_items, error_formatter, flash_message
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 
@@ -93,14 +92,11 @@ def create_fund():
             ),
         )
         add_fund(new_fund)
-        flash(f"""
-            <h3 class="govuk-notification-banner__heading">New grant added successfully</h3>
-            <p class="govuk-body">
-                <a class="govuk-notification-banner__link" href="#">
-                View {form.name_en.data}
-                </a>
-            </p>
-        """)
+        flash_message(
+            message="New grant added successfully",
+            href=url_for("fund_bp.view_fund_details", fund_id=new_fund.fund_id),
+            href_display_name=form.name_en.data,
+        )
         match request.args.get("action") or request.form.get("action"):
             case "return_home":
                 return redirect(url_for(INDEX_BP_DASHBOARD))
