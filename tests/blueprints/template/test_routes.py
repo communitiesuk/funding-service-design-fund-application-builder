@@ -1,5 +1,7 @@
 import pytest
 
+from app.db.models import Form
+
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "db_with_templates")
 def test_generalized_table_template_with_existing_templates(flask_test_client):
@@ -45,3 +47,34 @@ def test_generalized_table_template_with_existing_templates(flask_test_client):
         "Tasklist name and table component is missing"
     )
     assert "Edit details" in html, "Edit action is missing"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
+def test_template_details_view(flask_test_client, seed_dynamic_data):
+    form: Form = seed_dynamic_data["forms"][0]
+
+    response = flask_test_client.get(
+        f"/templates/{form.form_id}",
+    )
+
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+
+    # Title component availability check
+    assert '<a href="/templates" class="govuk-back-link">Back</a>' in html, "Back button is missing"
+    assert "Preview template (Opens in a new tab)" in html, "Preview template is missing"
+    assert f"/preview/{form.form_id}" in html, "Preview link is missing"
+
+    # table titles
+    assert "Template name" in html, "Summary title is missing"
+    assert "Task title" in html, "Summary title is missing"
+    assert "Template JSON file" in html, "Summary title is missing"
+
+    # table data
+    assert "About your organization template" in html, "Template name is missing"
+    assert "About your organisation" in html, "Task title is missing"
+    assert "about-your-org" in html, "Template JSON name is missing"
+    assert '<a class="govuk-link" href="#">Change</a>' in html, "Change action is missing"
+
+    # Detail component availability check
+    assert "View template questions" in html, "View template questions is missing"

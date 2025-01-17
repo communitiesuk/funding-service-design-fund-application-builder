@@ -426,6 +426,7 @@ def init_unit_test_data() -> dict:
         name_in_apply_json={"en": "About your organisation"},
         section_index=1,
         runner_publish_name="about-your-org",
+        template_name="About your organization template",
     )
     p1: Page = Page(
         page_id=uuid4(),

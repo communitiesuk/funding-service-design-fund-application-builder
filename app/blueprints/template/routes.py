@@ -77,6 +77,15 @@ def view_templates():
     return render_template("view_templates.html", **params, error=error, form_designer_url=form_designer_url)
 
 
+@template_bp.route("/<uuid:form_id>", methods=["GET"])
+def template_details(form_id):
+    """
+    Renders template details page
+    """
+    form = get_form_by_id(form_id)
+    return render_template("template_details.html", form=form)
+
+
 @template_bp.route("/<form_id>", methods=["GET", "POST"])
 def edit_template(form_id):
     template_form = TemplateFormForm()
