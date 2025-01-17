@@ -39,12 +39,6 @@ def view_all_rounds():
     Renders a list of rounds in the application page
     """
     params = GenericTablePage(
-        page_heading="Applications",
-        page_description="View existing applications or create a new one.",
-        detail_text="Creating a new grant application",
-        detail_description="Follow the step-by-step instructions to create a new grant application.",
-        button_text="Create new application",
-        button_url=url_for("round_bp.select_fund", action="applications_table"),
         table_header=[{"text": "Application name"}, {"text": "Grant"}, {"text": ""}],
         table_rows=build_round_rows(get_all_rounds()),
         current_page=int(request.args.get("page", 1)),

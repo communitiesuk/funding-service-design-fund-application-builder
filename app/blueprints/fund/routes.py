@@ -32,12 +32,6 @@ def view_all_funds():
     Renders list of grants in the grant page
     """
     params = GenericTablePage(
-        page_heading="Grants",
-        page_description="View all existing grants or add a new grant.",
-        detail_text="Creating new grants",
-        detail_description="This is an placeholder which will be added for the grants page",
-        button_text="Add new grant",
-        button_url=url_for("fund_bp.create_fund", action="grants_table"),
         table_header=[{"text": "Grant Name"}, {"text": "Description"}, {"text": "Grant Type"}],
         table_rows=build_fund_rows(get_all_funds()),
         current_page=int(request.args.get("page", 1)),
