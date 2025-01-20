@@ -103,7 +103,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
-    { name = "urllib3" },
+    { name = "urllib3", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8c/66/01d63edf404b2ef2c5594701565ac0c031ce7253231298d423e2514566b8/botocore-1.34.144.tar.gz", hash = "sha256:4215db28d25309d59c99507f1f77df9089e5bebbad35f6e19c7c44ec5383a3e8", size = 12618703 }
 wheels = [
@@ -179,7 +179,7 @@ name = "click"
 version = "8.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "platform_system == 'Windows'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/96/d3/f04c7bfcf5c1862a2a5b845c6b2b360488cf47af55dfa79c98f6a6bf98b5/click-8.1.7.tar.gz", hash = "sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de", size = 336121 }
 wheels = [
@@ -262,6 +262,15 @@ wheels = [
 ]
 
 [[package]]
+name = "deepmerge"
+version = "2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a8/3a/b0ba594708f1ad0bc735884b3ad854d3ca3bdc1d741e56e40bbda6263499/deepmerge-2.0.tar.gz", hash = "sha256:5c3d86081fbebd04dd5de03626a0607b809a98fb6ccba5770b62466fe940ff20", size = 19890 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2d/82/e5d2c1c67d19841e9edc74954c827444ae826978499bde3dfc1d007c8c11/deepmerge-2.0-py3-none-any.whl", hash = "sha256:6de9ce507115cff0bed95ff0ce9ecc31088ef50cbdf09bc90a09349a318b3d00", size = 13475 },
+]
+
+[[package]]
 name = "distlib"
 version = "0.3.8"
 source = { registry = "https://pypi.org/simple" }
@@ -283,9 +292,9 @@ dependencies = [
     { name = "pathspec" },
     { name = "pyyaml" },
     { name = "regex" },
-    { name = "tomli" },
+    { name = "tomli", marker = "python_full_version == '3.10.*'" },
     { name = "tqdm" },
-    { name = "typing-extensions" },
+    { name = "typing-extensions", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/74/89/ecf5be9f5c59a0c53bcaa29671742c5e269cc7d0e2622e3f65f41df251bf/djlint-1.36.4.tar.gz", hash = "sha256:17254f218b46fe5a714b224c85074c099bcb74e3b2e1f15c2ddc2cf415a408a1", size = 47849 }
 wheels = [
@@ -441,6 +450,7 @@ dependencies = [
     { name = "flask-wtf" },
     { name = "funding-service-design-utils" },
     { name = "govuk-frontend-jinja" },
+    { name = "govuk-frontend-wtf" },
     { name = "jsonschema" },
     { name = "psycopg2-binary" },
     { name = "requests" },
@@ -474,6 +484,7 @@ requires-dist = [
     { name = "flask-wtf", specifier = "==1.2.2" },
     { name = "funding-service-design-utils", specifier = "==6.0.1" },
     { name = "govuk-frontend-jinja", specifier = "==3.4.0" },
+    { name = "govuk-frontend-wtf", specifier = "==3.2.0" },
     { name = "jsonschema", specifier = "==4.23.0" },
     { name = "psycopg2-binary", specifier = "==2.9.10" },
     { name = "requests", specifier = "==2.32.3" },
@@ -533,6 +544,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1c/cc/258f63af5304fe4ef0352ea6643d8038ece91b76021e2297175f5aaaa066/govuk_frontend_jinja-3.4.0.tar.gz", hash = "sha256:26f34d47a4fe7447078bb6fbe8e9923fa0f5bd9c56230605e5a150e28c1c76d2", size = 33259 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d7/c0/90cbd104aa0758627e5e7574d2876c762d66cd17c8fe1d9d9c7dbe7ef290/govuk_frontend_jinja-3.4.0-py3-none-any.whl", hash = "sha256:d2d3d56db3549e0dbef1b385076ea3a55b0c2279a57205cafc7fd812e0f3943f", size = 46320 },
+]
+
+[[package]]
+name = "govuk-frontend-wtf"
+version = "3.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "deepmerge" },
+    { name = "flask" },
+    { name = "flask-wtf" },
+    { name = "govuk-frontend-jinja" },
+    { name = "jinja2" },
+    { name = "wtforms" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a8/1e/c843510033dd35cdf7df2904de22c081e9ad59326b34356b2d1b1a14b519/govuk_frontend_wtf-3.2.0.tar.gz", hash = "sha256:a5b22d7c4a61a8466ac5590581f86837cd24d98c663c7380f333cd5879efa461", size = 15262 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/97/0f0c2e6c22dad5f9aec3c47a4863b614d3c7dc620e6cc2ae88688e042bc2/govuk_frontend_wtf-3.2.0-py3-none-any.whl", hash = "sha256:1f8fcb8a63e485b5e85474f43b9339347b42234068c1c204d912f5dd45b51779", size = 14055 },
 ]
 
 [[package]]
@@ -712,7 +740,7 @@ version = "1.14.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mypy-extensions" },
-    { name = "tomli" },
+    { name = "tomli", marker = "python_full_version == '3.10.*'" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/eb/2c92d8ea1e684440f54fa49ac5d9a5f19967b7b472a281f419e69a8d228e/mypy-1.14.1.tar.gz", hash = "sha256:7ec88144fe9b510e8475ec2f5f251992690fcf89ccb4500b214b4226abcd32d6", size = 3216051 }
@@ -854,11 +882,11 @@ version = "8.3.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "exceptiongroup" },
+    { name = "exceptiongroup", marker = "python_full_version == '3.10.*'" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
-    { name = "tomli" },
+    { name = "tomli", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/05/35/30e0d83068951d90a01852cb1cef56e5d8a09d20c7f511634cc2f7e0372a/pytest-8.3.4.tar.gz", hash = "sha256:965370d062bce11e73868e0335abac31b4d3de0e82f4007408d242b4f8610761", size = 1445919 }
 wheels = [
@@ -871,7 +899,7 @@ version = "1.1.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pytest" },
-    { name = "tomli" },
+    { name = "tomli", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1f/31/27f28431a16b83cab7a636dce59cf397517807d247caa38ee67d65e71ef8/pytest_env-1.1.5.tar.gz", hash = "sha256:91209840aa0e43385073ac464a554ad2947cc2fd663a9debf88d03b01e0cc1cf", size = 8911 }
 wheels = [
@@ -976,7 +1004,7 @@ name = "redis"
 version = "4.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "async-timeout" },
+    { name = "async-timeout", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/73/88/63d802c2b18dd9eaa5b846cbf18917c6b2882f20efda398cc16a7500b02c/redis-4.6.0.tar.gz", hash = "sha256:585dc516b9eb042a619ef0a39c3d7d55fe81bdb4df09a52c9cdde0d07bf1aa7d", size = 4561721 }
 wheels = [
@@ -1161,7 +1189,7 @@ name = "sqlalchemy"
 version = "2.0.37"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "greenlet", marker = "platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'" },
+    { name = "greenlet", marker = "(platform_machine == 'AMD64' and python_full_version == '3.10.*') or (platform_machine == 'WIN32' and python_full_version == '3.10.*') or (platform_machine == 'aarch64' and python_full_version == '3.10.*') or (platform_machine == 'amd64' and python_full_version == '3.10.*') or (platform_machine == 'ppc64le' and python_full_version == '3.10.*') or (platform_machine == 'win32' and python_full_version == '3.10.*') or (platform_machine == 'x86_64' and python_full_version == '3.10.*')" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3b/20/93ea2518df4d7a14ebe9ace9ab8bb92aaf7df0072b9007644de74172b06c/sqlalchemy-2.0.37.tar.gz", hash = "sha256:12b28d99a9c14eaf4055810df1001557176716de0167b91026e648e65229bffb", size = 9626249 }
@@ -1208,7 +1236,7 @@ name = "tqdm"
 version = "4.66.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "platform_system == 'Windows'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5a/c0/b7599d6e13fe0844b0cda01b9aaef9a0e87dbb10b06e4ee255d3fa1c79a2/tqdm-4.66.4.tar.gz", hash = "sha256:e4d936c9de8727928f3be6079590e97d9abfe8d39a590be678eb5919ffc186bb", size = 169392 }
 wheels = [

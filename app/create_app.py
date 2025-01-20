@@ -5,6 +5,7 @@ from fsd_utils.authentication.decorators import SupportedApp, check_internal_use
 from fsd_utils.healthchecks.checkers import FlaskRunningChecker
 from fsd_utils.healthchecks.healthcheck import Healthcheck
 from fsd_utils.logging import logging
+from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 
 from app.blueprints.application.routes import application_bp
@@ -75,10 +76,17 @@ def create_app() -> Flask:
     flask_app.jinja_loader = ChoiceLoader(
         [
             PackageLoader("app"),
-            PrefixLoader({"govuk_frontend_jinja": PackageLoader("govuk_frontend_jinja")}),
+            PrefixLoader(
+                {
+                    "govuk_frontend_jinja": PackageLoader("govuk_frontend_jinja"),
+                    "govuk_frontend_wtf": PackageLoader("govuk_frontend_wtf"),
+                }
+            ),
         ]
     )
     flask_app.jinja_env.add_extension("jinja2.ext.do")
+
+    WTFormsHelpers(flask_app)
 
     @flask_app.errorhandler(403)
     def forbidden_error(error):
