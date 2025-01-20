@@ -57,7 +57,7 @@ def validate_unique_round_short_name(form, field):
         rond_data = get_round_by_short_name_and_fund_id(form.data.get("fund_id"), field.data)
         if rond_data and str(rond_data.round_id) != form.data.get("round_id"):
             fund_data = get_fund_by_id(form.data.get("fund_id"))
-            raise ValidationError(f'Given short name already exists in the fund {fund_data.title_json.get("en")}.')
+            raise ValidationError(f"Given short name already exists in the fund {fund_data.title_json.get('en')}.")
 
 
 def get_datetime(form_field):

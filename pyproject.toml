@@ -15,13 +15,14 @@ dependencies = [
     "flask==3.1.0",
     "flask-talisman==1.1.0",
     "funding-service-design-utils==6.0.1",
-    "govuk-frontend-jinja==3.4.0",
+    "govuk-frontend-jinja==3.3.0",
     "jsonschema==4.23.0",
     "psycopg2-binary==2.9.10",
     "requests==2.32.3",
     "sentry-sdk==2.20.0",
     "sqlalchemy[mypy]==2.0.37",
     "flask-debugtoolbar==0.16.0",
+    "govuk-frontend-wtf==3.2.0",
 ]
 
 [tool.ruff]
