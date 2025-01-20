@@ -1,6 +1,5 @@
 {% extends "govuk_frontend_jinja/template.html" %}
 {% from "govuk_frontend_jinja/components/breadcrumbs/macro.html" import govukBreadcrumbs %}
-{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 {% set assetPath = url_for("static", filename="").rstrip("/") %}
 
 {% set cspNonce = csp_nonce() %}  {# Used in the base template govuk_frontend_jinja/template.html #}
@@ -35,16 +34,6 @@
 <div class="govuk-width-container {{ containerClasses }}">
   {% block beforeContent %}{% endblock beforeContent %}
   <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="govuk-grid-row">
-              <div class="govuk-grid-column-full">
-                {{ govukNotificationBanner({"html": messages[0],"type": "success"}) }}
-              </div>
-            </div>
-        {% endif %}
-    {% endwith %}
-
     {% block content %}{% endblock content %}
   </main>
 </div>

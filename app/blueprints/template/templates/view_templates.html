@@ -5,12 +5,20 @@
 {% from "macros/wtfToGovUk.html" import input %}
 {%- from "govuk_frontend_jinja/components/file-upload/macro.html" import govukFileUpload -%}
 {%- from "macros/tablePagination.html" import govukTablePagination -%}
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 {%- from "govuk_frontend_jinja/components/details/macro.html" import govukDetails -%}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 
 
 {% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="govuk-grid-row">
+                {{ govukNotificationBanner({"html": messages[0],"type": "success"}) }}
+            </div>
+        {% endif %}
+    {% endwith %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-l">Templates</h1>

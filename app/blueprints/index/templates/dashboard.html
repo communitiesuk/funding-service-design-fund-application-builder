@@ -2,8 +2,16 @@
 {% set showNavigationBar = True %}
 {% set active_item_identifier = "home" %}
 
+{% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 {% block content %}
     <div class="govuk-width-container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="govuk-grid-row">
+                    {{ govukNotificationBanner({"html": messages[0], "type": "success"}) }}
+                </div>
+            {% endif %}
+        {% endwith %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <h1 class="govuk-heading-l">Creating a new grant application</h1>
