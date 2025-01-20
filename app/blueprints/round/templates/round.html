@@ -11,11 +11,8 @@
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        {% if error %}
-            {{ govukErrorSummary({
-                "titleText": error.titleText,
-                "errorList": error.errorList
-            }) }}
+        {% if form.errors %}
+          {{ govukErrorSummary(wtforms_errors(form)) }}
         {% endif %}
         <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
         <p class="govuk-body govuk-!-margin-bottom-1">Grant: <a href="{{ url_for('fund_bp.edit_fund', fund_id=fund.fund_id) }}" class="govuk-link">{{ fund.title_json["en"] }}</a></p>

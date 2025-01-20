@@ -9,13 +9,8 @@
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
-        {% if error %}
-            {{
-            govukErrorSummary({
-                "titleText": error.titleText,
-                "errorList": error.errorList
-            })
-            }}
+        {% if form.errors %}
+          {{ govukErrorSummary(wtforms_errors(form)) }}
         {% endif %}
         <h1 class="govuk-heading-l">{{pageHeading}}</h1>
         <div class="govuk-form-group">

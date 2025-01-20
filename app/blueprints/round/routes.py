@@ -21,7 +21,7 @@ from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_all_rounds, get_round_by_id
 from app.shared.forms import SelectFundForm
-from app.shared.helpers import error_formatter, flash_message
+from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -105,8 +105,7 @@ def create_round():
         "fund": fund,
         "round_id": None,  # Since we're creating a new round, there's no round ID yet
     }
-    error = error_formatter(form)
-    return render_template("round.html", **params, error=error)
+    return render_template("round.html", **params)
 
 
 @round_bp.route("/<round_id>/edit", methods=["GET", "POST"])
@@ -131,8 +130,7 @@ def edit_round(round_id):
         "fund": get_fund_by_id(existing_round.fund_id),
         "round_id": round_id,
     }
-    error = error_formatter(form)
-    return render_template("round.html", **params, error=error)
+    return render_template("round.html", **params)
 
 
 @round_bp.route("/<round_id>/clone", methods=["POST"])
