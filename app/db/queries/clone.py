@@ -166,6 +166,10 @@ def clone_single_round(round_id, new_fund_id, new_short_name) -> Round:
     cloned_round = Round(**round_to_clone.as_dict())
     cloned_round.fund_id = new_fund_id
     cloned_round.short_name = new_short_name
+    cloned_round.title_json["en"] = "Copy of " + cloned_round.title_json.get("en")
+    cloned_round.title_json["cy"] = (
+        "Copi o " + cloned_round.title_json.get("cy") if cloned_round.title_json.get("cy", None) else ""
+    )
     cloned_round.round_id = uuid4()
     cloned_round.is_template = False
     cloned_round.source_template_id = round_to_clone.round_id

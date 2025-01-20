@@ -196,3 +196,7 @@ class RoundForm(FlaskForm):
         description="Leave blank for English-only funds",
         validators=[validate_json_field],
     )
+
+
+class CloneRoundForm(FlaskForm):
+    fund_id = HiddenField("Fund", validators=[DataRequired()])

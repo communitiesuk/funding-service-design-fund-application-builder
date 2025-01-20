@@ -1,5 +1,6 @@
 import pytest
-from flask import url_for
+from bs4 import BeautifulSoup
+from flask import g, url_for
 
 from app.db.models import Round
 from app.db.queries.round import get_round_by_id
@@ -206,7 +207,7 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
     }
 
     test_round = seed_dynamic_data["rounds"][0]
-    response = submit_form(flask_test_client, f"/rounds/{test_round.round_id}", update_round_data)
+    response = submit_form(flask_test_client, f"/rounds/{test_round.round_id}/edit", update_round_data)
     assert response.status_code == 200
 
     updated_round = get_round_by_id(test_round.round_id)
@@ -301,3 +302,68 @@ def test_all_applications_page(flask_test_client, seed_dynamic_data):
     assert "round the first" in html, "Application name is missing"
     assert "funding to improve testing" in html, "Grant name and table component is missing"
     assert "Build application" in html, "Build application is not available and table component is missing"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_view_round_details(flask_test_client, seed_dynamic_data):
+    """
+    Test to check round detail route is working as expected.
+    and verify the round details template is rendered as expected.
+    """
+
+    test_round = seed_dynamic_data["rounds"][0]
+    test_fund = seed_dynamic_data["funds"][0]
+    response = flask_test_client.get(f"/rounds/{test_round.round_id}", follow_redirects=True)
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+    heading = soup.find("h2", {"class": "govuk-heading-l"})
+    assert heading.text.strip() == "Apply for " + test_fund.title_json["en"]
+
+    fundname = soup.find("p", {"class": "govuk-body"})
+    assert fundname.text.strip() == "Grant: " + test_fund.name_json["en"]
+
+    backlink = soup.find("a", {"class": "govuk-back-link"})
+    assert backlink.text == "Back"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_clone_round(flask_test_client, seed_dynamic_data):
+    """
+    Test to check round detail route is working as expected.
+    and verify the round details template is rendered as expected.
+    """
+
+    test_round = seed_dynamic_data["rounds"][0]
+    test_fund = seed_dynamic_data["funds"][0]
+    response = flask_test_client.get(f"/rounds/{test_round.round_id}", follow_redirects=True)
+    assert response.status_code == 200
+    with flask_test_client.session_transaction():
+        url = url_for("round_bp.clone_round", round_id=test_round.round_id)
+        response = flask_test_client.post(
+            url,
+            data={"fund_id": test_fund.fund_id, "csrf_token": g.csrf_token},
+            follow_redirects=True,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+
+        soup = BeautifulSoup(response.data, "html.parser")
+        notification = soup.find("div", {"class": "govuk-notification-banner__content"})
+        assert notification.text.strip() == "Application copied successfully"
+        copied_round_id = response.request.path.split("/")[-1]
+        expected_application_name = f"Copy of {test_round.title_json['en']}"
+
+        assert f"Copy of {test_round.title_json['en']}" in soup.text
+        updated_round = get_round_by_id(copied_round_id)
+        assert updated_round.title_json["en"] == expected_application_name
+
+        response = flask_test_client.post(
+            url,
+            data={"csrf_token": g.csrf_token},
+            follow_redirects=True,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+
+        soup = BeautifulSoup(response.data, "html.parser")
+        notification = soup.find("div", {"class": "govuk-notification-banner__content"})
+        assert notification.text.strip() == "Error copying application"

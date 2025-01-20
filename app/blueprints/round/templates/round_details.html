@@ -1,0 +1,537 @@
+{% from "govuk_frontend_jinja/macros/attributes.html" import govukAttributes -%}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
+{%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
+{%- from "govuk_frontend_jinja/components/details/macro.html" import govukDetails -%}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{%- from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList -%}
+{% from "macros/wtfToGovUk.html" import backlink %}
+{% set showNavigationBar = True %}
+{% set active_item_identifier = "applications" %}
+{% extends "base.html" %}
+{% block beforeContent %}
+  {{ super() }}
+     <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ govukBackLink({
+              "text": "Back",
+              "href": url_for("round_bp.view_all_rounds")
+            }) }}
+        </div>
+    </div>
+{% endblock beforeContent %}
+{% block content %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+        <h2 class="govuk-heading-l govuk-!-margin-bottom-0">Apply for {{ round.fund.title_json["en"] }}</h2>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for("fund_bp.edit_fund", fund_id=round.fund.fund_id, _anchor=fund_form.title_en.id) }}">Change application heading</a>
+    </div>
+    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+        {{ govukButton({ "text": "Build application",
+            "href": url_for("application_bp.build_application", round_id=round.round_id),
+            "classes": "govuk-button--secondary"
+        }) }}
+    </div>
+</div>
+<div class="govuk-grid-row">
+   <div class="govuk-grid-column-two-thirds">
+       <form method="POST" action={{ url_for("round_bp.clone_round", round_id=round.round_id) }}>
+           <div class="govuk-form-group">
+               {{ cloned_form.hidden_tag() }}
+               {{ cloned_form.fund_id() }}
+            </div>
+            {{ govukButton({ "text": "Copy application", "type": submit,
+                    "classes": "govuk-button--secondary"
+            }) }}
+       </form>
+
+    </div>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+    <p class="govuk-body">Grant: {{ round.fund.name_json['en'] }}</p>
+
+    {{ govukSummaryList({
+        "classes": "govuk-!-margin-bottom-9",
+            "rows": [
+                {
+                    "key": {"text": "Application round"},
+                    "value": {"text": round.title_json["en"]},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.title_en.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "Title english",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Application round (Welsh)"},
+                    "value": {"text": round.title_json["cy"]},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.title_cy.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "Title welsh",
+                            }
+                        ]
+                    },
+                } if round.fund.welsh_available else {},
+                {
+                    "key": {"text": "Round short name"},
+                    "value": {"text": round.short_name},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.short_name.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "short name",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Application round opens"},
+                    "value": {"text": round.opens.strftime('%d %B %Y at %H:%M')},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.opens.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "application round open date",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Application round closes"},
+                    "value": {"text": round.deadline.strftime('%d %B %Y at %H:%M')},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.deadline.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "application round close date",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Applicant reminder date"},
+                    "value": {"text": round.reminder_date.strftime('%d %B %Y at %H:%M')},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.reminder_date.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "applicant reminder date",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Assessment opens"},
+                    "value": {"text": round.assessment_start.strftime('%d %B %Y at %H:%M')},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.assessment_start.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "assessment open date",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Assessment closes"},
+                    "value": {"text": round.assessment_deadline.strftime('%d %B %Y at %H:%M')},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.assessment_deadline.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "assessment close date",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Assessor guidance link"},
+                    "value": {"text": round.guidance_url},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.guidance_url.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "assessor guidance link",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Grant team email address"},
+                    "value": {"text": round.contact_email},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.contact_email.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "grant team email",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Grant team phone number"},
+                    "value": {"text": round.contact_phone},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.contact_phone.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "grant team contact number",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Grant team textphone number"},
+                    "value": {"text": round.contact_textphone},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.contact_textphone.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "grant team text phone",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Grant team support hours"},
+                    "value": {"text": round.support_times},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.support_times.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "grant team support hours",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Grant team support days"},
+                    "value": {"text": round.support_days},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.support_days.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "grant team support days",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Before you apply guidance"},
+                    "value": {"text": round.instructions_json['en']},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.instructions_en.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "instruction before you apply",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Before you apply guidance (Welsh)"},
+                    "value": {"text": round.instructions_json['cy']},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.instructions_cy.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "instruction before you apply welsh",
+                            }
+                        ]
+                    },
+                } if round.fund.welsh_available else {},
+                {
+                    "key": {"text": "Complete the application guidance"},
+                    "value": {"text": round.application_guidance_json['en']},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.application_guidance_en.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "instruction before you apply",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Complete the application guidance (Welsh)"},
+                    "value": {"text": round.application_guidance_json['cy']},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.application_guidance_cy.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "application guidance welsh",
+                            }
+                        ]
+                    },
+                } if round.fund.welsh_available else {},
+                {
+                    "key": {"text": "Feedback link"},
+                    "value": {"text": round.feedback_link},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.feedback_link.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "Feedback link",
+                            }
+                        ]
+                    },
+                },
+                 {
+                    "key": {"text": "Prospectus link"},
+                    "value": {"text": round.prospectus_link},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.prospectus_link.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "Prospectus link",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Privacy notice link"},
+                    "value": {"text": round.privacy_notice_link},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.privacy_notice_link.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "privacy notice link",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Project name field ID"},
+                    "value": {"text": round.project_name_field_id},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.project_name_field_id.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "application guidance ",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Expression of interest decision schema"},
+                    "value": {"text": round.eoi_decision_schema["en"]},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.eoi_decision_schema_en.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "EOI decision schema english",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Expression of interest decision schema (Welsh)"},
+                    "value": {"text": round.eoi_decision_schema["cy"]},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.eoi_decision_schema_cy.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "EOI decision schema welsh",
+                            }
+                        ]
+                    },
+                } if round.fund.welsh_available else {},
+                {
+                    "key": {"text": "Do you want to include the contact us page in applicant emails?"},
+                    "value": {"text": "Yes" if round.reference_contact_page_over_email == "true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.reference_contact_page_over_email.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "Include contact us page in applicant email",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Do you want to allow assessors to download application fields?"},
+                    "value": {"text": "Yes" if round.application_fields_download_available == "true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.application_fields_download_available.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "Allow assessors to download application fields",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Do you want to have the MHCLG logo on PDFs?"},
+                    "value": {"text": "Yes" if round.display_logo_on_pdf_exports == "true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.display_logo_on_pdf_exports.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "Display MHCLG logo on pdf's",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Do you want applicants to mark sections as complete?"},
+                    "value": {"text": "Yes" if round.mark_as_complete_enabled == "true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.mark_as_complete_enabled.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "Mark sections as completed",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Is this application round an expression of interest?"},
+                    "value": {"text": "Yes" if round.is_expression_of_interest == "true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.is_expression_of_interest.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "application round an expression of interest",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Do you want to include a feedback survey?"},
+                    "value": {"text": "Yes" if round.feedback_survey_config["has_feedback_survey"]=="true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.has_feedback_survey.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "include a feedback survey",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Is the feedback survey optional?"},
+                    "value": {"text": "Yes" if round.feedback_survey_config["is_feedback_survey_optional"]=="true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.is_feedback_survey_optional.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "feedback survey optional",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Do you want to include a research survey?"},
+                    "value": {"text": "Yes" if round.feedback_survey_config["has_research_survey"]=="true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.has_research_survey.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "include research survey",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Is the research survey optional?"},
+                    "value": {"text": "Yes" if round.feedback_survey_config["is_research_survey_optional"]=="true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.is_research_survey_optional.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "optional research survey",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "key": {"text": "Do applicants need to pass eligibility questions before applying?"},
+                    "value": {"text": "Yes" if round.eligibility_config["has_eligibility"] == "true" else "No"},
+                    "actions": {
+                        "items": [
+                            {
+                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.eligibility_config.id),
+                                "text": "Change",
+                                "classes": "govuk-link--no-visited-state",
+                                "visuallyHiddenText": "eligibility config ",
+                            }
+                        ]
+                    },
+                },
+           ]
+    }) }}
+    </div>
+</div>
+{% endblock content %}
