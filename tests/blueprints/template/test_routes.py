@@ -4,6 +4,7 @@ from io import BytesIO
 from unittest.mock import patch
 
 import pytest
+from flask import g
 
 from app.db.models import Form
 
@@ -102,47 +103,52 @@ def test_template_create_invalid_data(flask_test_client):
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_template_create_already_existing_template(flask_test_client):
-    response = flask_test_client.get("/templates/create")
-    csrf_token = None
-    for line in response.data.decode().splitlines():
-        if "csrf_token" in line:
-            csrf_token = line.split('value="')[1].split('"')[0]
-            break
-    assert csrf_token is not None
-    with patch("app.blueprints.template.routes.get_form_by_template_name", return_value=True):
+    flask_test_client.get("/templates/create")
+    with flask_test_client.session_transaction():
+        with patch("app.blueprints.template.routes.get_form_by_template_name", return_value=True):
+            data = {
+                "template_name": "existing_template",
+                "tasklist_name": "tasklist1",
+                "file": (BytesIO(b'{"key": "value"}'), "test.json"),
+                "csrf_token": g.csrf_token,
+            }
+            response = flask_test_client.post("/templates/create", data=data)
+            assert response.status_code == 200
+            assert b"Template name already exists" in response.data
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_template_create_invalid_json_file(flask_test_client):
+    flask_test_client.get("/templates/create")
+    with flask_test_client.session_transaction():
         data = {
             "template_name": "existing_template",
             "tasklist_name": "tasklist1",
             "file": (BytesIO(b'{"key": "value"}'), "test.json"),
-            "csrf_token": csrf_token,
+            "csrf_token": g.csrf_token,
         }
         response = flask_test_client.post("/templates/create", data=data)
         assert response.status_code == 200
-        assert b"Template name already exists" in response.data
+        assert b"Please upload valid JSON file" in response.data
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "clean_db")
 def test_template_create_success(flask_test_client, clean_db):
-    response = flask_test_client.get("/templates/create")
-    csrf_token = None
-    for line in response.data.decode().splitlines():
-        if "csrf_token" in line:
-            csrf_token = line.split('value="')[1].split('"')[0]
-            break
-    assert csrf_token is not None
-    test_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    test_data_dir = os.path.join(test_root, "test_data")
-    file_path = os.path.join(test_data_dir, "asset-information.json")
-    data = {
-        "template_name": f"existing_template-{uuid.uuid4()}",
-        "tasklist_name": f"tasklist1-{uuid.uuid4()}",
-        "file": (open(file_path, "rb"), "org-info.json"),
-        "csrf_token": csrf_token,
-    }
-    response = flask_test_client.post("/templates/create", data=data)
-    assert response.status_code == 302
+    flask_test_client.get("/templates/create")
+    with flask_test_client.session_transaction():
+        test_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+        test_data_dir = os.path.join(test_root, "test_data")
+        file_path = os.path.join(test_data_dir, "asset-information.json")
+        data = {
+            "template_name": f"existing_template-{uuid.uuid4()}",
+            "tasklist_name": f"tasklist1-{uuid.uuid4()}",
+            "file": (open(file_path, "rb"), "org-info.json"),
+            "csrf_token": g.csrf_token,
+        }
+        response = flask_test_client.post("/templates/create", data=data)
+        assert response.status_code == 302
 
-    # Check the flash messages (if there are any)
-    with flask_test_client.session_transaction() as session:
-        flash_messages = session.get("_flashes", [])
-        assert any("Template uploaded" in msg[1] for msg in flash_messages)
+        # Check the flash messages (if there are any)
+        with flask_test_client.session_transaction() as session:
+            flash_messages = session.get("_flashes", [])
+            assert any("Template uploaded" in msg[1] for msg in flash_messages)
