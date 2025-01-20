@@ -10,13 +10,8 @@ Edit Template
 {% endset %}
 {% block content %}
 <div class="govuk-grid-row">
-    {% if error %}
-        {{
-        govukErrorSummary({
-            "titleText": error.titleText,
-            "errorList": error.errorList
-        })
-        }}
+    {% if template_form.errors %}
+      {{ govukErrorSummary(wtforms_errors(template_form)) }}
     {% endif %}
     <h1 class="govuk-heading-l">{{pageHeading}}</h1>
 </div>

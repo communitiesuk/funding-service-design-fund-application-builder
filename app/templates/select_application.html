@@ -13,12 +13,8 @@
       "href": url_for("application_bp.select_fund")
     }) }}
 
-    {% if error %}
-      {{ govukErrorSummary({
-        "titleText": error.titleText,
-        "errorList": error.errorList,
-        "classes": "govuk-!-margin-bottom-4"
-      }) }}
+    {% if form.errors %}
+      {{ govukErrorSummary(wtforms_errors(form)) }}
     {% endif %}
 
     <span class="govuk-caption-m">{{ fund.short_name + " - " + fund.title_json["en"] }}</span>

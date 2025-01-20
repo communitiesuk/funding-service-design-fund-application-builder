@@ -67,12 +67,9 @@ def select_fund():
     form.fund_id.choices = choices
     if form.validate_on_submit():
         return redirect(url_for("application_bp.select_application", fund_id=form.fund_id.data))
-    error = None
-    if form.fund_id.errors:
-        error = {"titleText": "There is a problem", "errorList": [{"text": form.fund_id.errors[0], "href": "#fund_id"}]}
     select_items = [{"value": value, "text": text} for value, text in choices]
     return render_template(
-        "select_fund.html", form=form, error=error, select_items=select_items, back_link=url_for("index_bp.dashboard")
+        "select_fund.html", form=form, select_items=select_items, back_link=url_for("index_bp.dashboard")
     )
 
 
@@ -92,14 +89,8 @@ def select_application():
     form.round_id.choices = choices
     if form.validate_on_submit():
         return redirect(url_for("application_bp.build_application", round_id=form.round_id.data))
-    error = None
-    if form.round_id.errors:
-        error = {
-            "titleText": "There is a problem",
-            "errorList": [{"text": form.round_id.errors[0], "href": "#round_id"}],
-        }
     select_items = [{"value": value, "text": text} for value, text in choices]
-    return render_template("select_application.html", form=form, fund=fund, error=error, select_items=select_items)
+    return render_template("select_application.html", form=form, fund=fund, select_items=select_items)
 
 
 @application_bp.route("/<round_id>/sections")

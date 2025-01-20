@@ -13,7 +13,6 @@ from app.db.queries.application import (
     get_form_by_template_name,
     update_form,
 )
-from app.shared.helpers import error_formatter
 from app.shared.table_pagination import GovUKTableAndPagination
 
 template_bp = Blueprint(
@@ -71,10 +70,7 @@ def view_templates():
 
         return redirect(url_for("template_bp.view_templates"))
 
-    error = None
-    if "uploadform" in params:
-        error = error_formatter(params["uploadform"])
-    return render_template("view_templates.html", **params, error=error, form_designer_url=form_designer_url)
+    return render_template("view_templates.html", **params, form_designer_url=form_designer_url)
 
 
 @template_bp.route("/<uuid:form_id>", methods=["GET"])
@@ -102,11 +98,9 @@ def edit_template(form_id):
     template_form.tasklist_name.data = existing_form.name_in_apply_json["en"]
     template_form.url_path.data = existing_form.runner_publish_name
     params = {"template_form": template_form}
-    error = error_formatter(template_form)
     return render_template(
         "edit_form_template.html",
         **params,
-        error=error,
     )
 
 

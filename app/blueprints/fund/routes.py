@@ -12,7 +12,7 @@ from app.blueprints.fund.forms import FundForm
 from app.blueprints.fund.services import build_fund_rows
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
-from app.shared.helpers import all_funds_as_govuk_select_items, error_formatter, flash_message
+from app.shared.helpers import all_funds_as_govuk_select_items, flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -99,8 +99,7 @@ def create_fund():
             case _:
                 return redirect(url_for("round_bp.create_round", fund_id=new_fund.fund_id))
 
-    error = error_formatter(form)
-    return render_template("fund.html", form=form, fund_id=None, error=error)
+    return render_template("fund.html", form=form, fund_id=None)
 
 
 @fund_bp.route("/<uuid:fund_id>/edit", methods=["GET", "POST"])
@@ -148,5 +147,4 @@ def edit_fund(fund_id):
             return redirect(url_for(INDEX_BP_DASHBOARD))
         return redirect(url_for("fund_bp.view_fund_details", fund_id=fund.fund_id))
 
-    error = error_formatter(form)
-    return render_template("fund.html", form=form, fund_id=fund_id, error=error)
+    return render_template("fund.html", form=form, fund_id=fund_id)
