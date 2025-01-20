@@ -60,23 +60,12 @@ def build_govuk_assets(static_dist_root="app/static/dist"):
     for file_to_move in os.listdir(ASSETS_PATH):
         shutil.move("/".join([ASSETS_PATH, file_to_move]), DIST_PATH)
 
-    # Update relative paths
-
-    print("Updating relative paths in css files to " + GOVUK_DIR)
-    cwd = os.getcwd()
-    os.chdir(DIST_PATH)
-    for css_file in glob.glob("*.css"):
-        # Read in the file
-        with open(css_file, "r") as file:
-            filedata = file.read()
-
-        # Replace the target string
-        filedata = filedata.replace(ASSETS_DIR, ASSETS_DIR + GOVUK_DIR)
-
-        # Write the file out again
-        with open(css_file, "w") as file:
-            file.write(filedata)
-    os.chdir(cwd)
+    # We are using pre-compiled GOV.UK Frontend at the moment, which bakes in some expected URL paths for certain
+    # assets. So here we massage some files into the correct place.
+    print("Copying images and fonts to /static for hard-coded CSS in GOV.UK Frontend")
+    shutil.copytree("app/static/dist/govuk-frontend/images", "app/static/dist/images")
+    shutil.copytree("app/static/dist/govuk-frontend/fonts", "app/static/dist/fonts")
+    shutil.copy("app/static/dist/govuk-frontend/manifest.json", "app/static/dist/manifest.json")
 
     # Delete temp files
     print("Deleting " + ASSETS_PATH)
