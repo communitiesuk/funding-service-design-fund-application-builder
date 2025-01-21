@@ -1,4 +1,10 @@
+import os
+import uuid
+from io import BytesIO
+from unittest.mock import patch
+
 import pytest
+from flask import g
 
 from app.db.models import Form
 
@@ -33,9 +39,10 @@ def test_generalized_table_template_with_existing_templates(flask_test_client):
 
     # Button component availability check
     assert "Upload template" in html, "Button text is missing"
-    assert '<a href="#" role="button" draggable="false" class="govuk-button" data-module="govuk-button">' in html, (
-        "Button component is missing"
-    )
+    assert (
+        '<a href="/templates/create" role="button" draggable="false" class="govuk-button" data-module="govuk-button">'
+        in html
+    ), "Button component is missing"
 
     # Table component availability check
     assert '<thead class="govuk-table__head">' in html, "Table is missing"
@@ -67,7 +74,7 @@ def test_template_details_view(flask_test_client, seed_dynamic_data):
 
     # table titles
     assert "Template name" in html, "Summary title is missing"
-    assert "Task title" in html, "Summary title is missing"
+    assert "Task name" in html, "Summary title is missing"
     assert "Template JSON file" in html, "Summary title is missing"
 
     # table data
@@ -78,3 +85,70 @@ def test_template_details_view(flask_test_client, seed_dynamic_data):
 
     # Detail component availability check
     assert "View template questions" in html, "View template questions is missing"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_template_create_get_form(flask_test_client):
+    response = flask_test_client.get("/templates/create")
+    assert response.status_code == 200
+    assert b"Add a new template" in response.data
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_template_create_invalid_data(flask_test_client):
+    response = flask_test_client.post("/templates/create", data={})
+    assert response.status_code == 200
+    assert b"This field is required" in response.data
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_template_create_already_existing_template(flask_test_client):
+    flask_test_client.get("/templates/create")
+    with flask_test_client.session_transaction():
+        with patch("app.blueprints.template.routes.get_form_by_template_name", return_value=True):
+            data = {
+                "template_name": "existing_template",
+                "tasklist_name": "tasklist1",
+                "file": (BytesIO(b'{"key": "value"}'), "test.json"),
+                "csrf_token": g.csrf_token,
+            }
+            response = flask_test_client.post("/templates/create", data=data)
+            assert response.status_code == 200
+            assert b"Template name already exists" in response.data
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_template_create_invalid_json_file(flask_test_client):
+    flask_test_client.get("/templates/create")
+    with flask_test_client.session_transaction():
+        data = {
+            "template_name": "existing_template",
+            "tasklist_name": "tasklist1",
+            "file": (BytesIO(b'{"key": "value"}'), "test.json"),
+            "csrf_token": g.csrf_token,
+        }
+        response = flask_test_client.post("/templates/create", data=data)
+        assert response.status_code == 200
+        assert b"Please upload valid JSON file" in response.data
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "clean_db")
+def test_template_create_success(flask_test_client, clean_db):
+    flask_test_client.get("/templates/create")
+    with flask_test_client.session_transaction():
+        test_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+        test_data_dir = os.path.join(test_root, "test_data")
+        file_path = os.path.join(test_data_dir, "asset-information.json")
+        data = {
+            "template_name": f"existing_template-{uuid.uuid4()}",
+            "tasklist_name": f"tasklist1-{uuid.uuid4()}",
+            "file": (open(file_path, "rb"), "org-info.json"),
+            "csrf_token": g.csrf_token,
+        }
+        response = flask_test_client.post("/templates/create", data=data)
+        assert response.status_code == 302
+
+        # Check the flash messages (if there are any)
+        with flask_test_client.session_transaction() as session:
+            flash_messages = session.get("_flashes", [])
+            assert any("Template uploaded" in msg[1] for msg in flash_messages)

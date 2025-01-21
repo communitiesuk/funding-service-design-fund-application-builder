@@ -10,9 +10,6 @@
 
 
 {% block content %}
-    {% if uploadform.errors %}
-      {{ govukErrorSummary(wtforms_errors(uploadform)) }}
-    {% endif %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-l">Templates</h1>
@@ -49,7 +46,7 @@
         <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
             {{ govukButton({
                 "text": "Upload template",
-                "href": "#"
+                "href": url_for('template_bp.create_template')
             }) }}
         </div>
     </div>
