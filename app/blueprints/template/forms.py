@@ -1,11 +1,20 @@
 from flask_wtf import FlaskForm
+from govuk_frontend_wtf.wtforms_widgets import GovFileInput, GovTextInput
 from wtforms import FileField, HiddenField, StringField
 from wtforms.validators import DataRequired, Regexp
 
 
-class TemplateUploadForm(FlaskForm):
-    template_name = StringField("Template Name", validators=[DataRequired()])
-    file = FileField("Upload File", validators=[DataRequired()])
+class TemplateCreateForm(FlaskForm):
+    template_name = StringField("Template name", widget=GovTextInput(), validators=[DataRequired()])
+    tasklist_name = StringField(
+        "Task name",
+        widget=GovTextInput(),
+        description="For example, Project management. Applicants will see this in the application",
+        validators=[DataRequired()],
+    )
+    file = FileField(
+        "Upload a file", description="Supports JSON files only", widget=GovFileInput(), validators=[DataRequired()]
+    )
 
 
 class TemplateFormForm(FlaskForm):

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% set showNavigationBar = True %}
+{% set active_item_identifier = "templates" %}
+
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        {% if error %}
+            {{
+                    govukErrorSummary({
+                        "titleText": error.titleText,
+                        "errorList": error.errorList
+                    })
+                    }}
+        {% endif %}
+        {{ govukBackLink({
+              "text": "Back",
+              "href": url_for("template_bp.view_templates")
+            }) }}
+        <h2 class="govuk-heading-m">Add a new template</h2>
+        <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.csrf_token }}
+                    {{ form.hidden_tag() }}
+                    {{ form.template_name() }}
+                    {{ form.tasklist_name() }}
+                    {{ form.file() }}
+
+                    <div class="govuk-button-group govuk-!-margin-top-6">
+                        {{ govukButton({
+                            "text": "Save and continue",
+                            "classes": "govuk-button",
+                            "name": "action",
+                            "value": "continue"
+                        }) }}
+
+                        {{ govukButton({
+                            "text": "Cancel",
+                            "classes": "govuk-button govuk-button--secondary",
+                            "href": url_for("template_bp.view_templates")
+                        }) }}
+                    </div>
+
+                    <p class="govuk-body">
+                        {{ govukButton({
+                            "text": "Save and return to home",
+                            "classes": "govuk-button govuk-button--secondary",
+                            "name": "action",
+                            "value": "return_home"
+                        }) }}
+                    </p>
+                </form>
+            </fieldset>
+        </div>
+    </div>
+{% endblock %}
