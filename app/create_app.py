@@ -76,6 +76,7 @@ def create_app() -> Flask:
     flask_app.jinja_loader = ChoiceLoader(
         [
             PackageLoader("app"),
+            PackageLoader("govuk_frontend_ext"),
             PrefixLoader(
                 {
                     "govuk_frontend_jinja": PackageLoader("govuk_frontend_jinja"),

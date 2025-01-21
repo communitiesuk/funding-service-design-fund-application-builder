@@ -1,14 +1,15 @@
-import datetime
 import json
 import re
 
 from flask_wtf import FlaskForm, Form
-from wtforms import FormField, HiddenField, RadioField, StringField, TextAreaField, URLField
+from wtforms import HiddenField, RadioField, StringField, TextAreaField, URLField
+from wtforms.fields.datetime import DateTimeField
 from wtforms.validators import DataRequired, Length, ValidationError
 
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_short_name_and_fund_id
 from app.shared.helpers import no_spaces_between_letters
+from govuk_frontend_ext.fields import GovDatetimeInput
 
 
 def validate_json_field(form, field):
@@ -58,19 +59,6 @@ def validate_unique_round_short_name(form, field):
         if rond_data and str(rond_data.round_id) != form.data.get("round_id"):
             fund_data = get_fund_by_id(form.data.get("fund_id"))
             raise ValidationError(f"Given short name already exists in the fund {fund_data.title_json.get('en')}.")
-
-
-def get_datetime(form_field):
-    day = int(form_field.day.data)
-    month = int(form_field.month.data)
-    year = int(form_field.year.data)
-    hour = int(form_field.hour.data)
-    minute = int(form_field.minute.data)
-    try:
-        form_field_datetime = datetime.datetime(year, month, day, hour=hour, minute=minute).strftime("%m-%d-%Y %H:%M")
-        return form_field_datetime
-    except ValueError as ex:
-        raise ValidationError(f"Invalid date entered for {form_field}") from ex
 
 
 class DateInputForm(Form):
@@ -131,11 +119,36 @@ class RoundForm(FlaskForm):
         description="Choose a unique short name with 6 or fewer characters",
         validators=[DataRequired(), Length(max=6), no_spaces_between_letters, validate_unique_round_short_name],
     )
-    opens = FormField(DateInputForm, label="Opens")
-    deadline = FormField(DateInputForm, label="Deadline")
-    assessment_start = FormField(DateInputForm, label="Assessment start date")
-    reminder_date = FormField(DateInputForm, label="Reminder date")
-    assessment_deadline = FormField(DateInputForm, label="Assessment deadline")
+    opens = DateTimeField(
+        "Opens",
+        widget=GovDatetimeInput(),
+        format="%d %m %Y %H %M",
+        validators=[DataRequired(message="Enter a valid date and time")],
+    )
+    deadline = DateTimeField(
+        "Deadline",
+        widget=GovDatetimeInput(),
+        format="%d %m %Y %H %M",
+        validators=[DataRequired(message="Enter a valid date and time")],
+    )
+    assessment_start = DateTimeField(
+        "Assessment start date",
+        widget=GovDatetimeInput(),
+        format="%d %m %Y %H %M",
+        validators=[DataRequired(message="Enter a valid date and time")],
+    )
+    reminder_date = DateTimeField(
+        "Reminder date",
+        widget=GovDatetimeInput(),
+        format="%d %m %Y %H %M",
+        validators=[DataRequired(message="Enter a valid date and time")],
+    )
+    assessment_deadline = DateTimeField(
+        "Assessment deadline",
+        widget=GovDatetimeInput(),
+        format="%d %m %Y %H %M",
+        validators=[DataRequired(message="Enter a valid date and time")],
+    )
     prospectus_link = URLField("Prospectus link", validators=[DataRequired(), validate_flexible_url])
     privacy_notice_link = URLField("Privacy notice link", validators=[DataRequired(), validate_flexible_url])
     application_reminder_sent = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
