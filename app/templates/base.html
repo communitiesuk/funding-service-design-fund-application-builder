@@ -5,7 +5,7 @@
 
 {% set cspNonce = csp_nonce() %}  {# Used in the base template govuk_frontend_jinja/template.html #}
 
-{% block pageTitle %}Fund Application Builder{% endblock pageTitle %}
+{% block pageTitle %}Fund application builder{% endblock pageTitle %}
 
 {% block head %}
   {% include "head.html" %}
@@ -15,7 +15,7 @@
   {{ govukHeader({
     "useTudorCrown": "yes",
     "classes": "govuk-header--full-width-border",
-    "serviceName": "Fund Application Builder",
+    "serviceName": "Fund application builder",
     "serviceUrl": url_for("index_bp.index"),
     "navigation": [
         {
