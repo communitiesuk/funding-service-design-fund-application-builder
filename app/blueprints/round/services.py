@@ -3,7 +3,6 @@ from datetime import datetime
 
 from flask import url_for
 
-from app.blueprints.round.forms import get_datetime
 from app.db.models.round import Round
 from app.db.queries.round import add_round, update_round
 
@@ -150,11 +149,11 @@ def update_existing_round(round_obj, form, user="dummy_user"):
     }
 
     # IMPORTANT: convert date sub-form dicts into Python datetime objects
-    round_obj.opens = get_datetime(form.opens)
-    round_obj.deadline = get_datetime(form.deadline)
-    round_obj.assessment_start = get_datetime(form.assessment_start)
-    round_obj.reminder_date = get_datetime(form.reminder_date)
-    round_obj.assessment_deadline = get_datetime(form.assessment_deadline)
+    round_obj.opens = form.opens.data
+    round_obj.deadline = form.deadline.data
+    round_obj.assessment_start = form.assessment_start.data
+    round_obj.reminder_date = form.reminder_date.data
+    round_obj.assessment_deadline = form.assessment_deadline.data
 
     round_obj.prospectus_link = form.prospectus_link.data
     round_obj.privacy_notice_link = form.privacy_notice_link.data
@@ -197,11 +196,11 @@ def create_new_round(form, user="dummy_user"):
         title_json={"en": form.title_en.data or None, "cy": form.title_cy.data or None},
         short_name=form.short_name.data,
         # Again convert each date dict to a datetime object
-        opens=get_datetime(form.opens),
-        deadline=get_datetime(form.deadline),
-        assessment_start=get_datetime(form.assessment_start),
-        reminder_date=get_datetime(form.reminder_date),
-        assessment_deadline=get_datetime(form.assessment_deadline),
+        opens=form.opens.data,
+        deadline=form.deadline.data,
+        assessment_start=form.assessment_start.data,
+        reminder_date=form.reminder_date.data,
+        assessment_deadline=form.assessment_deadline.data,
         prospectus_link=form.prospectus_link.data,
         privacy_notice_link=form.privacy_notice_link.data,
         contact_us_banner_json={

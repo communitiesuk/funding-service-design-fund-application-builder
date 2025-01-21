@@ -27,11 +27,11 @@
                     {{input(form.title_en)}}
                     {{input(form.title_cy, classes="welsh-field")}}
                     {{input(form.short_name)}}
-                    {{dateinput(form.opens)}}
-                    {{dateinput(form.deadline)}}
-                    {{dateinput(form.assessment_start)}}
-                    {{dateinput(form.reminder_date)}}
-                    {{dateinput(form.assessment_deadline)}}
+                    {{form.opens()}}
+                    {{form.deadline()}}
+                    {{form.assessment_start()}}
+                    {{form.reminder_date()}}
+                    {{form.assessment_deadline()}}
                     {{input(form.prospectus_link)}}
                     {{input(form.privacy_notice_link)}}
                     {{ multilineinput(form.contact_us_banner_en) }}

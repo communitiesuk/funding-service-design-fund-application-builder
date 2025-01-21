@@ -41,14 +41,11 @@ class TestDatetimeField:
 
     def test_fields_render_errors(self, app):
         class _Form(Form):
-            field = DateTimeField(None, widget=GovDatetimeInput())
+            field = DateTimeField(None, format="%Y %m %d %H %M", widget=GovDatetimeInput())
 
         expected_values = ["02", "01", "2000", "10", "30"]
 
         form = _Form()
-        import pdb
-
-        pdb.set_trace()
         form.process(formdata=MultiDict([("field", val) for val in expected_values]))
         form.validate()
         assert form.errors == {"field": ["Not a valid datetime value."]}
