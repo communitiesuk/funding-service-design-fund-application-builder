@@ -24,7 +24,7 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-three-quarters">
         <h2 class="govuk-heading-l govuk-!-margin-bottom-0">Apply for {{ round.fund.title_json["en"] }}</h2>
-        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('fund_bp.edit_fund', fund_id=round.fund.fund_id, _anchor=fund_form.title_en.id) }}">Change application heading</a>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('fund_bp.edit_fund', fund_id=round.fund.fund_id,  actions="view_application", _anchor=fund_form.title_en.id) }}">Change application heading</a>
     </div>
     <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
         {{ govukButton({ "text": "Build application",

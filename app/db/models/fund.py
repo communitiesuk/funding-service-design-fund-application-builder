@@ -28,9 +28,9 @@ class FundingType(Enum):
             case FundingType.COMPETITIVE:
                 return "Competitive"
             case FundingType.EOI:
-                return "EOI"
+                return "Expression of interest"
             case FundingType.UNCOMPETED:
-                return "Uncompeted"
+                return "Un-competed"
             case _:
                 return self.value
 

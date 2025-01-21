@@ -1,7 +1,6 @@
-from enum import Enum
-
 from flask_wtf import FlaskForm
-from wtforms import HiddenField, RadioField, StringField, TextAreaField
+from govuk_frontend_wtf.wtforms_widgets import GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
+from wtforms import HiddenField, RadioField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length, ValidationError
 
 from app.db.models.fund import FundingType
@@ -16,37 +15,63 @@ def validate_unique_fund_short_name(form, field):
             raise ValidationError("Given fund short name already exists.")
 
 
-class GovUkRadioEnumField(RadioField):
-    source_enum: Enum
-    gov_uk_choices: list
-
-    def __init__(self, name: str, _prefix, _translations, label: str, _form, source_enum: Enum):
-        super().__init__(
-            name=name,
-            label=label,
-            _form=_form,
-            _prefix=_prefix,
-            _translations=_translations,
-            choices=[(value.name, value.value) for value in source_enum],
-        )
-        self.source_enum = source_enum
-        self.gov_uk_choices = [
-            {"text": value.get_text_for_display(), "value": value.value} for value in self.source_enum
-        ]
-
-
 class FundForm(FlaskForm):
     fund_id = HiddenField("Fund ID")
-    name_en = StringField("Grant name", validators=[DataRequired()])
-    name_cy = StringField("Grant name (Welsh)")
-    title_en = StringField("Application heading", validators=[DataRequired()])
-    title_cy = StringField("Application heading (Welsh)")
+    welsh_available = RadioField(
+        "Is this grant available in Welsh?",
+        choices=[("true", "Yes"), ("false", "No")],
+        coerce=lambda value: value == "true",
+        widget=GovRadioInput(),
+        default="false",
+        render_kw={"class": "govuk-radios govuk-radios--inline"},
+    )
+    name_en = StringField(
+        "Grant name",
+        widget=GovTextInput(),
+        description="For example, Community Ownership Fund",
+        validators=[DataRequired()],
+    )
+    name_cy = StringField(
+        "Grant name (Welsh)", widget=GovTextInput(), description="For example, Community Ownership Fund"
+    )
     short_name = StringField(
-        "Short name",
+        "Grant Short name",
+        widget=GovTextInput(),
+        description="A unique acronym of up to 10 characters for the grant.For example, COF",
         validators=[DataRequired(), Length(max=10), no_spaces_between_letters, validate_unique_fund_short_name],
     )
-    description_en = TextAreaField("Description", validators=[DataRequired()])
-    description_cy = TextAreaField("Description (Welsh)")
-    welsh_available = RadioField("Welsh available", choices=[("true", "Yes"), ("false", "No")], default="false")
-    funding_type = GovUkRadioEnumField(label="Funding type", source_enum=FundingType)
-    ggis_scheme_reference_number = StringField("GGIS scheme reference number", validators=[Length(max=255)])
+    title_en = StringField(
+        "Application heading",
+        widget=GovTextInput(),
+        description="For example, Apply for funding to save an asset in your community",
+        validators=[DataRequired()],
+    )
+    title_cy = StringField(
+        "Application heading (Welsh)",
+        widget=GovTextInput(),
+        description="For example, Apply for funding to save an asset in your community",
+    )
+    description_en = TextAreaField(
+        "Description",
+        widget=GovTextArea(),
+        description="What the grant is for. You can find this in the grant prospectus",
+        validators=[DataRequired()],
+    )
+    description_cy = TextAreaField(
+        "Description (Welsh)",
+        widget=GovTextArea(),
+        description="What the grant is for. You can find this in the grant prospectus",
+    )
+
+    funding_type = RadioField(
+        "Funding type",
+        choices=[(choice.value, choice.get_text_for_display()) for choice in FundingType],
+        widget=GovRadioInput(),
+    )
+    ggis_scheme_reference_number = StringField(
+        "GGIS scheme reference number",
+        widget=GovTextInput(),
+        validators=[Length(max=255)],
+    )
+    save_and_continue = SubmitField("Save and continue", widget=GovSubmitInput())
+    save_and_return_home = SubmitField("Save and return home", widget=GovSubmitInput())

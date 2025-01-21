@@ -1,4 +1,6 @@
 import pytest
+from bs4 import BeautifulSoup
+from flask import g
 
 from app.db.models import Fund
 from app.db.models.fund import FundingType
@@ -7,7 +9,7 @@ from tests.helpers import submit_form
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_create_fund(flask_test_client):
+def test_create_fund(flask_test_client, seed_dynamic_data):
     """
     Tests that a fund can be successfully created using the /grants/create route
     Verifies that the created fund has the correct attributes
@@ -42,7 +44,7 @@ def test_create_fund(flask_test_client):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_create_fund_with_existing_short_name(flask_test_client):
+def test_create_fund_with_existing_short_name(flask_test_client, seed_dynamic_data):
     """
     Tests that a fund can be successfully created using the /grants/create route
     Verifies that the created fund has the correct attributes
@@ -111,8 +113,91 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_update_fund_and_return_home(flask_test_client, seed_dynamic_data):
+    """Tests that 'Save and return home' action correctly redirects to dashboard after fund update"""
+    test_fund = seed_dynamic_data["funds"][0]
+    flask_test_client.get(f"/grants/{test_fund.fund_id}/edit")
+    with flask_test_client.session_transaction():
+        update_data = {
+            "name_en": "Updated Fund",
+            "title_en": "Updated Fund Title",
+            "description_en": "Updated Fund Description",
+            "welsh_available": "true",
+            "short_name": "UF1234",
+            "submit": "Submit",
+            "funding_type": "EOI",
+            "ggis_scheme_reference_number": "G3-SCH-0000092414",
+            "save_and_return_home": True,
+            "csrf_token": g.csrf_token,
+        }
+        response = flask_test_client.post(
+            f"/grants/{test_fund.fund_id}/edit",
+            data=update_data,
+            follow_redirects=True,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+    assert response.request.path == "/dashboard"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_update_fund_and_return_fund_details(flask_test_client, seed_dynamic_data):
+    """Tests that 'Save and continue' action correctly redirects to dashboard after fund update"""
+    test_fund = seed_dynamic_data["funds"][0]
+    flask_test_client.get(f"/grants/{test_fund.fund_id}/edit")
+    with flask_test_client.session_transaction():
+        update_data = {
+            "name_en": "Updated Fund",
+            "title_en": "Updated Fund Title",
+            "description_en": "Updated Fund Description",
+            "welsh_available": "true",
+            "short_name": "UF1234",
+            "submit": "Submit",
+            "funding_type": "EOI",
+            "ggis_scheme_reference_number": "G3-SCH-0000092414",
+            "save_and_continue": True,
+            "csrf_token": g.csrf_token,
+        }
+        response = flask_test_client.post(
+            f"/grants/{test_fund.fund_id}/edit",
+            data=update_data,
+            follow_redirects=True,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+    assert response.request.path == f"/grants/{test_fund.fund_id}"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_update_fund_and_return_round_details(flask_test_client, seed_dynamic_data):
+    """Tests that 'Save and continue' action correctly redirects to dashboard after fund update"""
+    test_fund = seed_dynamic_data["funds"][0]
+    test_round = seed_dynamic_data["rounds"][0]
+    flask_test_client.get(f"/grants/{test_fund.fund_id}/edit")
+    with flask_test_client.session_transaction():
+        update_data = {
+            "name_en": "Updated Fund",
+            "title_en": "Updated Fund Title",
+            "description_en": "Updated Fund Description",
+            "welsh_available": "true",
+            "short_name": "UF1234",
+            "submit": "Submit",
+            "funding_type": "EOI",
+            "ggis_scheme_reference_number": "G3-SCH-0000092414",
+            "save_and_continue": True,
+            "csrf_token": g.csrf_token,
+        }
+        response = flask_test_client.post(
+            f"/grants/{test_fund.fund_id}/edit?actions=view_application&round_id={test_round.round_id}",
+            data=update_data,
+            follow_redirects=True,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+    assert response.request.path == f"/rounds/{test_round.round_id}"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_fund_with_return_home(flask_test_client):
     """Tests that 'Save and return home' action correctly redirects to dashboard after fund creation"""
+    flask_test_client.get("/grants/create")
     create_data = {
         "name_en": "New Fund",
         "title_en": "New Fund Title",
@@ -121,14 +206,81 @@ def test_create_fund_with_return_home(flask_test_client):
         "short_name": "NF5433",
         "funding_type": FundingType.COMPETITIVE.value,
         "ggis_scheme_reference_number": "G1-SCH-0000092415",
-        "action": "return_home",
+        "save_and_return_home": True,
+        "csrf_token": g.csrf_token,
     }
-
-    response = submit_form(flask_test_client, "/grants/create", create_data)
+    with flask_test_client.session_transaction():
+        response = flask_test_client.post(
+            "/grants/create",
+            data=create_data,
+            follow_redirects=True,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
     assert response.request.path == "/dashboard"
+    soup = BeautifulSoup(response.data, "html.parser")
+    notification = soup.find("h3", {"class": "govuk-notification-banner__heading"})
+    assert notification.text.strip() == "New grant added successfully"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "clean_db")
+def test_create_fund_from_grant_details(flask_test_client, seed_dynamic_data):
+    """Tests that 'Save and continue' action correctly redirects to grants list after fund creation"""
+    flask_test_client.get("/grants/create?actions=grants_table")
+    with flask_test_client.session_transaction():
+        create_data = {
+            "name_en": "New Fund",
+            "title_en": "New Fund Title",
+            "description_en": "New Fund Description",
+            "welsh_available": "false",
+            "short_name": "NF5433",
+            "funding_type": FundingType.COMPETITIVE.value,
+            "ggis_scheme_reference_number": "G1-SCH-0000092415",
+            "save_and_continue": True,
+            "csrf_token": g.csrf_token,
+        }
+        response = flask_test_client.post(
+            "/grants/create?actions=grants_table",
+            data=create_data,
+            follow_redirects=True,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        assert response.request.path == "/grants/"
+        soup = BeautifulSoup(response.data, "html.parser")
+        notification = soup.find("h3", {"class": "govuk-notification-banner__heading"})
+        assert notification.text.strip() == "New grant added successfully"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "clean_db")
+def test_create_fund_from_select_grant(flask_test_client):
+    """Tests that 'Save and continue' action correctly redirects to round creation after fund creation
+    when add grant is submitted from select grant page"""
+    flask_test_client.get("/grants/create")
+    create_data = {
+        "name_en": "New Fund",
+        "title_en": "New Fund Title",
+        "description_en": "New Fund Description",
+        "welsh_available": "false",
+        "short_name": "NF5433",
+        "funding_type": FundingType.COMPETITIVE.value,
+        "ggis_scheme_reference_number": "G1-SCH-0000092415",
+        "save_and_continue": True,
+        "csrf_token": g.csrf_token,
+    }
+    with flask_test_client.session_transaction():
+        response = flask_test_client.post(
+            "/grants/create?actions=select_grant",
+            data=create_data,
+            follow_redirects=True,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+
+    assert response.request.path == "/rounds/create"
+    soup = BeautifulSoup(response.data, "html.parser")
+    notification = soup.find("h3", {"class": "govuk-notification-banner__heading"})
+    assert notification.text.strip() == "New grant added successfully"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_view_all_funds(flask_test_client, seed_dynamic_data):
     response = flask_test_client.get(
         "/grants/", follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
