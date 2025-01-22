@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-from flask import render_template, url_for
+from flask import url_for
 
 from app.db.models.round import Round
 from app.db.queries.round import add_round, update_round
@@ -23,23 +23,20 @@ def build_round_rows(rounds: list[Round]) -> list[dict]:
     rows = []
     for round in rounds:
         row = [
+            # TODO need a refactor to get rid of the html
             {
-                "classes": "govuk-!-width-one-half",
-                "html": render_template(
-                    "partials/link.html",
-                    url=url_for("round_bp.round_details", round_id=round.round_id),
-                    text=f"Apply for {round.fund.title_json['en']}",
-                ),
+                "html": f"""<a class='govuk-link govuk-link--no-visited-state'
+                href='{url_for("round_bp.round_details", round_id=round.round_id)}'>
+                Apply for {round.fund.title_json["en"]}</a>"""  # noqa: E501
             },
-            {"classes": "govuk-!-width-one-third", "html": round.fund.title_json["en"]},
-            {"html": round.title_json["en"]},
+            {"text": round.fund.title_json["en"]},
+            {"classes": "govuk-!-width-one-quarter", "text": round.title_json["en"]},
             {
-                "classes": "govuk-!-text-align-right govuk-!-width-one-quarter",
-                "html": render_template(
-                    "partials/link.html",
-                    url=url_for("application_bp.build_application", round_id=round.round_id),
-                    text="Build application",
-                ),
+                "classes": "govuk-!-text-align-right fab-nowrap",
+                "html": f"""
+                <a class='govuk-link govuk-link--no-visited-state' href='{
+                    url_for("application_bp.build_application", round_id=round.round_id)
+                }'>Build application</a>""",
             },
         ]
         rows.append(row)

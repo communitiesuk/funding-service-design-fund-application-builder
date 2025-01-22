@@ -137,7 +137,7 @@ def test_view_all_funds(flask_test_client, seed_dynamic_data):
     assert response.status_code == 200
     html = response.data.decode("utf-8")
     # Title component availability check
-    assert '<h1 class="govuk-heading-l govuk-!-margin-bottom-3">' in html, "Heading title component is missing"
+    assert '<h1 class="govuk-heading-l">' in html, "Heading title component is missing"
     assert "Grants" in html, "Heading title is missing"
 
     # Description component availability check

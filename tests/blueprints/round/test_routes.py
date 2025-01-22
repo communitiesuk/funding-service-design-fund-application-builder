@@ -201,7 +201,7 @@ def test_all_applications_page(flask_test_client, seed_dynamic_data):
     html = response.data.decode("utf-8")
 
     # Title component availability check
-    assert '<h1 class="govuk-heading-l govuk-!-margin-bottom-3">' in html, "Heading title component is missing"
+    assert '<h1 class="govuk-heading-l">' in html, "Heading title component is missing"
     assert "Applications" in html, "Heading title is missing"
 
     # Description component availability check
