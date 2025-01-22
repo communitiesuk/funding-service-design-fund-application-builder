@@ -1,47 +1,43 @@
 {% extends "base.html" %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
-{%- from "govuk_frontend_jinja/components/accordion/macro.html" import govukAccordion -%}
-{%- from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList -%}
-{%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
-{% block content %}
-    <div class="govuk-grid-row">
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% set showNavigationBar = True %}
+{% set active_item_identifier = "applications" %}
+
+
+{% block beforeContent %}
+  {{ super() }}
+     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-l">Build Application</h1>
-            <h2 class="govuk-heading-m">{{ fund.short_name }} - {{round.title_json["en"]}} ({{ round.short_name }})</h2>
+            {{ govukBackLink({
+                "text": "Back",
+                "href": url_for("round_bp.view_all_rounds")
+            }) }}
         </div>
     </div>
-    {{ govukButton({
-        "text": "View All Questions",
-        "href": url_for("application_bp.view_all_questions", round_id=round.round_id) ,
-        "classes": "govuk-button--secondary"
-    })
-    }}
-    {{ govukButton({
-        "text": "Create export files for round",
-        "href": url_for("application_bp.create_export_files", round_id=round.round_id) ,
-        "classes": "govuk-button--secondary"
-    })
-    }}
+{% endblock beforeContent %}
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <span class="govuk-caption-l">Apply for {{ fund.title_json["en"] }}</span>
+            <h1 class="govuk-heading-l">Build Application</h1>
+            <p class="govuk-body">Build the application by adding sections and using templates.</p>
+        </div>
+    </div>
     <ul class="app-task-list__items">
-        {{ govukButton({
-            "text": "Add Section",
-            "href": url_for("application_bp.section", round_id=round.round_id),
-            "classes": "govuk-button--secondary"
-        })
-        }}
         {% for section in round.sections %}
         <li class="">
                 <span class="app-task-list__task-name">
                     <h3 class="govuk-heading-m">{{ section.index }}. {{ section.name_in_apply_json["en"] }}</h3>
                 </span>
                 <span class="app-task-list__task-actions">
-                    <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section", round_id=round.round_id, section_id=section.section_id) }}'>Edit</a>&nbsp;
-                    <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.delete_section",round_id=round.round_id, section_id=section.section_id) }}'>Remove</a>&nbsp;
+                    <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section", round_id=round.round_id, section_id=section.section_id) }}'>Edit</a>
+                    <a class="govuk-link--no-visited-state govuk-!-margin-left-2" href='{{ url_for("application_bp.delete_section",round_id=round.round_id, section_id=section.section_id) }}'>Remove</a>
                     {% if section.index > 1 %}
-                        <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.move_section_up_route",round_id=round.round_id, section_id=section.section_id) }}'>Move up</a>&nbsp;
+                        <a class="govuk-link--no-visited-state govuk-!-margin-left-2" href='{{ url_for("application_bp.move_section_up_route",round_id=round.round_id, section_id=section.section_id) }}'>Move up</a>
                     {% endif %}
                     {% if section.index < round.sections | length %}
-                        <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.move_section_down_route",round_id=round.round_id, section_id=section.section_id) }}'> Move down</a>
+                        <a class="govuk-link--no-visited-state govuk-!-margin-left-2" href='{{ url_for("application_bp.move_section_down_route",round_id=round.round_id, section_id=section.section_id) }}'> Move down</a>
                     {% endif %}
                 </span>
                 <ul class="app-task-list__items">
@@ -49,13 +45,12 @@
                         <li class="app-task-list__item task-list__new-design">
                             <span class="app-task-list__task-name">
                                 <h3 class="govuk-body">
-                                    {{ section.index }}.&nbsp;{{ form.section_index }}.&nbsp;{{ form.name_in_apply_json["en"] }}
+                                    {{ form.name_in_apply_json["en"] }}
                                 </h3>
                             </span>
                             <span class="app-task-list__task-actions">
-                                <a class="govuk-link--no-visited-state" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View</a>&nbsp;
-                                <a class="govuk-link--no-visited-state" href='{{ url_for("index_bp.download_form_json", form_id=form.form_id) }}'>Download</a>&nbsp;
-                                <a class="govuk-link--no-visited-state" href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>Preview</a>&nbsp;
+                                <a class="govuk-link--no-visited-state" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions</a>
+                                <a class="govuk-link--no-visited-state govuk-!-margin-left-2" href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>Preview</a>
                             </span>
                         </li>
                     {% endfor %}
@@ -63,4 +58,27 @@
             </li>
         {% endfor %}
     </ul>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {{ govukButton({
+                "text": "Add Section",
+                "href": url_for("application_bp.section", round_id=round.round_id),
+                "classes": "govuk-button--secondary"
+            })
+            }}
+        </div>
+        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+            <p class="govuk-body">
+                <a class="govuk-link" href="{{ url_for('application_bp.view_all_questions', round_id=round.round_id) }}">View all application questions</a>
+            </p>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-three-quarters">
+            <p class="govuk-body">
+                <a class="govuk-link" href="{{ url_for('application_bp.create_export_files', round_id=round.round_id) }}">Download application ZIP file</a>
+            </p>
+        </div>
+    </div>
+
 {% endblock content %}
