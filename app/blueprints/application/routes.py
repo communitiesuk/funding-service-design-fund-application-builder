@@ -100,7 +100,12 @@ def build_application(round_id):
     """
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
-    return render_template("build_application.html", round=round, fund=fund)
+    back_link = (
+        url_for("round_bp.round_details", round_id=round.round_id)
+        if request.args.get("action") == "application_details"
+        else url_for("round_bp.view_all_rounds")
+    )
+    return render_template("build_application.html", round=round, fund=fund, back_link=back_link)
 
 
 @application_bp.route("/<round_id>/sections/all-questions", methods=["GET"])
