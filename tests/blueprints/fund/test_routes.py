@@ -137,7 +137,7 @@ def test_view_all_funds(flask_test_client, seed_dynamic_data):
     assert response.status_code == 200
     html = response.data.decode("utf-8")
     # Title component availability check
-    assert '<h1 class="govuk-heading-l">' in html, "Heading title component is missing"
+    assert '<h1 class="govuk-heading-l govuk-!-margin-bottom-3">' in html, "Heading title component is missing"
     assert "Grants" in html, "Heading title is missing"
 
     # Description component availability check
@@ -153,9 +153,8 @@ def test_view_all_funds(flask_test_client, seed_dynamic_data):
     assert '<th scope="col" class="govuk-table__header">Description</th>' in html, "Description header missing"
     assert '<th scope="col" class="govuk-table__header">Grant Type</th>' in html, "Grant type header missing"
     assert "New Fund" in html, "Grant name is missing"
-    assert "<a class='govuk-link--no-visited-state'" in html, "Grant view link is missing"
-    assert '<td class="govuk-table__cell">New Fund Description</td>' in html, "Fund Description is missing"
-    assert '<td class="govuk-table__cell">Competitive</td>' in html, "Grant type is missing"
+    assert "New Fund Description" in html, "Fund Description is missing"
+    assert "Competitive" in html, "Grant type is missing"
 
     # fetch test data and check the link to grant details link
     test_fund = seed_dynamic_data["funds"][0]

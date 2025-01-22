@@ -201,7 +201,7 @@ def test_all_applications_page(flask_test_client, seed_dynamic_data):
     html = response.data.decode("utf-8")
 
     # Title component availability check
-    assert '<h1 class="govuk-heading-l">' in html, "Heading title component is missing"
+    assert '<h1 class="govuk-heading-l govuk-!-margin-bottom-3">' in html, "Heading title component is missing"
     assert "Applications" in html, "Heading title is missing"
 
     # Description component availability check
@@ -217,8 +217,11 @@ def test_all_applications_page(flask_test_client, seed_dynamic_data):
         "Application Name header is missing"
     )
     assert '<th scope="col" class="govuk-table__header">Grant</th>' in html, "Grant Name header missing"
-    assert "round the first" in html, "Application name is missing"
+    assert '<th scope="col" class="govuk-table__header">Round</th>' in html, "Grant Name header missing"
+
+    assert "Apply for funding to improve testing" in html, "Application name is missing"
     assert "funding to improve testing" in html, "Grant name and table component is missing"
+    assert "round the first" in html, "Round name and table component is missing"
     assert "Build application" in html, "Build application is not available and table component is missing"
 
 

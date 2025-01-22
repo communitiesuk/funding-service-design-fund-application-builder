@@ -3,46 +3,51 @@
 {% set active_item_identifier = "home" %}
 
 {% block content %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-                <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Creating a new grant application</h1>
-                <p class="govuk-body govuk-!-margin-bottom-5">
-                    Follow the step-by-step instructions to create a new grant application.
-                </p>
-                <ol class="govuk-list govuk-!-margin-bottom-7">
-                    <li>
-                        <p class="govuk-body govuk-!-margin-bottom-0">
-                            <a class="govuk-link govuk-!-font-weight-bold" href="{{ url_for('fund_bp.create_fund') }}">1. Add a new grant</a>
-                        </p>
-                        <p class="govuk-body">
-                            Add a grant's details before creating an application.
-                        </p>
-                    </li>
-                    <li>
-                        <p class="govuk-body govuk-!-margin-bottom-0">
-                            <a class="govuk-link govuk-!-font-weight-bold" href="{{ url_for('round_bp.select_fund') }}">2. Set up a new application</a>
-                        </p>
-                        <p class="govuk-body">
-                            Set up an application with details such as deadlines and the prospectus link.
-                        </p>
-                    </li>
-                    <li>
-                        <p class="govuk-body govuk-!-margin-bottom-0">
-                            <a class="govuk-link govuk-!-font-weight-bold" href="{{ url_for('application_bp.select_fund') }}">3. Design your application</a>
-                        </p>
-                        <p class="govuk-body">
-                            Add questions to your application using templates.
-                        </p>
-                    </li>
-                </ol>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Creating a new grant application</h1>
+            <p class="govuk-body govuk-!-margin-bottom-5">
+                Follow the step-by-step instructions to create a new grant application.
+            </p>
+            <ol class="govuk-list govuk-!-margin-bottom-7">
+                <li>
+                    <p class="govuk-body govuk-!-margin-bottom-0">
+                        <a class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state"
+                           href="{{ url_for('fund_bp.create_fund') }}">1. Add a new grant</a>
+                    </p>
+                    <p class="govuk-body">
+                        Add a grant's details before creating an application.
+                    </p>
+                </li>
+                <li>
+                    <p class="govuk-body govuk-!-margin-bottom-0">
+                        <a class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state"
+                           href="{{ url_for('round_bp.select_fund') }}">2. Set up a new application</a>
+                    </p>
+                    <p class="govuk-body">
+                        Set up an application with details such as deadlines and the prospectus link.
+                    </p>
+                </li>
+                <li>
+                    <p class="govuk-body govuk-!-margin-bottom-0">
+                        <a class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state"
+                           href="{{ url_for('application_bp.select_fund') }}">3. Design your application</a>
+                    </p>
+                    <p class="govuk-body">
+                        Add questions to your application using templates.
+                    </p>
+                </li>
+            </ol>
 
-                <h2 class="govuk-heading-m">How to use templates</h2>
-                <p class="govuk-body">
-                    Use existing templates for standard application questions, or create a new template for specific grant questions if needed.
-                </p>
-                <p class="govuk-body">
-                    <a class="govuk-link" href="{{ url_for('template_bp.view_templates') }}">View and create templates</a>
-                </p>
-            </div>
+            <h2 class="govuk-heading-m">How to use templates</h2>
+            <p class="govuk-body">
+                Use existing templates for standard application questions, or create a new template for specific grant
+                questions if needed.
+            </p>
+            <p class="govuk-body">
+                <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('template_bp.view_templates') }}">View
+                    and create templates</a>
+            </p>
         </div>
+    </div>
 {% endblock content %}

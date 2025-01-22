@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 
-from flask import url_for
+from flask import render_template, url_for
 
 from app.db.models.round import Round
 from app.db.queries.round import add_round, update_round
@@ -24,17 +24,22 @@ def build_round_rows(rounds: list[Round]) -> list[dict]:
     for round in rounds:
         row = [
             {
-                "html": f"""<a class='govuk-link--no-visited-state'
-                href='{url_for("round_bp.round_details", round_id=round.round_id)}'>
-                {round.title_json["en"]}</a>"""  # noqa: E501
+                "classes": "govuk-!-width-one-half",
+                "html": render_template(
+                    "partials/link.html",
+                    url=url_for("round_bp.round_details", round_id=round.round_id),
+                    text=f"Apply for {round.fund.title_json['en']}",
+                ),
             },
-            {"html": f"""{round.fund.title_json["en"]}"""},
+            {"classes": "govuk-!-width-one-third", "html": round.fund.title_json["en"]},
+            {"html": round.title_json["en"]},
             {
-                "classes": "govuk-!-text-align-right",
-                "html": f"""
-                <a class='govuk-link--no-visited-state govuk-!-text-align-right' href='{
-                    url_for("application_bp.build_application", round_id=round.round_id)
-                }'>Build application</a>""",
+                "classes": "govuk-!-text-align-right govuk-!-width-one-quarter",
+                "html": render_template(
+                    "partials/link.html",
+                    url=url_for("application_bp.build_application", round_id=round.round_id),
+                    text="Build application",
+                ),
             },
         ]
         rows.append(row)

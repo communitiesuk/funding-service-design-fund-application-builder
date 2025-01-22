@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% set showNavigationBar = True %}
+{% set active_item_identifier = "templates" %}
+
+{% from "macros/wtfToGovUk.html" import input %}
+{%- from "govuk_frontend_jinja/components/file-upload/macro.html" import govukFileUpload -%}
+{%- from "macros/tablePagination.html" import govukTablePagination -%}
+{%- from "govuk_frontend_jinja/components/details/macro.html" import govukDetails -%}
+{%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+
+
+{% block content %}
+<h1 class="govuk-heading-l govuk-!-margin-bottom-3">Templates</h1>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+        <p class="govuk-body">
+            View existing templates or upload a new template you have created using
+            <br>
+            <a class="govuk-link govuk-link--no-visited-state"
+               target="_blank"
+               href="{{ form_designer_url }}">Form Designer (opens in a new tab)</a>.
+        </p>
+    </div>
+</div>
+<div class="govuk-grid-row">
+    {% set detailsHTML %}
+    <p class="govuk-body">You should use existing templates for standard application questions. For example, all
+        grant applications should collect organisation and risk information in the same way.</p>
+    <p class="govuk-body">If your application needs questions specific to the grant, you can create a new template
+        by:</p>
+    <ol>
+        <li>designing the template in Form Designer</li>
+        <li>downloading the template</li>
+        <li>uploading the template to Fund application builder</li>
+    </ol>
+    {% endset %}
+    <div class="govuk-grid-column-three-quarters">
+        {{ govukDetails({
+                "summaryText": "Creating new templates",
+                "html": detailsHTML
+            }) }}
+    </div>
+    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+        {{ govukButton({
+                "text": "Upload template",
+                "href": url_for('template_bp.create_template')
+            }) }}
+    </div>
+</div>
+{{ govukTablePagination({
+        "table_pagination_page": table_pagination_page
+    }) }}
+{% endblock %}
