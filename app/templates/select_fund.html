@@ -3,28 +3,41 @@
 {% from "govuk_frontend_jinja/components/select/macro.html" import govukSelect %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
-
+{% block beforeContent %}
+    {{ super() }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ govukBackLink({
+              "text": "Back",
+              "href": url_for("round_bp.view_all_rounds")
+            }) }}
+        </div>
+    </div>
+{% endblock beforeContent %}
 {% block content %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {{ govukBackLink({
-      "text": "Back",
-      "href": back_link
-    }) }}
-    {% if form.errors %}
-      {{ govukErrorSummary(wtforms_errors(form)) }}
-    {% endif %}
-
-    <h1 class="govuk-heading-l">Select a grant</h1>
-    <p class="govuk-body">Select or add a new grant for this application</p>
-
-    <form method="POST">
-      {{ form.csrf_token }}
-      {{ govukSelect({
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {% if form.errors %}
+                {{ govukErrorSummary(wtforms_errors(form)) }}
+            {% endif %}
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">Select a grant</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <form method="POST">
+                {{ form.csrf_token }}
+                {{ govukSelect({
         "id": form.fund_id.id,
         "name": form.fund_id.name,
         "items": select_items,
-        "label": "",
+        "label": {
+            "text": "Select or add a new grant for this application"
+          },
         "errorMessage": {"text": form.fund_id.errors[0]} if form.fund_id.errors else None,
         "classes": "govuk-!-width-one-half",
         "formGroup": {
@@ -32,22 +45,22 @@
         }
       }) }}
 
-      <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-7">
-        <a href="{{ url_for('fund_bp.create_fund') }}" class="govuk-link">Add a new grant</a>
-      </p>
+                <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-7">
+                    <a href="{{ url_for('fund_bp.create_fund') }}" class="govuk-link">Add a new grant</a>
+                </p>
 
-      <div class="govuk-button-group">
-        {{ govukButton({
+                <div class="govuk-button-group">
+                    {{ govukButton({
           "text": "Continue",
           "type": "submit"
         }) }}
-        {{ govukButton({
+                    {{ govukButton({
           "text": "Cancel",
           "href": back_link,
           "classes": "govuk-button--secondary"
         }) }}
-      </div>
-    </form>
-  </div>
-</div>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock content %}
