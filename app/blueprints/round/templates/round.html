@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% set pageHeading %}{{ 'Update a Round' if round_id else 'Create a Round' }}{% endset %}
 
-{% from "macros/wtfToGovUk.html" import input %}
-{% from "macros/wtfToGovUk.html" import multilineinput %}
-{% from "macros/wtfToGovUk.html" import yes_no %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
@@ -20,47 +17,46 @@
         </p>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
-                <form method="POST">
-                    {{ form.hidden_tag()}}
-                    <input type="hidden" name="fund_id" value="{{ fund.fund_id }}" />
-                    {{input(form.title_en)}}
-                    {{input(form.title_cy, classes="welsh-field")}}
-                    {{input(form.short_name)}}
+                <form method="POST" novalidate>
+                    {{form.hidden_tag()}}
+                    {{form.title_en}}
+                    {{form.title_cy(params={"classes": "welsh-field"})}}
+                    {{form.short_name}}
                     {{form.opens()}}
                     {{form.deadline()}}
                     {{form.assessment_start()}}
                     {{form.reminder_date()}}
                     {{form.assessment_deadline()}}
-                    {{input(form.prospectus_link)}}
-                    {{input(form.privacy_notice_link)}}
-                    {{ multilineinput(form.contact_us_banner_en) }}
-                    {{ multilineinput(form.contact_us_banner_cy, classes="welsh-field") }}
-                    {{ yes_no(form.reference_contact_page_over_email) }}
-                    {{ input(form.contact_email) }}
-                    {{ input(form.contact_phone) }}
-                    {{ input(form.contact_textphone) }}
-                    {{ input(form.support_times) }}
-                    {{ input(form.support_days) }}
-                    {{ multilineinput(form.instructions_en) }}
-                    {{ multilineinput(form.instructions_cy, classes="welsh-field") }}
-                    {{input(form.feedback_link)}}
-                    {{ input(form.project_name_field_id) }}
-                    {{ multilineinput(form.application_guidance_en) }}
-                    {{ multilineinput(form.application_guidance_cy, classes="welsh-field") }}
-                    {{ input(form.guidance_url) }}
-                    {{ yes_no(form.application_fields_download_available) }}
-                    {{ yes_no(form.display_logo_on_pdf_exports) }}
-                    {{ yes_no(form.mark_as_complete_enabled) }}
-                    {{ yes_no(form.is_expression_of_interest) }}
-                    {{ yes_no(form.has_feedback_survey) }}
-                    {{ yes_no(form.has_section_feedback) }}
-                    {{ yes_no(form.has_research_survey) }}
-                    {{ yes_no(form.is_feedback_survey_optional) }}
-                    {{ yes_no(form.is_section_feedback_optional) }}
-                    {{ yes_no(form.is_research_survey_optional) }}
-                    {{ yes_no(form.eligibility_config) }}
-                    {{ multilineinput(form.eoi_decision_schema_en) }}
-                    {{ multilineinput(form.eoi_decision_schema_cy, classes="welsh-field") }}
+                    {{form.prospectus_link}}
+                    {{form.privacy_notice_link}}
+                    {{form.contact_us_banner_en }}
+                    {{form.contact_us_banner_cy(params={"classes": "welsh-field"}) }}
+                    {{form.reference_contact_page_over_email}}
+                    {{form.contact_email}}
+                    {{form.contact_phone}}
+                    {{form.contact_textphone}}
+                    {{form.support_times}}
+                    {{form.support_days}}
+                    {{form.instructions_en }}
+                    {{form.instructions_cy(params={"classes":"welsh-field"}) }}
+                    {{form.feedback_link}}
+                    {{form.project_name_field_id}}
+                    {{form.application_guidance_en}}
+                    {{form.application_guidance_cy(params={"classes": "welsh-field"}) }}
+                    {{form.guidance_url}}
+                    {{form.application_fields_download_available}}
+                    {{form.display_logo_on_pdf_exports}}
+                    {{form.mark_as_complete_enabled}}
+                    {{form.is_expression_of_interest}}
+                    {{form.has_feedback_survey}}
+                    {{form.has_section_feedback}}
+                    {{form.has_research_survey}}
+                    {{form.is_feedback_survey_optional}}
+                    {{form.is_section_feedback_optional}}
+                    {{form.is_research_survey_optional}}
+                    {{form.eligibility_config}}
+                    {{form.eoi_decision_schema_en }}
+                    {{form.eoi_decision_schema_cy(params={"classes": "welsh-field"}) }}
                     <div class="govuk-button-group govuk-!-margin-top-6">
                         {{ govukButton({
                             "text": "Save and continue",

@@ -83,8 +83,8 @@ def create_round():
     Create a new round for a chosen fund.
     Expects a ?fund_id=... in the query string, set by the select_fund route or other means.
     """
-    form = RoundForm()
     fund_id = request.args.get("fund_id", None)
+    form = RoundForm(data={"fund_id": fund_id})
     if not fund_id:
         raise ValueError("Fund ID is required to create a round")
     fund = get_fund_by_id(fund_id)
@@ -116,7 +116,7 @@ def edit_round(round_id):
     existing_round = get_round_by_id(round_id)
     if not existing_round:
         raise ValueError(f"Round with ID {round_id} not found")
-    form = RoundForm()
+    form = RoundForm(data={"fund_id": existing_round.fund_id})
     if request.method == "GET":
         form = populate_form_with_round_data(existing_round, RoundForm)
     if form.validate_on_submit():
@@ -154,8 +154,8 @@ def clone_round(round_id):
 
 @round_bp.route("/<round_id>")
 def round_details(round_id):
-    form = RoundForm()
     fund_round = get_round_by_id(round_id)
+    form = RoundForm(data={"fund_id": fund_round.fund_id})
     cloned_form = CloneRoundForm(data={"fund_id": fund_round.fund_id})
     fund_form = FundForm()
     return render_template(
