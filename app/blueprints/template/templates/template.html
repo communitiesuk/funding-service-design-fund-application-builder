@@ -7,18 +7,36 @@
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 {% block beforeContent %}
     {{ super() }}
-    {{ govukBackLink({
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ govukBackLink({
               "text": "Back",
               "href": url_for("template_bp.view_templates")
             }) }}
+        </div>
+    </div>
 {% endblock beforeContent %}
 {% block content %}
-    {% if form.errors %}
-        {{ govukErrorSummary(wtforms_errors(form)) }}
-    {% endif %}
-    <h1 class="govuk-heading-l">Add a new template</h1>
-    <div class="govuk-form-group">
-        <fieldset class="govuk-fieldset">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {% if form.errors %}
+                {{ govukErrorSummary(wtforms_errors(form)) }}
+            {% endif %}
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">
+                {% if template_name %}
+                    {{ template_name }}
+                {% else %}
+                    Add a new template
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
             <form method="POST" enctype="multipart/form-data" novalidate>
                 {{ form.hidden_tag() }}
                 {{ form.template_name() }}
@@ -39,6 +57,6 @@
                     {{ form.save_and_return_home(params={'classes': 'govuk-button--secondary'}) }}
                 </p>
             </form>
-        </fieldset>
+        </div>
     </div>
 {% endblock %}

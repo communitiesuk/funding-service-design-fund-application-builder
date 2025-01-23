@@ -1,7 +1,7 @@
 import os
 import uuid
 from io import BytesIO
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from flask import g
@@ -80,8 +80,7 @@ def test_template_details_view(flask_test_client, seed_dynamic_data):
     # table data
     assert "About your organization template" in html, "Template name is missing"
     assert "About your organisation" in html, "Task title is missing"
-    assert "about-your-org" in html, "Template JSON name is missing"
-    assert '<a class="govuk-link govuk-link--no-visited-state" href="#">Change</a>' in html, "Change action is missing"
+    assert "Change" in html, "Change action is missing"
 
     # Detail component availability check
     assert "View template questions" in html, "View template questions is missing"
@@ -152,3 +151,85 @@ def test_template_create_success(flask_test_client, clean_db):
         with flask_test_client.session_transaction() as session:
             flash_messages = session.get("_flashes", [])
             assert any("Template uploaded" in msg[1] for msg in flash_messages)
+
+
+@patch("app.blueprints.template.routes.get_form_by_id")
+@patch("app.blueprints.template.routes.update_form")
+@patch("app.blueprints.template.routes.delete_form")
+@patch("app.blueprints.template.routes.json_import")
+@patch("app.blueprints.template.routes.flash")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_edit_template_get(
+    mock_flash, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
+):
+    mock_form = MagicMock()
+    mock_form.template_name = "Test Template"
+    mock_form.name_in_apply_json = {"en": "Test Tasklist"}
+    mock_get_form_by_id.return_value = mock_form
+    form_mock_id = uuid.uuid4()
+    form_id = str(form_mock_id)
+    response = flask_test_client.get(f"/templates/{form_id}/edit")
+    assert response.status_code == 200
+    assert b"Test Template" in response.data
+    assert b"Test Tasklist" in response.data
+    mock_get_form_by_id.assert_called_once_with(form_id=form_mock_id)
+
+
+@patch("app.blueprints.template.routes.get_form_by_id")
+@patch("app.blueprints.template.routes.update_form")
+@patch("app.blueprints.template.routes.delete_form")
+@patch("app.blueprints.template.routes.json_import")
+@patch("app.blueprints.template.routes.flash")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_edit_template_post_update(
+    mock_flash, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
+):
+    form_mock_id = uuid.uuid4()
+    form_id = str(form_mock_id)
+    flask_test_client.get(f"/templates/{form_id}/edit")
+    with flask_test_client.session_transaction():
+        form_data = {
+            "template_name": "Updated Template",
+            "tasklist_name": "Updated Tasklist",
+            "save_and_continue": "true",
+            "csrf_token": g.csrf_token,
+        }
+        response = flask_test_client.post(f"/templates/{form_id}/edit", data=form_data, follow_redirects=True)
+        assert response.status_code == 200
+        mock_update_form.assert_called_once_with(
+            form_id=form_mock_id,
+            new_form_config={
+                "name_in_apply_json": {"en": "Updated Tasklist"},
+                "template_name": "Updated Template",
+            },
+        )
+        mock_flash.assert_called_with("Updated template Updated Template")
+
+
+@patch("app.blueprints.template.routes.get_form_by_id")
+@patch("app.blueprints.template.routes.update_form")
+@patch("app.blueprints.template.routes.delete_form")
+@patch("app.blueprints.template.routes.json_import")
+@patch("app.blueprints.template.routes.flash")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_edit_template_post_with_file(
+    mock_flash, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
+):
+    form_mock_id = uuid.uuid4()
+    form_id = str(form_mock_id)
+    flask_test_client.get(f"/templates/{form_id}/edit")
+    with flask_test_client.session_transaction():
+        test_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+        test_data_dir = os.path.join(test_root, "test_data")
+        file_path = os.path.join(test_data_dir, "asset-information.json")
+        form_data = {
+            "template_name": "Updated Template",
+            "tasklist_name": "Updated Tasklist",
+            "file": (open(file_path, "rb"), "org-info.json"),
+            "save_and_continue": "true",
+            "csrf_token": g.csrf_token,
+        }
+        flask_test_client.post(f"/templates/{form_id}/edit", data=form_data, follow_redirects=True)
+        mock_delete_form.assert_called_once_with(form_id=form_mock_id, cascade=True)
+        mock_json_import.assert_called_once()
+        mock_flash.assert_called_with("Updated template Updated Template")

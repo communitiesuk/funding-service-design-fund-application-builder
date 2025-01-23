@@ -24,7 +24,7 @@ from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 def test_add_organisation(flask_test_client, _db, clear_test_data):
     o = Organisation(
         name="test_org_1",
-        short_name=f"X{randint(0,99999)}",
+        short_name=f"X{randint(0, 99999)}",
         logo_uri="http://www.google.com",
         funds=[],
     )
@@ -37,7 +37,7 @@ def test_add_fund(flask_test_client, _db, clear_test_data):
     o = add_organisation(
         Organisation(
             name="test_org_2",
-            short_name=f"X{randint(0,99999)}",
+            short_name=f"X{randint(0, 99999)}",
             logo_uri="http://www.google.com",
             funds=[],
         )
@@ -47,7 +47,7 @@ def test_add_fund(flask_test_client, _db, clear_test_data):
         title_json={"en": "longer hello"},
         description_json={"en": "reeeaaaaallly loooooooog helloooooooooo"},
         welsh_available=False,
-        short_name=f"X{randint(0,99999)}",
+        short_name=f"X{randint(0, 99999)}",
         owner_organisation_id=o.organisation_id,
         funding_type=FundingType.COMPETITIVE,
         ggis_scheme_reference_number="G2-SCH-0000092414",
@@ -80,7 +80,7 @@ def test_add_round(seed_dynamic_data):
             fund_id=seed_dynamic_data["funds"][0].fund_id,
             audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
             title_json={"en": "test title"},
-            short_name=f"Z{randint(0,99999)}",
+            short_name=f"Z{randint(0, 99999)}",
             opens=datetime.now(),
             deadline=datetime.now(),
             assessment_start=datetime.now(),
