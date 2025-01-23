@@ -27,10 +27,10 @@ class TemplateCreateForm(FlaskForm):
     save_and_return_home = SubmitField("Save and return home", widget=GovSubmitInput())
 
 
-class TemplateUpdateFormForm(TemplateCreateForm):
+class TemplateUpdateForm(TemplateCreateForm):
     form_id = HiddenField()
     file = FileField(
-        "Upload a file",
+        "Replace template file",
         description="Supports JSON files only",
         widget=GovFileInput(),
         validators=[

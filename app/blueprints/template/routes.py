@@ -3,7 +3,7 @@ import json
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
 from app.blueprints.index.routes import INDEX_BP_DASHBOARD
-from app.blueprints.template.forms import TemplateCreateForm, TemplateUpdateFormForm
+from app.blueprints.template.forms import TemplateCreateForm, TemplateUpdateForm
 from app.blueprints.template.services import build_rows, json_import
 from app.db.queries.application import (
     delete_form,
@@ -80,21 +80,22 @@ def create_template():
 
 @template_bp.route("/<uuid:form_id>", methods=["GET"])
 def template_details(form_id):
-    form_obj = TemplateUpdateFormForm()
+    form_obj = TemplateUpdateForm()
     form = get_form_by_id(form_id)
     return render_template("template_details.html", form=form, form_obj=form_obj)
 
 
 @template_bp.route("/<uuid:form_id>/edit", methods=["GET", "POST"])
 def edit_template(form_id):
-    form = TemplateUpdateFormForm()
+    form = TemplateUpdateForm()
     params = {"form": form}
+    existing_form = get_form_by_id(form_id=form_id)
     if request.method == "GET":
-        existing_form = get_form_by_id(form_id=form_id)
         form.form_id.data = form_id
         form.template_name.data = existing_form.template_name
         form.tasklist_name.data = existing_form.name_in_apply_json["en"]
         form.file.data = human_to_kebab_case(f"{existing_form.name_in_apply_json['en']}.json")
+        params.update({"template_name": existing_form.template_name})
         return render_template("template.html", **params)
     if form.validate_on_submit():
         update_form(
@@ -122,6 +123,7 @@ def edit_template(form_id):
         if form.save_and_continue.data:
             return redirect(url_for("template_bp.template_details", form_id=form_id))
         return redirect(url_for("index_bp.dashboard"))
+    params.update({"template_name": existing_form.template_name})
     return render_template("template.html", **params)
 
 
