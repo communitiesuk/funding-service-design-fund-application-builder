@@ -409,9 +409,9 @@ def test_generate_config_for_round_valid_input(
     # Compare the contents of the files
 
     # ensure the keys of the output form are in the input form keys
-    assert set(output_form.keys()) - {"name"} <= set(
-        input_form.keys()
-    ), "Output form keys are not a subset of input form keys, ignoring 'name'"
+    assert set(output_form.keys()) - {"name"} <= set(input_form.keys()), (
+        "Output form keys are not a subset of input form keys, ignoring 'name'"
+    )
 
     # check conditions length is equal
     input_condition_count = len(input_form.get("conditions", []))

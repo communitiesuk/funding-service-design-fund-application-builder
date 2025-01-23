@@ -30,7 +30,7 @@
                             "items": [
                                 {
                                 "classes": "govuk-link--no-visited-state",
-                                "href": "#",
+                                "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, _anchor=form_obj.template_name.id),
                                 "text": "Change"
                                 }
                             ]
@@ -43,7 +43,7 @@
                             "items": [
                                 {
                                 "classes": "govuk-link--no-visited-state",
-                                "href": "#",
+                                "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, _anchor=form_obj.tasklist_name.id),
                                 "text": "Change"
                                 }
                             ]
@@ -51,15 +51,15 @@
                     },
                     {
                         "key": {"text": "Template JSON file"},
-                        "value": {"text": form.runner_publish_name},
+                        "value": {"text": "File added"},
                         "actions": {
                             "items": [
                                 {
                                 "classes": "govuk-link--no-visited-state",
-                                "href": "#",
-                                 "text": "Change"
-                                 }
-                            ]
+                                "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, _anchor=form_obj.file.id),
+                                "text": "Change"
+                                }
+                             ]
                         }
                     }
                     ]
