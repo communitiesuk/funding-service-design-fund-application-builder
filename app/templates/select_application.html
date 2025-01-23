@@ -3,31 +3,42 @@
 {% from "govuk_frontend_jinja/components/select/macro.html" import govukSelect %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
-
-
+{% block beforeContent %}
+    {{ super() }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ govukBackLink({
+              "text": "Back",
+              "href": url_for("round_bp.view_all_rounds")
+            }) }}
+        </div>
+    </div>
+{% endblock beforeContent %}
 {% block content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-full">
-    {{ govukBackLink({
-      "text": "Back",
-      "href": url_for("application_bp.select_fund")
-    }) }}
-
-    {% if form.errors %}
-      {{ govukErrorSummary(wtforms_errors(form)) }}
-    {% endif %}
-
-    <span class="govuk-caption-m">{{ fund.short_name + " - " + fund.title_json["en"] }}</span>
-    <h1 class="govuk-heading-l">Select an application</h1>
-    <p class="govuk-body">Select the application you want to manage or create a new one</p>
-
-    <form method="POST">
-      {{ form.csrf_token }}
-      {{ govukSelect({
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {% if form.errors %}
+                {{ govukErrorSummary(wtforms_errors(form)) }}
+            {% endif %}
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <span class="govuk-caption-m">{{ fund.short_name + " - " + fund.title_json["en"] }}</span>
+            <h1 class="govuk-heading-l">Select an application</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <form method="POST">
+                {{ form.csrf_token }}
+                {{ govukSelect({
         "id": form.round_id.id,
         "name": form.round_id.name,
         "items": select_items,
-        "label": "",
+        "label": {
+            "text": "Select the application you want to manage or create a new one"
+          },
         "errorMessage": {"text": form.round_id.errors[0]} if form.round_id.errors else None,
         "classes": "govuk-!-width-one-half",
         "formGroup": {
@@ -35,22 +46,23 @@
         }
       }) }}
 
-      <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-7">
-        <a href="{{ url_for('round_bp.create_round', fund_id=fund.fund_id) }}" class="govuk-link">Add a new application</a>
-      </p>
+                <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-7">
+                    <a href="{{ url_for('round_bp.create_round', fund_id=fund.fund_id) }}" class="govuk-link">Add a new
+                        application</a>
+                </p>
 
-      <div class="govuk-button-group">
-        {{ govukButton({
+                <div class="govuk-button-group">
+                    {{ govukButton({
           "text": "Continue",
           "type": "submit"
         }) }}
-        {{ govukButton({
+                    {{ govukButton({
           "text": "Cancel",
           "href": url_for("index_bp.dashboard"),
           "classes": "govuk-button--secondary"
         }) }}
-      </div>
-    </form>
-  </div>
-</div>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock content %}
