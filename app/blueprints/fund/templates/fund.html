@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 {% set pageHeading %}{{ 'Update a Fund' if fund_id else 'Create a Fund' }} {% endset %}
-{% from "macros/wtfToGovUk.html" import input %}
-{% from "macros/wtfToGovUk.html" import multilineinput %}
-{% from "macros/wtfToGovUk.html" import yes_no %}
-{% from "macros/wtfToGovUk.html" import radios_from_enum %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 {% block content %}
@@ -15,19 +11,19 @@
         <h1 class="govuk-heading-l">{{pageHeading}}</h1>
         <div class="govuk-form-group">
             <fieldset class="govuk-fieldset">
-                <form method="POST">
+                <form method="POST" novalidate>
                     {{ form.hidden_tag()}}
 
-                    {{yes_no(form.welsh_available)}}
-                    {{input(form.name_en)}}
-                    {{input(form.name_cy, classes="welsh-field")}}
-                    {{input(form.title_en)}}
-                    {{input(form.title_cy, classes="welsh-field")}}
-                    {{input(form.short_name)}}
-                    {{multilineinput(form.description_en)}}
-                    {{multilineinput(form.description_cy, classes="welsh-field")}}
-                    {{radios_from_enum(form.funding_type)}}
-                    {{input(form.ggis_scheme_reference_number)}}
+                    {{form.welsh_available(params={"classes": "govuk-radios--inline"})}}
+                    {{form.name_en}}
+                    {{form.name_cy(params={"classes": "welsh-field"})}}
+                    {{form.title_en}}
+                    {{form.title_cy(params={"classes": "welsh-field"})}}
+                    {{form.short_name}}
+                    {{form.description_en}}
+                    {{form.description_cy(params={"classes": "welsh-field"})}}
+                    {{form.funding_type(params={"classes": "govuk-radios--inline"})}}
+                    {{form.ggis_scheme_reference_number}}
                     <div class="govuk-button-group govuk-!-margin-top-6">
                         {{ govukButton({
                             "text": "Save and continue",

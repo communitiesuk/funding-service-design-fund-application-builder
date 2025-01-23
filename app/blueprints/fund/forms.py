@@ -1,6 +1,5 @@
-from enum import Enum
-
 from flask_wtf import FlaskForm
+from govuk_frontend_wtf.wtforms_widgets import GovRadioInput, GovTextArea, GovTextInput
 from wtforms import HiddenField, RadioField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, ValidationError
 
@@ -16,37 +15,27 @@ def validate_unique_fund_short_name(form, field):
             raise ValidationError("Given fund short name already exists.")
 
 
-class GovUkRadioEnumField(RadioField):
-    source_enum: Enum
-    gov_uk_choices: list
-
-    def __init__(self, name: str, _prefix, _translations, label: str, _form, source_enum: Enum):
-        super().__init__(
-            name=name,
-            label=label,
-            _form=_form,
-            _prefix=_prefix,
-            _translations=_translations,
-            choices=[(value.name, value.value) for value in source_enum],
-        )
-        self.source_enum = source_enum
-        self.gov_uk_choices = [
-            {"text": value.get_text_for_display(), "value": value.value} for value in self.source_enum
-        ]
-
-
 class FundForm(FlaskForm):
     fund_id = HiddenField("Fund ID")
-    name_en = StringField("Grant name", validators=[DataRequired()])
-    name_cy = StringField("Grant name (Welsh)")
-    title_en = StringField("Application heading", validators=[DataRequired()])
-    title_cy = StringField("Application heading (Welsh)")
+    name_en = StringField("Grant name", widget=GovTextInput(), validators=[DataRequired()])
+    name_cy = StringField("Grant name (Welsh)", widget=GovTextInput())
+    title_en = StringField("Application heading", widget=GovTextInput(), validators=[DataRequired()])
+    title_cy = StringField("Application heading (Welsh)", widget=GovTextInput())
     short_name = StringField(
         "Short name",
+        widget=GovTextInput(),
         validators=[DataRequired(), Length(max=10), no_spaces_between_letters, validate_unique_fund_short_name],
     )
-    description_en = TextAreaField("Description", validators=[DataRequired()])
-    description_cy = TextAreaField("Description (Welsh)")
-    welsh_available = RadioField("Welsh available", choices=[("true", "Yes"), ("false", "No")], default="false")
-    funding_type = GovUkRadioEnumField(label="Funding type", source_enum=FundingType)
-    ggis_scheme_reference_number = StringField("GGIS scheme reference number", validators=[Length(max=255)])
+    description_en = TextAreaField("Description", widget=GovTextArea(), validators=[DataRequired()])
+    description_cy = TextAreaField("Description (Welsh)", widget=GovTextArea())
+    welsh_available = RadioField(
+        "Welsh available", widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
+    funding_type = RadioField(
+        label="Funding type",
+        widget=GovRadioInput(),
+        choices=[(value.value, value.get_text_for_display()) for value in FundingType],
+    )
+    ggis_scheme_reference_number = StringField(
+        "GGIS scheme reference number", widget=GovTextInput(), validators=[Length(max=255)]
+    )
