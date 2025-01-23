@@ -13,15 +13,15 @@ def build_rows(forms: list[Form]) -> list[dict]:
     rows = []
     for form in forms:
         row = [
-            # TODO move this html to template and use namespace functionality
+            # TODO need a refactor to get rid of the html
             {
-                "html": "<a class='govuk-link--no-visited-state' "
+                "html": "<a class='govuk-link govuk-link--no-visited-state' "
                 f"href='{url_for('template_bp.template_details', form_id=form.form_id)}'>{form.template_name}</a>"
             },
-            {"text": form.name_in_apply_json["en"]},
+            {"classes": "govuk-!-width-one-third", "text": form.name_in_apply_json["en"]},
             {
-                "classes": "govuk-!-text-align-right",
-                "html": "<a class='govuk-link--no-visited-state' href='"
+                "classes": "govuk-!-text-align-right fab-nowrap",
+                "html": "<a class='govuk-link govuk-link--no-visited-state' href='"
                 f"{url_for('template_bp.edit_template', form_id=form.form_id)}'>Edit details</a>",
             },
         ]

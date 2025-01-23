@@ -23,16 +23,18 @@ def build_round_rows(rounds: list[Round]) -> list[dict]:
     rows = []
     for round in rounds:
         row = [
+            # TODO need a refactor to get rid of the html
             {
-                "html": f"""<a class='govuk-link--no-visited-state'
+                "html": f"""<a class='govuk-link govuk-link--no-visited-state'
                 href='{url_for("round_bp.round_details", round_id=round.round_id)}'>
-                {round.title_json["en"]}</a>"""  # noqa: E501
+                Apply for {round.fund.title_json["en"]}</a>"""  # noqa: E501
             },
-            {"html": f"""{round.fund.title_json["en"]}"""},
+            {"text": round.fund.title_json["en"]},
+            {"classes": "govuk-!-width-one-quarter", "text": round.title_json["en"]},
             {
-                "classes": "govuk-!-text-align-right",
+                "classes": "govuk-!-text-align-right fab-nowrap",
                 "html": f"""
-                <a class='govuk-link--no-visited-state govuk-!-text-align-right' href='{
+                <a class='govuk-link govuk-link--no-visited-state' href='{
                     url_for("application_bp.build_application", round_id=round.round_id)
                 }'>Build application</a>""",
             },

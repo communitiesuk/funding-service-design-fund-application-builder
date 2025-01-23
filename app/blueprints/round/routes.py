@@ -40,7 +40,7 @@ def view_all_rounds():
     Renders a list of rounds in the application page
     """
     params = GovUKTableAndPagination(
-        table_header=[{"text": "Application name"}, {"text": "Grant"}, {"text": ""}],
+        table_header=[{"text": "Application name"}, {"text": "Grant"}, {"text": "Round"}, {"text": ""}],
         table_rows=build_round_rows(get_all_rounds()),
         current_page=int(request.args.get("page", 1)),
     ).__dict__

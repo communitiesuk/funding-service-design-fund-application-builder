@@ -38,7 +38,7 @@ def view_templates():
         current_page=int(request.args.get("page", 1)),
     ).__dict__
 
-    return render_template("view_templates.html", **params, form_designer_url=form_designer_url)
+    return render_template("view_all_templates.html", **params, form_designer_url=form_designer_url)
 
 
 @template_bp.route("/create", methods=["GET", "POST"])
