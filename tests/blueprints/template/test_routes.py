@@ -233,3 +233,19 @@ def test_edit_template_post_with_file(
         mock_delete_form.assert_called_once_with(form_id=form_mock_id, cascade=True)
         mock_json_import.assert_called_once()
         mock_flash.assert_called_with("Updated template Updated Template")
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
+def test_template_questions_view(flask_test_client, seed_dynamic_data):
+    form: Form = seed_dynamic_data["forms"][0]
+
+    response = flask_test_client.get(
+        f"/templates/{form.form_id}/questions",
+    )
+
+    assert response.status_code == 200
+    html = response.data.decode("utf-8")
+
+    # Title component availability check
+    assert "About your organization template" in html, "Template title is missing"
+    assert "This template contains the following questions." in html, "Title description is missing"

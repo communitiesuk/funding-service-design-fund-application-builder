@@ -4,14 +4,17 @@
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {% set showNavigationBar = True %}
 {% set active_item_identifier = "templates" %}
-{% block content %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{ govukBackLink({
+{% block beforeContent %}
+    {{ super() }}
+    {{ govukBackLink({
               "text": "Back",
               "href": url_for("template_bp.view_templates")
             }) }}
-            <h2 class="govuk-heading-l govuk-!-margin-bottom-2">{{ form.template_name }}</h2>
+{% endblock beforeContent %}
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l govuk-!-margin-bottom-2">{{ form.template_name }}</h1>
             <p class="govuk-body govuk-!-margin-bottom-7">
                 <a class='govuk-link govuk-link--no-visited-state'
                    target="_blank"
@@ -64,10 +67,19 @@
                     }
                     ]
             }) }}
-            <p class="govuk-body govuk-!-margin-top-8">
+            <p class="govuk-body govuk-!-margin-top-2">
                 <a class='govuk-link govuk-link--no-visited-state'
-                   href='#'>View template questions</a>
+                   href='{{ url_for("template_bp.template_questions", form_id=form.form_id) }}'>
+                    View template questions
+                </a>
             </p>
+            <div class="govuk-body govuk-!-margin-top-8">
+                {{ govukButton({
+                  "text": "Delete template ",
+                  "classes": "govuk-button--warning",
+                  "href": url_for("template_bp.delete_template", form_id=form.form_id)
+                }) }}
+            </div>
         </div>
     </div>
 {% endblock content %}
