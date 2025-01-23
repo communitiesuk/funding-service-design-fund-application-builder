@@ -78,6 +78,12 @@ def create_template():
     return render_template("template.html", **params)
 
 
+@template_bp.route("/<uuid:form_id>/questions", methods=["GET"])
+def template_questions(form_id):
+    form = get_form_by_id(form_id)
+    return render_template("view_template_questions.html", form=form)
+
+
 @template_bp.route("/<uuid:form_id>", methods=["GET"])
 def template_details(form_id):
     form_obj = TemplateUpdateForm()
