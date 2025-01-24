@@ -1,0 +1,31 @@
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+
+{% extends "base.html" %}
+{% set showNavigationBar = True %}
+{% set active_item_identifier = "templates" %}
+{% block beforeContent %}
+    {{ super() }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ govukBackLink({
+              "text": "Back",
+              "href":  url_for("template_bp.template_details", form_id=form.form_id)
+            }) }}
+        </div>
+    </div>
+{% endblock beforeContent %}
+{% block content %}
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">{{ form.template_name }}</h1>
+        <p class="govuk-body">This template contains the following questions.</p>
+    </div>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {% autoescape on %}
+        {{ question_html | safe }}
+        {% endautoescape %}
+    </div>
+</div>
+{% endblock %}

@@ -4,22 +4,32 @@
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {% set showNavigationBar = True %}
 {% set active_item_identifier = "templates" %}
-{% block content %}
+{% block beforeContent %}
+    {{ super() }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             {{ govukBackLink({
               "text": "Back",
-              "href": url_for("template_bp.view_templates")
+              "href":  url_for("template_bp.view_templates")
             }) }}
-            <h2 class="govuk-heading-l govuk-!-margin-bottom-2">{{ form.template_name }}</h2>
-            <p class="govuk-body govuk-!-margin-bottom-7">
+        </div>
+    </div>
+{% endblock beforeContent %}
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">{{ form.template_name }}</h1>
+            <p class="govuk-body">
                 <a class='govuk-link govuk-link--no-visited-state'
                    target="_blank"
                    href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
                     Preview template (opens in a new tab)
                 </a>
             </p>
-
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
             {{ govukSummaryList({
                 "classes": "govuk-!-margin-bottom-1",
                 "rows": [
@@ -64,10 +74,25 @@
                     }
                     ]
             }) }}
-            <p class="govuk-body govuk-!-margin-top-8">
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <p class="govuk-body">
                 <a class='govuk-link govuk-link--no-visited-state'
-                   href='#'>View template questions</a>
+                   href='{{ url_for("template_bp.template_questions", form_id=form.form_id) }}'>
+                    View template questions
+                </a>
             </p>
+        </div>
+    </div>
+    <div class="govuk-grid-row govuk-!-margin-top-8">
+        <div class="govuk-grid-column-full">
+            {{ govukButton({
+                  "text": "Delete template ",
+                  "classes": "govuk-button--warning",
+                  "href": url_for("template_bp.delete_template", form_id=form.form_id)
+                }) }}
         </div>
     </div>
 {% endblock content %}

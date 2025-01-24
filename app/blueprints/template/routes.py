@@ -2,6 +2,7 @@ import json
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
+from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.index.routes import INDEX_BP_DASHBOARD
 from app.blueprints.template.forms import TemplateCreateForm, TemplateUpdateForm
 from app.blueprints.template.services import build_rows, json_import
@@ -12,6 +13,8 @@ from app.db.queries.application import (
     get_form_by_template_name,
     update_form,
 )
+from app.export_config.generate_all_questions import print_html
+from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import human_to_kebab_case
 from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
@@ -76,6 +79,23 @@ def create_template():
                 return render_template("template.html", **params)
         return redirect(url_for("template_bp.view_templates"))
     return render_template("template.html", **params)
+
+
+@template_bp.route("/<uuid:form_id>/questions", methods=["GET"])
+def template_questions(form_id):
+    form = get_form_by_id(form_id)
+    section_data = [
+        {
+            "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
+            "forms": [{"name": form.runner_publish_name, "form_data": build_form_json(form)}],
+        }
+    ]
+    print_data = generate_print_data_for_sections(
+        section_data,
+        lang="en",
+    )
+    html = print_html(print_data, False, False, False)
+    return render_template("view_template_questions.html", question_html=html, form=form)
 
 
 @template_bp.route("/<uuid:form_id>", methods=["GET"])
