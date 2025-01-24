@@ -91,7 +91,9 @@ def create_round():
     if form.validate_on_submit():
         new_round = create_new_round(form)
         flash_message(
-            message="New application created successfully", href="#", href_display_name=new_round.title_json["en"]
+            message="New application created",
+            href=url_for("round_bp.round_details", round_id=new_round.round_id),
+            href_display_name=new_round.title_json["en"],
         )
         match request.args.get("action") or request.form.get("action"):
             case "return_home":
