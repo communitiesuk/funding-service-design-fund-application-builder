@@ -55,7 +55,7 @@ def select_fund():
     form = SelectFundForm()
     choices = [("", "Select a grant")]
     for fund in get_all_funds():
-        choices.append((str(fund.fund_id), fund.short_name + " - " + fund.title_json["en"]))
+        choices.append((str(fund.fund_id), fund.short_name + " - " + fund.name_json["en"]))
     form.fund_id.choices = choices
     if form.validate_on_submit():
         return redirect(
