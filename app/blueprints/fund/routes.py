@@ -164,7 +164,13 @@ def edit_fund(fund_id):
         update_fund(fund)
 
         if form.save_and_return_home.data:
+            flash_message(
+                message="Grant updated",
+                href=url_for(FUND_DETAILS_ROUTE, fund_id=fund.fund_id),
+                href_display_name=form.name_en.data,
+            )
             return redirect(url_for(INDEX_BP_DASHBOARD))
+        flash_message(message="Grant updated")
         return redirect(prev_nav_url)
 
     params.update({"fund_id": fund_id, "form": form, "prev_nav_url": prev_nav_url})

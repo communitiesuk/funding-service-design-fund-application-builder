@@ -4,8 +4,8 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 {% block beforeContent %}
-  {{ super() }}
-     <div class="govuk-grid-row">
+    {{ super() }}
+    <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             {{ govukBackLink({
               "text": "Back",
@@ -15,45 +15,52 @@
     </div>
 {% endblock beforeContent %}
 {% block content %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {% if form.errors %}
-          {{ govukErrorSummary(wtforms_errors(form)) }}
-        {% endif %}
-        <h1 class="govuk-heading-l">{{pageHeading}}</h1>
-        <div class="govuk-form-group">
-            <fieldset class="govuk-fieldset">
-                <form method="POST" novalidate>
-                    {{ form.hidden_tag()}}
-                    {{ form.welsh_available(params={'classes':'govuk-radios--inline'} ) }}
-                    {{ form.name_en }}
-                    {{ form.name_cy(params= {"classes": "welsh-field"}) }}
-                    {{ form.short_name }}
-                    {{ form.title_en(params={"prefix": {'text':'Apply for'} }) }}
-                    {{ form.title_cy(params={"prefix": {'text':'Gwnewch gais am'}, 'classes': 'welsh-field'}) }}
-                    {{ form.description_en }}
-                    {{ form.description_cy(params= {"classes": "welsh-field"}) }}
-                    {{ form.funding_type(params={'classes':'govuk-radios--inline'}) }}
-                    {{ form.ggis_scheme_reference_number }}
-                    <div class="govuk-button-group govuk-!-margin-top-6">
-                        {{ form.save_and_continue() }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {% if form.errors %}
+                {{ govukErrorSummary(wtforms_errors(form)) }}
+            {% endif %}
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-form-group">
+                <fieldset class="govuk-fieldset">
+                    <form method="POST" novalidate>
+                        {{ form.hidden_tag() }}
+                        {{ form.welsh_available(params={'classes':'govuk-radios--inline'} ) }}
+                        {{ form.name_en }}
+                        {{ form.name_cy(params= {"classes": "welsh-field"}) }}
+                        {{ form.short_name }}
+                        {{ form.title_en(params={"prefix": {'text':'Apply for'} }) }}
+                        {{ form.title_cy(params={"prefix": {'text':'Gwnewch gais am'}, 'classes': 'welsh-field'}) }}
+                        {{ form.description_en }}
+                        {{ form.description_cy(params= {"classes": "welsh-field"}) }}
+                        {{ form.funding_type(params={'classes':'govuk-radios--inline'}) }}
+                        {{ form.ggis_scheme_reference_number }}
+                        <div class="govuk-button-group govuk-!-margin-top-6">
+                            {{ form.save_and_continue() }}
 
-                        {{ govukButton({
+                            {{ govukButton({
                             "text": "Cancel",
                             "classes": "govuk-button govuk-button--secondary",
                             "href": prev_nav_url
                         }) }}
-                    </div>
+                        </div>
 
-                    <p class="govuk-body">
-                    {{ form.save_and_return_home(params={'classes': 'govuk-button govuk-button--secondary'}) }}
-                    </p>
-                </form>
-            </fieldset>
+                        <p class="govuk-body">
+                            {{ form.save_and_return_home(params={'classes': 'govuk-button govuk-button--secondary'}) }}
+                        </p>
+                    </form>
+                </fieldset>
+            </div>
         </div>
     </div>
-</div>
-
-<div id="fund-config" data-dashboard-url="{{ url_for('index_bp.dashboard') }}"></div>
-<script src="{{ url_for('static', filename='js/create_edit_fund.js') }}"></script>
+    <div id="fund-config" data-dashboard-url="{{ url_for('index_bp.dashboard') }}"></div>
+    <script src="{{ url_for('static', filename='js/create_edit_fund.js') }}"></script>
 {% endblock content %}
