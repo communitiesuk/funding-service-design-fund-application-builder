@@ -12,7 +12,7 @@ from app.blueprints.fund.forms import FundForm
 from app.blueprints.fund.services import build_fund_rows
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
-from app.shared.helpers import all_funds_as_govuk_select_items, flash_message
+from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -41,24 +41,6 @@ def view_all_funds():
         current_page=int(request.args.get("page", 1)),
     ).__dict__
     return render_template("view_all_funds.html", **params)
-
-
-@fund_bp.route("/view", methods=["GET", "POST"])
-def view_fund():
-    """
-    Renders a template providing a drop down list of funds. If a fund is selected, renders its config info
-    """
-    params = {"all_funds": all_funds_as_govuk_select_items(get_all_funds())}
-    fund = None
-    if request.method == "POST":
-        fund_id = request.form.get("fund_id")
-    else:
-        fund_id = request.args.get("fund_id")
-    if fund_id:
-        fund = get_fund_by_id(fund_id)
-        params["fund"] = fund
-        params["selected_fund_id"] = fund_id
-    return render_template("fund_config.html", **params)
 
 
 @fund_bp.route("/<uuid:fund_id>", methods=["GET"])
