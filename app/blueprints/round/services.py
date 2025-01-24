@@ -29,7 +29,7 @@ def build_round_rows(rounds: list[Round]) -> list[dict]:
                 href='{url_for("round_bp.round_details", round_id=round.round_id)}'>
                 Apply for {round.fund.title_json["en"]}</a>"""  # noqa: E501
             },
-            {"text": round.fund.title_json["en"]},
+            {"text": round.fund.name_json["en"]},
             {"classes": "govuk-!-width-one-quarter", "text": round.title_json["en"]},
             {
                 "classes": "govuk-!-text-align-right fab-nowrap",
