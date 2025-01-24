@@ -40,7 +40,7 @@
                             "items": [
                                 {
                                 "classes": "govuk-link--no-visited-state",
-                                "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, _anchor=form_obj.template_name.id),
+                                "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, actions='template_details', _anchor=form_obj.template_name.id),
                                 "text": "Change"
                                 }
                             ]
@@ -53,7 +53,7 @@
                             "items": [
                                 {
                                 "classes": "govuk-link--no-visited-state",
-                                "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, _anchor=form_obj.tasklist_name.id),
+                                "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, actions='template_details', _anchor=form_obj.tasklist_name.id),
                                 "text": "Change"
                                 }
                             ]
@@ -66,7 +66,7 @@
                             "items": [
                                 {
                                 "classes": "govuk-link--no-visited-state",
-                                "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, _anchor=form_obj.file.id),
+                                "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, actions='template_details', _anchor=form_obj.file.id),
                                 "text": "Change"
                                 }
                              ]

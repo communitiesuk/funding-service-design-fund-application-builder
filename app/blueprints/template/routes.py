@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, redirect, render_template, request, url_for
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.index.routes import INDEX_BP_DASHBOARD
@@ -25,6 +25,8 @@ template_bp = Blueprint(
     url_prefix="/templates",
     template_folder="templates",
 )
+
+TEMPLATE_TABLE = "template_table"
 
 
 @template_bp.route("", methods=["GET"])
@@ -116,9 +118,11 @@ def edit_template(form_id):
         form.tasklist_name.data = existing_form.name_in_apply_json["en"]
         form.file.data = human_to_kebab_case(f"{existing_form.name_in_apply_json['en']}.json")
         params.update({"template_name": existing_form.template_name})
+        if request.args.get("actions"):
+            params.update({"actions": request.args.get("actions")})
         return render_template("template.html", **params)
     if form.validate_on_submit():
-        update_form(
+        updated_form = update_form(
             form_id=form_id,
             new_form_config={
                 "name_in_apply_json": {"en": form.tasklist_name.data},
@@ -135,16 +139,29 @@ def edit_template(form_id):
                 template_name=form.template_name.data,
                 filename=human_to_kebab_case(f"{form.tasklist_name.data}.json"),
             )
-            flash(f"Updated template {form.template_name.data}")
-            if form.save_and_continue.data:
-                return redirect(url_for("template_bp.template_details", form_id=created_form.form_id))
-            return redirect(url_for("index_bp.dashboard"))
-        flash(f"Updated template {form.template_name.data}")
-        if form.save_and_continue.data:
-            return redirect(url_for("template_bp.template_details", form_id=form_id))
-        return redirect(url_for("index_bp.dashboard"))
+            return _save_and_return(created_form, form)
+        return _save_and_return(updated_form, form)
     params.update({"template_name": existing_form.template_name})
     return render_template("template.html", **params)
+
+
+def _save_and_return(updated_form, form):
+    if form.save_and_continue.data:
+        if request.args.get("actions") == TEMPLATE_TABLE:
+            flash_message(
+                message="Template updated",
+                href=url_for("template_bp.template_details", form_id=updated_form.form_id),
+                href_display_name=updated_form.template_name,
+            )
+            return redirect(url_for("template_bp.view_templates"))
+        flash_message("Template updated")
+        return redirect(url_for("template_bp.template_details", form_id=updated_form.form_id))
+    flash_message(
+        message="Template updated",
+        href=url_for("template_bp.template_details", form_id=updated_form.form_id),
+        href_display_name=updated_form.template_name,
+    )
+    return redirect(url_for("index_bp.dashboard"))
 
 
 @template_bp.route("/<form_id>/delete", methods=["GET"])

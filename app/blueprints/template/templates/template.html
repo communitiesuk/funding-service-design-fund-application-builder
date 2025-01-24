@@ -49,7 +49,7 @@
                     {{ govukButton({
                             "text": "Cancel",
                             "classes": "govuk-button--secondary",
-                            "href": url_for("template_bp.view_templates")
+                            "href": url_for("template_bp.template_details", form_id=form.form_id.data) if actions=='template_details' else url_for("template_bp.view_templates")
                         }) }}
                 </div>
 

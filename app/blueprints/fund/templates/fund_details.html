@@ -3,15 +3,26 @@
 {%- from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList -%}
 {% set showNavigationBar = True %}
 {% set active_item_identifier = "grants" %}
-{% block content %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {{ govukBackLink({
+{% block beforeContent %}
+    {{ super() }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ govukBackLink({
           "text": "Back",
           "href": url_for("fund_bp.view_all_funds")
         }) }}
-        <h2 class="govuk-heading-l">{{ fund.name_json["en"] }}</h2>
-        {{ govukSummaryList({
+        </div>
+    </div>
+{% endblock beforeContent %}
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l">{{ fund.name_json["en"] }}</h1>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ govukSummaryList({
             "classes": "govuk-!-margin-bottom-9",
                 "rows": [
                     {
@@ -156,6 +167,6 @@
                     },
                 ]
         }) }}
+        </div>
     </div>
-</div>
 {% endblock content %}

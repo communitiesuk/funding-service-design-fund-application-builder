@@ -22,7 +22,7 @@ def build_rows(forms: list[Form]) -> list[dict]:
             {
                 "classes": "govuk-!-text-align-right fab-nowrap",
                 "html": "<a class='govuk-link govuk-link--no-visited-state' href='"
-                f"{url_for('template_bp.edit_template', form_id=form.form_id)}'>Edit details</a>",
+                f"{url_for('template_bp.edit_template', form_id=form.form_id, actions='template_table')}'>Edit details</a>",  # noqa: E501
             },
         ]
         rows.append(row)
