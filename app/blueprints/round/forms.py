@@ -2,6 +2,7 @@ import json
 import re
 
 from flask_wtf import FlaskForm, Form
+from govuk_frontend_wtf.wtforms_widgets import GovRadioInput, GovTextArea, GovTextInput
 from wtforms import HiddenField, RadioField, StringField, TextAreaField, URLField
 from wtforms.fields.datetime import DateTimeField
 from wtforms.validators import DataRequired, Length, ValidationError
@@ -111,11 +112,12 @@ class RoundForm(FlaskForm):
     JSON_FIELD_HINT = "Valid json format, using double quotes, lowercase true/false"
 
     round_id = HiddenField("Round ID")
-    fund_id = StringField("Fund", validators=[DataRequired()])
-    title_en = StringField("Title (English)", validators=[DataRequired()])
-    title_cy = StringField("Title (Welsh)")
+    fund_id = HiddenField("Fund", validators=[DataRequired()])
+    title_en = StringField("Title", widget=GovTextInput(), validators=[DataRequired()])
+    title_cy = StringField("Title (Welsh)", widget=GovTextInput())
     short_name = StringField(
         "Short name",
+        widget=GovTextInput(),
         description="Choose a unique short name with 6 or fewer characters",
         validators=[DataRequired(), Length(max=6), no_spaces_between_letters, validate_unique_round_short_name],
     )
@@ -149,63 +151,99 @@ class RoundForm(FlaskForm):
         format="%d %m %Y %H %M",
         validators=[DataRequired(message="Enter a valid date and time")],
     )
-    prospectus_link = URLField("Prospectus link", validators=[DataRequired(), validate_flexible_url])
-    privacy_notice_link = URLField("Privacy notice link", validators=[DataRequired(), validate_flexible_url])
-    application_reminder_sent = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
+    prospectus_link = URLField(
+        "Prospectus link", widget=GovTextInput(), validators=[DataRequired(), validate_flexible_url]
+    )
+    privacy_notice_link = URLField(
+        "Privacy notice link", widget=GovTextInput(), validators=[DataRequired(), validate_flexible_url]
+    )
+    application_reminder_sent = RadioField(
+        widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
     contact_us_banner_en = TextAreaField(
-        "Contact Us banner (English)", description="HTML to display to override the default 'Contact Us' page content"
+        "Contact Us banner",
+        widget=GovTextArea(),
+        description="HTML to display to override the default 'Contact Us' page content",
     )
-    contact_us_banner_cy = TextAreaField("Contact Us banner (Welsh)")
+    contact_us_banner_cy = TextAreaField("Contact Us banner (Welsh)", widget=GovTextArea())
     reference_contact_page_over_email = RadioField(
-        "Reference contact page over email", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Reference contact page over email",
+        widget=GovRadioInput(),
+        choices=[("true", "Yes"), ("false", "No")],
+        default="false",
     )
-    contact_email = StringField("Grant team email address")
-    contact_phone = StringField("Grant team phone number")
-    contact_textphone = StringField("Grant team text phone number")
-    support_times = StringField("Support times for applicants", validators=[DataRequired()])
-    support_days = StringField("Support days", validators=[DataRequired()])
-    instructions_en = TextAreaField("Instructions (English)")
-    instructions_cy = StringField("Instructions (Welsh)")
-    feedback_link = URLField("Feedback link", validators=[validate_flexible_url])
-    project_name_field_id = StringField("Project name field ID", validators=[DataRequired()])
-    application_guidance_en = TextAreaField("Application guidance (English)")
-    application_guidance_cy = TextAreaField("Application guidance (Welsh)")
-    guidance_url = URLField("Guidance link", validators=[validate_flexible_url])
-    all_uploaded_documents_section_available = RadioField(choices=[("true", "Yes"), ("false", "No")], default="false")
+    contact_email = StringField("Grant team email address", widget=GovTextInput())
+    contact_phone = StringField("Grant team phone number", widget=GovTextInput())
+    contact_textphone = StringField("Grant team text phone number", widget=GovTextInput())
+    support_times = StringField("Support times for applicants", widget=GovTextInput(), validators=[DataRequired()])
+    support_days = StringField("Support days", widget=GovTextInput(), validators=[DataRequired()])
+    instructions_en = TextAreaField("Instructions", widget=GovTextArea())
+    instructions_cy = StringField("Instructions (Welsh)", widget=GovTextInput())
+    feedback_link = URLField("Feedback link", widget=GovTextInput(), validators=[validate_flexible_url])
+    project_name_field_id = StringField("Project name field ID", widget=GovTextInput(), validators=[DataRequired()])
+    application_guidance_en = TextAreaField("Application guidance", widget=GovTextArea())
+    application_guidance_cy = TextAreaField("Application guidance (Welsh)", widget=GovTextArea())
+    guidance_url = URLField("Guidance link", widget=GovTextInput(), validators=[validate_flexible_url])
+    all_uploaded_documents_section_available = RadioField(
+        widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
     application_fields_download_available = RadioField(
-        "Application fields download available", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Application fields download available",
+        widget=GovRadioInput(),
+        choices=[("true", "Yes"), ("false", "No")],
+        default="false",
     )
     display_logo_on_pdf_exports = RadioField(
-        "Display logo on PDF exports", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Display logo on PDF exports",
+        widget=GovRadioInput(),
+        choices=[("true", "Yes"), ("false", "No")],
+        default="false",
     )
     mark_as_complete_enabled = RadioField(
-        "Mark as complete enabled", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Mark as complete enabled", widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
     )
     is_expression_of_interest = RadioField(
-        "Is expression of interest", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Is expression of interest", widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
     )
-    has_feedback_survey = RadioField("Has feedback survey", choices=[("true", "Yes"), ("false", "No")], default="false")
+    has_feedback_survey = RadioField(
+        "Has feedback survey", widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
     has_section_feedback = RadioField(
-        "Has section feedback", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Has section feedback", widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
     )
-    has_research_survey = RadioField("Has research survey", choices=[("true", "Yes"), ("false", "No")], default="false")
+    has_research_survey = RadioField(
+        "Has research survey", widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
+    )
     is_feedback_survey_optional = RadioField(
-        "Is feedback survey optional", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Is feedback survey optional",
+        widget=GovRadioInput(),
+        choices=[("true", "Yes"), ("false", "No")],
+        default="false",
     )
     is_section_feedback_optional = RadioField(
-        "Is section feedback optional", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Is section feedback optional",
+        widget=GovRadioInput(),
+        choices=[("true", "Yes"), ("false", "No")],
+        default="false",
     )
     is_research_survey_optional = RadioField(
-        "Is research survey optional", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Is research survey optional",
+        widget=GovRadioInput(),
+        choices=[("true", "Yes"), ("false", "No")],
+        default="false",
     )
     eligibility_config = RadioField(
-        "Has eligibility config", choices=[("true", "Yes"), ("false", "No")], default="false"
+        "Has eligibility config", widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
     )
     eoi_decision_schema_en = TextAreaField(
-        "EOI decision schema (English)", validators=[validate_json_field], description=JSON_FIELD_HINT
+        "EOI decision schema",
+        widget=GovTextArea(),
+        validators=[validate_json_field],
+        description=JSON_FIELD_HINT,
     )
     eoi_decision_schema_cy = TextAreaField(
         "EOI decision schema (Welsh)",
+        widget=GovTextArea(),
         description="Leave blank for English-only funds",
         validators=[validate_json_field],
     )
