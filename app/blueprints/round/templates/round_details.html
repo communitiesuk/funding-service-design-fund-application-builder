@@ -34,7 +34,7 @@
 </div>
 <div class="govuk-grid-row">
    <div class="govuk-grid-column-two-thirds">
-       <form method="POST" action={{ url_for("round_bp.clone_round", round_id=round.round_id) }}>
+       <form method="POST" action="{{ url_for("round_bp.clone_round", round_id=round.round_id) }}" novalidate>
            <div class="govuk-form-group">
                {{ cloned_form.hidden_tag() }}
                {{ cloned_form.fund_id() }}
