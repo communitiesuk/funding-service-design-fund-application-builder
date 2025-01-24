@@ -6,6 +6,24 @@ from app.db.models import Round
 from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
 
+round_data_info = {
+    "opens": ["01", "10", "2024", "09", "00"],
+    "deadline": ["01", "12", "2024", "17", "00"],
+    "assessment_start": ["02", "12", "2024", "09", "00"],
+    "reminder_date": ["15", "11", "2024", "09", "00"],
+    "assessment_deadline": ["15", "12", "2024", "17", "00"],
+    "prospectus_link": "https://example.com/prospectus",
+    "privacy_notice_link": "https://example.com/privacy",
+    "contact_email": "contact@example.com",
+    "contact_phone": "1234567890",
+    "contact_textphone": "0987654321",
+    "support_times": "9am - 5pm",
+    "support_days": "Monday to Friday",
+    "feedback_link": "https://example.com/feedback",
+    "project_name_field_id": 1,
+    "guidance_url": "https://example.com/guidance",
+}
+
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_select_fund(flask_test_client, seed_dynamic_data):
@@ -41,21 +59,8 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
         "fund_id": test_fund.fund_id,
         "title_en": "New Round",
         "short_name": "NR123",
-        "opens": ["01", "10", "2024", "09", "00"],
-        "deadline": ["01", "12", "2024", "17", "00"],
-        "assessment_start": ["02", "12", "2024", "09", "00"],
-        "reminder_date": ["15", "11", "2024", "09", "00"],
-        "assessment_deadline": ["15", "12", "2024", "17", "00"],
-        "prospectus_link": "http://example.com/prospectus",
-        "privacy_notice_link": "http://example.com/privacy",
-        "contact_email": "contact@example.com",
-        "contact_phone": "1234567890",
-        "contact_textphone": "0987654321",
-        "support_times": "9am - 5pm",
-        "support_days": "Monday to Friday",
-        "feedback_link": "http://example.com/feedback",
-        "project_name_field_id": 1,
-        "guidance_url": "http://example.com/guidance",
+        "save_and_return_home": True,
+        **round_data_info,
     }
 
     error_html = '<a href="#short_name">Given short name already exists in the fund funding to improve testing.</a>'
@@ -80,43 +85,6 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_create_new_round(flask_test_client, seed_dynamic_data):
-    """
-    Tests that a round can be successfully created using the /rounds/create route
-    Verifies that the created round has the correct attributes
-    """
-    test_fund = seed_dynamic_data["funds"][0]
-    new_round_data = {
-        "fund_id": test_fund.fund_id,
-        "title_en": "New Round",
-        "short_name": "NR123",
-        "opens": ["01", "10", "2024", "09", "00"],
-        "deadline": ["01", "12", "2024", "17", "00"],
-        "assessment_start": ["02", "12", "2024", "09", "00"],
-        "reminder_date": ["15", "11", "2024", "09", "00"],
-        "assessment_deadline": ["15", "12", "2024", "17", "00"],
-        "prospectus_link": "http://example.com/prospectus",
-        "privacy_notice_link": "http://example.com/privacy",
-        "contact_email": "contact@example.com",
-        "contact_phone": "1234567890",
-        "contact_textphone": "0987654321",
-        "support_times": "9am - 5pm",
-        "support_days": "Monday to Friday",
-        "feedback_link": "http://example.com/feedback",
-        "project_name_field_id": 1,
-        "guidance_url": "http://example.com/guidance",
-    }
-
-    response = submit_form(flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}", new_round_data)
-    assert response.status_code == 200
-
-    new_round = Round.query.filter_by(short_name="NR123").first()
-    assert new_round is not None
-    assert new_round.title_json["en"] == "New Round"
-    assert new_round.short_name == "NR123"
-
-
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_update_existing_round(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully updated using the /rounds/<round_id> route
@@ -126,23 +94,10 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
         "fund_id": seed_dynamic_data["funds"][0].fund_id,
         "title_en": "Updated Round",
         "short_name": "UR123",
-        "opens": ["01", "10", "2024", "09", "00"],
-        "deadline": ["01", "12", "2024", "17", "00"],
-        "assessment_start": ["02", "12", "2024", "09", "00"],
-        "reminder_date": ["15", "11", "2024", "09", "00"],
-        "assessment_deadline": ["15", "12", "2024", "17", "00"],
-        "prospectus_link": "http://example.com/updated_prospectus",
-        "privacy_notice_link": "http://example.com/updated_privacy",
-        "contact_email": "updated_contact@example.com",
-        "contact_phone": "1234567890",
-        "contact_textphone": "0987654321",
-        "support_times": "9am - 5pm",
-        "support_days": "Monday to Friday",
-        "feedback_link": "http://example.com/feedback",
-        "project_name_field_id": 1,
-        "guidance_url": "http://example.com/guidance",
-        "has_feedback_survey": "true",
+        "save_and_continue": True,
+        **round_data_info,
     }
+    update_round_data.update({"has_feedback_survey": "true"})
 
     test_round = seed_dynamic_data["rounds"][0]
     response = submit_form(flask_test_client, f"/rounds/{test_round.round_id}/edit", update_round_data)
@@ -160,35 +115,102 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
         "is_research_survey_optional": False,
     }
 
+    assert response.request.path == f"/rounds/{test_round.round_id}"
+    soup = BeautifulSoup(response.data, "html.parser")
+    notification = soup.find("h3", {"class": "govuk-notification-banner__heading"})
+    assert notification.text.strip() == "Application updated"
+
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_create_round_with_return_home(flask_test_client, seed_dynamic_data):
     """Tests that 'Save and return home' action correctly redirects to dashboard after round creation"""
     test_fund = seed_dynamic_data["funds"][0]
     new_round_data = {
-        "fund_id": test_fund.fund_id,
         "title_en": "New Round",
         "short_name": "NR456",
-        "opens": ["01", "10", "2024", "09", "00"],
-        "deadline": ["01", "12", "2024", "17", "00"],
-        "assessment_start": ["02", "12", "2024", "09", "00"],
-        "reminder_date": ["15", "11", "2024", "09", "00"],
-        "assessment_deadline": ["15", "12", "2024", "17", "00"],
-        "prospectus_link": "http://example.com/prospectus",
-        "privacy_notice_link": "http://example.com/privacy",
-        "contact_email": "contact@example.com",
-        "contact_phone": "1234567890",
-        "contact_textphone": "0987654321",
-        "support_times": "9am - 5pm",
-        "support_days": "Monday to Friday",
-        "feedback_link": "http://example.com/feedback",
-        "project_name_field_id": 1,
-        "guidance_url": "http://example.com/guidance",
-        "action": "return_home",
+        "fund_id": test_fund.fund_id,
+        "save_and_return_home": True,
+        **round_data_info,
     }
 
-    response = submit_form(flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}", new_round_data)
+    response = submit_form(
+        flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}&action=return_home", new_round_data
+    )
+    new_round = Round.query.filter_by(short_name="NR456").first()
+    assert new_round is not None
+    assert new_round.title_json["en"] == "New Round"
+    assert new_round.short_name == "NR456"
+
     assert response.request.path == "/dashboard"
+    soup = BeautifulSoup(response.data, "html.parser")
+    notification = soup.find("h3", {"class": "govuk-notification-banner__heading"})
+    assert notification.text.strip() == "New application created"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_round_from_application_list(flask_test_client, seed_dynamic_data):
+    """Tests that 'Save and return to applications list'
+    action correctly redirects to application list after round creation"""
+    test_fund = seed_dynamic_data["funds"][0]
+    new_round_data = {
+        "title_en": "New Round",
+        "short_name": "NR456",
+        "fund_id": test_fund.fund_id,
+        "save_and_continue": True,
+        **round_data_info,
+    }
+
+    response = submit_form(
+        flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}&action=applications_table", new_round_data
+    )
+    assert response.request.path == "/rounds/"
+    soup = BeautifulSoup(response.data, "html.parser")
+    notification = soup.find("h3", {"class": "govuk-notification-banner__heading"})
+    assert notification.text.strip() == "New application created"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_round_from_application_list_and_return_to_home(flask_test_client, seed_dynamic_data):
+    """Tests that 'Save and return home' action correctly redirects to dashboard after round creation"""
+    test_fund = seed_dynamic_data["funds"][0]
+    new_round_data = {
+        "title_en": "New Round",
+        "short_name": "NR456",
+        "fund_id": test_fund.fund_id,
+        "save_and_return_home": True,
+        **round_data_info,
+    }
+
+    response = submit_form(
+        flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}&action=applications_table", new_round_data
+    )
+    assert response.request.path == "/dashboard"
+    soup = BeautifulSoup(response.data, "html.parser")
+    notification = soup.find("h3", {"class": "govuk-notification-banner__heading"})
+    assert notification.text.strip() == "New application created"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_round_from_dashboard_and_continue_build(flask_test_client, seed_dynamic_data):
+    """Tests that 'Save and continue build application'
+    action correctly redirects to build application after round creation"""
+    test_fund = seed_dynamic_data["funds"][0]
+    new_round_data = {
+        "title_en": "New Round",
+        "short_name": "NR456",
+        "fund_id": test_fund.fund_id,
+        "save_and_continue": True,
+        **round_data_info,
+    }
+
+    response = submit_form(
+        flask_test_client, f"/rounds/create?fund_id={test_fund.fund_id}&action=return_home", new_round_data
+    )
+    new_round_id = response.request.path.split("/")[-2]
+    assert response.request.path == f"/rounds/{new_round_id}/sections"
+    soup = BeautifulSoup(response.data, "html.parser")
+    notification = soup.find("h3", {"class": "govuk-notification-banner__heading"})
+    assert notification.text.strip() == "New application created"
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
@@ -270,7 +292,7 @@ def test_clone_round(flask_test_client, seed_dynamic_data):
 
         soup = BeautifulSoup(response.data, "html.parser")
         notification = soup.find("div", {"class": "govuk-notification-banner__content"})
-        assert notification.text.strip() == "Application copied successfully"
+        assert notification.text.strip() == "Application copied"
         copied_round_id = response.request.path.split("/")[-1]
         expected_application_name = f"Copy of {test_round.title_json['en']}"
 

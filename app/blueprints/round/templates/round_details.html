@@ -54,7 +54,7 @@
         "classes": "govuk-!-margin-bottom-9",
             "rows": [
                 {
-                    "key": {"text": "Application round"},
+                    "key": {"text": form.title_en.label},
                     "value": {"text": round.title_json["en"]},
                     "actions": {
                         "items": [
@@ -68,7 +68,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Application round (Welsh)"},
+                    "key": {"text": form.title_en.label},
                     "value": {"text": round.title_json["cy"]},
                     "actions": {
                         "items": [
@@ -82,7 +82,7 @@
                     },
                 } if round.fund.welsh_available else {},
                 {
-                    "key": {"text": "Round short name"},
+                    "key": {"text": form.short_name.label},
                     "value": {"text": round.short_name},
                     "actions": {
                         "items": [
@@ -96,7 +96,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Application round opens"},
+                    "key": {"text": form.opens.label},
                     "value": {"text": round.opens.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -110,7 +110,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Application round closes"},
+                    "key": {"text": form.deadline.label},
                     "value": {"text": round.deadline.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -124,7 +124,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Applicant reminder date"},
+                    "key": {"text": form.reminder_date.label},
                     "value": {"text": round.reminder_date.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -138,7 +138,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Assessment opens"},
+                    "key": {"text": form.assessment_start.label},
                     "value": {"text": round.assessment_start.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -152,7 +152,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Assessment closes"},
+                    "key": {"text": form.assessment_deadline.label},
                     "value": {"text": round.assessment_deadline.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -222,7 +222,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Grant team support hours"},
+                    "key": {"text": form.support_times.label},
                     "value": {"text": round.support_times},
                     "actions": {
                         "items": [
@@ -236,7 +236,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Grant team support days"},
+                    "key": {"text": form.support_days.label},
                     "value": {"text": round.support_days},
                     "actions": {
                         "items": [
@@ -278,7 +278,7 @@
                     },
                 } if round.fund.welsh_available else {},
                 {
-                    "key": {"text": "Complete the application guidance"},
+                    "key": {"text": "Completing the application guidance"},
                     "value": {"text": round.application_guidance_json['en']},
                     "actions": {
                         "items": [
@@ -292,7 +292,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Complete the application guidance (Welsh)"},
+                    "key": {"text": "Completing the application guidance (Welsh)"},
                     "value": {"text": round.application_guidance_json['cy']},
                     "actions": {
                         "items": [
@@ -320,7 +320,7 @@
                     },
                 },
                  {
-                    "key": {"text": "Prospectus link"},
+                    "key": {"text": form.prospectus_link.label},
                     "value": {"text": round.prospectus_link},
                     "actions": {
                         "items": [
@@ -334,7 +334,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Privacy notice link"},
+                    "key": {"text": form.privacy_notice_link.label},
                     "value": {"text": round.privacy_notice_link},
                     "actions": {
                         "items": [
@@ -348,7 +348,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Project name field ID"},
+                    "key": {"text": form.project_name_field_id.label},
                     "value": {"text": round.project_name_field_id},
                     "actions": {
                         "items": [
@@ -390,8 +390,8 @@
                     },
                 } if round.fund.welsh_available else {},
                 {
-                    "key": {"text": "Do you want to include the contact us page in applicant emails?"},
-                    "value": {"text": "Yes" if round.reference_contact_page_over_email == "true" else "No"},
+                    "key": {"text": form.reference_contact_page_over_email.label},
+                    "value": {"text": "Yes" if round.reference_contact_page_over_email else "No"},
                     "actions": {
                         "items": [
                             {
@@ -404,8 +404,8 @@
                     },
                 },
                 {
-                    "key": {"text": "Do you want to allow assessors to download application fields?"},
-                    "value": {"text": "Yes" if round.application_fields_download_available == "true" else "No"},
+                    "key": {"text": form.application_fields_download_available.label},
+                    "value": {"text": "Yes" if round.application_fields_download_available else "No"},
                     "actions": {
                         "items": [
                             {
@@ -418,8 +418,8 @@
                     },
                 },
                 {
-                    "key": {"text": "Do you want to have the MHCLG logo on PDFs?"},
-                    "value": {"text": "Yes" if round.display_logo_on_pdf_exports == "true" else "No"},
+                    "key": {"text": form.display_logo_on_pdf_exports.label},
+                    "value": {"text": "Yes" if round.display_logo_on_pdf_exports  else "No"},
                     "actions": {
                         "items": [
                             {
@@ -432,8 +432,8 @@
                     },
                 },
                 {
-                    "key": {"text": "Do you want applicants to mark sections as complete?"},
-                    "value": {"text": "Yes" if round.mark_as_complete_enabled == "true" else "No"},
+                    "key": {"text": form.mark_as_complete_enabled.label},
+                    "value": {"text": "Yes" if round.mark_as_complete_enabled else "No"},
                     "actions": {
                         "items": [
                             {
@@ -446,7 +446,7 @@
                     },
                 },
                 {
-                    "key": {"text": "Is this application round an expression of interest?"},
+                    "key": {"text": form.is_expression_of_interest.label},
                     "value": {"text": "Yes" if round.is_expression_of_interest == "true" else "No"},
                     "actions": {
                         "items": [
@@ -460,8 +460,8 @@
                     },
                 },
                 {
-                    "key": {"text": "Do you want to include a feedback survey?"},
-                    "value": {"text": "Yes" if round.feedback_survey_config["has_feedback_survey"]=="true" else "No"},
+                    "key": {"text": "form.has_feedback_survey.label"},
+                    "value": {"text": "Yes" if round.feedback_survey_config["has_feedback_survey"] else "No"},
                     "actions": {
                         "items": [
                             {
@@ -474,8 +474,8 @@
                     },
                 },
                 {
-                    "key": {"text": "Is the feedback survey optional?"},
-                    "value": {"text": "Yes" if round.feedback_survey_config["is_feedback_survey_optional"]=="true" else "No"},
+                    "key": {"text": form.is_feedback_survey_optional.label},
+                    "value": {"text": "Yes" if round.feedback_survey_config["is_feedback_survey_optional"] else "No"},
                     "actions": {
                         "items": [
                             {
@@ -488,8 +488,8 @@
                     },
                 },
                 {
-                    "key": {"text": "Do you want to include a research survey?"},
-                    "value": {"text": "Yes" if round.feedback_survey_config["has_research_survey"]=="true" else "No"},
+                    "key": {"text": form.has_research_survey.label},
+                    "value": {"text": "Yes" if round.feedback_survey_config["has_research_survey"] else "No"},
                     "actions": {
                         "items": [
                             {
@@ -502,8 +502,8 @@
                     },
                 },
                 {
-                    "key": {"text": "Is the research survey optional?"},
-                    "value": {"text": "Yes" if round.feedback_survey_config["is_research_survey_optional"]=="true" else "No"},
+                    "key": {"text": form.is_research_survey_optional.label},
+                    "value": {"text": "Yes" if round.feedback_survey_config["is_research_survey_optional"] else "No"},
                     "actions": {
                         "items": [
                             {
@@ -516,8 +516,8 @@
                     },
                 },
                 {
-                    "key": {"text": "Do applicants need to pass eligibility questions before applying?"},
-                    "value": {"text": "Yes" if round.eligibility_config["has_eligibility"] == "true" else "No"},
+                    "key": {"text": form.eligibility_config.label},
+                    "value": {"text": "Yes" if round.eligibility_config["has_eligibility"] else "No"},
                     "actions": {
                         "items": [
                             {

@@ -142,12 +142,12 @@ def update_existing_round(round_obj, form, user="dummy_user"):
     round_obj.title_json = {"en": form.title_en.data or None, "cy": form.title_cy.data or None}
     round_obj.short_name = form.short_name.data
     round_obj.feedback_survey_config = {
-        "has_feedback_survey": form.has_feedback_survey.data == "true",
-        "has_section_feedback": form.has_section_feedback.data == "true",
-        "has_research_survey": form.has_research_survey.data == "true",
-        "is_feedback_survey_optional": form.is_feedback_survey_optional.data == "true",
-        "is_section_feedback_optional": form.is_section_feedback_optional.data == "true",
-        "is_research_survey_optional": form.is_research_survey_optional.data == "true",
+        "has_feedback_survey": form.has_feedback_survey.data,
+        "has_section_feedback": form.has_section_feedback.data,
+        "has_research_survey": form.has_research_survey.data,
+        "is_feedback_survey_optional": form.is_feedback_survey_optional.data,
+        "is_section_feedback_optional": form.is_section_feedback_optional.data,
+        "is_research_survey_optional": form.is_research_survey_optional.data,
     }
 
     # IMPORTANT: convert date sub-form dicts into Python datetime objects
@@ -159,7 +159,7 @@ def update_existing_round(round_obj, form, user="dummy_user"):
 
     round_obj.prospectus_link = form.prospectus_link.data
     round_obj.privacy_notice_link = form.privacy_notice_link.data
-    round_obj.reference_contact_page_over_email = form.reference_contact_page_over_email.data == "true"
+    round_obj.reference_contact_page_over_email = form.reference_contact_page_over_email.data
     round_obj.contact_email = form.contact_email.data
     round_obj.contact_phone = form.contact_phone.data
     round_obj.contact_textphone = form.contact_textphone.data
@@ -168,11 +168,11 @@ def update_existing_round(round_obj, form, user="dummy_user"):
     round_obj.feedback_link = form.feedback_link.data
     round_obj.project_name_field_id = form.project_name_field_id.data
     round_obj.guidance_url = form.guidance_url.data
-    round_obj.all_uploaded_documents_section_available = form.all_uploaded_documents_section_available.data == "true"
-    round_obj.application_fields_download_available = form.application_fields_download_available.data == "true"
-    round_obj.display_logo_on_pdf_exports = form.display_logo_on_pdf_exports.data == "true"
-    round_obj.mark_as_complete_enabled = form.mark_as_complete_enabled.data == "true"
-    round_obj.is_expression_of_interest = form.is_expression_of_interest.data == "true"
+    round_obj.all_uploaded_documents_section_available = form.all_uploaded_documents_section_available.data
+    round_obj.application_fields_download_available = form.application_fields_download_available.data
+    round_obj.display_logo_on_pdf_exports = form.display_logo_on_pdf_exports.data
+    round_obj.mark_as_complete_enabled = form.mark_as_complete_enabled.data
+    round_obj.is_expression_of_interest = form.is_expression_of_interest.data
     round_obj.contact_us_banner_json = {
         "en": form.contact_us_banner_en.data or None,
         "cy": form.contact_us_banner_cy.data or None,
@@ -182,7 +182,7 @@ def update_existing_round(round_obj, form, user="dummy_user"):
         "en": form.application_guidance_en.data or None,
         "cy": form.application_guidance_cy.data or None,
     }
-    round_obj.eligibility_config = {"has_eligibility": form.eligibility_config.data == "true"}
+    round_obj.eligibility_config = {"has_eligibility": form.eligibility_config.data}
     round_obj.eoi_decision_schema = {
         "en": convert_form_data_to_json(form.eoi_decision_schema_en.data),
         "cy": convert_form_data_to_json(form.eoi_decision_schema_cy.data),
@@ -209,7 +209,7 @@ def create_new_round(form, user="dummy_user"):
             "en": form.contact_us_banner_en.data or None,
             "cy": form.contact_us_banner_cy.data or None,
         },
-        reference_contact_page_over_email=form.reference_contact_page_over_email.data == "true",
+        reference_contact_page_over_email=form.reference_contact_page_over_email.data,
         contact_email=form.contact_email.data,
         contact_phone=form.contact_phone.data,
         contact_textphone=form.contact_textphone.data,
@@ -223,20 +223,20 @@ def create_new_round(form, user="dummy_user"):
             "cy": form.application_guidance_cy.data or None,
         },
         guidance_url=form.guidance_url.data,
-        all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data == "true",
-        application_fields_download_available=form.application_fields_download_available.data == "true",
-        display_logo_on_pdf_exports=form.display_logo_on_pdf_exports.data == "true",
-        mark_as_complete_enabled=form.mark_as_complete_enabled.data == "true",
-        is_expression_of_interest=form.is_expression_of_interest.data == "true",
+        all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data,
+        application_fields_download_available=form.application_fields_download_available.data,
+        display_logo_on_pdf_exports=form.display_logo_on_pdf_exports.data,
+        mark_as_complete_enabled=form.mark_as_complete_enabled.data,
+        is_expression_of_interest=form.is_expression_of_interest.data,
         feedback_survey_config={
-            "has_feedback_survey": form.has_feedback_survey.data == "true",
-            "has_section_feedback": form.has_section_feedback.data == "true",
-            "has_research_survey": form.has_research_survey.data == "true",
-            "is_feedback_survey_optional": form.is_feedback_survey_optional.data == "true",
-            "is_section_feedback_optional": form.is_section_feedback_optional.data == "true",
-            "is_research_survey_optional": form.is_research_survey_optional.data == "true",
+            "has_feedback_survey": form.has_feedback_survey.data,
+            "has_section_feedback": form.has_section_feedback.data,
+            "has_research_survey": form.has_research_survey.data,
+            "is_feedback_survey_optional": form.is_feedback_survey_optional.data,
+            "is_section_feedback_optional": form.is_section_feedback_optional.data,
+            "is_research_survey_optional": form.is_research_survey_optional.data,
         },
-        eligibility_config={"has_eligibility": form.eligibility_config.data == "true"},
+        eligibility_config={"has_eligibility": form.eligibility_config.data},
         eoi_decision_schema={
             "en": convert_form_data_to_json(form.eoi_decision_schema_en.data),
             "cy": convert_form_data_to_json(form.eoi_decision_schema_cy.data),
