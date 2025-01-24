@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% from "govuk_frontend_jinja/components/button/macro.html" import govukButton %}
-{% from "govuk_frontend_jinja/components/select/macro.html" import govukSelect %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary %}
 {% block beforeContent %}
@@ -29,21 +28,9 @@
     </div>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <form method="POST">
+            <form method="POST" novalidate>
                 {{ form.csrf_token }}
-                {{ govukSelect({
-        "id": form.fund_id.id,
-        "name": form.fund_id.name,
-        "items": select_items,
-        "label": {
-            "text": "Select or add a new grant for this application"
-          },
-        "errorMessage": {"text": form.fund_id.errors[0]} if form.fund_id.errors else None,
-        "classes": "govuk-!-width-one-half",
-        "formGroup": {
-          "classes": "govuk-!-margin-bottom-3"
-        }
-      }) }}
+                {{ form.fund_id }}
 
                 <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-7">
                     <a href="{{ url_for('fund_bp.create_fund', actions="select_grant") }}" class="govuk-link">Add a new grant</a>

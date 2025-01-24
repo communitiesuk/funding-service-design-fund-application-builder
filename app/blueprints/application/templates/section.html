@@ -5,8 +5,6 @@
     {% else %}
         Create{% endif %}&nbsp;Section
 {% endset %}
-{% from "macros/wtfToGovUk.html" import input %}
-{% from "macros/wtfToGovUk.html" import yes_no %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
 {% block content %}
@@ -17,7 +15,7 @@
                     <div class="govuk-form-group">
                         <h3 class="govuk-heading-m">Section Name</h3>
                         {{ form.hidden_tag() }}
-                        {{ input(form.name_in_apply_en) }}
+                        {{ form.name_in_apply_en }}
                     </div>
                     {{ govukButton({"text": "Save"}) }}
                 </form>

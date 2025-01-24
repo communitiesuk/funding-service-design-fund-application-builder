@@ -81,16 +81,11 @@ def select_application():
     fund_id = request.args.get("fund_id")
     if not fund_id:
         raise ValueError("Fund ID is required to manage an application")
-    form = SelectApplicationForm()
     fund = get_fund_by_id(fund_id)
-    choices = [("", "Select an application")]
-    for round_ in fund.rounds:
-        choices.append((str(round_.round_id), round_.short_name + " - " + round_.title_json["en"]))
-    form.round_id.choices = choices
+    form = SelectApplicationForm(fund)
     if form.validate_on_submit():
         return redirect(url_for("application_bp.build_application", round_id=form.round_id.data))
-    select_items = [{"value": value, "text": text} for value, text in choices]
-    return render_template("select_application.html", form=form, fund=fund, select_items=select_items)
+    return render_template("select_application.html", form=form, fund=fund)
 
 
 @application_bp.route("/<round_id>/sections")
