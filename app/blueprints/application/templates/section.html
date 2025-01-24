@@ -5,19 +5,17 @@
     {% else %}
         Create{% endif %}&nbsp;Section
 {% endset %}
-{% from "macros/wtfToGovUk.html" import input %}
-{% from "macros/wtfToGovUk.html" import yes_no %}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
-                <form method="POST">
+                <form method="POST" novalidate>
                     <div class="govuk-form-group">
                         <h3 class="govuk-heading-m">Section Name</h3>
                         {{ form.hidden_tag() }}
-                        {{ input(form.name_in_apply_en) }}
+                        {{ form.name_in_apply_en }}
                     </div>
                     {{ govukButton({"text": "Save"}) }}
                 </form>
@@ -52,7 +50,8 @@
                     </ul>
                     <h3 class="govuk-heading-m">Add Form From Template</h3>
                     <form method="POST"
-                          action="{{ url_for('application_bp.add_form', round_id=round_id, section_id=form.section_id.data) }}">
+                          action="{{ url_for('application_bp.add_form', round_id=round_id, section_id=form.section_id.data) }}"
+                          novalidate>
                         {{ govukSelect({
                                                 "id": "template_id",
                                                 "name": "template_id",
