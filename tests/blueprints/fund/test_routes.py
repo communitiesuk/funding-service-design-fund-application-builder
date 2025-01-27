@@ -17,7 +17,7 @@ def test_create_fund(flask_test_client, seed_dynamic_data):
     create_data = {
         "name_en": "New Fund",
         "title_en": "New Fund Title",
-        "description_en": "New Fund Description",
+        "description_en": "New fund description",
         "welsh_available": "false",
         "short_name": "NF5432",
         "funding_type": FundingType.COMPETITIVE.value,
@@ -52,7 +52,7 @@ def test_create_fund_with_existing_short_name(flask_test_client, seed_dynamic_da
     create_data = {
         "name_en": "New Fund 2",
         "title_en": "New Fund Title 2",
-        "description_en": "New Fund Description 2",
+        "description_en": "New fund description 2",
         "welsh_available": "false",
         "short_name": "SMP1",
         "funding_type": FundingType.COMPETITIVE.value,
@@ -63,7 +63,7 @@ def test_create_fund_with_existing_short_name(flask_test_client, seed_dynamic_da
     create_data = {
         "name_en": "New Fund 3",
         "title_en": "New Fund Title 3",
-        "description_en": "New Fund Description 3",
+        "description_en": "New fund description 3",
         "welsh_available": "false",
         "short_name": "SMP1",
         "funding_type": FundingType.COMPETITIVE.value,
@@ -201,7 +201,7 @@ def test_create_fund_with_return_home(flask_test_client):
     create_data = {
         "name_en": "New Fund",
         "title_en": "New Fund Title",
-        "description_en": "New Fund Description",
+        "description_en": "New fund description",
         "welsh_available": "false",
         "short_name": "NF5433",
         "funding_type": FundingType.COMPETITIVE.value,
@@ -230,7 +230,7 @@ def test_create_fund_from_grant_details(flask_test_client, seed_dynamic_data):
         create_data = {
             "name_en": "New Fund",
             "title_en": "New Fund Title",
-            "description_en": "New Fund Description",
+            "description_en": "New fund description",
             "welsh_available": "false",
             "short_name": "NF5433",
             "funding_type": FundingType.COMPETITIVE.value,
@@ -258,7 +258,7 @@ def test_create_fund_from_select_grant(flask_test_client):
     create_data = {
         "name_en": "New Fund",
         "title_en": "New Fund Title",
-        "description_en": "New Fund Description",
+        "description_en": "New fund description",
         "welsh_available": "false",
         "short_name": "NF5433",
         "funding_type": FundingType.COMPETITIVE.value,
@@ -301,11 +301,11 @@ def test_view_all_funds(flask_test_client, seed_dynamic_data):
 
     # Table component availability check
     assert '<thead class="govuk-table__head">' in html, "Table is missing"
-    assert '<th scope="col" class="govuk-table__header">Grant Name</th>' in html, "Grant Name header is missing"
+    assert '<th scope="col" class="govuk-table__header">Grant name</th>' in html, "Grant name header is missing"
     assert '<th scope="col" class="govuk-table__header">Description</th>' in html, "Description header missing"
-    assert '<th scope="col" class="govuk-table__header">Grant Type</th>' in html, "Grant type header missing"
-    assert "New Fund" in html, "Grant name is missing"
-    assert "New Fund Description" in html, "Fund Description is missing"
+    assert '<th scope="col" class="govuk-table__header">Grant type</th>' in html, "Grant type header missing"
+    assert "New fund" in html, "Grant name is missing"
+    assert "New fund description" in html, "Fund description is missing"
     assert "Competitive" in html, "Grant type is missing"
 
     # fetch test data and check the link to grant details link

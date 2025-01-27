@@ -1,5 +1,5 @@
 from flask import current_app
-from sqlalchemy import select
+from sqlalchemy import String, cast, select
 
 from app.db import db
 from app.db.models.fund import Fund, Organisation
@@ -25,7 +25,7 @@ def update_fund(fund: Fund) -> Fund:
 
 
 def get_all_funds() -> list[Fund]:
-    stmt = select(Fund).order_by(Fund.short_name)
+    stmt = select(Fund).order_by(cast(Fund.name_json["en"], String))
     return db.session.scalars(stmt).all()
 
 

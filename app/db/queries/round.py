@@ -1,7 +1,8 @@
 from flask import current_app
-from sqlalchemy import select
+from sqlalchemy import String, cast, select
 
 from app.db import db
+from app.db.models import Fund
 from app.db.models.round import Round
 
 
@@ -30,5 +31,5 @@ def get_round_by_short_name_and_fund_id(fund_id: str, short_name: str) -> Round:
 
 
 def get_all_rounds() -> list[Round]:
-    stmt = select(Round).order_by(Round.short_name)
+    stmt = select(Round).join(Round.fund).order_by(cast(Fund.title_json["en"], String))
     return db.session.scalars(stmt).all()

@@ -162,10 +162,10 @@ class RoundForm(FlaskForm):
     support_times = StringField("Grant team support hours", widget=GovTextInput(), validators=[DataRequired()])
     support_days = StringField("Grant team support days", widget=GovTextInput(), validators=[DataRequired()])
     instructions_en = TextAreaField("Before you apply guidance (optional)", widget=GovTextArea())
-    instructions_cy = StringField("Before you apply guidance (Welsh)(optional)", widget=GovTextInput())
-    application_guidance_en = TextAreaField("Completing the application guidance", widget=GovTextArea())
+    instructions_cy = StringField("Before you apply guidance (Welsh) (optional)", widget=GovTextInput())
+    application_guidance_en = TextAreaField("Completing the application guidance (optional)", widget=GovTextArea())
     application_guidance_cy = TextAreaField(
-        "Completing the application guidance (Welsh)(optional)", widget=GovTextArea()
+        "Completing the application guidance (Welsh) (optional)", widget=GovTextArea()
     )
     feedback_link = URLField("Feedback link (optional)", widget=GovTextInput(), validators=[validate_flexible_url])
     prospectus_link = URLField(
@@ -177,7 +177,7 @@ class RoundForm(FlaskForm):
     project_name_field_id = StringField(
         "Project name field ID",
         widget=GovTextInput(),
-        description="Ask a developer on your team for the correct field ID",
+        description="Ask a developer on the Forms team for the correct field ID",
         validators=[DataRequired()],
     )
     eoi_decision_schema_en = TextAreaField(
@@ -187,7 +187,7 @@ class RoundForm(FlaskForm):
         description=JSON_FIELD_HINT,
     )
     eoi_decision_schema_cy = TextAreaField(
-        "Expression of interest decision schema (Welsh)(optional)",
+        "Expression of interest decision schema (Welsh) (optional)",
         widget=GovTextArea(),
         description=JSON_FIELD_HINT,
         validators=[validate_json_field],
@@ -198,7 +198,7 @@ class RoundForm(FlaskForm):
         description="HTML to display to override the default 'Contact Us' page content",
     )
     contact_us_banner_cy = TextAreaField(
-        "Contact Us information (Welsh)(optional)",
+        "Contact Us information (Welsh) (optional)",
         widget=GovTextArea(),
         description="HTML to display to override the default 'Contact Us' page content",
     )

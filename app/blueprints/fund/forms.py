@@ -35,19 +35,19 @@ class FundForm(FlaskForm):
         "Grant name (Welsh)", widget=GovTextInput(), description="For example, Community Ownership Fund"
     )
     short_name = StringField(
-        "Grant Short name",
+        "Grant short name",
         widget=GovTextInput(),
-        description="A unique acronym of up to 10 characters for the grant.For example, COF",
+        description="A unique acronym of up to 10 characters for the grant. For example, COF",
         validators=[DataRequired(), Length(max=10), no_spaces_between_letters, validate_unique_fund_short_name],
     )
     title_en = StringField(
-        "Application heading",
+        "Application name",
         widget=GovTextInput(),
         description="For example, Apply for funding to save an asset in your community",
         validators=[DataRequired()],
     )
     title_cy = StringField(
-        "Application heading (Welsh)",
+        "Application name (Welsh)",
         widget=GovTextInput(),
         description="For example, Apply for funding to save an asset in your community",
     )
