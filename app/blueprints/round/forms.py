@@ -7,9 +7,8 @@ from wtforms import HiddenField, RadioField, StringField, SubmitField, TextAreaF
 from wtforms.fields.datetime import DateTimeField
 from wtforms.validators import DataRequired, Length, ValidationError
 
-from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_short_name_and_fund_id
-from app.shared.helpers import no_spaces_between_letters
+from app.shared.validators import NoSpacesBetweenLetters
 from govuk_frontend_ext.fields import GovDatetimeInput
 
 
@@ -58,8 +57,7 @@ def validate_unique_round_short_name(form, field):
     if form.data and field.data and form.data.get("fund_id"):
         rond_data = get_round_by_short_name_and_fund_id(form.data.get("fund_id"), field.data)
         if rond_data and str(rond_data.round_id) != form.data.get("round_id"):
-            fund_data = get_fund_by_id(form.data.get("fund_id"))
-            raise ValidationError(f"Given short name already exists in the fund {fund_data.title_json.get('en')}.")
+            raise ValidationError("Application short name must be unique")
 
 
 class RoundForm(FlaskForm):
@@ -81,7 +79,7 @@ class RoundForm(FlaskForm):
         validators=[
             DataRequired(message="Enter the round short name"),
             Length(max=6, message="Application short name must be a maximum of 6 characters"),
-            no_spaces_between_letters,
+            NoSpacesBetweenLetters(message="Application short name must not have spaces between characters"),
             validate_unique_round_short_name,
         ],
     )

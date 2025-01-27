@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired, Length, ValidationError
 
 from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_short_name
-from app.shared.helpers import no_spaces_between_letters
+from app.shared.validators import NoSpacesBetweenLetters
 
 
 def validate_unique_fund_short_name(form, field):
@@ -41,7 +41,7 @@ class FundForm(FlaskForm):
         validators=[
             DataRequired(message="Enter the grant short name"),
             Length(max=10, message="Grant short name must be a maximum of 10 characters"),
-            no_spaces_between_letters,
+            NoSpacesBetweenLetters(message="Grant short name must not have spaces between characters"),
             validate_unique_fund_short_name,
         ],
     )
