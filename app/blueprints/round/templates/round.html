@@ -28,11 +28,11 @@
 <div class="govuk-grid-column-full">
         {% if round_id %}
             <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ pageHeading }}</h1>
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('fund_bp.edit_fund', fund_id=fund.fund_id,  actions="edit_application", round_id=round_id, _anchor=fund_form.title_en.id) }}">Change application heading</a>
-            <p class="govuk-body govuk-!-margin-top-7">Grant: {{ fund.title_json["en"] }}</p>
+            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('fund_bp.edit_fund', fund_id=fund.fund_id,  actions="edit_application", round_id=round_id, _anchor=fund_form.title_en.id) }}">Change application name</a>
+            <p class="govuk-body govuk-!-margin-top-7">Grant: {{ fund.name_json["en"] }}</p>
         {% else %}
             <h1 class="govuk-heading-l govuk-!-margin-bottom-7">{{ pageHeading }}</h1>
-            <p class="govuk-body govuk-!-margin-bottom-0">Grant: {{ fund.title_json["en"] }}</p>
+            <p class="govuk-body govuk-!-margin-bottom-0">Grant: {{ fund.name_json["en"] }}</p>
             <p class="govuk-body govuk-!-margin-bottom-7">
             <a href="{{ url_for('round_bp.select_fund') }}" class="govuk-link govuk-link--no-visited-state">Change grant</a>
         </p>

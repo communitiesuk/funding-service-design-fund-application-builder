@@ -23,7 +23,7 @@ from app.db.queries.application import (
 
 new_template_section_config = {
     "round_id": uuid.uuid4(),
-    "name_in_apply_json": {"en": "Section Name"},
+    "name_in_apply_json": {"en": "Section name"},
     "template_name": "Template Name",
     "is_template": True,
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
@@ -32,7 +32,7 @@ new_template_section_config = {
 
 new_section_config = {
     "round_id": uuid.uuid4(),
-    "name_in_apply_json": {"en": "Template Section Name"},
+    "name_in_apply_json": {"en": "Template section name"},
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
     "index": 1,
 }
@@ -83,7 +83,7 @@ def test_update_section(flask_test_client, _db, clear_test_data, seed_dynamic_da
 
     # Update new_section_config
     updated_section_config = deepcopy(new_section_config)
-    updated_section_config["name_in_apply_json"] = {"en": "Updated Section Name"}
+    updated_section_config["name_in_apply_json"] = {"en": "Updated section name"}
     updated_section_config["audit_info"] = {"created_by": "Jonny Doe", "created_at": "2024-01-02"}
 
     updated_section = update_section(new_section.section_id, updated_section_config)

@@ -17,7 +17,7 @@ def get_section_by_id(section_id) -> Section:
 
 
 def get_all_template_forms() -> list[Form]:
-    return db.session.query(Form).where(Form.is_template == True).all()  # noqa:E712
+    return db.session.query(Form).where(Form.is_template == True).order_by(Form.template_name).all()  # noqa:E712
 
 
 def get_form_for_component(component: Component) -> Form:

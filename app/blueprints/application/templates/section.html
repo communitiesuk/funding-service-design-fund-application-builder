@@ -21,7 +21,7 @@
             <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
                 <form method="POST" novalidate>
                     <div class="govuk-form-group">
-                        <h3 class="govuk-heading-m">Section Name</h3>
+                        <h3 class="govuk-heading-m">Section name</h3>
                         {{ form.hidden_tag() }}
                         {{ form.name_in_apply_en }}
                     </div>
@@ -56,7 +56,7 @@
                             </li>
                         {% endfor %}
                     </ul>
-                    <h3 class="govuk-heading-m">Add Form From Template</h3>
+                    <h3 class="govuk-heading-m">Add form from template</h3>
                     <form method="POST"
                           action="{{ url_for('application_bp.add_form', round_id=round_id, section_id=form.section_id.data) }}"
                           novalidate>

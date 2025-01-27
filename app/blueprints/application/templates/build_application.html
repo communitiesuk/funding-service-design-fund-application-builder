@@ -20,7 +20,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             <span class="govuk-caption-l">Apply for {{ fund.title_json["en"] }}</span>
-            <h1 class="govuk-heading-l">Build Application</h1>
+            <h1 class="govuk-heading-l">Build application</h1>
             <p class="govuk-body">Build the application by adding sections and using templates.</p>
         </div>
     </div>
@@ -61,7 +61,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
             {{ govukButton({
-                "text": "Add Section",
+                "text": "Add section",
                 "href": url_for("application_bp.section", round_id=round.round_id),
                 "classes": "govuk-button--secondary"
             })
