@@ -77,7 +77,7 @@ def create_template():
                     return redirect(url_for(INDEX_BP_DASHBOARD))
             except Exception as e:
                 print(e)
-                form.file.errors.append("Please upload valid JSON file")
+                form.file.errors.append("Upload a valid JSON file")
                 return render_template("template.html", **params)
         return redirect(url_for("template_bp.view_templates"))
     return render_template("template.html", **params)

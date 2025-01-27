@@ -1,8 +1,6 @@
-import re
 from dataclasses import asdict, is_dataclass
 
 from flask import flash, render_template
-from wtforms.validators import ValidationError
 
 from app.db.models import Page
 
@@ -39,15 +37,6 @@ def get_all_pages_in_parent_form(db, page_id):
     page_ids = [p.page_id for p in page_ids]
 
     return page_ids
-
-
-# Custom validator to check for spaces between letters
-def no_spaces_between_letters(form, field):
-    # Regular expression to check for spaces between letters
-    if not field.data:
-        return
-    if re.search(r"\b\w+\s+\w+\b", field.data):  # Matches sequences with spaces in between
-        raise ValidationError("Spaces between letters are not allowed.")
 
 
 def flash_message(

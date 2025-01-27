@@ -6,20 +6,22 @@ from wtforms.validators import DataRequired
 
 
 class TemplateCreateForm(FlaskForm):
-    template_name = StringField("Template name", widget=GovTextInput(), validators=[DataRequired()])
+    template_name = StringField(
+        "Template name", widget=GovTextInput(), validators=[DataRequired(message="Enter the template name")]
+    )
     tasklist_name = StringField(
         "Task name",
         widget=GovTextInput(),
         description="For example, Project management. Applicants will see this in the application",
-        validators=[DataRequired()],
+        validators=[DataRequired(message="Enter the task name")],
     )
     file = FileField(
         "Upload a file",
         description="Supports JSON files only",
         widget=GovFileInput(),
         validators=[
-            FileRequired(message="File upload is required"),
-            FileAllowed(upload_set=["json"], message="Select a file with the extension .json"),
+            FileRequired(message="Choose a template file"),
+            FileAllowed(upload_set=["json"], message="Upload a valid JSON file"),
             FileSize(max_size=2 * 1024 * 1024, message="Select a file smaller than 2MB"),
         ],
     )
@@ -34,7 +36,7 @@ class TemplateUpdateForm(TemplateCreateForm):
         description="Supports JSON files only",
         widget=GovFileInput(),
         validators=[
-            FileAllowed(upload_set=["json"], message="Select a file with the extension .json"),
+            FileAllowed(upload_set=["json"], message="Upload a valid JSON file"),
             FileSize(max_size=2 * 1024 * 1024, message="Select a file smaller than 2MB"),
         ],
     )
