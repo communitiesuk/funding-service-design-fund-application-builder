@@ -18,6 +18,7 @@ from app.shared.table_pagination import GovUKTableAndPagination
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 SELECT_GRANT_PAGE = "select_grant"
 APPLICATIONS_DETAIL_PAGE = "view_application"
+APPLICATION_EDIT_PAGE = "edit_application"
 FUND_LIST_PAGE = "grants_table"
 FUND_DETAILS_ROUTE = "fund_bp.view_fund_details"
 
@@ -112,7 +113,8 @@ def create_fund():
 def _edit_fund_get_previous_url(actions, fund_id, round_id):
     if actions == APPLICATIONS_DETAIL_PAGE:
         return url_for("round_bp.round_details", round_id=round_id)
-
+    if actions == APPLICATION_EDIT_PAGE:
+        return url_for("round_bp.edit_round", round_id=round_id)
     return url_for(FUND_DETAILS_ROUTE, fund_id=fund_id)
 
 

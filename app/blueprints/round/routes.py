@@ -25,6 +25,9 @@ from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
+ROUND_DETAILS = "round_bp.round_details"
+BUILD_APPLICATION = "application_bp.build_application"
+ROUND_LIST = "round_bp.view_all_rounds"
 
 round_bp = Blueprint(
     "round_bp",
@@ -70,11 +73,21 @@ def select_fund():
         error = {"titleText": "There is a problem", "errorList": [{"text": form.fund_id.errors[0], "href": "#fund_id"}]}
     select_items = [{"value": value, "text": text} for value, text in choices]
     back_link = (
-        url_for("round_bp.view_all_rounds")
-        if request.args.get("action") == "applications_table"
-        else url_for("index_bp.dashboard")
+        url_for(ROUND_LIST) if request.args.get("action") == "applications_table" else url_for("index_bp.dashboard")
     )
     return render_template("select_fund.html", form=form, error=error, select_items=select_items, back_link=back_link)
+
+
+def _create_round_get_previous_url(action):
+    cancel_url = url_for(INDEX_BP_DASHBOARD)
+    if action == "applications_table":
+        cancel_url = url_for(ROUND_LIST)
+
+    prev_nav_url = url_for(
+        "round_bp.select_fund",
+        **({"action": action} if action else {}),
+    )
+    return cancel_url, prev_nav_url
 
 
 @round_bp.route("/create", methods=["GET", "POST"])
@@ -85,26 +98,41 @@ def create_round():
     """
     fund_id = request.args.get("fund_id", None)
     form = RoundForm(data={"fund_id": fund_id})
+    fund_form = FundForm()
     if not fund_id:
         raise ValueError("Fund ID is required to create a round")
     fund = get_fund_by_id(fund_id)
+
+    cancel_url, prev_nav_url = _create_round_get_previous_url(action=request.args.get("action"))
+
     if form.validate_on_submit():
         new_round = create_new_round(form)
+        if form.save_and_return_home.data:
+            flash_message(
+                message="New application created",
+                href=url_for(ROUND_DETAILS, round_id=new_round.round_id),
+                href_display_name=fund.title_json["en"],
+                next_href=url_for(BUILD_APPLICATION, round_id=new_round.round_id),
+                next_href_display_name="Design your application",
+            )
+            return redirect(url_for(INDEX_BP_DASHBOARD))
+
         flash_message(
             message="New application created",
-            href=url_for("round_bp.round_details", round_id=new_round.round_id),
-            href_display_name=new_round.title_json["en"],
+            href=url_for(ROUND_DETAILS, round_id=new_round.round_id),
+            href_display_name=fund.title_json["en"],
         )
-        match request.args.get("action") or request.form.get("action"):
-            case "return_home":
-                return redirect(url_for(INDEX_BP_DASHBOARD))
-            case "applications_table":
-                return redirect(url_for("round_bp.view_all_rounds"))
-            case _:
-                return redirect(url_for("application_bp.build_application", round_id=new_round.round_id))
+
+        if request.args.get("action") == "applications_table":
+            return redirect(url_for(ROUND_LIST))
+        return redirect(url_for(BUILD_APPLICATION, round_id=new_round.round_id))
+
     params = {
         "form": form,
         "fund": fund,
+        "fund_form": fund_form,
+        "prev_nav_url": prev_nav_url,
+        "cancel_url": cancel_url,
         "round_id": None,  # Since we're creating a new round, there's no round ID yet
     }
     return render_template("round.html", **params)
@@ -118,19 +146,34 @@ def edit_round(round_id):
     existing_round = get_round_by_id(round_id)
     if not existing_round:
         raise ValueError(f"Round with ID {round_id} not found")
+
     form = RoundForm(data={"fund_id": existing_round.fund_id})
+    fund = get_fund_by_id(existing_round.fund_id)
+    fund_form = FundForm()
     if request.method == "GET":
         form = populate_form_with_round_data(existing_round, RoundForm)
     if form.validate_on_submit():
         update_existing_round(existing_round, form)
-        flash(f"Updated round {existing_round.title_json['en']}")
-        if request.form.get("action") == "return_home":
+        if form.save_and_return_home.data:
+            flash_message(
+                message="Application updated",
+                href=url_for(ROUND_DETAILS, round_id=existing_round.round_id),
+                href_display_name=fund.title_json["en"],
+                next_href=url_for(BUILD_APPLICATION, round_id=existing_round.round_id),
+                next_href_display_name="Design your application",
+            )
             return redirect(url_for(INDEX_BP_DASHBOARD))
-        return redirect(url_for("round_bp.round_details", round_id=existing_round.round_id))
+        flash_message(message="Application updated")
+        return redirect(url_for(ROUND_DETAILS, round_id=existing_round.round_id))
+
+    prev_nav_url = url_for(ROUND_DETAILS, round_id=existing_round.round_id)
     params = {
         "form": form,
-        "fund": get_fund_by_id(existing_round.fund_id),
+        "fund": fund,
+        "fund_form": fund_form,
         "round_id": round_id,
+        "prev_nav_url": prev_nav_url,
+        "cancel_url": prev_nav_url,
     }
     return render_template("round.html", **params)
 
@@ -149,9 +192,9 @@ def clone_round(round_id):
             new_short_name=f"R-C{randint(0, 999)}",
         )
         round_id = cloned.round_id
-        msg = "Application copied successfully"
+        msg = "Application copied"
     flash(msg)
-    return redirect(url_for("round_bp.round_details", round_id=round_id))
+    return redirect(url_for(ROUND_DETAILS, round_id=round_id))
 
 
 @round_bp.route("/<round_id>")
