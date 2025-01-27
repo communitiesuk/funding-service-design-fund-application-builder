@@ -97,7 +97,9 @@ def test_template_create_get_form(flask_test_client):
 def test_template_create_invalid_data(flask_test_client):
     response = flask_test_client.post("/templates/create", data={})
     assert response.status_code == 200
-    assert b"This field is required" in response.data
+    assert b"Enter the template name" in response.data
+    assert b"Enter the task name" in response.data
+    assert b"Choose a template file" in response.data
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
@@ -128,7 +130,7 @@ def test_template_create_invalid_json_file(flask_test_client):
         }
         response = flask_test_client.post("/templates/create", data=data)
         assert response.status_code == 200
-        assert b"Please upload valid JSON file" in response.data
+        assert b"Upload a valid JSON file" in response.data
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "clean_db")

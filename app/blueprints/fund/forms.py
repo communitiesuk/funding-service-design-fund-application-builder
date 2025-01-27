@@ -12,7 +12,7 @@ def validate_unique_fund_short_name(form, field):
     if field.data and form.data:
         fund_data = get_fund_by_short_name(field.data)
         if fund_data and str(fund_data.fund_id) != form.data.get("fund_id"):
-            raise ValidationError("Given fund short name already exists.")
+            raise ValidationError("Grant short name must be unique")
 
 
 class FundForm(FlaskForm):
@@ -29,7 +29,7 @@ class FundForm(FlaskForm):
         "Grant name",
         widget=GovTextInput(),
         description="For example, Community Ownership Fund",
-        validators=[DataRequired()],
+        validators=[DataRequired(message="Enter the grant name")],
     )
     name_cy = StringField(
         "Grant name (Welsh)", widget=GovTextInput(), description="For example, Community Ownership Fund"
@@ -38,13 +38,18 @@ class FundForm(FlaskForm):
         "Grant short name",
         widget=GovTextInput(),
         description="A unique acronym of up to 10 characters for the grant. For example, COF",
-        validators=[DataRequired(), Length(max=10), no_spaces_between_letters, validate_unique_fund_short_name],
+        validators=[
+            DataRequired(message="Enter the grant short name"),
+            Length(max=10, message="Grant short name must be a maximum of 10 characters"),
+            no_spaces_between_letters,
+            validate_unique_fund_short_name,
+        ],
     )
     title_en = StringField(
         "Application name",
         widget=GovTextInput(),
         description="For example, Apply for funding to save an asset in your community",
-        validators=[DataRequired()],
+        validators=[DataRequired(message="Enter the application heading")],
     )
     title_cy = StringField(
         "Application name (Welsh)",
@@ -55,7 +60,7 @@ class FundForm(FlaskForm):
         "Description",
         widget=GovTextArea(),
         description="What the grant is for. You can find this in the grant prospectus",
-        validators=[DataRequired()],
+        validators=[DataRequired(message="Enter the grant description")],
     )
     description_cy = TextAreaField(
         "Description (Welsh)",
@@ -67,11 +72,12 @@ class FundForm(FlaskForm):
         "Funding type",
         choices=[(choice.value, choice.get_text_for_display()) for choice in FundingType],
         widget=GovRadioInput(),
+        validators=[DataRequired(message="Select the funding type")],
     )
     ggis_scheme_reference_number = StringField(
         "GGIS scheme reference number",
         widget=GovTextInput(),
-        validators=[Length(max=255)],
+        validators=[Length(max=255, message="GGIS scheme reference number must be a maximum of 255 characters")],
     )
     save_and_continue = SubmitField("Save and continue", widget=GovSubmitInput())
     save_and_return_home = SubmitField("Save and return home", widget=GovSubmitInput())

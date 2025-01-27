@@ -72,7 +72,7 @@ def test_create_fund_with_existing_short_name(flask_test_client, seed_dynamic_da
     response = submit_form(flask_test_client, "/grants/create", create_data)
     assert response.status_code == 200
     html = response.data.decode("utf-8")
-    assert '<a href="#short_name">Given fund short name already exists.</a>' in html, (
+    assert '<a href="#short_name">Grant short name must be unique</a>' in html, (
         "Not having the fund short name already exists error"
     )
 

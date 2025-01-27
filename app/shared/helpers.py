@@ -47,7 +47,12 @@ def no_spaces_between_letters(form, field):
     if not field.data:
         return
     if re.search(r"\b\w+\s+\w+\b", field.data):  # Matches sequences with spaces in between
-        raise ValidationError("Spaces between letters are not allowed.")
+        msg_prefix = ""
+        if type(form).__name__ == "FundForm":
+            msg_prefix = "Grant"
+        elif type(form).__name__ == "RoundForm":
+            msg_prefix = "Application"
+        raise ValidationError(f"{msg_prefix} short name must be unique")
 
 
 def flash_message(
