@@ -1,7 +1,7 @@
 import json
 import re
 
-from flask_wtf import FlaskForm, Form
+from flask_wtf import FlaskForm
 from govuk_frontend_wtf.wtforms_widgets import GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
 from wtforms import HiddenField, RadioField, StringField, SubmitField, TextAreaField, URLField
 from wtforms.fields.datetime import DateTimeField
@@ -62,96 +62,58 @@ def validate_unique_round_short_name(form, field):
             raise ValidationError(f"Given short name already exists in the fund {fund_data.title_json.get('en')}.")
 
 
-class DateInputForm(Form):
-    day = StringField("Day", validators=[DataRequired(), Length(min=1, max=2)])
-    month = StringField("Month", validators=[DataRequired(), Length(min=1, max=2)])
-    year = StringField("Year", validators=[DataRequired(), Length(min=1, max=4)])
-    hour = StringField("Hour", validators=[DataRequired(), Length(min=1, max=2)])
-    minute = StringField("Minute", validators=[DataRequired(), Length(min=1, max=2)])
-
-    def validate_day(self, field):
-        try:
-            day = int(field.data)
-            if day < 1 or day > 31:
-                raise ValidationError("Day must be between 1 and 31 inclusive.")
-        except ValueError as ex:
-            raise ValidationError("Invalid Day") from ex
-
-    def validate_month(self, field):
-        try:
-            month = int(field.data)
-            if month < 1 or month > 12:
-                raise ValidationError("Month must be between 1 and 12")
-        except ValueError as ex:
-            raise ValidationError("Invalid month") from ex
-
-    def validate_year(self, field):
-        try:
-            int(field.data)
-        except ValueError as ex:
-            raise ValidationError("Invalid Year") from ex
-
-    def validate_hour(self, field):
-        try:
-            hour = int(field.data)
-            if hour < 0 or hour > 23:
-                raise ValidationError("Hour must be between 0 and 23 inclusive.")
-        except ValueError as ex:
-            raise ValidationError("Invalid Day") from ex
-
-    def validate_minute(self, field):
-        try:
-            minute = int(field.data)
-            if minute < 0 or minute >= 60:
-                raise ValidationError("Minute must be between 0 and 59 inclusive.")
-        except ValueError as ex:
-            raise ValidationError("Invalid Day") from ex
-
-
 class RoundForm(FlaskForm):
     JSON_FIELD_HINT = "Valid json format, using double quotes, lowercase true/false"
 
     round_id = HiddenField("Round ID")
     fund_id = HiddenField("Fund", validators=[DataRequired()])
     title_en = StringField(
-        "Application round", widget=GovTextInput(), description="For example, Round 3", validators=[DataRequired()]
+        "Application round",
+        widget=GovTextInput(),
+        description="For example, Round 3",
+        validators=[DataRequired(message="Enter the application round")],
     )
     title_cy = StringField("Application round (Welsh)", widget=GovTextInput(), description="For example, Round 3")
     short_name = StringField(
         "Round short name",
         widget=GovTextInput(),
         description="Choose a unique short name with a maximum of 6 characters",
-        validators=[DataRequired(), Length(max=6), no_spaces_between_letters, validate_unique_round_short_name],
+        validators=[
+            DataRequired(message="Enter the round short name"),
+            Length(max=6, message="Application short name must be a maximum of 6 characters"),
+            no_spaces_between_letters,
+            validate_unique_round_short_name,
+        ],
     )
     opens = DateTimeField(
         "Application round opens",
         widget=GovDatetimeInput(),
         format="%d %m %Y %H %M",
-        validators=[DataRequired(message="Enter a valid date and time")],
+        validators=[DataRequired(message="Enter the date and time the application round opens")],
     )
     deadline = DateTimeField(
         "Application round closes",
         widget=GovDatetimeInput(),
         format="%d %m %Y %H %M",
-        validators=[DataRequired(message="Enter a valid date and time")],
+        validators=[DataRequired(message="Enter the date and time the application round closes")],
     )
     reminder_date = DateTimeField(
         "Application reminder email",
         widget=GovDatetimeInput(),
         format="%d %m %Y %H %M",
-        validators=[DataRequired(message="Enter a valid date and time")],
+        validators=[DataRequired(message="Enter the date and time for the applicant reminder email")],
     )
     assessment_start = DateTimeField(
         "Assessment opens",
         widget=GovDatetimeInput(),
         format="%d %m %Y %H %M",
-        validators=[DataRequired(message="Enter a valid date and time")],
+        validators=[DataRequired(message="Enter the date and time the assessment opens")],
     )
     assessment_deadline = DateTimeField(
         "Assessment closes",
         widget=GovDatetimeInput(),
         format="%d %m %Y %H %M",
-        validators=[DataRequired(message="Enter a valid date and time")],
+        validators=[DataRequired(message="Enter the date and time the assessment closes")],
     )
     guidance_url = URLField(
         "Assessor guidance link (optional)", widget=GovTextInput(), validators=[validate_flexible_url]
@@ -159,8 +121,12 @@ class RoundForm(FlaskForm):
     contact_email = StringField("Grant team email address (optional)", widget=GovTextInput())
     contact_phone = StringField("Grant team phone number (optional)", widget=GovTextInput())
     contact_textphone = StringField("Grant team text phone number (optional)", widget=GovTextInput())
-    support_times = StringField("Grant team support hours", widget=GovTextInput(), validators=[DataRequired()])
-    support_days = StringField("Grant team support days", widget=GovTextInput(), validators=[DataRequired()])
+    support_times = StringField(
+        "Grant team support hours", widget=GovTextInput(), validators=[DataRequired()], default="9am to 5pm"
+    )
+    support_days = StringField(
+        "Grant team support days", widget=GovTextInput(), validators=[DataRequired()], default="Monday to Friday"
+    )
     instructions_en = TextAreaField("Before you apply guidance (optional)", widget=GovTextArea())
     instructions_cy = StringField("Before you apply guidance (Welsh) (optional)", widget=GovTextInput())
     application_guidance_en = TextAreaField("Completing the application guidance (optional)", widget=GovTextArea())
@@ -169,16 +135,20 @@ class RoundForm(FlaskForm):
     )
     feedback_link = URLField("Feedback link (optional)", widget=GovTextInput(), validators=[validate_flexible_url])
     prospectus_link = URLField(
-        "Prospectus link", widget=GovTextInput(), validators=[DataRequired(), validate_flexible_url]
+        "Prospectus link",
+        widget=GovTextInput(),
+        validators=[DataRequired(message="Enter the prospectus link"), validate_flexible_url],
     )
     privacy_notice_link = URLField(
-        "Privacy notice link", widget=GovTextInput(), validators=[DataRequired(), validate_flexible_url]
+        "Privacy notice link",
+        widget=GovTextInput(),
+        validators=[DataRequired(message="Enter the privacy notice link"), validate_flexible_url],
     )
     project_name_field_id = StringField(
         "Project name field ID",
         widget=GovTextInput(),
         description="Ask a developer on the Forms team for the correct field ID",
-        validators=[DataRequired()],
+        validators=[DataRequired(message="Enter the project name field ID")],
     )
     eoi_decision_schema_en = TextAreaField(
         "Expression of interest decision schema (optional)",
