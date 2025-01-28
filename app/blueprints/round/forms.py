@@ -151,7 +151,7 @@ class RoundForm(FlaskForm):
     eoi_decision_schema_en = TextAreaField(
         "Expression of interest decision schema (optional)",
         widget=GovTextArea(),
-        validators=[validate_json_field],
+        validators=[],
         description=JSON_FIELD_HINT,
     )
     eoi_decision_schema_cy = TextAreaField(
