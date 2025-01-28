@@ -3,7 +3,8 @@ from unittest.mock import MagicMock
 import pytest
 from wtforms.validators import ValidationError
 
-from app.blueprints.round.forms import validate_flexible_url, validate_json_field
+from app.blueprints.round.forms import validate_json_field
+from app.shared.validators import FlexibleUrl
 
 
 class MockField:
@@ -54,18 +55,18 @@ def test_validate_flexible_url(url, should_pass):
 
     if should_pass:
         try:
-            validate_flexible_url(mock_form, field)
+            FlexibleUrl().__call__(mock_form, field)
         except ValidationError:
             pytest.fail(f"URL '{url}' should have passed validation but failed")
     else:
         with pytest.raises(ValidationError):
-            validate_flexible_url(mock_form, field)
+            FlexibleUrl().__call__(mock_form, field)
 
 
 def test_validate_flexible_url_none_value():
     """Test that None value is handled gracefully"""
     field = MockField(None)
-    validate_flexible_url(None, field)  # Should not raise any exception
+    FlexibleUrl().__call__(None, field)  # Should not raise any exception
 
 
 @pytest.mark.parametrize("input_json_string", [(None), (""), ("{}"), (""), ("{}"), ('{"1":"2"}')])

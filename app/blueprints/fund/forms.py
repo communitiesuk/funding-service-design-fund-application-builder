@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired, Length, ValidationError
 
 from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_short_name
-from app.shared.validators import NoSpacesBetweenLetters
+from app.shared.validators import NoSpacesBetweenLetters, WelshDataRequired
 
 
 def validate_unique_fund_short_name(form, field):
@@ -32,7 +32,8 @@ class FundForm(FlaskForm):
         validators=[DataRequired(message="Enter the grant name")],
     )
     name_cy = StringField(
-        "Grant name (Welsh)", widget=GovTextInput(), description="For example, Community Ownership Fund"
+        "Grant name (Welsh)", widget=GovTextInput(), description="For example, Community Ownership Fund",
+        validators=[WelshDataRequired(message="Enter the Welsh grant name")],
     )
     short_name = StringField(
         "Grant short name",
@@ -55,6 +56,7 @@ class FundForm(FlaskForm):
         "Application name (Welsh)",
         widget=GovTextInput(),
         description="For example, Apply for funding to save an asset in your community",
+        validators=[WelshDataRequired(message="Enter the Welsh application name")],
     )
     description_en = TextAreaField(
         "Grant description",
@@ -66,6 +68,7 @@ class FundForm(FlaskForm):
         "Grant description (Welsh)",
         widget=GovTextArea(),
         description="What the grant is for. You can find this in the grant prospectus",
+        validators=[WelshDataRequired(message="Enter the Welsh grant description")],
     )
 
     funding_type = RadioField(

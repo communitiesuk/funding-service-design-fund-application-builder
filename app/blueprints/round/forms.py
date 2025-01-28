@@ -1,5 +1,4 @@
 import json
-import re
 
 from flask_wtf import FlaskForm
 from govuk_frontend_wtf.wtforms_widgets import GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
@@ -8,7 +7,7 @@ from wtforms.fields.datetime import DateTimeField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 from app.db.queries.round import get_round_by_short_name_and_fund_id
-from app.shared.validators import NoSpacesBetweenLetters
+from app.shared.validators import FlexibleUrl, NoSpacesBetweenLetters, WelshDataRequired
 from govuk_frontend_ext.fields import GovDatetimeInput
 
 
@@ -22,42 +21,11 @@ def validate_json_field(form, field):
         raise ValidationError(f"Content is not valid JSON. Underlying error: [{str(ex)}]") from ex
 
 
-def validate_flexible_url(form, field):
-    """
-    Validates URLs allowing:
-    - Optional scheme (http://, https://)
-    - Domain names with multiple subdomains
-    - Optional paths, query parameters
-    - Common TLDs
-    - No scheme required
-    """
-    if not field.data:
-        return
-
-    pattern = (
-        # Optional scheme
-        r"^(?:(?:http|https)://)?"
-        # Domain with optional subdomains
-        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,63})"
-        # Optional port
-        r"(?::\d+)?"
-        # Optional path
-        r"(?:/[^/\s]*)*"
-        # Optional query string
-        r"(?:\?[^\s]*)?"
-        # Optional fragment
-        r"(?:#[^\s]*)?$"
-    )
-
-    if not re.match(pattern, field.data, re.IGNORECASE):
-        raise ValidationError("Invalid URL. Please enter a valid web address.")
-
-
 def validate_unique_round_short_name(form, field):
     if form.data and field.data and form.data.get("fund_id"):
         rond_data = get_round_by_short_name_and_fund_id(form.data.get("fund_id"), field.data)
         if rond_data and str(rond_data.round_id) != form.data.get("round_id"):
-            raise ValidationError("Application short name must be unique")
+            raise ValidationError("Application round short name already exists for this grant")
 
 
 class RoundForm(FlaskForm):
@@ -114,7 +82,14 @@ class RoundForm(FlaskForm):
         validators=[DataRequired(message="Enter the date and time the assessment closes")],
     )
     guidance_url = URLField(
-        "Assessor guidance link (optional)", widget=GovTextInput(), validators=[validate_flexible_url]
+        "Assessor guidance link (optional)",
+        widget=GovTextInput(),
+        validators=[
+            FlexibleUrl(
+                message="Assessor guidance link must be in the correct website format. For example, www.sharepoint.co.uk/assessorguidance"
+                # noqa: E501
+            )
+        ],
     )
     contact_email = StringField("Grant team email address (optional)", widget=GovTextInput())
     contact_phone = StringField("Grant team phone number (optional)", widget=GovTextInput())
@@ -131,16 +106,36 @@ class RoundForm(FlaskForm):
     application_guidance_cy = TextAreaField(
         "Completing the application guidance (Welsh) (optional)", widget=GovTextArea()
     )
-    feedback_link = URLField("Feedback link (optional)", widget=GovTextInput(), validators=[validate_flexible_url])
+    feedback_link = URLField(
+        "Feedback link (optional)",
+        widget=GovTextInput(),
+        validators=[
+            FlexibleUrl(
+                message="Feedback link must be in the correct website format. For example, www.grantapplicationfeedback.com"
+                # noqa: E501
+            )
+        ],
+    )
     prospectus_link = URLField(
         "Prospectus link",
         widget=GovTextInput(),
-        validators=[DataRequired(message="Enter the prospectus link"), validate_flexible_url],
+        validators=[
+            DataRequired(message="Enter the prospectus link"),
+            FlexibleUrl(
+                message="Prospectus link must be in the correct website format. For example, www.grantprospectus.com"
+            ),
+            # noqa: E501
+        ],
     )
     privacy_notice_link = URLField(
         "Privacy notice link",
         widget=GovTextInput(),
-        validators=[DataRequired(message="Enter the privacy notice link"), validate_flexible_url],
+        validators=[
+            DataRequired(message="Enter the privacy notice link"),
+            FlexibleUrl(
+                message="Privacy notice must be in the correct website format. For example, www.grant.com/privacynotice"
+            ),
+        ],
     )
     project_name_field_id = StringField(
         "Project name field ID",
