@@ -85,6 +85,30 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_round_with_invalid_eoi_schema_json(flask_test_client, seed_dynamic_data):
+    """
+    Tests for rounds/create route verifies that the created round has the correct attributes
+    """
+    test_fund = seed_dynamic_data["funds"][0]
+    new_round_data = {
+        "fund_id": test_fund.fund_id,
+        "title_en": "New Round",
+        "short_name": "test123",
+        "save_and_return_home": True,
+        "eoi_decision_schema_en": "asdasd",
+        **round_data_info,
+    }
+
+    error_html = "Content is not valid JSON. Underlying error"
+    url = f"/rounds/create?fund_id={test_fund.fund_id}"
+
+    # Test works fine with first round
+    response = submit_form(flask_test_client, url, new_round_data)
+    assert response.status_code == 200
+    assert error_html in response.data.decode("utf-8"), "No errors found in response"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_update_existing_round(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully updated using the /rounds/<round_id> route
