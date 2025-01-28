@@ -5,7 +5,7 @@ from flask_wtf import FlaskForm
 from govuk_frontend_wtf.wtforms_widgets import GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
 from wtforms import HiddenField, RadioField, StringField, SubmitField, TextAreaField, URLField
 from wtforms.fields.datetime import DateTimeField
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 from app.db.queries.round import get_round_by_short_name_and_fund_id
 from app.shared.validators import NoSpacesBetweenLetters
@@ -151,14 +151,14 @@ class RoundForm(FlaskForm):
     eoi_decision_schema_en = TextAreaField(
         "Expression of interest decision schema (optional)",
         widget=GovTextArea(),
-        validators=[validate_json_field],
+        validators=[Optional(), validate_json_field],
         description=JSON_FIELD_HINT,
     )
     eoi_decision_schema_cy = TextAreaField(
         "Expression of interest decision schema (Welsh) (optional)",
         widget=GovTextArea(),
         description=JSON_FIELD_HINT,
-        validators=[validate_json_field],
+        validators=[Optional(), validate_json_field],
     )
     contact_us_banner_en = TextAreaField(
         "Contact Us information (optional)",
