@@ -1,3 +1,4 @@
+import json
 import re
 
 from wtforms.validators import ValidationError
@@ -68,5 +69,38 @@ class WelshDataRequired:
 
     def __call__(self, form, field):
         # Check if Welsh is available and name_cy is required
-        if form.welsh_available.data and not (field.data and field.data.strip()):
+        if isinstance(form.welsh_available.data, str):
+            form.welsh_available.data = True if form.welsh_available.data == "True" else False
+        if form.welsh_available and form.welsh_available.data and not (field.data and field.data.strip()):
             raise ValidationError(self.message)
+
+
+class JsonValidation:
+    """
+    validate given data compatible to json
+    """
+
+    def __init__(self, message=None):
+        self.message = message
+
+    def __call__(self, form, field):
+        str_content = field.data
+        if not str_content:
+            return
+        try:
+            json.loads(str_content)
+        except Exception as ex:
+            # TODO waiting for the error message
+            raise ValidationError(f"Content is not valid JSON. Underlying error: [{str(ex)}]") from ex
+
+
+class WelshJsonValidation(JsonValidation):
+    """
+    validate given data compatible to json
+    """
+
+    def __call__(self, form, field):
+        if isinstance(form.welsh_available.data, str):
+            form.welsh_available.data = True if form.welsh_available.data == "True" else False
+        if form.welsh_available and form.welsh_available.data:
+            super().__call__(form, field)

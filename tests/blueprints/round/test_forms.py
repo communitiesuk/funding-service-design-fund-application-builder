@@ -3,8 +3,7 @@ from unittest.mock import MagicMock
 import pytest
 from wtforms.validators import ValidationError
 
-from app.blueprints.round.forms import validate_json_field
-from app.shared.validators import FlexibleUrl
+from app.shared.validators import FlexibleUrl, JsonValidation
 
 
 class MockField:
@@ -73,7 +72,7 @@ def test_validate_flexible_url_none_value():
 def test_validate_json_input_valid(input_json_string):
     field = MagicMock()
     field.data = input_json_string
-    validate_json_field(None, field)
+    JsonValidation().__call__(None, field)
 
 
 @pytest.mark.parametrize(
@@ -87,5 +86,5 @@ def test_validate_json_input_invalid(input_json_string, exp_error_msg):
     field = MagicMock()
     field.data = input_json_string
     with pytest.raises(ValidationError) as error:
-        validate_json_field(None, field)
+        JsonValidation().__call__(None, field)
     assert exp_error_msg in str(error)

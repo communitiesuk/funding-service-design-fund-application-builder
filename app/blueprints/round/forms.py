@@ -7,18 +7,9 @@ from wtforms.fields.datetime import DateTimeField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 from app.db.queries.round import get_round_by_short_name_and_fund_id
-from app.shared.validators import FlexibleUrl, NoSpacesBetweenLetters, WelshDataRequired
+from app.shared.validators import FlexibleUrl, NoSpacesBetweenLetters, WelshDataRequired, JsonValidation, \
+    WelshJsonValidation
 from govuk_frontend_ext.fields import GovDatetimeInput
-
-
-def validate_json_field(form, field):
-    str_content = field.data
-    if not str_content:
-        return
-    try:
-        json.loads(str_content)
-    except Exception as ex:
-        raise ValidationError(f"Content is not valid JSON. Underlying error: [{str(ex)}]") from ex
 
 
 def validate_unique_round_short_name(form, field):
@@ -33,13 +24,15 @@ class RoundForm(FlaskForm):
 
     round_id = HiddenField("Round ID")
     fund_id = HiddenField("Fund", validators=[DataRequired()])
+    welsh_available = HiddenField("Welsh Available")
     title_en = StringField(
         "Application round",
         widget=GovTextInput(),
         description="For example, Round 3",
         validators=[DataRequired(message="Enter the application round")],
     )
-    title_cy = StringField("Application round (Welsh)", widget=GovTextInput(), description="For example, Round 3")
+    title_cy = StringField("Application round (Welsh)", widget=GovTextInput(), description="For example, Round 3",
+                           validators=[WelshDataRequired(message="Enter the Welsh application round")])
     short_name = StringField(
         "Round short name",
         widget=GovTextInput(),
@@ -146,14 +139,14 @@ class RoundForm(FlaskForm):
     eoi_decision_schema_en = TextAreaField(
         "Expression of interest decision schema (optional)",
         widget=GovTextArea(),
-        validators=[Optional(), validate_json_field],
+        validators=[Optional(), JsonValidation()],
         description=JSON_FIELD_HINT,
     )
     eoi_decision_schema_cy = TextAreaField(
         "Expression of interest decision schema (Welsh) (optional)",
         widget=GovTextArea(),
         description=JSON_FIELD_HINT,
-        validators=[Optional(), validate_json_field],
+        validators=[Optional(), WelshJsonValidation()],
     )
     contact_us_banner_en = TextAreaField(
         "Contact us information (optional)",

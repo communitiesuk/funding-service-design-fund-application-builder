@@ -97,11 +97,11 @@ def create_round():
     Expects a ?fund_id=... in the query string, set by the select_fund route or other means.
     """
     fund_id = request.args.get("fund_id", None)
-    form = RoundForm(data={"fund_id": fund_id})
     fund_form = FundForm()
     if not fund_id:
         raise ValueError("Fund ID is required to create a round")
     fund = get_fund_by_id(fund_id)
+    form = RoundForm(data={"fund_id": fund_id, "welsh_available": fund.welsh_available})
 
     cancel_url, prev_nav_url = _create_round_get_previous_url(action=request.args.get("action"))
 
@@ -147,8 +147,8 @@ def edit_round(round_id):
     if not existing_round:
         raise ValueError(f"Round with ID {round_id} not found")
 
-    form = RoundForm(data={"fund_id": existing_round.fund_id})
     fund = get_fund_by_id(existing_round.fund_id)
+    form = RoundForm(data={"fund_id": existing_round.fund_id, "welsh_available": fund.welsh_available})
     fund_form = FundForm()
     if request.method == "GET":
         form = populate_form_with_round_data(existing_round, RoundForm)
