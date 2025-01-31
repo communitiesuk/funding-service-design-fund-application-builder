@@ -72,10 +72,7 @@ def select_fund():
     if form.fund_id.errors:
         error = {"titleText": "There is a problem", "errorList": [{"text": form.fund_id.errors[0], "href": "#fund_id"}]}
     select_items = [{"value": value, "text": text} for value, text in choices]
-    back_link = (
-        url_for(ROUND_LIST) if request.args.get("action") == "applications_table" else url_for("index_bp.dashboard")
-    )
-    return render_template("select_fund.html", form=form, error=error, select_items=select_items, back_link=back_link)
+    return render_template("select_fund.html", form=form, error=error, select_items=select_items)
 
 
 def _create_round_get_previous_url(action):
@@ -83,11 +80,7 @@ def _create_round_get_previous_url(action):
     if action == "applications_table":
         cancel_url = url_for(ROUND_LIST)
 
-    prev_nav_url = url_for(
-        "round_bp.select_fund",
-        **({"action": action} if action else {}),
-    )
-    return cancel_url, prev_nav_url
+    return cancel_url
 
 
 @round_bp.route("/create", methods=["GET", "POST"])
@@ -103,7 +96,7 @@ def create_round():
     fund = get_fund_by_id(fund_id)
     form = RoundForm(data={"fund_id": fund_id, "welsh_available": fund.welsh_available})
 
-    cancel_url, prev_nav_url = _create_round_get_previous_url(action=request.args.get("action"))
+    cancel_url = _create_round_get_previous_url(action=request.args.get("action"))
 
     if form.validate_on_submit():
         new_round = create_new_round(form)
@@ -131,7 +124,6 @@ def create_round():
         "form": form,
         "fund": fund,
         "fund_form": fund_form,
-        "prev_nav_url": prev_nav_url,
         "cancel_url": cancel_url,
         "round_id": None,  # Since we're creating a new round, there's no round ID yet
     }
@@ -172,7 +164,6 @@ def edit_round(round_id):
         "fund": fund,
         "fund_form": fund_form,
         "round_id": round_id,
-        "prev_nav_url": prev_nav_url,
         "cancel_url": prev_nav_url,
     }
     return render_template("round.html", **params)

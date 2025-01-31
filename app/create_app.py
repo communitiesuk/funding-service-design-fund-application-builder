@@ -1,4 +1,6 @@
-from flask import Flask, render_template
+import uuid
+
+from flask import Flask, render_template, session, request
 from flask_talisman import Talisman
 from fsd_utils import init_sentry
 from fsd_utils.authentication.decorators import SupportedApp, check_internal_user, login_required
@@ -92,6 +94,37 @@ def create_app() -> Flask:
     @flask_app.errorhandler(403)
     def forbidden_error(error):
         return render_template("403.html"), 403
+
+    @flask_app.before_request
+    def track_pages():
+        # Initialize the visited pages list if not already
+        if 'visited_pages' not in session:
+            session['visited_pages'] = []
+        if 'session_id' not in session:
+            session['session_id'] = str(uuid.uuid4())
+
+        endpoint = request.endpoint
+        if not endpoint or "go_back" in endpoint:
+            return
+
+        tracked_blueprints = {"template_bp", "index_bp", "application_bp", "fund_bp", "round_bp"}
+        ignore_endpoints = {"application_bp.build_application"}
+        reset_endpoints = {
+            "index_bp.dashboard", "fund_bp.view_all_funds",
+            "round_bp.view_all_rounds", "template_bp.view_templates"
+        }
+
+        page = None
+        if any(bp in endpoint for bp in tracked_blueprints) and endpoint not in ignore_endpoints:
+            page = {"endpoint": endpoint, "view_args": request.view_args or {}, "query_params": request.args.to_dict()}
+            if not session["visited_pages"] or session["visited_pages"][-1]["endpoint"] != endpoint:
+                session["visited_pages"].append(page)
+                session.modified = True
+
+        # reset session based on the above endpoints
+        if endpoint in reset_endpoints and page:
+            session["visited_pages"] = [page]
+        session.modified = True
 
     @flask_app.errorhandler(500)
     def internal_server_error(e):

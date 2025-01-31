@@ -85,14 +85,20 @@ def clean_db(app, _db):
 @pytest.fixture(scope="session")
 def app():
     app = create_app()
-    yield app
+    # this will enable the usage of url_for but use the app context in the test
+    app.config["TESTING"] = True
+    app.config["SERVER_NAME"] = "localhost"
+    with app.app_context():
+        yield app
 
 
 @pytest.fixture(scope="function")
-def flask_test_client():
-    with create_app().app_context() as app_context:
+def flask_test_client(app):
+    with app.app_context():
         upgrade()
-        with app_context.app.test_client() as test_client:
+        with app.test_client() as test_client:
+            with test_client.session_transaction() as session:
+                session['visited_pages'] = []  # Initialize the session for the test
             yield test_client
 
 
