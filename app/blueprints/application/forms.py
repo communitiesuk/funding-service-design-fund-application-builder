@@ -7,12 +7,14 @@ from wtforms.validators import DataRequired
 class SectionForm(FlaskForm):
     round_id = HiddenField("Round ID")
     section_id = HiddenField("Section ID")
-    name_in_apply_en = StringField("Name", widget=GovTextInput(), validators=[DataRequired()])
+    name_in_apply_en = StringField(
+        "Name", widget=GovTextInput(), validators=[DataRequired(message="Enter the section name")]
+    )
 
 
 class SelectApplicationForm(FlaskForm):
     round_id = SelectField(
-        "Select or create an application",
+        "Select the application you want to manage or create a new one.",
         widget=GovSelect(),
         validators=[DataRequired(message="Select or create an application")],
     )

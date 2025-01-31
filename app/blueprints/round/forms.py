@@ -161,17 +161,17 @@ class RoundForm(FlaskForm):
         validators=[Optional(), validate_json_field],
     )
     contact_us_banner_en = TextAreaField(
-        "Contact Us information (optional)",
+        "Contact us information (optional)",
         widget=GovTextArea(),
         description="HTML to display to override the default 'Contact Us' page content",
     )
     contact_us_banner_cy = TextAreaField(
-        "Contact Us information (Welsh) (optional)",
+        "Contact us information (Welsh) (optional)",
         widget=GovTextArea(),
         description="HTML to display to override the default 'Contact Us' page content",
     )
     reference_contact_page_over_email = RadioField(
-        "Do you want to include the contact us page in applicant emails",
+        "Do you want to include the contact us page in applicant emails?",
         widget=GovRadioInput(),
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
@@ -227,7 +227,7 @@ class RoundForm(FlaskForm):
         default="false",
     )
     is_research_survey_optional = RadioField(
-        "Is research survey optional",
+        "Is the research survey optional?",
         widget=GovRadioInput(),
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
@@ -248,7 +248,7 @@ class RoundForm(FlaskForm):
         default="false",
     )
     is_section_feedback_optional = RadioField(
-        "Is section feedback optional",
+        "Is section feedback optional?",
         widget=GovRadioInput(),
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",

@@ -6,7 +6,7 @@ from wtforms.validators import DataRequired
 
 class SelectFundForm(FlaskForm):
     fund_id = SelectField(
-        "Select or add a new grant for this application",
+        "Select or add a new grant for this application.",
         widget=GovSelect(),
         validators=[DataRequired(message="Select or add a grant")],
     )
