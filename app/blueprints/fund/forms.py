@@ -5,7 +5,7 @@ from wtforms.validators import DataRequired, Length, ValidationError
 
 from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_short_name
-from app.shared.validators import NoSpacesBetweenLetters, WelshDataRequired
+from app.shared.validators import NoSpacesBetweenLetters
 
 
 def validate_unique_fund_short_name(form, field):
@@ -33,7 +33,6 @@ class FundForm(FlaskForm):
     )
     name_cy = StringField(
         "Grant name (Welsh)", widget=GovTextInput(), description="For example, Community Ownership Fund",
-        validators=[WelshDataRequired(message="Enter the Welsh grant name")],
     )
     short_name = StringField(
         "Grant short name",
@@ -56,7 +55,6 @@ class FundForm(FlaskForm):
         "Application name (Welsh)",
         widget=GovTextInput(),
         description="For example, Apply for funding to save an asset in your community",
-        validators=[WelshDataRequired(message="Enter the Welsh application name")],
     )
     description_en = TextAreaField(
         "Grant description",
@@ -68,7 +66,6 @@ class FundForm(FlaskForm):
         "Grant description (Welsh)",
         widget=GovTextArea(),
         description="What the grant is for. You can find this in the grant prospectus",
-        validators=[WelshDataRequired(message="Enter the Welsh grant description")],
     )
 
     funding_type = RadioField(
@@ -84,3 +81,23 @@ class FundForm(FlaskForm):
     )
     save_and_continue = SubmitField("Save and continue", widget=GovSubmitInput())
     save_and_return_home = SubmitField("Save and return home", widget=GovSubmitInput())
+
+    def validate(self, extra_validators=None):
+        form_status = super().validate(extra_validators)
+
+        # Convert welsh_available string to boolean
+        if isinstance(self.welsh_available.data, str):
+            self.welsh_available.data = self.welsh_available.data == "True"
+
+        # If Welsh is available, validate Welsh fields
+        if self.welsh_available.data:
+            for field, message in [
+                (self.description_cy, "Enter the Welsh grant description"),
+                (self.name_cy, "Enter the Welsh grant name"),
+                (self.title_cy, "Enter the Welsh application name")
+            ]:
+                if not field.data or not field.data.strip():
+                    field.errors.append(message)
+                    form_status = False
+
+        return form_status

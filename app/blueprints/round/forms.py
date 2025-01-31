@@ -1,5 +1,3 @@
-import json
-
 from flask_wtf import FlaskForm
 from govuk_frontend_wtf.wtforms_widgets import GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
 from wtforms import HiddenField, RadioField, StringField, SubmitField, TextAreaField, URLField
@@ -7,7 +5,7 @@ from wtforms.fields.datetime import DateTimeField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 from app.db.queries.round import get_round_by_short_name_and_fund_id
-from app.shared.validators import FlexibleUrl, NoSpacesBetweenLetters, WelshDataRequired, JsonValidation, \
+from app.shared.validators import FlexibleUrl, NoSpacesBetweenLetters, JsonValidation, \
     WelshJsonValidation
 from govuk_frontend_ext.fields import GovDatetimeInput
 
@@ -31,8 +29,7 @@ class RoundForm(FlaskForm):
         description="For example, Round 3",
         validators=[DataRequired(message="Enter the application round")],
     )
-    title_cy = StringField("Application round (Welsh)", widget=GovTextInput(), description="For example, Round 3",
-                           validators=[WelshDataRequired(message="Enter the Welsh application round")])
+    title_cy = StringField("Application round (Welsh)", widget=GovTextInput(), description="For example, Round 3", )
     short_name = StringField(
         "Round short name",
         widget=GovTextInput(),
@@ -253,6 +250,20 @@ class RoundForm(FlaskForm):
     )
     save_and_continue = SubmitField("Save and continue", widget=GovSubmitInput())
     save_and_return_home = SubmitField("Save and return home", widget=GovSubmitInput())
+
+    def validate(self, extra_validators=None):
+        form_status = super().validate(extra_validators)
+
+        # Convert welsh_available string to boolean
+        if isinstance(self.welsh_available.data, str):
+            self.welsh_available.data = self.welsh_available.data == "True"
+
+        # If Welsh is available, validate Welsh fields
+        if self.welsh_available.data and not self.title_cy.data.strip():
+            self.title_cy.errors.append("Enter the Welsh application round")
+            form_status = False
+
+        return form_status
 
 
 class CloneRoundForm(FlaskForm):

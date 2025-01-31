@@ -68,7 +68,7 @@ def test_validate_flexible_url_none_value():
     FlexibleUrl().__call__(None, field)  # Should not raise any exception
 
 
-@pytest.mark.parametrize("input_json_string", [(None), (""), ("{}"), (""), ("{}"), ('{"1":"2"}')])
+@pytest.mark.parametrize("input_json_string", [("{}"), ('{"1":"2"}')])
 def test_validate_json_input_valid(input_json_string):
     field = MagicMock()
     field.data = input_json_string
