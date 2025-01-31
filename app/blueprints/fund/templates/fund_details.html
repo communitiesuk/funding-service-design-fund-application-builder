@@ -26,7 +26,7 @@
             "classes": "govuk-!-margin-bottom-9",
                 "rows": [
                     {
-                        "key": {"text": form.name_en.label},
+                        "key": {"text": form.name_en.label.text},
                         "value": {"text": fund.name_json["en"]},
                         "actions": {
                             "items": [
@@ -40,7 +40,7 @@
                         },
                     },
                     {
-                        "key": {"text": form.name_cy.label},
+                        "key": {"text": form.name_cy.label.text},
                         "value": {"text": fund.name_json["cy"]},
                         "actions": {
                             "items": [
@@ -54,7 +54,7 @@
                         },
                     } if fund.welsh_available else {},
                     {
-                        "key": {"text": form.short_name.label},
+                        "key": {"text": form.short_name.label.text},
                         "value": {"text": fund.short_name},
                         "actions": {
                             "items": [
@@ -68,7 +68,7 @@
                         }
                     },
                     {
-                        "key": {"text": form.title_en.label},
+                        "key": {"text": form.title_en.label.text},
                         "value": {"text": "Apply for " + fund.title_json["en"]},
                         "actions": {
                             "items": [
@@ -82,7 +82,7 @@
                         }
                     },
                     {
-                        "key": {"text": form.title_cy.label},
+                        "key": {"text": form.title_cy.label.text},
                         "value": {"text": "Apply for " + fund.title_json["cy"] if fund.title_json["cy"] else ""},
                         "actions": {
                             "items": [
@@ -96,7 +96,7 @@
                         },
                     } if fund.welsh_available else {},
                     {
-                        "key": {"text": form.funding_type.label},
+                        "key": {"text": form.funding_type.label.text},
                         "value": {"text": fund.funding_type.get_text_for_display()},
                         "actions": {
                             "items": [
@@ -110,7 +110,7 @@
                         }
                     },
                     {
-                        "key": {"text": form.welsh_available.label},
+                        "key": {"text": form.welsh_available.label.text},
                         "value": {"text": "Yes" if fund.welsh_available else "No"},
                         "actions": {
                             "items": [
@@ -124,7 +124,7 @@
                         }
                     },
                     {
-                        "key": {"text": form.description_en.label},
+                        "key": {"text": form.description_en.label.text},
                         "value": {"text": fund.description_json["en"]},
                         "actions": {
                             "items": [
@@ -138,7 +138,7 @@
                         }
                     },
                     {
-                        "key": {"text": form.description_cy.label},
+                        "key": {"text": form.description_cy.label.text},
                         "value": {"text": fund.description_json["cy"]},
                         "actions": {
                             "items": [
@@ -152,7 +152,7 @@
                         }
                     } if fund.welsh_available else {},
                     {
-                        "key": {"text": form.ggis_scheme_reference_number.label},
+                        "key": {"text": form.ggis_scheme_reference_number.label.text},
                         "value": {"text": fund.ggis_scheme_reference_number},
                         "actions": {
                             "items": [
