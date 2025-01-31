@@ -302,7 +302,7 @@ def test_view_all_funds(flask_test_client, seed_dynamic_data):
     # Table component availability check
     assert '<thead class="govuk-table__head">' in html, "Table is missing"
     assert '<th scope="col" class="govuk-table__header">Grant name</th>' in html, "Grant name header is missing"
-    assert '<th scope="col" class="govuk-table__header">Description</th>' in html, "Description header missing"
+    assert '<th scope="col" class="govuk-table__header">Grant description</th>' in html, "Description header missing"
     assert '<th scope="col" class="govuk-table__header">Grant type</th>' in html, "Grant type header missing"
     assert "New fund" in html, "Grant name is missing"
     assert "New fund description" in html, "Fund description is missing"
@@ -330,7 +330,7 @@ def test_view_fund_details(flask_test_client, seed_dynamic_data):
     assert f'<h1 class="govuk-heading-l">{test_fund.name_json["en"]}</h1>' in html
     assert (
         f'<a class="govuk-link govuk-link--no-visited-state" href="/grants/{test_fund.fund_id}/edit#name_en">Change'
-        f'<span class="govuk-visually-hidden"> Name english</span></a>' in html  # noqa: E501
+        f'<span class="govuk-visually-hidden"> Grant name</span></a>' in html  # noqa: E501
     )
     assert '<a href="/grants/" class="govuk-back-link">Back</a>' in html
 
