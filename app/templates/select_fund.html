@@ -23,18 +23,19 @@
     </div>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-l">Select a grant</h1>
-        </div>
-    </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
             <form method="POST" novalidate>
                 {{ form.csrf_token }}
-                {{ form.fund_id }}
+                {% set labelHtml %}
+                {{ form.fund_id.label.text }}
+                {% endset %}
 
-                <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-7">
-                    <a href="{{ url_for('fund_bp.create_fund', actions="select_grant") }}" class="govuk-link">Add a new grant</a>
+                {% set hintHtml %}
+                <p class="govuk-body govuk-!-margin-top-3">
+                  <a href="{{ url_for('fund_bp.create_fund', actions="select_grant") }}}}" class="govuk-link">Add a new grant</a>
                 </p>
+                {%endset%}
+
+                {{ form.fund_id(params={"label": {"isPageHeading": true, "classes": "govuk-label--l", "html": labelHtml }, "formGroup": {"afterInput": {"html": hintHtml } } })  }}
 
                 <div class="govuk-button-group">
                     {{ govukButton({
