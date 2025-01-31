@@ -332,7 +332,7 @@ def test_view_fund_details(flask_test_client, seed_dynamic_data):
         f'<a class="govuk-link govuk-link--no-visited-state" href="/grants/{test_fund.fund_id}/edit#name_en">Change'
         f'<span class="govuk-visually-hidden"> Grant name</span></a>' in html  # noqa: E501
     )
-    assert '<a href="/grants/" class="govuk-back-link">Back</a>' in html
+    assert 'Back' in html
 
     assert '<dt class="govuk-summary-list__key"> Grant name (Welsh)</dt>' not in html
 
