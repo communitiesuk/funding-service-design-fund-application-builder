@@ -54,7 +54,7 @@
         "classes": "govuk-!-margin-bottom-9",
             "rows": [
                 {
-                    "key": {"text": form.title_en.label},
+                    "key": {"text": form.title_en.label.text},
                     "value": {"text": round.title_json["en"]},
                     "actions": {
                         "items": [
@@ -68,7 +68,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.title_cy.label},
+                    "key": {"text": form.title_cy.label.text},
                     "value": {"text": round.title_json["cy"]},
                     "actions": {
                         "items": [
@@ -82,7 +82,7 @@
                     },
                 } if round.fund.welsh_available else {},
                 {
-                    "key": {"text": form.short_name.label},
+                    "key": {"text": form.short_name.label.text},
                     "value": {"text": round.short_name},
                     "actions": {
                         "items": [
@@ -96,7 +96,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.opens.label},
+                    "key": {"text": form.opens.label.text},
                     "value": {"text": round.opens.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -110,7 +110,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.deadline.label},
+                    "key": {"text": form.deadline.label.text},
                     "value": {"text": round.deadline.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -124,7 +124,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.reminder_date.label},
+                    "key": {"text": form.reminder_date.label.text},
                     "value": {"text": round.reminder_date.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -138,7 +138,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.assessment_start.label},
+                    "key": {"text": form.assessment_start.label.text},
                     "value": {"text": round.assessment_start.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -152,7 +152,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.assessment_deadline.label},
+                    "key": {"text": form.assessment_deadline.label.text},
                     "value": {"text": round.assessment_deadline.strftime('%d %B %Y at %H:%M')},
                     "actions": {
                         "items": [
@@ -222,7 +222,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.support_times.label},
+                    "key": {"text": form.support_times.label.text},
                     "value": {"text": round.support_times},
                     "actions": {
                         "items": [
@@ -236,7 +236,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.support_days.label},
+                    "key": {"text": form.support_days.label.text},
                     "value": {"text": round.support_days},
                     "actions": {
                         "items": [
@@ -320,7 +320,7 @@
                     },
                 },
                  {
-                    "key": {"text": form.prospectus_link.label},
+                    "key": {"text": form.prospectus_link.label.text},
                     "value": {"text": round.prospectus_link},
                     "actions": {
                         "items": [
@@ -334,7 +334,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.privacy_notice_link.label},
+                    "key": {"text": form.privacy_notice_link.label.text},
                     "value": {"text": round.privacy_notice_link},
                     "actions": {
                         "items": [
@@ -348,7 +348,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.project_name_field_id.label},
+                    "key": {"text": form.project_name_field_id.label.text},
                     "value": {"text": round.project_name_field_id},
                     "actions": {
                         "items": [
@@ -390,7 +390,7 @@
                     },
                 } if round.fund.welsh_available else {},
                 {
-                    "key": {"text": form.reference_contact_page_over_email.label},
+                    "key": {"text": form.reference_contact_page_over_email.label.text},
                     "value": {"text": "Yes" if round.reference_contact_page_over_email else "No"},
                     "actions": {
                         "items": [
@@ -404,7 +404,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.application_fields_download_available.label},
+                    "key": {"text": form.application_fields_download_available.label.text},
                     "value": {"text": "Yes" if round.application_fields_download_available else "No"},
                     "actions": {
                         "items": [
@@ -418,7 +418,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.display_logo_on_pdf_exports.label},
+                    "key": {"text": form.display_logo_on_pdf_exports.label.text},
                     "value": {"text": "Yes" if round.display_logo_on_pdf_exports  else "No"},
                     "actions": {
                         "items": [
@@ -432,7 +432,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.mark_as_complete_enabled.label},
+                    "key": {"text": form.mark_as_complete_enabled.label.text},
                     "value": {"text": "Yes" if round.mark_as_complete_enabled else "No"},
                     "actions": {
                         "items": [
@@ -446,7 +446,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.is_expression_of_interest.label},
+                    "key": {"text": form.is_expression_of_interest.label.text},
                     "value": {"text": "Yes" if round.is_expression_of_interest == "true" else "No"},
                     "actions": {
                         "items": [
@@ -460,7 +460,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.has_feedback_survey.label},
+                    "key": {"text": form.has_feedback_survey.label.text},
                     "value": {"text": "Yes" if round.feedback_survey_config["has_feedback_survey"] else "No"},
                     "actions": {
                         "items": [
@@ -474,7 +474,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.is_feedback_survey_optional.label},
+                    "key": {"text": form.is_feedback_survey_optional.label.text},
                     "value": {"text": "Yes" if round.feedback_survey_config["is_feedback_survey_optional"] else "No"},
                     "actions": {
                         "items": [
@@ -488,7 +488,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.has_research_survey.label},
+                    "key": {"text": form.has_research_survey.label.text},
                     "value": {"text": "Yes" if round.feedback_survey_config["has_research_survey"] else "No"},
                     "actions": {
                         "items": [
@@ -502,7 +502,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.is_research_survey_optional.label},
+                    "key": {"text": form.is_research_survey_optional.label.text},
                     "value": {"text": "Yes" if round.feedback_survey_config["is_research_survey_optional"] else "No"},
                     "actions": {
                         "items": [
@@ -516,7 +516,7 @@
                     },
                 },
                 {
-                    "key": {"text": form.eligibility_config.label},
+                    "key": {"text": form.eligibility_config.label.text},
                     "value": {"text": "Yes" if round.eligibility_config["has_eligibility"] else "No"},
                     "actions": {
                         "items": [
