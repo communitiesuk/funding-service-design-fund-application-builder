@@ -87,7 +87,7 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
         "name_en": "Updated Fund",
         "title_en": "Updated Fund Title",
         "description_en": "Updated Fund Description",
-        "welsh_available": "true",
+        "welsh_available": "false",
         "short_name": "UF1234",
         "submit": "Submit",
         "funding_type": "EOI",
@@ -105,7 +105,7 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
         if key.endswith("_en"):
             assert updated_fund.__getattribute__(key[:-3] + "_json")["en"] == value
         elif key == "welsh_available":
-            assert updated_fund.welsh_available is True
+            assert updated_fund.welsh_available is False
         elif key == "funding_type":
             assert updated_fund.funding_type.value == value
         elif key != "submit":
@@ -122,7 +122,7 @@ def test_update_fund_and_return_home(flask_test_client, seed_dynamic_data):
             "name_en": "Updated Fund",
             "title_en": "Updated Fund Title",
             "description_en": "Updated Fund Description",
-            "welsh_available": "true",
+            "welsh_available": "false",
             "short_name": "UF1234",
             "submit": "Submit",
             "funding_type": "EOI",
@@ -149,7 +149,7 @@ def test_update_fund_and_return_fund_details(flask_test_client, seed_dynamic_dat
             "name_en": "Updated Fund",
             "title_en": "Updated Fund Title",
             "description_en": "Updated Fund Description",
-            "welsh_available": "true",
+            "welsh_available": "false",
             "short_name": "UF1234",
             "submit": "Submit",
             "funding_type": "EOI",
@@ -177,7 +177,7 @@ def test_update_fund_and_return_round_details(flask_test_client, seed_dynamic_da
             "name_en": "Updated Fund",
             "title_en": "Updated Fund Title",
             "description_en": "Updated Fund Description",
-            "welsh_available": "true",
+            "welsh_available": "false",
             "short_name": "UF1234",
             "submit": "Submit",
             "funding_type": "EOI",
@@ -335,3 +335,24 @@ def test_view_fund_details(flask_test_client, seed_dynamic_data):
     assert '<a href="/grants/" class="govuk-back-link">Back</a>' in html
 
     assert '<dt class="govuk-summary-list__key"> Grant name (Welsh)</dt>' not in html
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_fund_welsh_error_messages(flask_test_client, seed_dynamic_data):
+    """
+    Test welsh error messages are rendered as expected.
+    """
+    create_data = {
+        "name_en": "New Fund",
+        "title_en": "New Fund Title",
+        "description_en": "New fund description",
+        "welsh_available": "true",
+        "short_name": "NF5432",
+        "funding_type": FundingType.COMPETITIVE.value,
+        "ggis_scheme_reference_number": "G1-SCH-0000092415",
+    }
+    response = submit_form(flask_test_client, "/grants/create", create_data)
+    assert response.status_code == 200
+    assert b"Enter the Welsh grant name" in response.data  # Validation error message
+    assert b"Enter the Welsh application name" in response.data  # Validation error message
+    assert b"Enter the Welsh grant description" in response.data  # Validation error message

@@ -63,7 +63,7 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
         **round_data_info,
     }
 
-    error_html = '<a href="#short_name">Application short name must be unique</a>'
+    error_html = '<a href="#short_name">Application round short name already exists for this grant</a>'
     url = f"/rounds/create?fund_id={test_fund.fund_id}"
 
     # Test works fine with first round

@@ -35,7 +35,7 @@ def build_round_rows(rounds: list[Round]) -> list[dict]:
                 "classes": "govuk-!-text-align-right fab-nowrap",
                 "html": f"""
                 <a class='govuk-link govuk-link--no-visited-state' href='{
-                    url_for("application_bp.build_application", round_id=round.round_id)
+                url_for("application_bp.build_application", round_id=round.round_id)
                 }'>Build application</a>""",
             },
         ]
@@ -46,6 +46,7 @@ def build_round_rows(rounds: list[Round]) -> list[dict]:
 def populate_form_with_round_data(round_obj, form_class):
     round_data = {
         "fund_id": round_obj.fund_id,
+        "welsh_available": round_obj.fund.welsh_available,
         "round_id": round_obj.round_id,
         "title_en": round_obj.title_json.get("en", ""),
         "title_cy": round_obj.title_json.get("cy", ""),
@@ -185,7 +186,8 @@ def update_existing_round(round_obj, form, user="dummy_user"):
     round_obj.eligibility_config = {"has_eligibility": form.eligibility_config.data}
     round_obj.eoi_decision_schema = {
         "en": convert_form_data_to_json(form.eoi_decision_schema_en.data),
-        "cy": convert_form_data_to_json(form.eoi_decision_schema_cy.data),
+        "cy": convert_form_data_to_json(
+            form.eoi_decision_schema_cy.data) if form.eoi_decision_schema_cy.data and form.eoi_decision_schema_cy.data.lower() != "none" else None,
     }
     round_obj.audit_info = {"user": user, "timestamp": datetime.now().isoformat(), "action": "update"}
     update_round(round_obj)
