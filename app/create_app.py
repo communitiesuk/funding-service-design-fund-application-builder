@@ -15,6 +15,7 @@ from app.blueprints.fund.routes import fund_bp
 from app.blueprints.index.routes import index_bp
 from app.blueprints.round.routes import round_bp
 from app.blueprints.template.routes import template_bp
+from app.shared.page_tracker import PageTracker
 from config import Config
 
 PUBLIC_ROUTES = [
@@ -97,34 +98,8 @@ def create_app() -> Flask:
 
     @flask_app.before_request
     def track_pages():
-        # Initialize the visited pages list if not already
-        if 'visited_pages' not in session:
-            session['visited_pages'] = []
-        if 'session_id' not in session:
-            session['session_id'] = str(uuid.uuid4())
-
-        endpoint = request.endpoint
-        if not endpoint or "go_back" in endpoint:
-            return
-
-        tracked_blueprints = {"template_bp", "index_bp", "application_bp", "fund_bp", "round_bp"}
-        ignore_endpoints = {"application_bp.build_application"}
-        reset_endpoints = {
-            "index_bp.dashboard", "fund_bp.view_all_funds",
-            "round_bp.view_all_rounds", "template_bp.view_templates"
-        }
-
-        page = None
-        if any(bp in endpoint for bp in tracked_blueprints) and endpoint not in ignore_endpoints:
-            page = {"endpoint": endpoint, "view_args": request.view_args or {}, "query_params": request.args.to_dict()}
-            if not session["visited_pages"] or session["visited_pages"][-1]["endpoint"] != endpoint:
-                session["visited_pages"].append(page)
-                session.modified = True
-
-        # reset session based on the above endpoints
-        if endpoint in reset_endpoints and page:
-            session["visited_pages"] = [page]
-        session.modified = True
+        tracker = PageTracker()
+        tracker.process_request(request.endpoint)
 
     @flask_app.errorhandler(500)
     def internal_server_error(e):
