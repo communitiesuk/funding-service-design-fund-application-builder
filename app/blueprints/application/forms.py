@@ -14,7 +14,7 @@ class SectionForm(FlaskForm):
 
 class SelectApplicationForm(FlaskForm):
     round_id = SelectField(
-        "Select the application you want to manage or create a new one.",
+        "Select or create an application",
         widget=GovSelect(),
         validators=[DataRequired(message="Select or create an application")],
     )
