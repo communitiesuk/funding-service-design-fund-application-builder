@@ -40,12 +40,7 @@ BASIC_ROUND_INFO = {
     "prospectus_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
     "privacy_notice_link": "https://www.gov.uk/government/organisations/"
     "ministry-of-housing-communities-local-government",
-    "reference_contact_page_over_email": False,
     "contact_email": "help@fab.gov.uk",
-    "contact_phone": "01234 123123",
-    "contact_textphone": "None",
-    "support_times": "12-2",
-    "support_days": "Just Mondays",
     "instructions_json": {},
     "feedback_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
     "application_guidance_json": {
@@ -67,7 +62,6 @@ BASIC_ROUND_INFO = {
         "is_research_survey_optional": False,
     },
     "eligibility_config": {"has_eligibility": False},
-    "contact_us_banner_json": {},
 }
 
 page_one_id = uuid4()
@@ -398,10 +392,6 @@ def init_unit_test_data() -> dict:
         prospectus_link="https://www.google.com",
         privacy_notice_link="https://www.google.com",
         contact_email="test@test.com",
-        contact_phone="0123334444",
-        contact_textphone="0123334444",
-        support_times="9am to 5pm",
-        support_days="Monday to Friday",
         feedback_link="https://www.google.com",
         project_name_field_id="12312312312",
         guidance_url="https://www.google.com",

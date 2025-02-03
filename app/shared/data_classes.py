@@ -77,12 +77,6 @@ class DescriptionJson:
 
 
 @dataclass
-class ContactUsBannerJson:
-    en: str = ""
-    cy: str = ""
-
-
-@dataclass
 class FeedbackSurveyConfig:
     has_feedback_survey: Optional[bool] = None
     has_section_feedback: Optional[bool] = False
@@ -126,12 +120,7 @@ class RoundExport:
     assessment_deadline: Optional[str] = None  # Adjust type as needed
     prospectus: Optional[str] = None
     privacy_notice: Optional[str] = None
-    reference_contact_page_over_email: Optional[bool] = None
     contact_email: Optional[str] = None
-    contact_phone: Optional[str] = None
-    contact_textphone: Optional[str] = None
-    support_times: Optional[str] = None
-    support_days: Optional[str] = None
     instructions_json: Optional[Dict[str, str]] = None  # Assuming simple dict; adjust as needed
     feedback_link: Optional[str] = None
     project_name_field_id: Optional[str] = None
@@ -155,7 +144,6 @@ class RoundExport:
     )
     eligibility_config: Optional[Dict[str, bool]] = field(default_factory=lambda: {"has_eligibility": False})
     title_json: TitleJson = field(default_factory=TitleJson)
-    contact_us_banner_json: Optional[Dict[str, str]] = None
 
     def as_dict(self):
         return asdict(self)

@@ -82,14 +82,6 @@ class RoundForm(FlaskForm):
         ],
     )
     contact_email = StringField("Grant team email address (optional)", widget=GovTextInput())
-    contact_phone = StringField("Grant team phone number (optional)", widget=GovTextInput())
-    contact_textphone = StringField("Grant team text phone number (optional)", widget=GovTextInput())
-    support_times = StringField(
-        "Grant team support hours", widget=GovTextInput(), validators=[DataRequired()], default="9am to 5pm"
-    )
-    support_days = StringField(
-        "Grant team support days", widget=GovTextInput(), validators=[DataRequired()], default="Monday to Friday"
-    )
     instructions_en = TextAreaField("Before you apply guidance (optional)", widget=GovTextArea())
     instructions_cy = StringField("Before you apply guidance (Welsh) (optional)", widget=GovTextInput())
     application_guidance_en = TextAreaField("Completing the application guidance (optional)", widget=GovTextArea())
@@ -144,23 +136,6 @@ class RoundForm(FlaskForm):
         widget=GovTextArea(),
         description=JSON_FIELD_HINT,
         validators=[Optional(), WelshJsonValidation()],
-    )
-    contact_us_banner_en = TextAreaField(
-        "Contact us information (optional)",
-        widget=GovTextArea(),
-        description="HTML to display to override the default 'Contact Us' page content",
-    )
-    contact_us_banner_cy = TextAreaField(
-        "Contact us information (Welsh) (optional)",
-        widget=GovTextArea(),
-        description="HTML to display to override the default 'Contact Us' page content",
-    )
-    reference_contact_page_over_email = RadioField(
-        "Do you want to include the contact us page in applicant emails?",
-        widget=GovRadioInput(),
-        choices=[("true", "Yes"), ("false", "No")],
-        coerce=lambda value: value == "true",
-        default="false",
     )
     application_fields_download_available = RadioField(
         "Do you want to allow assessors to download application fields?",

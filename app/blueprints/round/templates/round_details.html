@@ -194,62 +194,6 @@
                     },
                 },
                 {
-                    "key": {"text": "Grant team phone number"},
-                    "value": {"text": round.contact_phone},
-                    "actions": {
-                        "items": [
-                            {
-                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.contact_phone.id),
-                                "text": "Change",
-                                "classes": "govuk-link--no-visited-state",
-                                "visuallyHiddenText": "Grant team phone number",
-                            }
-                        ]
-                    },
-                },
-                {
-                    "key": {"text": "Grant team textphone number"},
-                    "value": {"text": round.contact_textphone},
-                    "actions": {
-                        "items": [
-                            {
-                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.contact_textphone.id),
-                                "text": "Change",
-                                "classes": "govuk-link--no-visited-state",
-                                "visuallyHiddenText": "Grant team textphone number",
-                            }
-                        ]
-                    },
-                },
-                {
-                    "key": {"text": form.support_times.label.text},
-                    "value": {"text": round.support_times},
-                    "actions": {
-                        "items": [
-                            {
-                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.support_times.id),
-                                "text": "Change",
-                                "classes": "govuk-link--no-visited-state",
-                                "visuallyHiddenText": "Grant team support hours",
-                            }
-                        ]
-                    },
-                },
-                {
-                    "key": {"text": form.support_days.label.text},
-                    "value": {"text": round.support_days},
-                    "actions": {
-                        "items": [
-                            {
-                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.support_days.id),
-                                "text": "Change",
-                                "classes": "govuk-link--no-visited-state",
-                                "visuallyHiddenText": "Grant team support days",
-                            }
-                        ]
-                    },
-                },
-                {
                     "key": {"text": "Before you apply guidance"},
                     "value": {"text": round.instructions_json['en']},
                     "actions": {
@@ -389,20 +333,6 @@
                         ]
                     },
                 } if round.fund.welsh_available else {},
-                {
-                    "key": {"text": form.reference_contact_page_over_email.label.text},
-                    "value": {"text": "Yes" if round.reference_contact_page_over_email else "No"},
-                    "actions": {
-                        "items": [
-                            {
-                                "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.reference_contact_page_over_email.id),
-                                "text": "Change",
-                                "classes": "govuk-link--no-visited-state",
-                                "visuallyHiddenText": "Include the contact us page in applicant emails",
-                            }
-                        ]
-                    },
-                },
                 {
                     "key": {"text": form.application_fields_download_available.label.text},
                     "value": {"text": "Yes" if round.application_fields_download_available else "No"},
