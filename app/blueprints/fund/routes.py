@@ -37,7 +37,7 @@ def view_all_funds():
     Renders list of grants in the grant page
     """
     params = GovUKTableAndPagination(
-        table_header=[{"text": "Grant name"}, {"text": "Description"}, {"text": "Grant type"}],
+        table_header=[{"text": "Grant name"}, {"text": "Grant description"}, {"text": "Grant type"}],
         table_rows=build_fund_rows(get_all_funds()),
         current_page=int(request.args.get("page", 1)),
     ).__dict__

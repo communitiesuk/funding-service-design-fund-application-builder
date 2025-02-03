@@ -77,16 +77,16 @@
                     {{form.eoi_decision_schema_cy(params={"classes": "welsh-field"}) }}
                     {{form.contact_us_banner_en }}
                     {{form.contact_us_banner_cy(params={"classes": "welsh-field"}) }}
-                    {{form.reference_contact_page_over_email}}
-                    {{form.application_fields_download_available}}
-                    {{form.display_logo_on_pdf_exports}}
-                    {{form.mark_as_complete_enabled}}
-                    {{form.is_expression_of_interest}}
-                    {{form.has_feedback_survey}}
-                    {{form.is_feedback_survey_optional}}
-                    {{form.has_research_survey}}
-                    {{form.is_research_survey_optional}}
-                    {{form.eligibility_config}}
+                    {{form.reference_contact_page_over_email(params={'classes':'govuk-radios--inline'} )}}
+                    {{form.application_fields_download_available(params={'classes':'govuk-radios--inline'} )}}
+                    {{form.display_logo_on_pdf_exports(params={'classes':'govuk-radios--inline'} )}}
+                    {{form.mark_as_complete_enabled(params={'classes':'govuk-radios--inline'} )}}
+                    {{form.is_expression_of_interest(params={'classes':'govuk-radios--inline'} )}}
+                    {{form.has_feedback_survey(params={'classes':'govuk-radios--inline'} )}}
+                    {{form.is_feedback_survey_optional(params={'classes':'govuk-radios--inline'} )}}
+                    {{form.has_research_survey(params={'classes':'govuk-radios--inline'} )}}
+                    {{form.is_research_survey_optional(params={'classes':'govuk-radios--inline'} )}}
+                    {{form.eligibility_config(params={'classes':'govuk-radios--inline'} )}}
                     <div class="govuk-button-group govuk-!-margin-top-6">
                             {{ form.save_and_continue() }}
 

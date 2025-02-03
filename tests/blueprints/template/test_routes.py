@@ -90,7 +90,7 @@ def test_template_details_view(flask_test_client, seed_dynamic_data):
 def test_template_create_get_form(flask_test_client):
     response = flask_test_client.get("/templates/create")
     assert response.status_code == 200
-    assert b"Add a new template" in response.data
+    assert b"Upload a new template" in response.data
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
