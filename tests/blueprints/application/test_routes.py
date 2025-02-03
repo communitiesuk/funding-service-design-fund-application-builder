@@ -1,4 +1,5 @@
 import pytest
+from bs4 import BeautifulSoup
 from flask import url_for
 
 from tests.helpers import submit_form
@@ -60,3 +61,66 @@ def test_select_application_form_submission(flask_test_client, seed_dynamic_data
     # Confirm redirect to application_bp.build_application
     expected_location = url_for("application_bp.build_application", round_id=test_round.round_id)
     assert response.location == expected_location
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_section(flask_test_client, seed_dynamic_data):
+    test_round = seed_dynamic_data["rounds"][0]
+    url = f"/rounds/{test_round.round_id}/sections/create"
+    data = {"name_in_apply_en": "section 1", "save_section": True}
+    response = submit_form(flask_test_client, url, data, follow_redirects=True)
+
+    soup = BeautifulSoup(response.data, "html.parser")
+    section = soup.find("h3", class_="govuk-heading-m", string="2. section 1")
+    assert section
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_update_section_name(flask_test_client, seed_dynamic_data):
+    test_round = seed_dynamic_data["rounds"][0]
+    url = f"/rounds/{test_round.round_id}/sections/create"
+    data = {"name_in_apply_en": "section 1", "save_section": True}
+    response = submit_form(flask_test_client, url, data, follow_redirects=True)
+    soup = BeautifulSoup(response.data, "html.parser")
+    edit_section_link = soup.find("a", class_="govuk-link--no-visited-state", string="Edit").get("href")
+    data = {
+        "name_in_apply_en": "section updated",
+        "save_section": True,
+        "section_id": edit_section_link.split("/")[-1],
+        "template_id": "",
+    }
+
+    response = submit_form(flask_test_client, edit_section_link, data, follow_redirects=True)
+    soup = BeautifulSoup(response.data, "html.parser")
+    section = soup.find("h3", class_="govuk-heading-m", string="1. section updated")
+    assert section
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_update_section_empty_template_section_name(flask_test_client, seed_dynamic_data):
+    test_round = seed_dynamic_data["rounds"][0]
+    url = f"/rounds/{test_round.round_id}/sections/create"
+    data = {"name_in_apply_en": "section 1", "save_section": True}
+    response = submit_form(flask_test_client, url, data, follow_redirects=True)
+    soup = BeautifulSoup(response.data, "html.parser")
+    edit_section_link = soup.find("a", class_="govuk-link--no-visited-state", string="Edit").get("href")
+    data = {"name_in_apply_en": "", "add_form": True, "section_id": edit_section_link.split("/")[-1], "template_id": ""}
+
+    response = submit_form(flask_test_client, edit_section_link, data, follow_redirects=False)
+    soup = BeautifulSoup(response.data, "html.parser")
+    error_link = soup.find("a", href="#template_id")
+    assert error_link
+    assert error_link.get_text() == "Select a template"
+
+    data = {
+        "name_in_apply_en": "",
+        "save_section": True,
+        "section_id": edit_section_link.split("/")[-1],
+        "template_id": "",
+    }
+
+    response = submit_form(flask_test_client, edit_section_link, data, follow_redirects=False)
+    soup = BeautifulSoup(response.data, "html.parser")
+    error_link = soup.find("a", href="#name_in_apply_en")
+    assert error_link
+    assert error_link.get_text() == "Enter section name"
