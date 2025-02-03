@@ -6,6 +6,8 @@ from flask import url_for
 from app.db.models.round import Round
 from app.db.queries.round import add_round, update_round
 
+PROJECT_NAME_FIELD_DEFAULT = "RoLhhf"
+
 
 def convert_json_data_for_form(data) -> str:
     if isinstance(data, dict):
@@ -62,7 +64,6 @@ def populate_form_with_round_data(round_obj, form_class):
         "instructions_en": round_obj.instructions_json.get("en", "") if round_obj.instructions_json else "",
         "instructions_cy": round_obj.instructions_json.get("cy", "") if round_obj.instructions_json else "",
         "feedback_link": round_obj.feedback_link,
-        "project_name_field_id": round_obj.project_name_field_id,
         "application_guidance_en": (
             round_obj.application_guidance_json.get("en", "") if round_obj.application_guidance_json else ""
         ),
@@ -151,7 +152,8 @@ def update_existing_round(round_obj, form, user="dummy_user"):
     round_obj.privacy_notice_link = form.privacy_notice_link.data
     round_obj.contact_email = form.contact_email.data
     round_obj.feedback_link = form.feedback_link.data
-    round_obj.project_name_field_id = form.project_name_field_id.data
+    # TODO this need to be revisited with a good approach FS-4904
+    round_obj.project_name_field_id = PROJECT_NAME_FIELD_DEFAULT
     round_obj.guidance_url = form.guidance_url.data
     round_obj.all_uploaded_documents_section_available = form.all_uploaded_documents_section_available.data
     round_obj.application_fields_download_available = form.application_fields_download_available.data
@@ -190,7 +192,8 @@ def create_new_round(form, user="dummy_user"):
         contact_email=form.contact_email.data,
         instructions_json={"en": form.instructions_en.data or None, "cy": form.instructions_cy.data or None},
         feedback_link=form.feedback_link.data,
-        project_name_field_id=form.project_name_field_id.data,
+        # TODO this need to be revisited with a good approach FS-4904
+        project_name_field_id=PROJECT_NAME_FIELD_DEFAULT,
         application_guidance_json={
             "en": form.application_guidance_en.data or None,
             "cy": form.application_guidance_cy.data or None,
