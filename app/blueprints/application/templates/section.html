@@ -16,17 +16,16 @@
             {% endif %}
         </div>
     </div>
+    <form method="POST" novalidate>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
-                <form method="POST" novalidate>
                     <div class="govuk-form-group">
                         <h3 class="govuk-heading-m">Section name</h3>
                         {{ form.hidden_tag() }}
                         {{ form.name_in_apply_en }}
                     </div>
-                    {{ govukButton({"text": "Save"}) }}
-                </form>
+                        {{ form.save_section() }}
             </div>
         </div>
         {% if form.section_id.data %}
@@ -57,19 +56,15 @@
                         {% endfor %}
                     </ul>
                     <h3 class="govuk-heading-m">Add form from template</h3>
-                    <form method="POST"
-                          action="{{ url_for('application_bp.add_form', round_id=round_id, section_id=form.section_id.data) }}"
-                          novalidate>
-                        {{ govukSelect({
-                                                "id": "template_id",
-                                                "name": "template_id",
-                                                "label": {
-                                                "text": "Create form from template"
-                                                },
-                                                "items": available_template_forms}) }}
-                        {{ govukButton({"text": "Add"}) }}
-                    </form>
+                </div>
+            </div>
+                <div class="govuk-grid-row">
+                <div class="govuk-grid-column-full">
+                        {{ form.template_id() }}
+                        {{ form.add_form() }}
                 </div>
             </div>
         {% endif %}
+    </form>
+
     {% endblock content %}

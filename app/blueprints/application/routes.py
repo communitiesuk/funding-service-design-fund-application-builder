@@ -19,7 +19,6 @@ from app.blueprints.application.services import create_export_zip
 from app.db.queries.application import (
     delete_form_from_section,
     delete_section_from_round,
-    get_all_template_forms,
     get_form_by_id,
     get_section_by_id,
     insert_new_section,
@@ -165,8 +164,13 @@ def section(round_id, section_id=None):
     params = {
         "round_id": str(round_id),
     }
-    existing_section = None
     if form.validate_on_submit():
+        if form.add_form.data:
+            # clone template json if Add button is clicked
+            section = get_section_by_id(section_id=section_id)
+            new_section_index = max(len(section.forms) + 1, 1)
+            clone_single_form(form_id=form.template_id.data, new_section_id=section_id, section_index=new_section_index)
+
         count_existing_sections = len(round_obj.sections)
         if form.section_id.data:
             update_section(
@@ -186,15 +190,13 @@ def section(round_id, section_id=None):
 
         # flash(f"Saved section {form.name_in_apply_en.data}")
         return redirect(url_for("application_bp.build_application", round_id=round_obj.round_id))
+
     if section_id:
         existing_section = get_section_by_id(section_id)
         form.section_id.data = section_id
         form.name_in_apply_en.data = existing_section.name_in_apply_json["en"]
         params["forms_in_section"] = existing_section.forms
-        params["available_template_forms"] = [
-            {"text": f"{f.template_name} - {f.name_in_apply_json['en']}", "value": str(f.form_id)}
-            for f in get_all_template_forms()
-        ]
+
     return render_template("section.html", form=form, **params)
 
 
@@ -214,15 +216,6 @@ def move_section_up_route(round_id, section_id):
 def move_section_down_route(round_id, section_id):
     move_section_down(round_id=round_id, section_id=section_id)
     return redirect(url_for("application_bp.build_application", round_id=round_id))
-
-
-@application_bp.route("/<round_id>/sections/<section_id>/forms/add", methods=["POST"])
-def add_form(round_id, section_id):
-    template_id = request.form.get("template_id")
-    section = get_section_by_id(section_id=section_id)
-    new_section_index = max(len(section.forms) + 1, 1)
-    clone_single_form(form_id=template_id, new_section_id=section_id, section_index=new_section_index)
-    return redirect(url_for("application_bp.section", round_id=round_id, section_id=section_id))
 
 
 @application_bp.route("/<round_id>/sections/<section_id>/forms/<form_id>/delete", methods=["GET"])

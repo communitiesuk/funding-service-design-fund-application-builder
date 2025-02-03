@@ -1,7 +1,10 @@
 from flask_wtf import FlaskForm
-from govuk_frontend_wtf.wtforms_widgets import GovSelect, GovTextInput
+from govuk_frontend_wtf.wtforms_widgets import GovSelect, GovSubmitInput, GovTextInput
 from wtforms import HiddenField, SelectField, StringField
+from wtforms.fields.simple import SubmitField
 from wtforms.validators import DataRequired
+
+from app.db.queries.application import get_all_template_forms
 
 
 class SectionForm(FlaskForm):
@@ -10,6 +13,36 @@ class SectionForm(FlaskForm):
     name_in_apply_en = StringField(
         "Name", widget=GovTextInput(), validators=[DataRequired(message="Enter the section name")]
     )
+    template_id = SelectField(
+        "Create form from template",
+        widget=GovSelect(),
+        validators=[DataRequired(message="Select a template")],
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        choices = [("", "Select a template")]
+        for f in get_all_template_forms():
+            choices.append((str(f.form_id), f.template_name + " - " + f.name_in_apply_json["en"]))
+        self.template_id.choices = choices
+
+    add_form = SubmitField("Add", widget=GovSubmitInput())
+    save_section = SubmitField("Save", widget=GovSubmitInput())
+
+    def validate(self, extra_validators=None):
+        form_status = True
+        if self.save_section.data:
+            # render comments for updating section name
+            if not self.name_in_apply_en.data or not self.name_in_apply_en.data.strip():
+                self.name_in_apply_en.errors = ["Enter section name"]
+                form_status = False
+        elif self.add_form.data:
+            # render comments for adding template forms
+            if not self.template_id.data or not self.template_id.data.strip():
+                self.template_id.errors = ["Select a template"]
+                form_status = False
+
+        return form_status
 
 
 class SelectApplicationForm(FlaskForm):
