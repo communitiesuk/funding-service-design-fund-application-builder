@@ -7,10 +7,7 @@
     {{ super() }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            {{ govukBackLink({
-          "text": "Back",
-          "href": url_for("fund_bp.view_all_funds")
-        }) }}
+            <a href="#" id="back-link" class="govuk-back-link">Back</a>
         </div>
     </div>
 {% endblock beforeContent %}
@@ -169,4 +166,5 @@
         }) }}
         </div>
     </div>
+    <script src="{{ url_for('static', filename='js/back_button_handler.js') }}"></script>
 {% endblock content %}

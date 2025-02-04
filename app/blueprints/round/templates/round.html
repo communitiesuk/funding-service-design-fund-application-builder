@@ -9,10 +9,7 @@
     {{ super() }}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            {{ govukBackLink({
-              "text": "Back",
-              "href": prev_nav_url
-            }) }}
+            <a href="#" id="back-link" class="govuk-back-link">Back</a>
         </div>
     </div>
 {% endblock beforeContent %}
@@ -110,4 +107,5 @@
     data-dashboard-url="{{ url_for('index_bp.dashboard') }}">
 </div>
 <script src="{{ url_for('static', filename='js/create_edit_round.js') }}"></script>
+<script src="{{ url_for('static', filename='js/back_button_handler.js') }}"></script>
 {% endblock content %}
