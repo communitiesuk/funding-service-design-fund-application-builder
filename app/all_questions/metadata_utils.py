@@ -376,7 +376,7 @@ def build_components_from_page(
                 if "condition" in next_config and next_config["path"] != "/summary":
                     condition_name = next_config["condition"]
                     condition_config = next(fc for fc in form_conditions if fc["name"] == condition_name)
-                    destination = index_of_printed_headers[next_config["path"]]["heading_number"]
+                    destination = index_of_printed_headers[next_config["path"]]["title"]
                     text_with_coordinators = ""
                     for condition in [
                         cc for cc in condition_config["value"]["conditions"] if cc["field"]["name"] == c["name"]

@@ -3,7 +3,7 @@ from flask import current_app
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
-from app.export_config.generate_all_questions import print_html
+from app.export_config.generate_all_questions import generate_html
 from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import write_config
 
@@ -68,7 +68,7 @@ def generate_all_round_html(round_id, base_output_dir=None):
         lang="en",
     )
     html_content = frontend_html_prefix
-    html_content += print_html(print_data)
+    html_content += generate_html(print_data)
     html_content += frontend_html_suffix
     write_config(
         html_content,
