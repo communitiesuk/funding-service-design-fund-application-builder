@@ -107,12 +107,14 @@ jobs:
       AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_NOTIFICATION_CHANNEL_ID: ${{ secrets.SLACK_NOTIFICATION_CHANNEL_ID }}
+      SLACK_DEPLOYMENTS_CHANNEL_ID: ${{ secrets.SLACK_DEPLOYMENTS_CHANNEL_ID }}
     with:
       environment: uat
       app_name: fund-application-builder
       run_db_migrations: true
       image_location: ${{ needs.paketo_build.outputs.image_location }}
       notify_slack: true
+      notify_slack_on_deployment: true
 
   # post_uat_deploy_tests:
   #   needs: uat_deploy
