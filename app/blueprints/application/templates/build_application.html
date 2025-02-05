@@ -50,7 +50,7 @@
                             </span>
                             <span class="app-task-list__task-actions">
                                 <a class="govuk-link--no-visited-state" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions</a>
-                                <a class="govuk-link--no-visited-state govuk-!-margin-left-2" href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>Preview</a>
+                                <a class="govuk-link--no-visited-state govuk-!-margin-left-2" target="_blank" href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>Preview</a>
                             </span>
                         </li>
                     {% endfor %}
