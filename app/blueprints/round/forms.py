@@ -119,12 +119,6 @@ class RoundForm(FlaskForm):
             ),
         ],
     )
-    project_name_field_id = StringField(
-        "Project name field ID",
-        widget=GovTextInput(),
-        description="Ask a developer on the Forms team for the correct field ID",
-        validators=[DataRequired(message="Enter the project name field ID")],
-    )
     eoi_decision_schema_en = TextAreaField(
         "Expression of interest decision schema (optional)",
         widget=GovTextArea(),
