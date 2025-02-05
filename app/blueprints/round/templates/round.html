@@ -60,10 +60,6 @@
                     {{form.guidance_url}}
                     <div class="govuk-heading-m">Applicant support details</div>
                     {{form.contact_email}}
-                    {{form.contact_phone}}
-                    {{form.contact_textphone}}
-                    {{form.support_times}}
-                    {{form.support_days}}
                     {{form.instructions_en }}
                     {{form.instructions_cy(params={"classes":"welsh-field"}) }}
                     {{form.application_guidance_en}}
@@ -75,9 +71,6 @@
                     {{form.project_name_field_id}}
                     {{form.eoi_decision_schema_en }}
                     {{form.eoi_decision_schema_cy(params={"classes": "welsh-field"}) }}
-                    {{form.contact_us_banner_en }}
-                    {{form.contact_us_banner_cy(params={"classes": "welsh-field"}) }}
-                    {{form.reference_contact_page_over_email(params={'classes':'govuk-radios--inline'} )}}
                     {{form.application_fields_download_available(params={'classes':'govuk-radios--inline'} )}}
                     {{form.display_logo_on_pdf_exports(params={'classes':'govuk-radios--inline'} )}}
                     {{form.mark_as_complete_enabled(params={'classes':'govuk-radios--inline'} )}}

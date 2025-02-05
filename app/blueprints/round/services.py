@@ -58,18 +58,7 @@ def populate_form_with_round_data(round_obj, form_class):
         "assessment_deadline": round_obj.assessment_deadline,
         "prospectus_link": round_obj.prospectus_link,
         "privacy_notice_link": round_obj.privacy_notice_link,
-        "contact_us_banner_en": round_obj.contact_us_banner_json.get("en", "")
-        if round_obj.contact_us_banner_json
-        else "",
-        "contact_us_banner_cy": round_obj.contact_us_banner_json.get("cy", "")
-        if round_obj.contact_us_banner_json
-        else "",
-        "reference_contact_page_over_email": "true" if round_obj.reference_contact_page_over_email else "false",
         "contact_email": round_obj.contact_email,
-        "contact_phone": round_obj.contact_phone,
-        "contact_textphone": round_obj.contact_textphone,
-        "support_times": round_obj.support_times,
-        "support_days": round_obj.support_days,
         "instructions_en": round_obj.instructions_json.get("en", "") if round_obj.instructions_json else "",
         "instructions_cy": round_obj.instructions_json.get("cy", "") if round_obj.instructions_json else "",
         "feedback_link": round_obj.feedback_link,
@@ -160,12 +149,7 @@ def update_existing_round(round_obj, form, user="dummy_user"):
 
     round_obj.prospectus_link = form.prospectus_link.data
     round_obj.privacy_notice_link = form.privacy_notice_link.data
-    round_obj.reference_contact_page_over_email = form.reference_contact_page_over_email.data
     round_obj.contact_email = form.contact_email.data
-    round_obj.contact_phone = form.contact_phone.data
-    round_obj.contact_textphone = form.contact_textphone.data
-    round_obj.support_times = form.support_times.data
-    round_obj.support_days = form.support_days.data
     round_obj.feedback_link = form.feedback_link.data
     round_obj.project_name_field_id = form.project_name_field_id.data
     round_obj.guidance_url = form.guidance_url.data
@@ -174,10 +158,6 @@ def update_existing_round(round_obj, form, user="dummy_user"):
     round_obj.display_logo_on_pdf_exports = form.display_logo_on_pdf_exports.data
     round_obj.mark_as_complete_enabled = form.mark_as_complete_enabled.data
     round_obj.is_expression_of_interest = form.is_expression_of_interest.data
-    round_obj.contact_us_banner_json = {
-        "en": form.contact_us_banner_en.data or None,
-        "cy": form.contact_us_banner_cy.data or None,
-    }
     round_obj.instructions_json = {"en": form.instructions_en.data or None, "cy": form.instructions_cy.data or None}
     round_obj.application_guidance_json = {
         "en": form.application_guidance_en.data or None,
@@ -207,16 +187,7 @@ def create_new_round(form, user="dummy_user"):
         assessment_deadline=form.assessment_deadline.data,
         prospectus_link=form.prospectus_link.data,
         privacy_notice_link=form.privacy_notice_link.data,
-        contact_us_banner_json={
-            "en": form.contact_us_banner_en.data or None,
-            "cy": form.contact_us_banner_cy.data or None,
-        },
-        reference_contact_page_over_email=form.reference_contact_page_over_email.data,
         contact_email=form.contact_email.data,
-        contact_phone=form.contact_phone.data,
-        contact_textphone=form.contact_textphone.data,
-        support_times=form.support_times.data,
-        support_days=form.support_days.data,
         instructions_json={"en": form.instructions_en.data or None, "cy": form.instructions_cy.data or None},
         feedback_link=form.feedback_link.data,
         project_name_field_id=form.project_name_field_id.data,
