@@ -11,7 +11,7 @@ from flask import (
 from app.blueprints.fund.forms import FundForm
 from app.blueprints.fund.services import build_fund_rows
 from app.db.models.fund import Fund, FundingType
-from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
+from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund, delete_selected_fund
 from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
 
@@ -177,3 +177,8 @@ def edit_fund(fund_id):
 
     params.update({"fund_id": fund_id, "form": form, "prev_nav_url": prev_nav_url})
     return render_template("fund.html", **params)
+
+@fund_bp.route("/<uuid:fund_id>/delete", methods=["GET"])
+def delete_fund(fund_id):
+    delete_selected_fund(fund_id)
+    return redirect(url_for("fund_bp.view_all_funds"))
