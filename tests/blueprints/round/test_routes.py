@@ -235,9 +235,7 @@ def test_create_round_from_dashboard_and_continue_build(flask_test_client, seed_
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_all_applications_page(flask_test_client, seed_dynamic_data):
-    response = flask_test_client.get(
-        "/rounds", follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
-    )
+    response = flask_test_client.get("/rounds", follow_redirects=True)
 
     assert response.status_code == 200
     html = response.data.decode("utf-8")
