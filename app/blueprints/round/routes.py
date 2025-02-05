@@ -19,7 +19,7 @@ from app.blueprints.round.services import (
 )
 from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
-from app.db.queries.round import get_all_rounds, get_round_by_id
+from app.db.queries.round import get_all_rounds, get_round_by_id, delete_selected_round
 from app.shared.forms import SelectFundForm
 from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
@@ -197,3 +197,9 @@ def round_details(round_id):
     return render_template(
         "round_details.html", form=form, fund_form=fund_form, round=fund_round, cloned_form=cloned_form
     )
+
+
+@round_bp.route("/<uuid:round_id>/delete", methods=["GET"])
+def delete_round(round_id):
+    delete_selected_round(round_id)
+    return redirect(url_for("round_bp.view_all_rounds"))
