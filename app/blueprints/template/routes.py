@@ -96,7 +96,7 @@ def template_questions(form_id):
         section_data,
         lang="en",
     )
-    html = generate_html(print_data, False, False)
+    html = generate_html(print_data, False)
     return render_template("view_template_questions.html", question_html=html, form=form)
 
 

@@ -127,6 +127,7 @@ def view_all_questions(round_id):
         fund=fund,
         question_html=html,
         title=f"All Questions for {fund.short_name} - {round.short_name}",
+        all_questions_view=True
     )
 
 
@@ -256,7 +257,12 @@ def view_form_questions(round_id, section_id, form_id):
         section_data,
         lang="en",
     )
-    html = generate_html(print_data, True)
+    html = generate_html(print_data, False)
     return render_template(
-        "view_questions.html", round=round, fund=fund, question_html=html, title=form.name_in_apply_json["en"]
+        "view_questions.html",
+        round=round,
+        fund=fund,
+        question_html=html,
+        title=form.name_in_apply_json["en"],
+        all_questions_view=False
     )

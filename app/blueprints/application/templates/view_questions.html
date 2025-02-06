@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
-{% set pageHeading %}{{title}} {% endset %}
+{% set pageHeading %}{{ title }} {% endset %}
 {% block beforeContent %}
     {{ super() }}
     <div class="govuk-grid-row">
@@ -14,11 +14,16 @@
     </div>
 {% endblock beforeContent %}
 {% block content %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-l">[Preview] Application questions</span>
-        <h1 class="govuk-heading-xl">{{pageHeading}}</h1>
-        {{ question_html|safe}}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            {% if all_questions_view %}
+                <span class="govuk-caption-l">[Preview] Application questions</span>
+                <h1 class="govuk-heading-xl">{{ pageHeading }}</h1>
+            {% else %}
+                <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ pageHeading }}</h1>
+                <p class="govuk-body govuk-!-margin-bottom-9">This template contains the following questions.</p>
+            {% endif %}
+            {{ question_html | safe }}
+        </div>
     </div>
-</div>
 {% endblock %}
