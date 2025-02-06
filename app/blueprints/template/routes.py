@@ -13,7 +13,7 @@ from app.db.queries.application import (
     get_form_by_template_name,
     update_form,
 )
-from app.export_config.generate_all_questions import print_html
+from app.export_config.generate_all_questions import generate_html
 from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import human_to_kebab_case
 from app.shared.helpers import flash_message
@@ -96,7 +96,7 @@ def template_questions(form_id):
         section_data,
         lang="en",
     )
-    html = print_html(print_data, False, False, False)
+    html = generate_html(print_data, False)
     return render_template("view_template_questions.html", question_html=html, form=form)
 
 
