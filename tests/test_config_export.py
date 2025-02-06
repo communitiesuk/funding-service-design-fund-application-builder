@@ -17,6 +17,7 @@ from app.export_config.generate_fund_round_html import (
     generate_all_round_html,
 )
 from app.export_config.helpers import validate_json
+from bs4 import BeautifulSoup
 
 
 def read_data_from_output_file(file):
@@ -268,7 +269,7 @@ def test_generate_fund_round_html(seed_dynamic_data, temp_output_dir):
             / "html"
             / f"{fund_short_name.casefold()}_{round_short_name.casefold()}_all_questions_en.html",
             "expected_output": frontend_html_prefix
-            + '<div class="govuk-!-margin-bottom-8">\n  <h2 class="govuk-heading-m">\n    Table of contents\n  </h2>\n  <ol class="govuk-list govuk-list--number">\n    <li>\n      <a class="govuk-link" href="#organisation-information">\n        Organisation Information\n      </a>\n    </li>\n  </ol>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h2 class="govuk-heading-l" id="organisation-information">\n    1. Organisation Information\n  </h2>\n  <h3 class="govuk-heading-m">\n    About your organisation\n  </h3>\n  <h4 class="govuk-heading-s">\n    Organisation Name\n  </h4>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      What is your organisation\'s name?\n    </p>\n    <p class="govuk-body">\n      This must match the registered legal organisation name\n    </p>\n  </div>\n  <div class="govuk-body all-questions-component">\n    <p class="govuk-body">\n      How is your organisation classified?\n    </p>\n    <ul class="govuk-list govuk-list--bullet">\n      <li>\n        Charity\n      </li>\n      <li>\n        Public Limited Company\n      </li>\n    </ul>\n  </div>\n</div>'  # noqa: E501
+            + '<div class="govuk-!-margin-bottom-8">\n  <h2 class="govuk-heading-m">Table of contents</h2>\n  <ol class="govuk-list govuk-list--number">\n    <li><a class="govuk-link" href="#organisation-information">Organisation Information</a></li>\n  </ol>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h2 class="govuk-heading-l" id="organisation-information">1. Organisation Information</h2>\n  <h3 class="govuk-heading-m">About your organisation</h3>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n  <h4 class="govuk-heading-s">Organisation Name</h4>\n  <div class="govuk-body">\n    <p class="govuk-body">What is your organisation\'s name?</p>\n    <p class="govuk-body">This must match the registered legal organisation name</p>\n  </div>\n  <div class="govuk-body">\n    <p class="govuk-body">How is your organisation classified?</p>\n    <ul class="govuk-list govuk-list--bullet">\n      <li>Charity</li>\n      <li>Public Limited Company</li>\n    </ul>\n  </div>\n  <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />\n</div>'  # noqa: E501
             + frontend_html_suffix,
         }
     ]
@@ -278,7 +279,7 @@ def test_generate_fund_round_html(seed_dynamic_data, temp_output_dir):
 
     with open(expected_file["path"], "r") as file:
         data = file.read()
-        assert data == expected_file["expected_output"]
+        assert _normalize_html(data) == _normalize_html(expected_file["expected_output"]), "HTML outputs do not match"
 
 
 def test_generate_fund_round_html_invalid_input(seed_dynamic_data):
@@ -328,3 +329,8 @@ def test_create_export_zip(temp_output_dir):
     assert output
     output_path = Path(output)
     assert output_path.exists()
+
+
+def _normalize_html(html):
+    """Parses and normalizes HTML using BeautifulSoup to avoid formatting differences."""
+    return BeautifulSoup(html, "html.parser").prettify()

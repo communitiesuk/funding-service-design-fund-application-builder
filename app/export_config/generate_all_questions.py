@@ -50,7 +50,7 @@ def generate_table_of_contents(air, sections):
 # --------------------------
 # Component Rendering Section
 # --------------------------
-def render_components(air, components, show_field_types=False):
+def render_components(air, components):
     """
     Renders components within a page.
 
@@ -65,29 +65,29 @@ def render_components(air, components, show_field_types=False):
     </div>
     """
     for component in components:
-        with air.div(klass="govuk-body all-questions-component"):
-            title = component.get("title")
-            if not component.get("hide_title") and title:
-                with air.p(klass="govuk-body"):
-                    air(title)
-                    if show_field_types:
-                        air(f" [{component['type']}]")
+        title = component.get("title")
+        text_list = component.get("text", [])
 
-            for text in component.get("text", []):
-                if isinstance(text, list):
-                    with air.ul(klass="govuk-list govuk-list--bullet"):
-                        for bullet in text:
-                            with air.li():
-                                air(bullet)
-                else:
+        if (title and not component.get("hide_title")) or text_list:
+            with air.div(klass="govuk-body"):
+                if title and not component.get("hide_title"):
                     with air.p(klass="govuk-body"):
-                        air(text)
+                        air(title)
 
+                for text in text_list:
+                    if isinstance(text, list):
+                        with air.ul(klass="govuk-list govuk-list--bullet"):
+                            for bullet in text:
+                                with air.li():
+                                    air(bullet)
+                    else:
+                        with air.p(klass="govuk-body"):
+                            air(text)
 
 # --------------------------
 # Main HTML Generation Section
 # --------------------------
-def generate_html(sections, show_field_types=False, allow_table_of_content=True):
+def generate_html(sections, all_question_view=True):
     """
     Generates an HTML document for the given sections.
 
@@ -100,17 +100,17 @@ def generate_html(sections, show_field_types=False, allow_table_of_content=True)
     """
     air = Airium()
     with air.div(klass="govuk-!-margin-bottom-8"):
-        if allow_table_of_content:
+        if all_question_view:
             generate_table_of_contents(air, sections)
+            air.hr(klass="govuk-section-break govuk-section-break--l govuk-section-break--visible")
 
         for idx, (anchor, details) in enumerate(sections.items(), start=1):
             if anchor == "assessment_display_info":
                 continue
 
-            air.hr(klass="govuk-section-break govuk-section-break--l govuk-section-break--visible")
-
-            with air.h2(klass="govuk-heading-l", id=anchor):
-                air(f"{idx}. {details['title_text']}")
+            if all_question_view:
+                with air.h2(klass="govuk-heading-l", id=anchor):
+                    air(f"{idx}. {details['title_text']}")
 
             for heading, header_info in sorted(details["form_print_data"].items(),
                                                key=lambda item: str(item[1]["heading_number"])):
@@ -120,6 +120,7 @@ def generate_html(sections, show_field_types=False, allow_table_of_content=True)
                 with getattr(air, tag)(klass=f"govuk-heading-{'m' if tag == 'h3' else 's'}"):
                     air(heading_text)
 
-                render_components(air, header_info["components"], show_field_types)
+                render_components(air, header_info["components"])
+                air.hr(klass="govuk-section-break govuk-section-break--l govuk-section-break--visible")
 
     return str(air)
