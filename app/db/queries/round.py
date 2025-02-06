@@ -3,7 +3,7 @@ from sqlalchemy import String, cast, select
 from sqlalchemy.orm import joinedload
 
 from app.db import db
-from app.db.models import Fund, Component, Page, Form
+from app.db.models import Fund, Component, Page, Form, Lizt
 from app.db.models.round import Round
 from app.db.queries.util import delete_all_related_objects
 
@@ -39,11 +39,14 @@ def get_all_rounds() -> list[Round]:
 
 def _delete_sections_for_round(round_detail: Round):
     for section_detail in round_detail.sections:
+        lizt_ids = [component.list_id for form in section_detail.forms for page in form.pages for component in
+                    page.components]
         page_ids = [page.page_id for form in section_detail.forms for page in form.pages]
         form_ids = [form.form_id for form in section_detail.forms]
         section_ids = [section_detail.section_id]
 
         delete_all_related_objects(db=db, model=Component, column=Component.page_id, ids=page_ids)
+        delete_all_related_objects(db=db, model=Lizt, column=Lizt.list_id, ids=lizt_ids)
         delete_all_related_objects(db=db, model=Page, column=Page.form_id, ids=form_ids)
         delete_all_related_objects(db=db, model=Form, column=Form.section_id, ids=section_ids)
 
@@ -52,7 +55,7 @@ def _delete_sections_for_round(round_detail: Round):
 
 
 def delete_selected_round(round_id):
-    round_detail: Round = db.session.query(Round).options(joinedload(Round.sections)).get(round_id)
+    round_detail: Round = db.session.get(Round, round_id, options=[joinedload(Round.sections)])
     if not round_detail:
         raise ValueError(f"Round with id {round_id} not found")
     try:

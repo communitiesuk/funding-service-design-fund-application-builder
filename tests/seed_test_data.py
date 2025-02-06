@@ -39,7 +39,7 @@ BASIC_ROUND_INFO = {
     "project_name_field_id": 1,
     "prospectus_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
     "privacy_notice_link": "https://www.gov.uk/government/organisations/"
-    "ministry-of-housing-communities-local-government",
+                           "ministry-of-housing-communities-local-government",
     "contact_email": "help@fab.gov.uk",
     "instructions_json": {},
     "feedback_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
@@ -71,7 +71,7 @@ page_four_id = uuid4()
 page_five_id = uuid4()
 alt_page_id = uuid4()
 
-
+#NOSONAR Ignore since this data is related to unit tests
 def init_salmon_fishing_fund():
     organisation_uuid = uuid4()
     o: Organisation = Organisation(
@@ -355,7 +355,7 @@ def init_salmon_fishing_fund():
         "organisations": [o],
     }
 
-
+#NOSONAR Ignore since this data is related to unit tests
 def init_unit_test_data() -> dict:
     organisation_uuid = uuid4()
     o: Organisation = Organisation(
@@ -479,6 +479,142 @@ def init_unit_test_data() -> dict:
         "criteria": [cri1],
         "subcriteria": [sc1],
         "themes": [t1],
+    }
+
+#NOSONAR Ignore since this data is related to unit tests
+def fund_without_assessment() -> dict:
+    organisation_uuid = uuid4()
+    o: Organisation = Organisation(
+        organisation_id=organisation_uuid,
+        name=f"Ministry of Testing - {str(organisation_uuid)[:5]}",
+        short_name=f"MoT-{str(organisation_uuid)[:5]}",
+        logo_uri="https://www.google.com",
+        audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+    )
+
+    f2: Fund = Fund(
+        fund_id=uuid4(),
+        name_json={"en": "Unit Test Fund 2"},
+        title_json={"en": "funding to improve testing"},
+        description_json={"en": "A £10m fund to improve testing across the devolved nations."},
+        welsh_available=False,
+        short_name=f"UTF{randint(0, 999)}",
+        owner_organisation_id=o.organisation_id,
+        funding_type=FundingType.COMPETITIVE,
+        ggis_scheme_reference_number="G3-SCH-0000092414",
+    )
+
+    f2_r1: Round = Round(
+        round_id=uuid4(),
+        fund_id=f2.fund_id,
+        audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+        title_json={"en": "round the first"},
+        short_name=f"UTR{randint(0, 999)}",
+        opens=datetime.now(),
+        deadline=datetime.now(),
+        assessment_start=datetime.now(),
+        reminder_date=datetime.now(),
+        assessment_deadline=datetime.now(),
+        prospectus_link="https://www.google.com",
+        privacy_notice_link="https://www.google.com",
+        contact_email="test@test.com",
+        feedback_link="https://www.google.com",
+        project_name_field_id="12312312312",
+        guidance_url="https://www.google.com",
+        feedback_survey_config={
+            "has_feedback_survey": False,
+            "has_section_feedback": False,
+            "has_research_survey": False,
+            "is_feedback_survey_optional": False,
+            "is_section_feedback_optional": False,
+            "is_research_survey_optional": False,
+        },
+        eligibility_config={"has_eligibility": False},
+        eoi_decision_schema={"en": {"valid": True}, "cy": {"valid": False}},
+    )
+
+    f2_r1_s1: Section = Section(
+        section_id=uuid4(), index=1, round_id=f2_r1.round_id, name_in_apply_json={"en": "Organisation Information 2"}
+    )
+
+    f2_r1_s2: Section = Section(
+        section_id=uuid4(), index=1, round_id=f2_r1.round_id, name_in_apply_json={"en": "Organisation Information 3"}
+    )
+
+    f2_r1_s1_f1: Form = Form(
+        form_id=uuid4(),
+        section_id=f2_r1_s1.section_id,
+        name_in_apply_json={"en": "About your organisation"},
+        section_index=1,
+        runner_publish_name="about-your-org",
+        template_name="About your organization template",
+    )
+
+    f2_r1_s1_f2: Form = Form(
+        form_id=uuid4(),
+        section_id=f2_r1_s2.section_id,
+        name_in_apply_json={"en": "About your organisation 2"},
+        section_index=1,
+        runner_publish_name="about-your-org",
+        template_name="About your organization template",
+    )
+
+    f2_r1_s1_f1_p1: Page = Page(
+        page_id=uuid4(),
+        form_id=f2_r1_s1_f1.form_id,
+        display_path="organisation-name",
+        name_in_apply_json={"en": "Organisation Name"},
+        form_index=1,
+        default_next_page_id=None,
+    )
+
+    f2_r1_s1_f1_p2: Page = Page(
+        page_id=uuid4(),
+        form_id=f2_r1_s1_f2.form_id,
+        display_path="organisation-name",
+        name_in_apply_json={"en": "Organisation Name"},
+        form_index=1,
+        default_next_page_id=None,
+    )
+
+    f2_r1_s1_f1_p1_c1: Component = Component(
+        component_id=uuid4(),
+        page_id=f2_r1_s1_f1_p1.page_id,
+        title="What is your organisation's name?",
+        hint_text="This must match the registered legal organisation name",
+        type=ComponentType.TEXT_FIELD,
+        page_index=1,
+        options={"hideTitle": False, "classes": ""},
+        runner_component_name="organisation_name",
+    )
+
+    l1: Lizt = Lizt(
+        list_id=uuid4(),
+        name="classifications_list",
+        type="string",
+        items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
+        is_template=True,
+    )
+
+    f2_r1_s1_f1_p1_c2_with_list: Component = Component(
+        component_id=uuid4(),
+        page_id=f2_r1_s1_f1_p2.page_id,
+        title="How is your organisation classified?",
+        type=ComponentType.RADIOS_FIELD,
+        page_index=2,
+        options={"hideTitle": False, "classes": ""},
+        runner_component_name="organisation_classification",
+        list_id=l1.list_id,
+    )
+    return {
+        "lists": [l1],
+        "funds": [f2],
+        "organisations": [o],
+        "rounds": [f2_r1],
+        "sections": [f2_r1_s1, f2_r1_s2],
+        "forms": [f2_r1_s1_f1, f2_r1_s1_f2],
+        "pages": [f2_r1_s1_f1_p1, f2_r1_s1_f1_p2],
+        "components": [f2_r1_s1_f1_p1_c1, f2_r1_s1_f1_p1_c2_with_list]
     }
 
 
