@@ -14,6 +14,7 @@ from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund, delete_selected_fund
 from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
+from config import Config
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 SELECT_GRANT_PAGE = "select_grant"
@@ -51,7 +52,9 @@ def view_fund_details(fund_id):
     """
     form = FundForm()
     fund = get_fund_by_id(fund_id)
-    return render_template("fund_details.html", form=form, fund=fund)
+    return render_template("fund_details.html",
+                           form=form, fund=fund,
+                           feature_flags=Config.FEATURE_FLAGS)
 
 
 def _create_fund_get_previous_url(actions):
@@ -178,7 +181,10 @@ def edit_fund(fund_id):
     params.update({"fund_id": fund_id, "form": form, "prev_nav_url": prev_nav_url})
     return render_template("fund.html", **params)
 
+
 @fund_bp.route("/<uuid:fund_id>/delete", methods=["GET"])
 def delete_fund(fund_id):
+    if not Config.FEATURE_FLAGS.get('feature_delete'):
+        return "Delete Feature Disabled", 403
     delete_selected_fund(fund_id)
     return redirect(url_for("fund_bp.view_all_funds"))

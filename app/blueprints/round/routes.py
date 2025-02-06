@@ -23,6 +23,7 @@ from app.db.queries.round import get_all_rounds, get_round_by_id, delete_selecte
 from app.shared.forms import SelectFundForm
 from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
+from config import Config
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 ROUND_DETAILS = "round_bp.round_details"
@@ -195,11 +196,15 @@ def round_details(round_id):
     cloned_form = CloneRoundForm(data={"fund_id": fund_round.fund_id})
     fund_form = FundForm()
     return render_template(
-        "round_details.html", form=form, fund_form=fund_form, round=fund_round, cloned_form=cloned_form
+        "round_details.html", form=form, fund_form=fund_form, round=fund_round,
+        cloned_form=cloned_form,
+        feature_flags=Config.FEATURE_FLAGS
     )
 
 
 @round_bp.route("/<uuid:round_id>/delete", methods=["GET"])
 def delete_round(round_id):
+    if not Config.FEATURE_FLAGS.get('feature_delete'):
+        return "Delete Feature Disabled", 403
     delete_selected_round(round_id)
     return redirect(url_for("round_bp.view_all_rounds"))
