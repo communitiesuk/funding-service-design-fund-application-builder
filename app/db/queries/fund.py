@@ -4,7 +4,7 @@ from sqlalchemy import String, cast, select
 from sqlalchemy.orm import joinedload
 
 from app.db import db
-from app.db.models import Round, Component, Page, Form
+from app.db.models import Round, Component, Page, Form, Lizt
 from app.db.models.fund import Fund, Organisation
 from app.db.queries.util import delete_all_related_objects
 
@@ -48,11 +48,14 @@ def _delete_sections_for_fund_round(fund: Fund):
     for round_detail in fund.rounds:
         for section in round_detail.sections:
             if section:
+                lizt_ids = [component.list_id for form in section.forms for page in form.pages for component in
+                            page.components]
                 page_ids = [page.page_id for form in section.forms for page in form.pages]
                 form_ids = [form.form_id for form in section.forms]
                 section_ids = [section.section_id]
 
                 delete_all_related_objects(db=db, model=Component, column=Component.page_id, ids=page_ids)
+                delete_all_related_objects(db=db, model=Lizt, column=Lizt.list_id, ids=lizt_ids)
                 delete_all_related_objects(db=db, model=Page, column=Page.form_id, ids=form_ids)
                 delete_all_related_objects(db=db, model=Form, column=Form.section_id, ids=section_ids)
 
@@ -61,7 +64,7 @@ def _delete_sections_for_fund_round(fund: Fund):
 
 
 def delete_selected_fund(fund_id):
-    fund: Fund = db.session.query(Fund).options(joinedload(Fund.rounds).joinedload(Round.sections)).get(fund_id)
+    fund: Fund = db.session.get(Fund, fund_id, options=[joinedload(Fund.rounds).joinedload(Round.sections)])
     if not fund:
         raise ValueError(f"Fund with id {fund_id} not found")
     try:
