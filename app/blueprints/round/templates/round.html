@@ -17,73 +17,75 @@
     </div>
 {% endblock beforeContent %}
 {% block content %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-full">
-        {% if form.errors %}
-          {{ govukErrorSummary(wtforms_errors(form)) }}
-        {% endif %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {% if form.errors %}
+                {{ govukErrorSummary(wtforms_errors(form)) }}
+            {% endif %}
         </div>
-</div>
-<div class="govuk-grid-row">
-<div class="govuk-grid-column-full">
-        {% if round_id %}
-            <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ pageHeading }}</h1>
-            <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('fund_bp.edit_fund', fund_id=fund.fund_id,  actions="edit_application", round_id=round_id, _anchor=fund_form.title_en.id) }}">Change application name</a>
-            <p class="govuk-body govuk-!-margin-top-7">Grant: {{ fund.name_json["en"] }}</p>
-        {% else %}
-            <h1 class="govuk-heading-l govuk-!-margin-bottom-7">{{ pageHeading }}</h1>
-            <p class="govuk-body govuk-!-margin-bottom-0">Grant: {{ fund.name_json["en"] }}</p>
-            <p class="govuk-body govuk-!-margin-bottom-7">
-            <a href="{{ url_for('round_bp.select_fund') }}" class="govuk-link govuk-link--no-visited-state">Change grant</a>
-        </p>
-        {% endif %}
-
     </div>
-</div>
-<div class="govuk-grid-row govuk-!-margin-top-3">
-    <div class="govuk-grid-column-full">
-        <div class="govuk-form-group">
-            <fieldset class="govuk-fieldset">
-                <form method="POST" novalidate>
-                    {{form.hidden_tag()}}
-                    <div class="govuk-heading-m">Round details</div>
-                    {{form.title_en}}
-                    {{form.title_cy(params={"classes": "welsh-field"})}}
-                    {{form.short_name}}
-                     <div class="govuk-heading-m">Application dates</div>
-                    {{form.opens()}}
-                    {{form.deadline()}}
-                    {{form.reminder_date()}}
-                    <div class="govuk-heading-m">Assessment details</div>
-                    {{form.assessment_start()}}
-                    {{form.assessment_deadline()}}
-                    {{form.guidance_url}}
-                    <div class="govuk-heading-m">Applicant support details</div>
-                    {{form.contact_email}}
-                    {{form.instructions_en }}
-                    {{form.instructions_cy(params={"classes":"welsh-field"}) }}
-                    {{form.application_guidance_en}}
-                    {{form.application_guidance_cy(params={"classes": "welsh-field"}) }}
-                    {{form.feedback_link}}
-                    {{form.prospectus_link}}
-                    {{form.privacy_notice_link}}
-                     <div class="govuk-heading-m">Advanced settings</div>
-                    {{form.project_name_field_id}}
-                    {{form.eoi_decision_schema_en }}
-                    {{form.eoi_decision_schema_cy(params={"classes": "welsh-field"}) }}
-                    {{form.application_fields_download_available(params={'classes':'govuk-radios--inline'} )}}
-                    {{form.display_logo_on_pdf_exports(params={'classes':'govuk-radios--inline'} )}}
-                    {{form.mark_as_complete_enabled(params={'classes':'govuk-radios--inline'} )}}
-                    {{form.is_expression_of_interest(params={'classes':'govuk-radios--inline'} )}}
-                    {{form.has_feedback_survey(params={'classes':'govuk-radios--inline'} )}}
-                    {{form.is_feedback_survey_optional(params={'classes':'govuk-radios--inline'} )}}
-                    {{form.has_research_survey(params={'classes':'govuk-radios--inline'} )}}
-                    {{form.is_research_survey_optional(params={'classes':'govuk-radios--inline'} )}}
-                    {{form.eligibility_config(params={'classes':'govuk-radios--inline'} )}}
-                    <div class="govuk-button-group govuk-!-margin-top-6">
-                            {{ form.save_and_continue() }}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {% if round_id %}
+                <h1 class="govuk-heading-l govuk-!-margin-bottom-0">{{ pageHeading }}</h1>
+                <a class="govuk-link govuk-link--no-visited-state"
+                   href="{{ url_for('fund_bp.edit_fund', fund_id=fund.fund_id,  actions="edit_application", round_id=round_id, _anchor=fund_form.title_en.id) }}">Change
+                    application name</a>
+                <p class="govuk-body govuk-!-margin-top-7">Grant: {{ fund.name_json["en"] }}</p>
+            {% else %}
+                <h1 class="govuk-heading-l govuk-!-margin-bottom-7">{{ pageHeading }}</h1>
+                <p class="govuk-body govuk-!-margin-bottom-0">Grant: {{ fund.name_json["en"] }}</p>
+                <p class="govuk-body govuk-!-margin-bottom-7">
+                    <a href="{{ url_for('round_bp.select_fund') }}" class="govuk-link govuk-link--no-visited-state">Change
+                        grant</a>
+                </p>
+            {% endif %}
 
-                            {{ govukButton({
+        </div>
+    </div>
+    <div class="govuk-grid-row govuk-!-margin-top-3">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-form-group">
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="govuk-heading-m">Round details</div>
+                    {{ form.title_en }}
+                    {{ form.title_cy(params={"classes": "welsh-field"}) }}
+                    {{ form.short_name }}
+                    <div class="govuk-heading-m">Application dates</div>
+                    {{ form.opens() }}
+                    {{ form.deadline() }}
+                    {{ form.reminder_date() }}
+                    <div class="govuk-heading-m">Assessment details</div>
+                    {{ form.assessment_start() }}
+                    {{ form.assessment_deadline() }}
+                    {{ form.guidance_url }}
+                    <div class="govuk-heading-m">Applicant support details</div>
+                    {{ form.contact_email }}
+                    {{ form.instructions_en }}
+                    {{ form.instructions_cy(params={"classes":"welsh-field"}) }}
+                    {{ form.application_guidance_en }}
+                    {{ form.application_guidance_cy(params={"classes": "welsh-field"}) }}
+                    {{ form.feedback_link }}
+                    {{ form.prospectus_link }}
+                    {{ form.privacy_notice_link }}
+                    <div class="govuk-heading-m">Advanced settings</div>
+                    {{ form.project_name_field_id }}
+                    {{ form.eoi_decision_schema_en }}
+                    {{ form.eoi_decision_schema_cy(params={"classes": "welsh-field"}) }}
+                    {{ form.application_fields_download_available(params={'classes':'govuk-radios--inline'} ) }}
+                    {{ form.display_logo_on_pdf_exports(params={'classes':'govuk-radios--inline'} ) }}
+                    {{ form.mark_as_complete_enabled(params={'classes':'govuk-radios--inline'} ) }}
+                    {{ form.is_expression_of_interest(params={'classes':'govuk-radios--inline'} ) }}
+                    {{ form.has_feedback_survey(params={'classes':'govuk-radios--inline'} ) }}
+                    {{ form.is_feedback_survey_optional(params={'classes':'govuk-radios--inline'} ) }}
+                    {{ form.has_research_survey(params={'classes':'govuk-radios--inline'} ) }}
+                    {{ form.is_research_survey_optional(params={'classes':'govuk-radios--inline'} ) }}
+                    {{ form.eligibility_config(params={'classes':'govuk-radios--inline'} ) }}
+                    <div class="govuk-button-group govuk-!-margin-top-6">
+                        {{ form.save_and_continue() }}
+
+                        {{ govukButton({
                             "text": "Cancel",
                             "classes": "govuk-button govuk-button--secondary",
                             "href": cancel_url
@@ -93,14 +95,13 @@
                         {{ form.save_and_return_home(params={'classes': 'govuk-button govuk-button--secondary'}) }}
                     </p>
                 </form>
-            </fieldset>
+            </div>
         </div>
     </div>
-</div>
 
-<div id="round-config"
-    data-welsh-available="{{ fund.welsh_available | string | lower }}"
-    data-dashboard-url="{{ url_for('index_bp.dashboard') }}">
-</div>
-<script src="{{ url_for('static', filename='js/create_edit_round.js') }}"></script>
+    <div id="round-config"
+         data-welsh-available="{{ fund.welsh_available | string | lower }}"
+         data-dashboard-url="{{ url_for('index_bp.dashboard') }}">
+    </div>
+    <script src="{{ url_for('static', filename='js/create_edit_round.js') }}"></script>
 {% endblock content %}
