@@ -30,34 +30,32 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <div class="govuk-form-group">
-                <fieldset class="govuk-fieldset">
-                    <form method="POST" novalidate>
-                        {{ form.hidden_tag() }}
-                        {{ form.welsh_available(params={'classes':'govuk-radios--inline'} ) }}
-                        {{ form.name_en }}
-                        {{ form.name_cy(params= {"classes": "welsh-field"}) }}
-                        {{ form.short_name }}
-                        {{ form.title_en(params={"prefix": {'text':'Apply for'} }) }}
-                        {{ form.title_cy(params={"prefix": {'text':'Gwnewch gais am'}, 'classes': 'welsh-field'}) }}
-                        {{ form.description_en }}
-                        {{ form.description_cy(params= {"classes": "welsh-field"}) }}
-                        {{ form.funding_type(params={'classes':'govuk-radios--inline'}) }}
-                        {{ form.ggis_scheme_reference_number }}
-                        <div class="govuk-button-group govuk-!-margin-top-6">
-                            {{ form.save_and_continue() }}
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    {{ form.welsh_available(params={'classes':'govuk-radios--inline'} ) }}
+                    {{ form.name_en }}
+                    {{ form.name_cy(params= {"classes": "welsh-field"}) }}
+                    {{ form.short_name }}
+                    {{ form.title_en(params={"prefix": {'text':'Apply for'} }) }}
+                    {{ form.title_cy(params={"prefix": {'text':'Gwnewch gais am'}, 'classes': 'welsh-field'}) }}
+                    {{ form.description_en }}
+                    {{ form.description_cy(params= {"classes": "welsh-field"}) }}
+                    {{ form.funding_type(params={'classes':'govuk-radios--inline'}) }}
+                    {{ form.ggis_scheme_reference_number }}
+                    <div class="govuk-button-group govuk-!-margin-top-6">
+                        {{ form.save_and_continue() }}
 
-                            {{ govukButton({
+                        {{ govukButton({
                             "text": "Cancel",
                             "classes": "govuk-button govuk-button--secondary",
                             "href": prev_nav_url
                         }) }}
-                        </div>
+                    </div>
 
-                        <p class="govuk-body">
-                            {{ form.save_and_return_home(params={'classes': 'govuk-button govuk-button--secondary'}) }}
-                        </p>
-                    </form>
-                </fieldset>
+                    <p class="govuk-body">
+                        {{ form.save_and_return_home(params={'classes': 'govuk-button govuk-button--secondary'}) }}
+                    </p>
+                </form>
             </div>
         </div>
     </div>
