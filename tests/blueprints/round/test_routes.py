@@ -1,9 +1,8 @@
 import pytest
 from bs4 import BeautifulSoup
 from flask import g, url_for
-from sqlalchemy.orm import joinedload
 
-from app.db.models import Round, Fund, Section, Component, Lizt
+from app.db.models import Round
 from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
 
@@ -329,30 +328,3 @@ def test_clone_round(flask_test_client, seed_dynamic_data):
         soup = BeautifulSoup(response.data, "html.parser")
         notification = soup.find("div", {"class": "govuk-notification-banner__content"})
         assert notification.text.strip() == "Error copying application"
-
-
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_delete_fund_feature_enabled(_db, flask_test_client, seed_fund_without_assessment):
-    """Test that the delete endpoint redirects application table page"""
-    test_round: Round = seed_fund_without_assessment["rounds"][0]
-    flask_test_client.get(f"/rounds/{test_round.round_id}")
-    with flask_test_client.session_transaction():
-        output: Fund = _db.session.get(Fund, test_round.fund_id,
-                                       options=[joinedload(Fund.rounds).joinedload(Round.sections)])
-        assert output is not None, "No values present in the db"
-        response = flask_test_client.delete(f"/rounds/{test_round.round_id}", data={
-            "csrf_token": g.csrf_token,
-        }, follow_redirects=True)
-        assert response.status_code == 200  # Assuming redirection to a valid page
-        _db.session.commit()
-        output_f = _db.session.get(Fund, test_round.fund_id,
-                                   options=[joinedload(Fund.rounds).joinedload(Round.sections)])
-        assert output_f is not None, "Grant deleted"
-        output_r = _db.session.query(Round).all()
-        assert not output_r, "Round delete did not happened"
-        output_s = _db.session.query(Section).all()
-        assert not output_s, "Section delete did not happened"
-        output_c = _db.session.query(Component).all()
-        assert not output_c, "Component delete did not happened"
-        output_l = _db.session.query(Lizt).all()
-        assert not output_l, "Lizt delete did not happened"

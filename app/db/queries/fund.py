@@ -1,4 +1,3 @@
-from f86018f3ab453f90c0c3__mypyc import init_djlint___src
 from flask import current_app
 from sqlalchemy import String, cast, select
 from sqlalchemy.orm import joinedload

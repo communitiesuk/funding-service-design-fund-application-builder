@@ -19,11 +19,10 @@ from app.blueprints.round.services import (
 )
 from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
-from app.db.queries.round import get_all_rounds, get_round_by_id, delete_selected_round
+from app.db.queries.round import get_all_rounds, get_round_by_id
 from app.shared.forms import SelectFundForm
 from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
-from config import Config
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 ROUND_DETAILS = "round_bp.round_details"
@@ -189,16 +188,12 @@ def clone_round(round_id):
     return redirect(url_for(ROUND_DETAILS, round_id=round_id))
 
 
-@round_bp.route("/<round_id>", methods=["GET", "DELETE"])
+@round_bp.route("/<round_id>")
 def round_details(round_id):
     fund_round = get_round_by_id(round_id)
     form = RoundForm(data={"fund_id": fund_round.fund_id})
-    fund_form = FundForm()
-    if request.method == "DELETE":
-        delete_selected_round(round_id)
-        return redirect(url_for("round_bp.view_all_rounds"))
     cloned_form = CloneRoundForm(data={"fund_id": fund_round.fund_id})
-    # TODO at this time we are not implementing the delete applications but later we have to implement
+    fund_form = FundForm()
     return render_template(
-        "round_details.html", form=form, fund_form=fund_form, round=fund_round,
-        cloned_form=cloned_form)
+        "round_details.html", form=form, fund_form=fund_form, round=fund_round, cloned_form=cloned_form
+    )

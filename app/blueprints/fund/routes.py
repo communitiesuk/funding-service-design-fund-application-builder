@@ -11,7 +11,7 @@ from flask import (
 from app.blueprints.fund.forms import FundForm
 from app.blueprints.fund.services import build_fund_rows
 from app.db.models.fund import Fund, FundingType
-from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund, delete_selected_fund
+from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
 from app.shared.helpers import flash_message
 from app.shared.table_pagination import GovUKTableAndPagination
 
@@ -44,17 +44,13 @@ def view_all_funds():
     return render_template("view_all_funds.html", **params)
 
 
-@fund_bp.route("/<uuid:fund_id>", methods=["GET", "DELETE"])
+@fund_bp.route("/<uuid:fund_id>", methods=["GET"])
 def view_fund_details(fund_id):
     """
     Renders grant details page
     """
     form = FundForm()
-    if request.method == "DELETE":
-        delete_selected_fund(fund_id)
-        return redirect(url_for("fund_bp.view_all_funds"))
     fund = get_fund_by_id(fund_id)
-    #TODO at this time we are not implementing the delete grant but later we have to implement
     return render_template("fund_details.html", form=form, fund=fund)
 
 
