@@ -85,7 +85,3 @@ class DefaultConfig(object):
         "x_xss_protection": True,
         "content_security_policy_nonce_in": ["script-src"],
     }
-
-    FEATURE_FLAGS = {
-        "feature_delete": getenv("FEATURE_DELETE", "False").strip().lower() == "true",
-    }

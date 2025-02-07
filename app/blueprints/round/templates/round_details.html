@@ -9,8 +9,8 @@
 {% set active_item_identifier = "applications" %}
 {% extends "base.html" %}
 {% block beforeContent %}
-    {{ super() }}
-    <div class="govuk-grid-row">
+  {{ super() }}
+     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             {{ govukBackLink({
               "text": "Back",
@@ -20,39 +20,37 @@
     </div>
 {% endblock beforeContent %}
 {% block content %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-three-quarters">
-            <h2 class="govuk-heading-l govuk-!-margin-bottom-0">Apply for {{ round.fund.title_json["en"] }}</h2>
-            <a class="govuk-link govuk-link--no-visited-state"
-               href="{{ url_for('fund_bp.edit_fund', fund_id=round.fund.fund_id,  actions="view_application", round_id=round.round_id, _anchor=fund_form.title_en.id) }}">Change
-                application name</a>
-        </div>
-        <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
-            {{ govukButton({ "text": "Build application",
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+        <h2 class="govuk-heading-l govuk-!-margin-bottom-0">Apply for {{ round.fund.title_json["en"] }}</h2>
+        <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('fund_bp.edit_fund', fund_id=round.fund.fund_id,  actions="view_application", round_id=round.round_id, _anchor=fund_form.title_en.id) }}">Change application name</a>
+    </div>
+    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+        {{ govukButton({ "text": "Build application",
             "href": url_for("application_bp.build_application", round_id=round.round_id, action="application_details"),
             "classes": "govuk-button--secondary"
         }) }}
-        </div>
     </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <form method="POST" action="{{ url_for("round_bp.clone_round", round_id=round.round_id) }}" novalidate>
-                <div class="govuk-form-group">
-                    {{ cloned_form.hidden_tag() }}
-                    {{ cloned_form.fund_id() }}
-                </div>
-                {{ govukButton({ "text": "Copy application", "type": submit,
+</div>
+<div class="govuk-grid-row">
+   <div class="govuk-grid-column-two-thirds">
+       <form method="POST" action="{{ url_for("round_bp.clone_round", round_id=round.round_id) }}" novalidate>
+           <div class="govuk-form-group">
+               {{ cloned_form.hidden_tag() }}
+               {{ cloned_form.fund_id() }}
+            </div>
+            {{ govukButton({ "text": "Copy application", "type": submit,
                     "classes": "govuk-button--secondary"
             }) }}
-            </form>
+       </form>
 
-        </div>
     </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            <p class="govuk-body">Grant: {{ round.fund.name_json['en'] }}</p>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+    <p class="govuk-body">Grant: {{ round.fund.name_json['en'] }}</p>
 
-            {{ govukSummaryList({
+    {{ govukSummaryList({
         "classes": "govuk-!-margin-bottom-9",
             "rows": [
                 {
@@ -463,17 +461,6 @@
                 },
            ]
     }) }}
-        </div>
     </div>
-    {% if feature_flags.get('feature_delete') %}
-        <div class="govuk-grid-row govuk-!-margin-top-8">
-            <div class="govuk-grid-column-full">
-                {{ govukButton({
-                  "text": "Delete application ",
-                  "classes": "govuk-button--warning",
-                  "href": url_for("round_bp.delete_round", round_id=round.round_id)
-                }) }}
-            </div>
-        </div>
-    {% endif %}
+</div>
 {% endblock content %}

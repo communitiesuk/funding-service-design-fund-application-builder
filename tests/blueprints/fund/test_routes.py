@@ -1,13 +1,12 @@
 import pytest
 from bs4 import BeautifulSoup
 from flask import g
+from sqlalchemy.orm import joinedload
 
-from app.db.models import Fund, Round, Form, Section, Component, Lizt
+from app.db.models import Fund, Round, Section, Component, Lizt
 from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_id
 from tests.helpers import submit_form
-from config import Config
-from sqlalchemy.orm import joinedload
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
@@ -361,33 +360,27 @@ def test_create_fund_welsh_error_messages(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_delete_fund_feature_disabled(flask_test_client, monkeypatch, seed_fund_without_assessment):
-    """Test that the delete endpoint returns 403 when a feature flag is disabled."""
-    test_fund: Fund = seed_fund_without_assessment["funds"][0]
-    monkeypatch.setattr(Config, "FEATURE_FLAGS", {"feature_delete": False})
-    response = flask_test_client.get(f"/grants/{test_fund.fund_id}/delete", follow_redirects=True)
-    assert response.status_code == 403
-    assert b"Delete Feature Disabled" in response.data
-
-
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_delete_fund_feature_enabled(_db, flask_test_client, monkeypatch, seed_fund_without_assessment):
+def test_delete_fund_feature_enabled(_db, flask_test_client, seed_fund_without_assessment):
     """Test that the delete endpoint redirects when a feature flag is enabled."""
     test_fund: Fund = seed_fund_without_assessment["funds"][0]
-    monkeypatch.setattr(Config, "FEATURE_FLAGS", {"feature_delete": True})
-    output: Fund = _db.session.get(Fund, test_fund.fund_id,
+    flask_test_client.get(f"/grants/{test_fund.fund_id}")
+    with flask_test_client.session_transaction():
+        output: Fund = _db.session.get(Fund, test_fund.fund_id,
+                                       options=[joinedload(Fund.rounds).joinedload(Round.sections)])
+        assert output is not None, "No values present in the db"
+        response = flask_test_client.delete(f"/grants/{test_fund.fund_id}", data={
+            "csrf_token": g.csrf_token,
+        }, follow_redirects=True)
+        assert response.status_code == 200  # Assuming redirection to a valid page
+        _db.session.commit()
+        output_f = _db.session.get(Fund, test_fund.fund_id,
                                    options=[joinedload(Fund.rounds).joinedload(Round.sections)])
-    assert output is not None, "No values present in the db"
-    response = flask_test_client.get(f"/grants/{test_fund.fund_id}/delete", follow_redirects=True)
-    assert response.status_code == 200  # Assuming redirection to a valid page
-    _db.session.commit()
-    output_f = _db.session.get(Fund, test_fund.fund_id, options=[joinedload(Fund.rounds).joinedload(Round.sections)])
-    assert output_f is None, "Grant delete did not happened"
-    output_r = _db.session.query(Round).all()
-    assert not output_r, "Round delete did not happened"
-    output_s = _db.session.query(Section).all()
-    assert not output_s, "Section delete did not happened"
-    output_c = _db.session.query(Component).all()
-    assert not output_c, "Component delete did not happened"
-    output_l = _db.session.query(Lizt).all()
-    assert not output_l, "Lizt delete did not happened"
+        assert output_f is None, "Grant delete did not happened"
+        output_r = _db.session.query(Round).all()
+        assert not output_r, "Round delete did not happened"
+        output_s = _db.session.query(Section).all()
+        assert not output_s, "Section delete did not happened"
+        output_c = _db.session.query(Component).all()
+        assert not output_c, "Component delete did not happened"
+        output_l = _db.session.query(Lizt).all()
+        assert not output_l, "Lizt delete did not happened"
