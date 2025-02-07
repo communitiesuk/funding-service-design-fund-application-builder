@@ -19,7 +19,7 @@ dependencies = [
     "psycopg2-binary==2.9.10",
     "requests==2.32.3",
     "sentry-sdk==2.20.0",
-    "sqlalchemy[mypy]==2.0.37",
+    "sqlalchemy[mypy]==2.0.38",
     "flask-debugtoolbar==0.16.0",
     #
     # If updating either of the govuk-frontend-* packages below, check whether any changes need to be synced into the
