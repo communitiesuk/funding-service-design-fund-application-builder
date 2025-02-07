@@ -25,9 +25,10 @@ def determine_display_value_for_condition(
         return "No" if lang == "en" else "Nac ydy"
     else:
         if list_name:
-            list_values = next(lizt["items"] for lizt in form_lists if lizt["name"] == list_name)
-            condition_text = next(item["text"] for item in list_values if item["value"] == condition_value)
-            return condition_text
+            list_values = next((lizt["items"] for lizt in form_lists if lizt["name"] == list_name), None)
+            if list_values:
+                condition_text = next((item["text"] for item in list_values if item["value"] == condition_value), None)
+                return condition_text
         return condition_value
 
 
