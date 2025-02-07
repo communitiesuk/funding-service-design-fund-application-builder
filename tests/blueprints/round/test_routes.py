@@ -333,7 +333,7 @@ def test_clone_round(flask_test_client, seed_dynamic_data):
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_delete_fund_feature_enabled(_db, flask_test_client, seed_fund_without_assessment):
-    """Test that the delete endpoint redirects when a feature flag is enabled."""
+    """Test that the delete endpoint redirects application table page"""
     test_round: Round = seed_fund_without_assessment["rounds"][0]
     flask_test_client.get(f"/rounds/{test_round.round_id}")
     with flask_test_client.session_transaction():

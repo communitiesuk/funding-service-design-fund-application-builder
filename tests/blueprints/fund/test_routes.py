@@ -361,7 +361,7 @@ def test_create_fund_welsh_error_messages(flask_test_client, seed_dynamic_data):
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
 def test_delete_fund_feature_enabled(_db, flask_test_client, seed_fund_without_assessment):
-    """Test that the delete endpoint redirects when a feature flag is enabled."""
+    """Test that the delete endpoint redirects to grant table page"""
     test_fund: Fund = seed_fund_without_assessment["funds"][0]
     flask_test_client.get(f"/grants/{test_fund.fund_id}")
     with flask_test_client.session_transaction():
