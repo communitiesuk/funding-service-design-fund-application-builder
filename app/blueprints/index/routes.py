@@ -44,8 +44,6 @@ def login():
 
 @index_bp.route("/dashboard", methods=["GET"])
 def dashboard():
-    session["visited_pages"] = []
-    session.modified = True
     return render_template("dashboard.html")
 
 

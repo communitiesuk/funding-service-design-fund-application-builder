@@ -47,28 +47,22 @@ def test_session_track_visited_pages_template(flask_test_client, seed_dynamic_da
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_session_track_visited_pages_reset_session(flask_test_client, seed_dynamic_data):
+@pytest.mark.parametrize(
+    "endpoint, expected_endpoint",
+    [
+        ("fund_bp.view_all_funds", "fund_bp.view_all_funds"),
+        ("template_bp.view_templates", "template_bp.view_templates"),
+        ("round_bp.view_all_rounds", "round_bp.view_all_rounds"),
+    ],
+)
+def test_session_track_visited_pages_reset_session(flask_test_client, seed_dynamic_data, endpoint, expected_endpoint):
     with flask_test_client.session_transaction():
-        # Simulate visiting a page and reset once go into view_all_funds
+        # Simulate visiting a page and reset once navigating to the given endpoint
         _visit_template(flask_test_client, seed_dynamic_data)
         assert len(session["visited_pages"]) == 3
-        flask_test_client.get(url_for("fund_bp.view_all_funds"))
+        flask_test_client.get(url_for(endpoint))
         assert len(session["visited_pages"]) == 1
-        assert session["visited_pages"][0]["endpoint"] == "fund_bp.view_all_funds"
-
-        # Simulate visiting a page and reset once go into view_templates
-        _visit_template(flask_test_client, seed_dynamic_data)
-        assert len(session["visited_pages"]) == 3
-        flask_test_client.get(url_for("template_bp.view_templates"))
-        assert len(session["visited_pages"]) == 1
-        assert session["visited_pages"][0]["endpoint"] == "template_bp.view_templates"
-
-        # Simulate visiting a page and reset once go into view_templates
-        _visit_template(flask_test_client, seed_dynamic_data)
-        assert len(session["visited_pages"]) == 3
-        flask_test_client.get(url_for("round_bp.view_all_rounds"))
-        assert len(session["visited_pages"]) == 1
-        assert session["visited_pages"][0]["endpoint"] == "round_bp.view_all_rounds"
+        assert session["visited_pages"][0]["endpoint"] == expected_endpoint
 
 
 def _visit_template(flask_test_client, seed_dynamic_data):
