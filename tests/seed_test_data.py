@@ -20,6 +20,7 @@ from app.db.models import (
 from app.db.models.fund import FundingType
 from app.shared.data_classes import Condition, ConditionValue
 
+#NOSONAR Ignore since this data is related to unit tests
 BASIC_FUND_INFO = {
     "name_json": {"en": "Unit Test Fund"},
     "title_json": {"en": "funding to improve testing"},
@@ -29,6 +30,8 @@ BASIC_FUND_INFO = {
     "funding_type": FundingType.COMPETITIVE,
     "ggis_scheme_reference_number": "G2-SCH-0000092414",
 }
+
+#NOSONAR Ignore since this data is related to unit tests
 BASIC_ROUND_INFO = {
     "audit_info": {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
     "opens": "2024-10-01T11:59:00",
