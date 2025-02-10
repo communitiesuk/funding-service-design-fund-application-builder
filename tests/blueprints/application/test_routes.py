@@ -124,3 +124,36 @@ def test_update_section_empty_template_section_name(flask_test_client, seed_dyna
     error_link = soup.find("a", href="#name_in_apply_en")
     assert error_link
     assert error_link.get_text() == "Enter section name"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_update_template_form(flask_test_client, seed_dynamic_data):
+    test_round = seed_dynamic_data["rounds"][0]
+    test_form = seed_dynamic_data["forms"][0]
+    url = f"/rounds/{test_round.round_id}/sections/create"
+    data = {"name_in_apply_en": "section 1", "save_section": True}
+    response = submit_form(flask_test_client, url, data, follow_redirects=True)
+    soup = BeautifulSoup(response.data, "html.parser")
+    edit_section_link = soup.find("a", class_="govuk-link--no-visited-state", string="Edit").get("href")
+    data = {
+        "name_in_apply_en": "",
+        "add_form": True,
+        "section_id": edit_section_link.split("/")[-1],
+        "template_id": test_form.form_id,
+    }
+
+    response = submit_form(flask_test_client, edit_section_link, data, follow_redirects=False)
+    soup = BeautifulSoup(response.data, "html.parser")
+    spans_with_h3 = soup.find_all("span", class_="app-task-list__task-name")
+    # Flag to check if the search text is found
+    found = False
+
+    # Check each span for the <h3> and if its text contains the search text
+    for span in spans_with_h3:
+        h3_tag = span.find("h3", class_="govuk-body")
+        if h3_tag and test_form.name_in_apply_json["en"] in h3_tag.get_text():
+            found = True
+            break  # No need to check further once found
+
+    # Assert that the search text is found in at least one <h3> tag
+    assert found, "Template Form not found"
