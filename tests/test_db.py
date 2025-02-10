@@ -4,8 +4,9 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Form, Fund, Organisation, Round, Section
+from app.db.models import Form, Fund, Organisation, Round, Section, Component, Lizt
 from app.db.models.fund import FundingType
+from sqlalchemy.orm import joinedload
 from app.db.queries.application import (
     delete_form_from_section,
     delete_section_from_round,
@@ -16,8 +17,8 @@ from app.db.queries.application import (
     move_section_up,
     swap_elements_in_list,
 )
-from app.db.queries.fund import add_fund, add_organisation, get_all_funds, get_fund_by_id
-from app.db.queries.round import add_round, get_round_by_id
+from app.db.queries.fund import add_fund, add_organisation, get_all_funds, get_fund_by_id, delete_selected_fund
+from app.db.queries.round import add_round, get_round_by_id, delete_selected_round
 from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 
 
@@ -568,3 +569,45 @@ def test_base_path_sequence_insert(seed_dynamic_data, _db):
     added_round_2 = add_round(new_round_2)
     assert added_round_2.section_base_path
     assert added_round_2.section_base_path > added_round_1.section_base_path
+
+
+def test_delete_grant(_db, seed_fund_without_assessment):
+    """Test that the delete endpoint redirects to grant table page"""
+    test_fund: Fund = seed_fund_without_assessment["funds"][0]
+    output: Fund = _db.session.get(Fund, test_fund.fund_id,
+                                   options=[joinedload(Fund.rounds).joinedload(Round.sections)])
+    assert output is not None, "No values present in the db"
+    delete_selected_fund(test_fund.fund_id)
+    _db.session.commit()
+    output_f = _db.session.get(Fund, test_fund.fund_id,
+                               options=[joinedload(Fund.rounds).joinedload(Round.sections)])
+    assert output_f is None, "Grant delete did not happened"
+    output_r = _db.session.query(Round).all()
+    assert not output_r, "Round delete did not happened"
+    output_s = _db.session.query(Section).all()
+    assert not output_s, "Section delete did not happened"
+    output_c = _db.session.query(Component).all()
+    assert not output_c, "Component delete did not happened"
+    output_l = _db.session.query(Lizt).all()
+    assert not output_l, "Lizt delete did not happened"
+
+
+def test_delete_application(_db, seed_fund_without_assessment):
+    """Test that the delete endpoint redirects application table page"""
+    test_round: Round = seed_fund_without_assessment["rounds"][0]
+    output: Fund = _db.session.get(Fund, test_round.fund_id,
+                                   options=[joinedload(Fund.rounds).joinedload(Round.sections)])
+    assert output is not None, "No values present in the db"
+    delete_selected_round(test_round.round_id)
+    _db.session.commit()
+    output_f = _db.session.get(Fund, test_round.fund_id,
+                               options=[joinedload(Fund.rounds).joinedload(Round.sections)])
+    assert output_f is not None, "Grant deleted"
+    output_r = _db.session.query(Round).all()
+    assert not output_r, "Round delete did not happened"
+    output_s = _db.session.query(Section).all()
+    assert not output_s, "Section delete did not happened"
+    output_c = _db.session.query(Component).all()
+    assert not output_c, "Component delete did not happened"
+    output_l = _db.session.query(Lizt).all()
+    assert not output_l, "Lizt delete did not happened"
