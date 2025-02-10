@@ -1,4 +1,6 @@
-from flask import Flask, render_template
+import uuid
+
+from flask import Flask, render_template, session, request
 from flask_talisman import Talisman
 from fsd_utils import init_sentry
 from fsd_utils.authentication.decorators import SupportedApp, check_internal_user, login_required
@@ -13,6 +15,7 @@ from app.blueprints.fund.routes import fund_bp
 from app.blueprints.index.routes import index_bp
 from app.blueprints.round.routes import round_bp
 from app.blueprints.template.routes import template_bp
+from app.shared.page_tracker import PageTracker
 from config import Config
 
 PUBLIC_ROUTES = [
@@ -92,6 +95,11 @@ def create_app() -> Flask:
     @flask_app.errorhandler(403)
     def forbidden_error(error):
         return render_template("403.html"), 403
+
+    @flask_app.before_request
+    def track_pages():
+        tracker = PageTracker()
+        tracker.process_request(request.endpoint)
 
     @flask_app.errorhandler(500)
     def internal_server_error(e):

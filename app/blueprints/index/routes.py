@@ -9,6 +9,8 @@ from flask import (
     redirect,
     render_template,
     url_for,
+    session,
+    request
 )
 from fsd_utils.authentication.decorators import login_requested
 
@@ -79,3 +81,17 @@ def download_form_json(form_id):
         mimetype="application/json",
         headers={"Content-Disposition": f"attachment;filename=form-{randint(0, 999)}.json"},  # nosec B311
     )
+
+
+@index_bp.route('/back')
+def go_back():
+    # If there are previous pages, pop the last one and redirect
+    if len(session['visited_pages']) > 1:
+        history = session['visited_pages']
+        history.pop()  # Remove the current page
+        prev_page = history[-1]
+        session["visited_pages"] = history
+        session.modified = True
+        return redirect(url_for(prev_page["endpoint"], **prev_page["view_args"], **prev_page["query_params"]))
+    else:
+        return redirect(url_for("index_bp.index"))  # If no previous page, go home
