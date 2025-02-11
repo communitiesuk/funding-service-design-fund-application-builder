@@ -1,6 +1,7 @@
 {% extends "govuk_frontend_jinja/template.html" %}
 {% from "govuk_frontend_jinja/components/breadcrumbs/macro.html" import govukBreadcrumbs %}
 {% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
+{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {% set assetPath = url_for("static", filename="").rstrip("/") %}
 
 {% set cspNonce = csp_nonce() %}  {# Used in the base template govuk_frontend_jinja/template.html #}
@@ -33,7 +34,11 @@
 
 {% block main %}
 <div class="govuk-width-container {{ containerClasses }}">
-  {% block beforeContent %}{% endblock beforeContent %}
+  {% block beforeContent %}
+      {% if back_link %}
+         {{ govukBackLink({"text": "Back","href": url_for("index_bp.go_back")}) }}
+      {% endif %}
+  {% endblock beforeContent %}
   <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
     {% with messages = get_flashed_messages() %}
         {% if messages %}

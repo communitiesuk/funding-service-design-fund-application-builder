@@ -1,18 +1,7 @@
 {% extends "base.html" %}
-{% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 
 {% set pageHeading %}{{ title }} {% endset %}
-{% block beforeContent %}
-    {{ super() }}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{ govukBackLink({
-              "text": "Back",
-              "href":  url_for("application_bp.build_application", round_id=round.round_id)
-            }) }}
-        </div>
-    </div>
-{% endblock beforeContent %}
+{% set back_link = True %}
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
