@@ -166,31 +166,30 @@ def section(round_id, section_id=None):
         "round_id": str(round_id),
     }
     if form.validate_on_submit():
-        if form.add_form.data:
-            # clone template json if Add button is clicked
-            section = get_section_by_id(section_id=section_id)
-            new_section_index = max(len(section.forms) + 1, 1)
-            clone_single_form(form_id=form.template_id.data, new_section_id=section_id, section_index=new_section_index)
+        if not form.add_form.data:
+            count_existing_sections = len(round_obj.sections)
+            if form.section_id.data:
+                update_section(
+                    form.section_id.data,
+                    {
+                        "name_in_apply_json": {"en": form.name_in_apply_en.data},
+                    },
+                )
+            else:
+                insert_new_section(
+                    {
+                        "round_id": form.round_id.data,
+                        "name_in_apply_json": {"en": form.name_in_apply_en.data},
+                        "index": max(count_existing_sections + 1, 1),
+                    }
+                )
+            # flash(f"Saved section {form.name_in_apply_en.data}")
+            return redirect(url_for("application_bp.build_application", round_id=round_obj.round_id))
 
-        count_existing_sections = len(round_obj.sections)
-        if form.section_id.data:
-            update_section(
-                form.section_id.data,
-                {
-                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
-                },
-            )
-        else:
-            insert_new_section(
-                {
-                    "round_id": form.round_id.data,
-                    "name_in_apply_json": {"en": form.name_in_apply_en.data},
-                    "index": max(count_existing_sections + 1, 1),
-                }
-            )
-
-        # flash(f"Saved section {form.name_in_apply_en.data}")
-        return redirect(url_for("application_bp.build_application", round_id=round_obj.round_id))
+        # clone template json if Add button is clicked
+        section = get_section_by_id(section_id=section_id)
+        new_section_index = max(len(section.forms) + 1, 1)
+        clone_single_form(form_id=form.template_id.data, new_section_id=section_id, section_index=new_section_index)
 
     if section_id:
         existing_section = get_section_by_id(section_id)
