@@ -31,11 +31,11 @@ from app.db.queries.application import (
 from app.db.queries.clone import clone_single_form
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_round_by_id
-from app.export_config.generate_all_questions import print_html
+from app.export_config.generate_all_questions import generate_html
 from app.export_config.generate_assessment_config import (
     generate_assessment_config_for_round,
 )
-from app.export_config.generate_form import build_form_json
+from app.export_config.generate_form import build_form_json, _find_page_by_controller
 from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
@@ -120,13 +120,14 @@ def view_all_questions(round_id):
         section_data,
         lang="en",
     )
-    html = print_html(print_data)
+    html = generate_html(print_data)
     return render_template(
         "view_questions.html",
         round=round,
         fund=fund,
         question_html=html,
         title=f"All Questions for {fund.short_name} - {round.short_name}",
+        all_questions_view=True
     )
 
 
@@ -245,6 +246,7 @@ def view_form_questions(round_id, section_id, form_id):
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     form = get_form_by_id(form_id=form_id)
+    start_page = _find_page_by_controller(form.pages, "start.js")
     section_data = [
         {
             "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
@@ -256,7 +258,12 @@ def view_form_questions(round_id, section_id, form_id):
         section_data,
         lang="en",
     )
-    html = print_html(print_data, True)
+    html = generate_html(print_data, False)
     return render_template(
-        "view_questions.html", round=round, fund=fund, question_html=html, title=form.name_in_apply_json["en"]
+        "view_questions.html",
+        round=round,
+        fund=fund,
+        question_html=html,
+        title=start_page.name_in_apply_json["en"],
+        all_questions_view=False
     )
