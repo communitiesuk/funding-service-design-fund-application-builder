@@ -34,11 +34,12 @@
 
 {% block main %}
 <div class="govuk-width-container {{ containerClasses }}">
-  {% block beforeContent %}{% endblock beforeContent %}
+  {% block beforeContent %}
+      {% if back_link %}
+         {{ govukBackLink({"text": "Back","href": url_for("index_bp.go_back")}) }}
+      {% endif %}
+  {% endblock beforeContent %}
   <main class="govuk-main-wrapper {{ mainClasses }}" id="main-content" role="main"{% if mainLang %} lang="{{ mainLang }}"{% endif %}>
-    {% if back_link %}
-     {{ govukBackLink({"text": "Back","href": url_for("index_bp.go_back")}) }}
-    {% endif %}
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             <div class="govuk-grid-row">
