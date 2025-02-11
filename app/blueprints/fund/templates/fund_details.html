@@ -2,17 +2,10 @@
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
 {%- from "govuk_frontend_jinja/components/summary-list/macro.html" import govukSummaryList -%}
 {% set showNavigationBar = True %}
+{% set back_link = True %}
 {% set active_item_identifier = "grants" %}
 {% block beforeContent %}
     {{ super() }}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{ govukBackLink({
-          "text": "Back",
-          "href": url_for("index_bp.go_back")
-        }) }}
-        </div>
-    </div>
 {% endblock beforeContent %}
 {% block content %}
     <div class="govuk-grid-row">
