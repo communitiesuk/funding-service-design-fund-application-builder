@@ -3,7 +3,6 @@
 {{ 'Apply for ' + fund.title_json["en"]  if round_id else 'Create a new application' }}{% endset %}
 
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
-{%- from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink -%}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 {% set back_link = True %}
 {% block content %}
