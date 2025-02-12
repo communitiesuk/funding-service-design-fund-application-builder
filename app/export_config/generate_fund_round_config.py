@@ -93,9 +93,6 @@ def generate_fund_config(round_id):
         short_name=fund.short_name,
         description_json=fund.description_json,
         welsh_available=fund.welsh_available,
-        owner_organisation_name="None",
-        owner_organisation_shortname="None",
-        owner_organisation_logo_uri="None",
         funding_type=fund.funding_type.value,
         ggis_scheme_reference_number=fund.ggis_scheme_reference_number,
     )
