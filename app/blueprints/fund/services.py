@@ -3,7 +3,7 @@ from flask import url_for
 from app.db.models import Fund
 
 
-def build_fund_rows(funds: list[Fund]) -> list[dict]:
+def build_fund_rows(funds: list[dict]) -> list[dict]:
     rows = []
     for fund in funds:
         row = [

@@ -3,6 +3,7 @@ from dataclasses import asdict, is_dataclass
 from flask import flash, render_template
 
 from app.db.models import Page
+from flask_sqlalchemy.pagination import Pagination
 
 
 def convert_to_dict(obj):
@@ -40,11 +41,11 @@ def get_all_pages_in_parent_form(db, page_id):
 
 
 def flash_message(
-    message: str,
-    href: str = None,
-    href_display_name: str = None,
-    next_href: str = None,
-    next_href_display_name: str = None,
+        message: str,
+        href: str = None,
+        href_display_name: str = None,
+        next_href: str = None,
+        next_href_display_name: str = None,
 ):
     """
     Displays custom flash message.
@@ -69,3 +70,53 @@ def flash_message(
         ```
     """
     flash(render_template("partials/flash_template.html", **locals()))
+
+
+def pagination_convertor(pagination: Pagination):
+    """
+    convert a backend-paginated object into gov uk pagination
+
+    Args:
+        pagination (dict): backend-paginated object and convert into gov uk pagination.
+    """
+
+    if pagination.pages <= 1:
+        return None
+
+    pagination_json = {
+        **({"previous": {"href": f"?page={pagination.prev_num}"}} if pagination.has_prev else {}),
+        **({"next": {"href": f"?page={pagination.next_num}"}} if pagination.has_next else {}),
+        "items": []
+    }
+
+    # Helper function to add page number or ellipsis
+    def add_page(i, current_page):
+        return {"number": i, "href": f"?page={i}", "current": i == current_page}
+
+    items = []
+    # Add pages before the current page
+    if pagination.page > 3:
+        #  More than 3 pages left to the current then add ellipsis with the first page
+        items.extend([add_page(1, pagination.page), {"ellipsis": True}])
+
+    # Filling the left-hand side with items after current and ignore ellipsis range
+    start = max(1, pagination.page - 1)
+    for i in range(start, pagination.page):
+        items.append(add_page(i, pagination.page))
+
+    # Add the current page
+    items.append(add_page(pagination.page, pagination.page))
+
+    # Add pages after the current page
+    if pagination.page < pagination.pages - 2:
+        # Add ellipsis if there are more than pages after current pages after remove last one and once after the current
+        items.append(add_page(pagination.page + 1, pagination.page))
+        items.append({"ellipsis": True})
+        items.append(add_page(pagination.pages, pagination.page))
+    else:
+        # adding all the items if there is no ellipsis
+        items.extend(add_page(i, pagination.page) for i in range(pagination.page + 1, pagination.pages + 1))
+
+    # Assign the items to the pagination JSON
+    pagination_json["items"] = items
+    return pagination_json
