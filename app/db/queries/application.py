@@ -1,6 +1,7 @@
 from uuid import uuid4
 
-from sqlalchemy import delete
+from sqlalchemy import delete, String, cast, select
+from flask_sqlalchemy.pagination import Pagination
 
 from app.db import db
 from app.db.models import Component, Form, FormSection, Lizt, Page, Section
@@ -18,6 +19,11 @@ def get_section_by_id(section_id) -> Section:
 
 def get_all_template_forms() -> list[Form]:
     return db.session.query(Form).where(Form.is_template == True).order_by(Form.template_name).all()  # noqa:E712
+
+
+def get_paginated_forms(page: int, items_per_page: int = 20) -> Pagination:
+    stmt = select(Form).where(Form.is_template == True).order_by(cast(Form.template_name, String))
+    return db.paginate(stmt, page=page, per_page=items_per_page)
 
 
 def get_form_for_component(component: Component) -> Form:

@@ -19,7 +19,7 @@ def convert_form_data_to_json(data) -> dict:
     return {}
 
 
-def build_round_rows(rounds: list[Round]) -> list[dict]:
+def build_round_rows(rounds: list[dict]) -> list[dict]:
     rows = []
     for round in rounds:
         row = [
