@@ -105,7 +105,7 @@ def test_create_round_with_invalid_eoi_schema_json(flask_test_client, seed_dynam
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_update_existing_round(flask_test_client, seed_dynamic_data):
+def test_update_existing_round_check_eoi_schema_optional_value(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully updated using the /rounds/<round_id> route
     Verifies that the updated round has the correct attributes
@@ -139,6 +139,14 @@ def test_update_existing_round(flask_test_client, seed_dynamic_data):
     soup = BeautifulSoup(response.data, "html.parser")
     notification = soup.find("h3", {"class": "govuk-notification-banner__heading"})
     assert notification.text.strip() == "Application updated"
+    rows = soup.find_all("div", class_="govuk-summary-list__row")
+    for row in rows:
+        key = row.find("dt", class_="govuk-summary-list__key").text.strip()
+        if key == "Expression of interest decision schema":
+            break
+    # Extract the corresponding value (the text inside the <dd> tag)
+    eoi_schema = row.find("dd", class_="govuk-summary-list__value").text.strip()
+    assert eoi_schema == "Not provided"
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")

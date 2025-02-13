@@ -332,7 +332,7 @@ def test_view_fund_details(flask_test_client, seed_dynamic_data):
         f'<a class="govuk-link govuk-link--no-visited-state" href="/grants/{test_fund.fund_id}/edit#name_en">Change'
         f'<span class="govuk-visually-hidden"> Grant name</span></a>' in html  # noqa: E501
     )
-    assert 'Back' in html
+    assert "Back" in html
 
     assert '<dt class="govuk-summary-list__key"> Grant name (Welsh)</dt>' not in html
 
@@ -356,3 +356,42 @@ def test_create_fund_welsh_error_messages(flask_test_client, seed_dynamic_data):
     assert b"Enter the Welsh grant name" in response.data  # Validation error message
     assert b"Enter the Welsh application name" in response.data  # Validation error message
     assert b"Enter the Welsh grant description" in response.data  # Validation error message
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_update_fund_and_check_optinal_values_not_provided(flask_test_client, seed_dynamic_data):
+    test_fund = seed_dynamic_data["funds"][0]
+    flask_test_client.get(f"/grants/{test_fund.fund_id}/edit")
+    with flask_test_client.session_transaction():
+        update_data = {
+            "name_en": "Updated Fund",
+            "title_en": "Updated Fund Title",
+            "description_en": "Updated Fund Description",
+            "welsh_available": "false",
+            "short_name": "UF1234",
+            "submit": "Submit",
+            "funding_type": "EOI",
+            "ggis_scheme_reference_number": "",
+            "save_and_continue": True,
+            "csrf_token": g.csrf_token,
+        }
+        response = flask_test_client.post(
+            f"/grants/{test_fund.fund_id}/edit",
+            data=update_data,
+            follow_redirects=True,
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+    assert response.request.path == f"/grants/{test_fund.fund_id}"
+    soup = BeautifulSoup(response.data, "html.parser")
+    notification_banner = soup.find("h3", {"class": "govuk-notification-banner__heading"})
+    assert notification_banner.text.strip() == "Grant updated"
+    # Find all rows
+    rows = soup.find_all("div", class_="govuk-summary-list__row")
+
+    for row in rows:
+        key = row.find("dt", class_="govuk-summary-list__key").text.strip()
+        if key == "GGIS scheme reference number":
+            break
+    # Extract the corresponding value (the text inside the <dd> tag)
+    ggis_reference_number = row.find("dd", class_="govuk-summary-list__value").text.strip()
+    assert ggis_reference_number == "Not provided"

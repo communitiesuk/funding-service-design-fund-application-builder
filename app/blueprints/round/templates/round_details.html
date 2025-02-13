@@ -156,7 +156,7 @@
                 },
                 {
                     "key": {"text": "Assessor guidance link"},
-                    "value": {"text": round.guidance_url},
+                    "value": {"text": round.guidance_url or "Not provided"},
                     "actions": {
                         "items": [
                             {
@@ -170,7 +170,7 @@
                 },
                 {
                     "key": {"text": "Grant team email address"},
-                    "value": {"text": round.contact_email},
+                    "value": {"text": round.contact_email or "Not provided"},
                     "actions": {
                         "items": [
                             {
@@ -184,7 +184,7 @@
                 },
                 {
                     "key": {"text": "Before you apply guidance"},
-                    "value": {"text": round.instructions_json['en']},
+                    "value": {"text": round.instructions_json['en'] or "Not provided"},
                     "actions": {
                         "items": [
                             {
@@ -198,7 +198,7 @@
                 },
                 {
                     "key": {"text": "Before you apply guidance (Welsh)"},
-                    "value": {"text": round.instructions_json['cy']},
+                    "value": {"text": round.instructions_json['cy'] or "Not provided"},
                     "actions": {
                         "items": [
                             {
@@ -212,7 +212,7 @@
                 } if round.fund.welsh_available else {},
                 {
                     "key": {"text": "Completing the application guidance"},
-                    "value": {"text": round.application_guidance_json['en']},
+                    "value": {"text": round.application_guidance_json['en'] or "Not provided"},
                     "actions": {
                         "items": [
                             {
@@ -226,7 +226,7 @@
                 },
                 {
                     "key": {"text": "Completing the application guidance (Welsh)"},
-                    "value": {"text": round.application_guidance_json['cy']},
+                    "value": {"text": round.application_guidance_json['cy'] or "Not provided"},
                     "actions": {
                         "items": [
                             {
@@ -240,7 +240,7 @@
                 } if round.fund.welsh_available else {},
                 {
                     "key": {"text": "Feedback link"},
-                    "value": {"text": round.feedback_link},
+                    "value": {"text": round.feedback_link or "Not provided"},
                     "actions": {
                         "items": [
                             {
@@ -296,7 +296,7 @@
                 },
                 {
                     "key": {"text": "Expression of interest decision schema"},
-                    "value": {"text": round.eoi_decision_schema["en"]},
+                    "value": {"text": round.eoi_decision_schema["en"] or "Not provided"},
                     "actions": {
                         "items": [
                             {
@@ -310,7 +310,7 @@
                 },
                 {
                     "key": {"text": "Expression of interest decision schema (Welsh)"},
-                    "value": {"text": round.eoi_decision_schema["cy"]},
+                    "value": {"text": round.eoi_decision_schema["cy"] or "Not provided"},
                     "actions": {
                         "items": [
                             {
