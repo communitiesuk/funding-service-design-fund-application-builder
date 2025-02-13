@@ -16,8 +16,7 @@ class PageTracker:
             fund_bp.name,
             round_bp.name
         }
-        self.ignore_endpoints = {f'{application_bp.name}.{build_application.__name__}',
-                                 f'{application_bp.name}.{section.__name__}',
+        self.ignore_endpoints = {f'{application_bp.name}.{section.__name__}',
                                  f'{index_bp.name}.{go_back.__name__}'}
         self.reset_endpoints = {
             f'{index_bp.name}.{dashboard.__name__}',
