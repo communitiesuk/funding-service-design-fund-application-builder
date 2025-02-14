@@ -1,6 +1,7 @@
 from flask import current_app
 from sqlalchemy import String, cast, select
 from sqlalchemy.orm import joinedload
+from flask_sqlalchemy.pagination import Pagination
 
 from app.db import db
 from app.db.models import Round, Component, Page, Form, Lizt
@@ -30,6 +31,11 @@ def update_fund(fund: Fund) -> Fund:
 def get_all_funds() -> list[Fund]:
     stmt = select(Fund).order_by(cast(Fund.name_json["en"], String))
     return db.session.scalars(stmt).all()
+
+
+def get_paginated_funds(page: int, items_per_page: int = 20) -> Pagination:
+    stmt = select(Fund).order_by(cast(Fund.name_json["en"], String))
+    return db.paginate(stmt, page=page, per_page=items_per_page)
 
 
 def get_fund_by_id(id: str) -> Fund:
