@@ -5,6 +5,7 @@ import string
 from pathlib import Path
 
 import pytest
+from bs4 import BeautifulSoup
 
 from app.blueprints.application.routes import create_export_zip
 from app.export_config.generate_fund_round_config import generate_config_for_round
@@ -17,7 +18,6 @@ from app.export_config.generate_fund_round_html import (
     generate_all_round_html,
 )
 from app.export_config.helpers import validate_json
-from bs4 import BeautifulSoup
 
 
 def read_data_from_output_file(file):
@@ -63,9 +63,9 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                 "fund_config": {
                     "short_name": fund_short_name,
                     "welsh_available": False,
-                    "owner_organisation_name": "None",
-                    "owner_organisation_shortname": "None",
-                    "owner_organisation_logo_uri": "None",
+                    "owner_organisation_name": None,
+                    "owner_organisation_shortname": None,
+                    "owner_organisation_logo_uri": None,
                     "name_json": {"en": "Unit Test Fund 1"},
                     "title_json": {"en": "funding to improve testing"},
                     "description_json": {"en": "A £10m fund to improve testing across the devolved nations."},
