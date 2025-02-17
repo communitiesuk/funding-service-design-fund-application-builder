@@ -94,11 +94,11 @@ class FundExport:
     id: str
     short_name: dict
     welsh_available: bool
-    owner_organisation_name: str
-    owner_organisation_shortname: str
-    owner_organisation_logo_uri: str
     ggis_scheme_reference_number: str
     funding_type: FundingType
+    owner_organisation_name: Optional[str] = None
+    owner_organisation_shortname: Optional[str] = None
+    owner_organisation_logo_uri: Optional[str] = None
     name_json: NameJson = field(default_factory=NameJson)
     title_json: TitleJson = field(default_factory=TitleJson)
     description_json: DescriptionJson = field(default_factory=DescriptionJson)
