@@ -1,18 +1,6 @@
 {% macro govukTablePagination(params) %}
-
-    {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
     {%- from "govuk_frontend_jinja/components/pagination/macro.html" import govukPagination -%}
 
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{ govukTable({
-                "captionClasses": "govuk-table__caption--m",
-                "firstCellIsHeader": false,
-                "head": params.table_pagination_page.table.table_header,
-                "rows": params.table_pagination_page.table.table_rows
-            }) }}
-        </div>
-    </div>
     {% if params.table_pagination_page.pagination %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">

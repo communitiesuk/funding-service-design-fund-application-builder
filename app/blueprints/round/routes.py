@@ -45,14 +45,11 @@ def view_all_rounds():
     pagination_json = pagination_convertor(pagination=pagination_data)
     params = {
         "table_pagination_page": {
-            "table": {
-                "table_header": [{"text": "Application name"}, {"text": "Grant"}, {"text": "Round"}, {"text": ""}],
-                "table_rows": build_round_rows(pagination_data.items)
-            },
             **({"pagination": pagination_json} if pagination_data else {})
         }
     }
-    return render_template("view_all_rounds.html", **params)
+    return render_template("view_all_rounds.html", **params,
+                           table_rows=build_round_rows(pagination_data.items))
 
 
 @round_bp.route("/select-grant", methods=["GET", "POST"])

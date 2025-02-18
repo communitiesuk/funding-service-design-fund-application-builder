@@ -34,14 +34,12 @@ def view_templates():
     pagination_json = pagination_convertor(pagination=pagination_data)
     params = {
         "table_pagination_page": {
-            "table": {
-                "table_header": [{"text": "Template name"}, {"text": "Task name"}, {"text": ""}, ],
-                "table_rows": build_form_rows(pagination_data.items)
-            },
             **({"pagination": pagination_json} if pagination_data else {})
         }
     }
-    return render_template("view_all_templates.html", **params, form_designer_url=form_designer_url)
+    return render_template("view_all_templates.html", **params,
+                           form_designer_url=form_designer_url,
+                           table_rows=build_form_rows(pagination_data.items))
 
 
 @template_bp.route("/create", methods=["GET", "POST"])

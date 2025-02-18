@@ -39,14 +39,11 @@ def view_all_funds():
     pagination_json = pagination_convertor(pagination=pagination_data)
     params = {
         "table_pagination_page": {
-            "table": {
-                "table_header": [{"text": "Grant name"}, {"text": "Grant description"}, {"text": "Grant type"}],
-                "table_rows": build_fund_rows(pagination_data.items)
-            },
             **({"pagination": pagination_json} if pagination_data else {})
         }
     }
-    return render_template("view_all_funds.html",**params)
+    return render_template("view_all_funds.html",**params,
+                           table_rows=build_fund_rows(pagination_data.items))
 
 
 @fund_bp.route("/<uuid:fund_id>", methods=["GET"])

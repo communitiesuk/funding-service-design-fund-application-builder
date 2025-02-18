@@ -5,6 +5,7 @@
 {%- from "macros/tablePagination.html" import govukTablePagination -%}
 {%- from "govuk_frontend_jinja/components/details/macro.html" import govukDetails -%}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
+{% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
 
 {% block content %}
@@ -46,6 +47,16 @@
         {{ govukButton({
                 "text": "Upload template",
                 "href": url_for('template_bp.create_template')
+            }) }}
+    </div>
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {{ govukTable({
+                "captionClasses": "govuk-table__caption--m",
+                "firstCellIsHeader": false,
+                "head": [{"text": "Template name"}, {"text": "Task name"}, {"text": ""}, ],
+                "rows": table_rows
             }) }}
     </div>
 </div>
