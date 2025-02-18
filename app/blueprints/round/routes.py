@@ -21,7 +21,7 @@ from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_round_by_id, get_paginated_rounds
 from app.shared.forms import SelectFundForm
-from app.shared.helpers import flash_message, pagination_convertor
+from app.shared.helpers import flash_message
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 ROUND_DETAILS = "round_bp.round_details"
@@ -42,14 +42,10 @@ def view_all_rounds():
     Renders a list of rounds in the application page
     """
     pagination_data = get_paginated_rounds(page=int(request.args.get("page", 1)))
-    pagination_json = pagination_convertor(pagination=pagination_data)
-    params = {
-        "table_pagination_page": {
-            **({"pagination": pagination_json} if pagination_data else {})
-        }
-    }
-    return render_template("view_all_rounds.html", **params,
-                           table_rows=build_round_rows(pagination_data.items))
+    return render_template("view_all_rounds.html",
+                           table_rows=build_round_rows(pagination_data.items),
+                           pagination=pagination_data
+                           )
 
 
 @round_bp.route("/select-grant", methods=["GET", "POST"])

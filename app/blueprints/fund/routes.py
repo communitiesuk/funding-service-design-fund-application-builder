@@ -12,7 +12,7 @@ from app.blueprints.fund.forms import FundForm
 from app.blueprints.fund.services import build_fund_rows
 from app.db.models.fund import Fund, FundingType
 from app.db.queries.fund import add_fund, get_fund_by_id, update_fund, get_paginated_funds
-from app.shared.helpers import flash_message, pagination_convertor
+from app.shared.helpers import flash_message
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 SELECT_GRANT_PAGE = "select_grant"
@@ -36,14 +36,10 @@ def view_all_funds():
     Renders list of grants in the grant page
     """
     pagination_data = get_paginated_funds(page=int(request.args.get("page", 1)))
-    pagination_json = pagination_convertor(pagination=pagination_data)
-    params = {
-        "table_pagination_page": {
-            **({"pagination": pagination_json} if pagination_data else {})
-        }
-    }
-    return render_template("view_all_funds.html",**params,
-                           table_rows=build_fund_rows(pagination_data.items))
+    return render_template("view_all_funds.html",
+                           table_rows=build_fund_rows(pagination_data.items),
+                           pagination=pagination_data
+                           )
 
 
 @fund_bp.route("/<uuid:fund_id>", methods=["GET"])
