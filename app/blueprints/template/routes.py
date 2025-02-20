@@ -1,23 +1,21 @@
 import json
 
-from flask import Blueprint, current_app, redirect, render_template, request, url_for, session
+from flask import Blueprint, current_app, redirect, render_template, request, url_for
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.index.routes import INDEX_BP_DASHBOARD
 from app.blueprints.template.forms import TemplateCreateForm, TemplateUpdateForm
-from app.blueprints.template.services import build_rows, json_import
+from app.blueprints.template.services import build_form_rows, json_import
 from app.db.queries.application import (
     delete_form,
-    get_all_template_forms,
     get_form_by_id,
     get_form_by_template_name,
-    update_form,
+    update_form, get_paginated_forms,
 )
 from app.export_config.generate_all_questions import generate_html
 from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import human_to_kebab_case
 from app.shared.helpers import flash_message
-from app.shared.table_pagination import GovUKTableAndPagination
 
 template_bp = Blueprint(
     "template_bp",
@@ -31,19 +29,13 @@ TEMPLATE_TABLE = "template_table"
 
 @template_bp.route("", methods=["GET"])
 def view_templates():
-    forms = get_all_template_forms()
+    pagination_data = get_paginated_forms(page=int(request.args.get("page", 1)))
     form_designer_url = current_app.config["FORM_DESIGNER_URL_REDIRECT"] + "/app"
-    params = GovUKTableAndPagination(
-        table_header=[
-            {"text": "Template name"},
-            {"text": "Task name"},
-            {"text": ""},
-        ],
-        table_rows=build_rows(forms),
-        current_page=int(request.args.get("page", 1)),
-    ).__dict__
-
-    return render_template("view_all_templates.html", **params, form_designer_url=form_designer_url)
+    return render_template("view_all_templates.html",
+                           form_designer_url=form_designer_url,
+                           table_rows=build_form_rows(pagination_data.items),
+                           pagination=pagination_data
+                           )
 
 
 @template_bp.route("/create", methods=["GET", "POST"])

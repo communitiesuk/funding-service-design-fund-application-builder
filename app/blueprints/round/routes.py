@@ -19,10 +19,9 @@ from app.blueprints.round.services import (
 )
 from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
-from app.db.queries.round import get_all_rounds, get_round_by_id
+from app.db.queries.round import get_round_by_id, get_paginated_rounds
 from app.shared.forms import SelectFundForm
 from app.shared.helpers import flash_message
-from app.shared.table_pagination import GovUKTableAndPagination
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 ROUND_DETAILS = "round_bp.round_details"
@@ -42,12 +41,11 @@ def view_all_rounds():
     """
     Renders a list of rounds in the application page
     """
-    params = GovUKTableAndPagination(
-        table_header=[{"text": "Application name"}, {"text": "Grant"}, {"text": "Round"}, {"text": ""}],
-        table_rows=build_round_rows(get_all_rounds()),
-        current_page=int(request.args.get("page", 1)),
-    ).__dict__
-    return render_template("view_all_rounds.html", **params)
+    pagination_data = get_paginated_rounds(page=int(request.args.get("page", 1)))
+    return render_template("view_all_rounds.html",
+                           table_rows=build_round_rows(pagination_data.items),
+                           pagination=pagination_data
+                           )
 
 
 @round_bp.route("/select-grant", methods=["GET", "POST"])

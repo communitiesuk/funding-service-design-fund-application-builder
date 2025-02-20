@@ -1,6 +1,7 @@
 from flask import current_app
 from sqlalchemy import String, cast, select
 from sqlalchemy.orm import joinedload
+from flask_sqlalchemy.pagination import Pagination
 
 from app.db import db
 from app.db.models import Fund, Component, Page, Form, Lizt
@@ -36,6 +37,9 @@ def get_all_rounds() -> list[Round]:
     stmt = select(Round).join(Round.fund).order_by(cast(Fund.title_json["en"], String))
     return db.session.scalars(stmt).all()
 
+def get_paginated_rounds(page: int, items_per_page: int = 20) -> Pagination:
+    stmt = select(Round).join(Round.fund).order_by(cast(Fund.title_json["en"], String))
+    return db.paginate(stmt, page=page, per_page=items_per_page)
 
 def _delete_sections_for_round(round_detail: Round):
     for section_detail in round_detail.sections:

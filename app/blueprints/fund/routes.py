@@ -11,9 +11,8 @@ from flask import (
 from app.blueprints.fund.forms import FundForm
 from app.blueprints.fund.services import build_fund_rows
 from app.db.models.fund import Fund, FundingType
-from app.db.queries.fund import add_fund, get_all_funds, get_fund_by_id, update_fund
+from app.db.queries.fund import add_fund, get_fund_by_id, update_fund, get_paginated_funds
 from app.shared.helpers import flash_message
-from app.shared.table_pagination import GovUKTableAndPagination
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
 SELECT_GRANT_PAGE = "select_grant"
@@ -36,12 +35,11 @@ def view_all_funds():
     """
     Renders list of grants in the grant page
     """
-    params = GovUKTableAndPagination(
-        table_header=[{"text": "Grant name"}, {"text": "Grant description"}, {"text": "Grant type"}],
-        table_rows=build_fund_rows(get_all_funds()),
-        current_page=int(request.args.get("page", 1)),
-    ).__dict__
-    return render_template("view_all_funds.html", **params)
+    pagination_data = get_paginated_funds(page=int(request.args.get("page", 1)))
+    return render_template("view_all_funds.html",
+                           table_rows=build_fund_rows(pagination_data.items),
+                           pagination=pagination_data
+                           )
 
 
 @fund_bp.route("/<uuid:fund_id>", methods=["GET"])

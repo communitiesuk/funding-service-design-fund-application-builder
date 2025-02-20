@@ -1,0 +1,47 @@
+{%- from "govuk_frontend_jinja/components/pagination/macro.html" import govukPagination -%}
+
+{% macro Pagination(pagination) %}
+    {% if pagination %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                {% if pagination.pages > 1 %}
+                    {% set prev_link = "?page=" ~ pagination.prev_num if pagination.has_prev else None %}
+                    {% set next_link = "?page=" ~ pagination.next_num if pagination.has_next else None %}
+
+                    {% set pagination_items = namespace(items=[]) %}
+                    {% if pagination.page > 3 %}
+                        {% set pagination_items.items = pagination_items.items + [{"number": 1, "href": "?page=1", "current": false}] %}
+                        {% set pagination_items.items = pagination_items.items + [{"ellipsis": true}] %}
+                    {% endif %}
+
+                    {% if pagination.page == 3 %}
+                        {% set pagination_items.items = pagination_items.items + [{"number": 1, "href": "?page=1", "current": false}] %}
+                    {% endif %}
+
+                    {% set start = [1, pagination.page - 1]|max %}
+                    {% for i in range(start, pagination.page) %}
+                        {% set pagination_items.items = pagination_items.items + [{"number": i, "href": "?page=" ~ i, "current": false}] %}
+                    {% endfor %}
+
+                    {% set pagination_items.items = pagination_items.items + [{"number": pagination.page, "href": "?page=" ~ pagination.page, "current": true}] %}
+
+                    {% if pagination.page < pagination.pages - 2 %}
+                        {% set pagination_items.items = pagination_items.items + [{"number": pagination.page + 1, "href": "?page=" ~ (pagination.page + 1), "current": false}] %}
+                        {% set pagination_items.items = pagination_items.items + [{"ellipsis": true}] %}
+                        {% set pagination_items.items = pagination_items.items + [{"number": pagination.pages, "href": "?page=" ~ pagination.pages, "current": false}] %}
+                    {% else %}
+                        {% for i in range(pagination.page + 1, pagination.pages + 1) %}
+                            {% set pagination_items.items = pagination_items.items + [{"number": i, "href": "?page=" ~ i, "current": false}] %}
+                        {% endfor %}
+                    {% endif %}
+
+                    {{ govukPagination({
+                        "previous": {"href": prev_link} if prev_link else {},
+                        "next": {"href": next_link} if next_link else {},
+                        "items": pagination_items.items
+                    }) }}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}

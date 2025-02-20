@@ -9,7 +9,7 @@ def json_import(data, template_name, filename):
     return load_json_from_file(data, template_name, filename)
 
 
-def build_rows(forms: list[Form]) -> list[dict]:
+def build_form_rows(forms: list[dict]) -> list[dict]:
     rows = []
     for form in forms:
         row = [
