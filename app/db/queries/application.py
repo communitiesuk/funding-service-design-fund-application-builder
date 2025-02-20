@@ -21,7 +21,7 @@ def get_all_template_forms() -> list[Form]:
     return db.session.query(Form).where(Form.is_template == True).order_by(Form.template_name).all()  # noqa:E712
 
 
-def get_paginated_forms(page: int, items_per_page: int = 20) -> Pagination:
+def get_paginated_forms(page: int, items_per_page: int = 5) -> Pagination:
     stmt = select(Form).where(Form.is_template == True).order_by(cast(Form.template_name, String))
     return db.paginate(stmt, page=page, per_page=items_per_page)
 

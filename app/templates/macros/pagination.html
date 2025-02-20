@@ -9,10 +9,13 @@
                     {% set next_link = "?page=" ~ pagination.next_num if pagination.has_next else None %}
 
                     {% set pagination_items = namespace(items=[]) %}
-
                     {% if pagination.page > 3 %}
                         {% set pagination_items.items = pagination_items.items + [{"number": 1, "href": "?page=1", "current": false}] %}
                         {% set pagination_items.items = pagination_items.items + [{"ellipsis": true}] %}
+                    {% endif %}
+
+                    {% if pagination.page == 3 %}
+                        {% set pagination_items.items = pagination_items.items + [{"number": 1, "href": "?page=1", "current": false}] %}
                     {% endif %}
 
                     {% set start = [1, pagination.page - 1]|max %}

@@ -51,6 +51,16 @@ pagination_higher_than_limit_second = create_mock_pagination(
 )
 
 # Pagination with total items exceeding the limit, on the second page
+pagination_higher_than_limit_third = create_mock_pagination(
+    page=3,
+    pages=20,
+    has_next=True,
+    has_prev=True,
+    next_num=4,
+    prev_num=2,
+)
+
+# Pagination with total items exceeding the limit, on the second page
 pagination_higher_than_limit_middle = create_mock_pagination(
     page=10,
     pages=20,
@@ -58,6 +68,26 @@ pagination_higher_than_limit_middle = create_mock_pagination(
     has_prev=True,
     next_num=11,
     prev_num=9,
+)
+
+# Pagination with total items exceeding the limit, on the one page before last page
+pagination_higher_than_limit_one_before_last = create_mock_pagination(
+    page=19,
+    pages=20,
+    has_next=True,
+    has_prev=True,
+    prev_num=18,
+    next_num=20,
+)
+
+# Pagination with total items exceeding the limit, on the two pages before last page
+pagination_higher_than_limit_two_before_last = create_mock_pagination(
+    page=18,
+    pages=20,
+    has_next=True,
+    has_prev=True,
+    prev_num=17,
+    next_num=18,
 )
 
 # Pagination with total items exceeding the limit, on the last page
@@ -87,11 +117,28 @@ pagination_higher_than_limit_last = create_mock_pagination(
             "active_page": 2,
             "pagination": pagination_higher_than_limit_second
         },
+        {  # when page count is more than one pagination available and check the following combination 1,2,3,4,...,20
+            "expected_pagination": [1, 2, 3, 4, 20],
+            "active_page": 3,
+            "pagination": pagination_higher_than_limit_third
+        },
         {
             # when page count is more than one pagination available and check the following combination 1,...,9,10,11,...,20 noqa: E501
             "expected_pagination": [1, 9, 10, 11, 20],
             "active_page": 10,
             "pagination": pagination_higher_than_limit_middle
+        },
+        {
+            # when page count is more than one pagination available and check the following combination 1,...,17,18,19,20 noqa: E501
+            "expected_pagination": [1, 17, 18, 19, 20],
+            "active_page": 18,
+            "pagination": pagination_higher_than_limit_two_before_last
+        },
+        {
+            # when page count is more than one pagination available and check the following combination 1,...,18,19,20 noqa: E501
+            "expected_pagination": [1, 18, 19, 20],
+            "active_page": 19,
+            "pagination": pagination_higher_than_limit_one_before_last
         },
         {
             # when page count is more than one pagination available and check the following combination 1,...,19,20 noqa: E501
