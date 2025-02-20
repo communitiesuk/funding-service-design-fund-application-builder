@@ -1,8 +1,7 @@
 {%- from "govuk_frontend_jinja/components/pagination/macro.html" import govukPagination -%}
 
-{% macro Pagination(params) %}
-    {% if params.data %}
-        {% set pagination = params.data %}
+{% macro Pagination(pagination) %}
+    {% if pagination %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-full">
                 {% if pagination.pages > 1 %}
