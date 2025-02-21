@@ -12,7 +12,6 @@ from flask import (
 from app.blueprints.fund.forms import FundForm
 from app.blueprints.round.forms import CloneRoundForm, RoundForm
 from app.blueprints.round.services import (
-    build_round_rows,
     create_new_round,
     populate_form_with_round_data,
     update_existing_round,
@@ -41,11 +40,8 @@ def view_all_rounds():
     """
     Renders a list of rounds in the application page
     """
-    pagination_data = get_paginated_rounds(page=int(request.args.get("page", 1)))
     return render_template("view_all_rounds.html",
-                           table_rows=build_round_rows(pagination_data.items),
-                           pagination=pagination_data
-                           )
+                           pagination=get_paginated_rounds(page=int(request.args.get("page", 1))))
 
 
 @round_bp.route("/select-grant", methods=["GET", "POST"])

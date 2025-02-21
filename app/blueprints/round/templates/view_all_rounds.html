@@ -9,31 +9,54 @@
 
 
 {% block content %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">Applications</h1>
-        </div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">Applications</h1>
     </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-three-quarters">
-            <p class="govuk-body">View existing applications or create a new one.</p>
-        </div>
-        <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
-            {{ govukButton({
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+        <p class="govuk-body">View existing applications or create a new one.</p>
+    </div>
+    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+        {{ govukButton({
                 "text": "Create new application",
                 "href": url_for("round_bp.select_fund", action="applications_table")
             }) }}
-        </div>
     </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{ govukTable({
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        {% set table_rows = namespace(items=[]) %}
+        {% for round in pagination.items %}
+
+        {% set round_detail_link %}
+        <a class='govuk-link govuk-link--no-visited-state'
+           href='{{ url_for("round_bp.round_details", round_id=round.round_id) }}'>
+            Apply for {{ round.fund.title_json["en"] }}</a>
+        {% endset %}
+
+
+        {% set build_application_link %}
+        <a class='govuk-link govuk-link--no-visited-state'
+           href='{{ url_for("application_bp.build_application", round_id=round.round_id) }}'>Build application</a>
+        {% endset %}
+
+        {% set table_rows.items = table_rows.items + [[
+            {"html": round_detail_link},
+            {"text": round.fund.name_json["en"]},
+            {"classes": "govuk-!-width-one-quarter", "text": round.title_json["en"]},
+            {"classes": "govuk-!-text-align-right fab-nowrap","html": build_application_link,}
+                            ]] %}
+        {% endfor %}
+
+        {{ govukTable({
                 "captionClasses": "govuk-table__caption--m",
                 "firstCellIsHeader": false,
                 "head": [{"text": "Application name"}, {"text": "Grant"}, {"text": "Round"}, {"text": ""}],
-                "rows": table_rows
+                "rows": table_rows.items
             }) }}
-        </div>
     </div>
-    {{ Pagination(pagination) }}
+</div>
+{{ Pagination(pagination) }}
 {% endblock content %}
