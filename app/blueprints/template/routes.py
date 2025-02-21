@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, redirect, render_template, request, ur
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.index.routes import INDEX_BP_DASHBOARD
 from app.blueprints.template.forms import TemplateCreateForm, TemplateUpdateForm
-from app.blueprints.template.services import build_form_rows, json_import
+from app.blueprints.template.services import json_import
 from app.db.queries.application import (
     delete_form,
     get_form_by_id,
@@ -29,12 +29,9 @@ TEMPLATE_TABLE = "template_table"
 
 @template_bp.route("", methods=["GET"])
 def view_templates():
-    pagination_data = get_paginated_forms(page=int(request.args.get("page", 1)))
-    form_designer_url = current_app.config["FORM_DESIGNER_URL_REDIRECT"] + "/app"
     return render_template("view_all_templates.html",
-                           form_designer_url=form_designer_url,
-                           table_rows=build_form_rows(pagination_data.items),
-                           pagination=pagination_data
+                           form_designer_url=current_app.config["FORM_DESIGNER_URL_REDIRECT"] + "/app",
+                           pagination=get_paginated_forms(page=int(request.args.get("page", 1)))
                            )
 
 
