@@ -19,30 +19,6 @@ def convert_form_data_to_json(data) -> dict:
     return {}
 
 
-def build_round_rows(rounds: list[dict]) -> list[dict]:
-    rows = []
-    for round in rounds:
-        row = [
-            # TODO need a refactor to get rid of the html
-            {
-                "html": f"""<a class='govuk-link govuk-link--no-visited-state'
-                href='{url_for("round_bp.round_details", round_id=round.round_id)}'>
-                Apply for {round.fund.title_json["en"]}</a>"""  # noqa: E501
-            },
-            {"text": round.fund.name_json["en"]},
-            {"classes": "govuk-!-width-one-quarter", "text": round.title_json["en"]},
-            {
-                "classes": "govuk-!-text-align-right fab-nowrap",
-                "html": f"""
-                <a class='govuk-link govuk-link--no-visited-state' href='{
-                url_for("application_bp.build_application", round_id=round.round_id)
-                }'>Build application</a>""",
-            },
-        ]
-        rows.append(row)
-    return rows
-
-
 def populate_form_with_round_data(round_obj, form_class):
     round_data = {
         "fund_id": round_obj.fund_id,
