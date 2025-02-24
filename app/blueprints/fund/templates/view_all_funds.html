@@ -9,31 +9,43 @@
 
 
 {% block content %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">Grants</h1>
-        </div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">Grants</h1>
     </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-three-quarters">
-            <p class="govuk-body">View all existing grants or add a new grant.</p>
-        </div>
-        <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
-            {{ govukButton({
+</div>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+        <p class="govuk-body">View all existing grants or add a new grant.</p>
+    </div>
+    <div class="govuk-grid-column-one-quarter govuk-!-text-align-right">
+        {{ govukButton({
                 "text": "Add new grant",
                 "href": url_for("fund_bp.create_fund", actions="grants_table")
             }) }}
-        </div>
     </div>
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
-            {{ govukTable({
+</div>
+<div class="govuk-grid-row">
+    {% set table_rows = namespace(items=[]) %}
+    {% for fund in pagination.items %}
+    {% set fund_detail_link %}
+    <a class='govuk-link govuk-link--no-visited-state'
+       href={{ url_for("fund_bp.view_fund_details", fund_id=fund.fund_id) }}>{{ fund.name_json["en"] }}</a>
+    {% endset %}
+    {% set table_rows.items = table_rows.items + [
+                            [{"html": fund_detail_link},
+                            {"classes": "govuk-!-width-one-half", "text": fund.description_json["en"]},
+                            {"text": fund.funding_type.get_text_for_display()}
+                            ]] %}
+    {% endfor %}
+    <div class="govuk-grid-column-full">
+        {{ govukTable({
                 "captionClasses": "govuk-table__caption--m",
                 "firstCellIsHeader": false,
                 "head": [{"text": "Grant name"}, {"text": "Grant description"}, {"text": "Grant type"}],
-                "rows": table_rows
+                "rows": table_rows.items
             }) }}
-        </div>
     </div>
-    {{ Pagination(pagination) }}
+</div>
+{{ Pagination(pagination) }}
 {% endblock content %}
