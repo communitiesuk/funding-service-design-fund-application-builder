@@ -1,3 +1,4 @@
+from app.create_app import create_app
 from app.db import db
 from app.db.models.fund import Fund
 from app.db.models.round import Round
@@ -80,12 +81,14 @@ def delete_rounds():
 
 
 if __name__ == "__main__":
-    try:
-        # Delete rounds first to avoid foreign key constraints
-        delete_rounds()
-        # Then delete funds
-        delete_funds()
-        print("\n✓ Deletion process completed")
-    except Exception as e:
-        print(f"\n❌ Fatal error during deletion process: {str(e)}")
-        db.session.rollback()
+    app = create_app()  # Create the Flask app
+    with app.app_context():  # Create application context
+        try:
+            # Delete rounds first to avoid foreign key constraints
+            delete_rounds()
+            # Then delete funds
+            delete_funds()
+            print("\n✓ Deletion process completed")
+        except Exception as e:
+            print(f"\n❌ Fatal error during deletion process: {str(e)}")
+            db.session.rollback()
