@@ -7,7 +7,7 @@ import pytest
 from app.db.models.application_config import Component
 from app.import_config.load_form_json import _build_condition, add_conditions_to_components
 from app.shared.data_classes import Condition, ConditionValue, SubCondition
-from tests.unit_test_data import (
+from tests.unit.unit_test_data import (
     test_condition_org_type_a,
     test_condition_org_type_c,
     test_form_json_condition_org_type_a,
