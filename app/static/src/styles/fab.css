@@ -70,3 +70,24 @@
 .fab-nowrap {
     white-space: nowrap;
 }
+
+.disabled-link {
+    color: #b1b4b6 !important;
+    text-decoration: underline;
+    cursor: default;
+}
+
+.task-list__new-design {
+    display: flex;
+    align-items: center;
+}
+
+
+.app-task-list__task-name {
+    flex: 1;
+}
+
+.app-task-list__task-actions {
+    align-items: center;
+    display: flex;
+}
