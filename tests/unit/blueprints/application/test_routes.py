@@ -2,7 +2,7 @@ import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
-from tests.helpers import submit_form
+from tests.unit.helpers import submit_form
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")

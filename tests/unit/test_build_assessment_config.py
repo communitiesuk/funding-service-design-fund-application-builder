@@ -1,5 +1,5 @@
 from app.export_config.generate_assessment_config import build_assessment_config
-from tests.unit_test_data import cri1, crit_1_id, mock_form_1
+from tests.unit.unit_test_data import cri1, crit_1_id, mock_form_1
 
 
 def test_build_basic_structure(mocker):

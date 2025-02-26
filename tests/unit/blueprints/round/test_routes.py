@@ -4,7 +4,7 @@ from flask import g, url_for
 
 from app.db.models import Round
 from app.db.queries.round import get_round_by_id
-from tests.helpers import submit_form
+from tests.unit.helpers import submit_form
 
 round_data_info = {
     "opens": ["01", "10", "2024", "09", "00"],

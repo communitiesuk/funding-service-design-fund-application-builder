@@ -76,7 +76,7 @@ def test_generate_config_for_round_valid_input_file(seed_dynamic_data, _db):
 
 
 def test_import_multi_input_field(seed_dynamic_data, _db):
-    with open(Path("tests") / "test_data" / "multi_input.json", "r") as json_file:
+    with open(Path("tests") / "unit" / "test_data" / "multi_input.json", "r") as json_file:
         form = json.load(json_file)
 
     load_json_from_file(form, template_name="test_input_multi_input", filename="multi_input.json")

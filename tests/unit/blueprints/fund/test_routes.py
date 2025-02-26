@@ -5,7 +5,7 @@ from flask import g
 from app.db.models import Fund
 from app.db.models.fund import FundingType
 from app.db.queries.fund import get_fund_by_id
-from tests.helpers import submit_form
+from tests.unit.helpers import submit_form
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")

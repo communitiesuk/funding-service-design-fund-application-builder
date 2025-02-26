@@ -15,7 +15,7 @@ from app.export_config.generate_fund_round_form_jsons import (
 )
 from app.import_config.load_form_json import load_form_jsons
 from app.shared.data_classes import Condition, ConditionValue
-from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
+from tests.unit.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 
 
 def test_build_form_json_no_conditions(seed_dynamic_data):
