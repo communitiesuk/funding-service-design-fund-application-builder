@@ -27,7 +27,7 @@ class SectionForm(FlaskForm):
         self.template_id.choices = choices
 
     add_form = SubmitField("Add", widget=GovSubmitInput())
-    save_section = SubmitField("Save", widget=GovSubmitInput())
+    save_section = SubmitField("Save and continue", widget=GovSubmitInput())
 
     def validate(self, extra_validators=None):
         form_status = True

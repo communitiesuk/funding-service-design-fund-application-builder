@@ -37,7 +37,6 @@
                 {{ form.hidden_tag() }}
                 {{ form.name_in_apply_en }}
             </div>
-                {{ form.save_section() }}
         </div>
     </div>
         {% if form.section_id.data %}
@@ -75,13 +74,19 @@
                             </li>
                         {% endfor %}
                     </ul>
-                    <h3 class="govuk-heading-m">Add form from template</h3>
                 </div>
             </div>
-                <div class="govuk-grid-row">
+            <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
+                    <h3 class="govuk-heading-m">Add form from template</h3>
+                    <div id="select-template-group">
                         {{ form.template_id() }}
                         {{ form.add_form() }}
+                    </div>
+                    <div class="govuk-button-group">
+                        {{ form.save_section() }}
+                        <a href="{{ url_for('application_bp.build_application', round_id=round_id) }}" class="govuk-button govuk-button--secondary">Cancel</a>
+                    </div>
                 </div>
             </div>
         {% endif %}

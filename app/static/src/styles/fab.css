@@ -91,3 +91,21 @@
     align-items: center;
     display: flex;
 }
+
+#template_id {
+    width: 100%;
+}
+
+#select-template-group {
+    align-items: center;
+    display: flex;
+}
+
+#select-template-group .govuk-form-group {
+    flex: 1;
+}
+
+#select-template-group .govuk-button {
+    margin-bottom: 2px;
+    margin-left: 15px;
+}
