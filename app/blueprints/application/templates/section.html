@@ -5,6 +5,7 @@
     {% else %}
         Create{% endif %}&nbsp;Section
 {% endset %}
+{% set back_link = True %}
 {%- from "govuk_frontend_jinja/components/error-summary/macro.html" import govukErrorSummary -%}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {%- from "govuk_frontend_jinja/components/select/macro.html" import govukSelect -%}
