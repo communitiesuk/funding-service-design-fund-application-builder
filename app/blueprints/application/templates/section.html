@@ -19,16 +19,27 @@
     </div>
     <form method="POST" novalidate>
     <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
+        <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
-                    <div class="govuk-form-group">
-                        <h3 class="govuk-heading-m">Section name</h3>
-                        {{ form.hidden_tag() }}
-                        {{ form.name_in_apply_en }}
-                    </div>
-                        {{ form.save_section() }}
-            </div>
         </div>
+        {% if form.section_id.data %}
+        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+            <a href="{{ url_for('application_bp.delete_section', round_id=round_id, section_id=form.section_id.data) }}" class="govuk-button govuk-button--warning" data-module="govuk-button">
+                Delete section
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <div class="govuk-form-group">
+                <h3 class="govuk-heading-m">Section name</h3>
+                {{ form.hidden_tag() }}
+                {{ form.name_in_apply_en }}
+            </div>
+                {{ form.save_section() }}
+        </div>
+    </div>
         {% if form.section_id.data %}
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
