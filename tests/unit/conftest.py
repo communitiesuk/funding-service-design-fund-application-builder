@@ -137,7 +137,7 @@ def patch_validate_token_rs256_internal_user():
     with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
         mock_validate_token_rs256.return_value = {
             "accountId": "test-account-id",
-            "roles": [],
+            "roles": ["FSD_ADMIN"],
             "email": "test@communities.gov.uk",
         }
         yield mock_validate_token_rs256
@@ -149,7 +149,7 @@ def patch_validate_token_rs256_external_user():
     with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
         mock_validate_token_rs256.return_value = {
             "accountId": "test-account-id",
-            "roles": [],
+            "roles": ["FSD_ADMIN"],
             "email": "test@gmail.com",
         }
         yield mock_validate_token_rs256
