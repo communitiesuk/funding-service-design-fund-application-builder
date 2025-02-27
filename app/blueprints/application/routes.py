@@ -35,7 +35,7 @@ from app.export_config.generate_all_questions import generate_html
 from app.export_config.generate_assessment_config import (
     generate_assessment_config_for_round,
 )
-from app.export_config.generate_form import build_form_json, _find_page_by_controller
+from app.export_config.generate_form import _find_page_by_controller, build_form_json
 from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,

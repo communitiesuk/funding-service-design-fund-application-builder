@@ -18,7 +18,7 @@ from app.blueprints.round.services import (
 )
 from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
-from app.db.queries.round import get_round_by_id, get_paginated_rounds
+from app.db.queries.round import get_paginated_rounds, get_round_by_id
 from app.shared.forms import SelectFundForm
 from app.shared.helpers import flash_message
 

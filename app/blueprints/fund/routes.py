@@ -10,7 +10,7 @@ from flask import (
 
 from app.blueprints.fund.forms import FundForm
 from app.db.models.fund import Fund, FundingType
-from app.db.queries.fund import add_fund, get_fund_by_id, update_fund, get_paginated_funds
+from app.db.queries.fund import add_fund, get_fund_by_id, get_paginated_funds, update_fund
 from app.shared.helpers import flash_message
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"

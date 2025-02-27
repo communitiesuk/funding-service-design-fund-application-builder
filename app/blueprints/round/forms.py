@@ -5,8 +5,7 @@ from wtforms.fields.datetime import DateTimeField
 from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 from app.db.queries.round import get_round_by_short_name_and_fund_id
-from app.shared.validators import FlexibleUrl, NoSpacesBetweenLetters, JsonValidation, \
-    WelshJsonValidation
+from app.shared.validators import FlexibleUrl, JsonValidation, NoSpacesBetweenLetters, WelshJsonValidation
 from govuk_frontend_ext.fields import GovDatetimeInput
 
 
@@ -76,7 +75,8 @@ class RoundForm(FlaskForm):
         widget=GovTextInput(),
         validators=[
             FlexibleUrl(
-                message="Assessor guidance link must be in the correct website format. For example, www.sharepoint.co.uk/assessorguidance"
+                message="Assessor guidance link must be in the correct website format. "
+                        "For example, www.sharepoint.co.uk/assessorguidance"
                 # noqa: E501
             )
         ],
@@ -93,7 +93,8 @@ class RoundForm(FlaskForm):
         widget=GovTextInput(),
         validators=[
             FlexibleUrl(
-                message="Feedback link must be in the correct website format. For example, www.grantapplicationfeedback.com"
+                message="Feedback link must be in the correct website format. For example, "
+                        "www.grantapplicationfeedback.com"
                 # noqa: E501
             )
         ],

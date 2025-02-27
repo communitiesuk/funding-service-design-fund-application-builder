@@ -13,7 +13,7 @@ BOILERPLATE_START = """
 {% block content %}
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-        <span class="govuk-caption-l">{% trans %}{{fund_title}}{% endtrans %} {% trans %}{{round_title}}{% endtrans %}</span>
+<span class="govuk-caption-l">{% trans %}{{fund_title}}{% endtrans %} {% trans %}{{round_title}}{% endtrans %}</span>
         <h1 class="govuk-heading-xl">{{pageHeading}}</h1>
 """
 
@@ -112,7 +112,7 @@ def generate_html(sections, all_question_view=True):
                 with air.h2(klass="govuk-heading-l", id=anchor):
                     air(f"{idx}. {details['title_text']}")
 
-            for heading, header_info in sorted(details["form_print_data"].items(),
+            for _, header_info in sorted(details["form_print_data"].items(),
                                                key=lambda item: str(item[1]["heading_number"])):
                 tag = "h3" if header_info["is_form_heading"] else "h4"
                 heading_text = header_info["title"]

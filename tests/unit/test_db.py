@@ -3,10 +3,10 @@ from random import randint
 from uuid import uuid4
 
 import pytest
-
-from app.db.models import Form, Fund, Organisation, Round, Section, Component, Lizt
-from app.db.models.fund import FundingType
 from sqlalchemy.orm import joinedload
+
+from app.db.models import Component, Form, Fund, Lizt, Organisation, Round, Section
+from app.db.models.fund import FundingType
 from app.db.queries.application import (
     delete_form_from_section,
     delete_section_from_round,
@@ -17,8 +17,8 @@ from app.db.queries.application import (
     move_section_up,
     swap_elements_in_list,
 )
-from app.db.queries.fund import add_fund, add_organisation, get_all_funds, get_fund_by_id, delete_selected_fund
-from app.db.queries.round import add_round, get_round_by_id, delete_selected_round
+from app.db.queries.fund import add_fund, add_organisation, delete_selected_fund, get_all_funds, get_fund_by_id
+from app.db.queries.round import add_round, delete_selected_round, get_round_by_id
 from tests.unit.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 
 

@@ -11,7 +11,8 @@ from sqlalchemy import text
 from app.create_app import create_app
 from app.import_config.load_form_json import load_form_jsons
 from config import Config
-from tests.unit.seed_test_data import init_unit_test_data, insert_test_data, fund_without_assessment
+from tests.unit.seed_test_data import fund_without_assessment, init_unit_test_data, insert_test_data
+
 
 @pytest.fixture(scope="session")
 def temp_output_dir():

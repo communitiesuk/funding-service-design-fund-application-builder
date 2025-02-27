@@ -1,8 +1,8 @@
 from flask import request, session
 
-from app.blueprints.application.routes import application_bp, build_application, section
+from app.blueprints.application.routes import application_bp, section
 from app.blueprints.fund.routes import fund_bp, view_all_funds
-from app.blueprints.index.routes import index_bp, go_back, dashboard
+from app.blueprints.index.routes import dashboard, go_back, index_bp
 from app.blueprints.round.routes import round_bp, view_all_rounds
 from app.blueprints.template.routes import template_bp, view_templates
 

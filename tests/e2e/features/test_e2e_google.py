@@ -1,6 +1,5 @@
 from playwright.sync_api import sync_playwright
 
-
 # TODO this test is generated to test the e2e frame work once tests implementing this will be removed
 
 def test_homepage():

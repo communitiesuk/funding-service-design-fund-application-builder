@@ -3,7 +3,6 @@ from dataclasses import asdict, is_dataclass
 from flask import flash, render_template
 
 from app.db.models import Page
-from flask_sqlalchemy.pagination import Pagination
 
 
 def convert_to_dict(obj):

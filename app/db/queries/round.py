@@ -1,10 +1,10 @@
 from flask import current_app
+from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import String, cast, select
 from sqlalchemy.orm import joinedload
-from flask_sqlalchemy.pagination import Pagination
 
 from app.db import db
-from app.db.models import Fund, Component, Page, Form, Lizt
+from app.db.models import Component, Form, Fund, Lizt, Page
 from app.db.models.round import Round
 from app.db.queries.util import delete_all_related_objects
 

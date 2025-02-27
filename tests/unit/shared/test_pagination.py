@@ -1,9 +1,9 @@
-import json
 from unittest.mock import MagicMock
-from flask_sqlalchemy.pagination import Pagination
-from flask import render_template
-from bs4 import BeautifulSoup
+
 import pytest
+from bs4 import BeautifulSoup
+from flask import render_template
+from flask_sqlalchemy.pagination import Pagination
 
 
 def create_mock_pagination(
@@ -107,41 +107,48 @@ pagination_higher_than_limit_last = create_mock_pagination(
             "expected_pagination": None,
             "pagination": pagination_lower_than_limit
         },
-        {  # when page count is more than one pagination available and check the following combination 1,2,...,20
+        {  # when page count is more than one pagination
+            # available and check the following combination 1,2,...,20
             "expected_pagination": [1, 2, 20],
             "active_page": 1,
             "pagination": pagination_higher_than_limit_first
         },
-        {  # when page count is more than one pagination available and check the following combination 1,2,3,...,20
+        {  # when page count is more than one pagination
+            # available and check the following combination 1,2,3,...,20
             "expected_pagination": [1, 2, 3, 20],
             "active_page": 2,
             "pagination": pagination_higher_than_limit_second
         },
-        {  # when page count is more than one pagination available and check the following combination 1,2,3,4,...,20
+        {  # when page count is more than one pagination
+            # available and check the following combination 1,2,3,4,...,20
             "expected_pagination": [1, 2, 3, 4, 20],
             "active_page": 3,
             "pagination": pagination_higher_than_limit_third
         },
         {
-            # when page count is more than one pagination available and check the following combination 1,...,9,10,11,...,20 noqa: E501
+            # when page count is more than one pagination
+            # available and check the following combination 1,...,9,10,11,...,20 noqa: E501
             "expected_pagination": [1, 9, 10, 11, 20],
             "active_page": 10,
             "pagination": pagination_higher_than_limit_middle
         },
         {
-            # when page count is more than one pagination available and check the following combination 1,...,17,18,19,20 noqa: E501
+            # when page count is more than one pagination
+            # available and check the following combination 1,...,17,18,19,20 noqa: E501
             "expected_pagination": [1, 17, 18, 19, 20],
             "active_page": 18,
             "pagination": pagination_higher_than_limit_two_before_last
         },
         {
-            # when page count is more than one pagination available and check the following combination 1,...,18,19,20 noqa: E501
+            # when page count is more than one pagination available
+            # and check the following combination 1,...,18,19,20 noqa: E501
             "expected_pagination": [1, 18, 19, 20],
             "active_page": 19,
             "pagination": pagination_higher_than_limit_one_before_last
         },
         {
-            # when page count is more than one pagination available and check the following combination 1,...,19,20 noqa: E501
+            # when page count is more than one pagination available and
+            # check the following combination 1,...,19,20 noqa: E501
             "expected_pagination": [1, 19, 20],
             "active_page": 20,
             "pagination": pagination_higher_than_limit_last
