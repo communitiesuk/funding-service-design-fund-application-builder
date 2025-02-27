@@ -53,8 +53,9 @@ def _delete_sections_for_fund_round(fund: Fund):
     for round_detail in fund.rounds:
         for section in round_detail.sections:
             if section:
-                lizt_ids = [component.list_id for form in section.forms for page in form.pages for component in
-                            page.components]
+                lizt_ids = [
+                    component.list_id for form in section.forms for page in form.pages for component in page.components
+                ]
                 page_ids = [page.page_id for form in section.forms for page in form.pages]
                 form_ids = [form.form_id for form in section.forms]
                 section_ids = [section.section_id]
@@ -74,8 +75,9 @@ def delete_selected_fund(fund_id):
         raise ValueError(f"Fund with id {fund_id} not found")
     try:
         _delete_sections_for_fund_round(fund)
-        delete_all_related_objects(db=db, model=Round, column=Round.round_id,
-                                   ids=[round_detail.round_id for round_detail in fund.rounds])
+        delete_all_related_objects(
+            db=db, model=Round, column=Round.round_id, ids=[round_detail.round_id for round_detail in fund.rounds]
+        )
         delete_all_related_objects(db=db, model=Fund, column=Fund.fund_id, ids=[fund_id])
         db.session.commit()
     except Exception as e:

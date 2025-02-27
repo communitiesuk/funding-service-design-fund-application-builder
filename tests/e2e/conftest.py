@@ -42,10 +42,10 @@ def domains(request: pytest.FixtureRequest, get_e2e_params) -> str:
 
 @pytest.fixture
 def context(
-        new_context: CreateContextCallback,
-        request: pytest.FixtureRequest,
-        e2e_test_secrets: EndToEndTestSecrets,
-        get_e2e_params,
+    new_context: CreateContextCallback,
+    request: pytest.FixtureRequest,
+    e2e_test_secrets: EndToEndTestSecrets,
+    get_e2e_params,
 ):
     e2e_env = get_e2e_params["e2e_env"]
     http_credentials = e2e_test_secrets.HTTP_BASIC_AUTH if e2e_env in {"dev", "test"} else None

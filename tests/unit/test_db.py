@@ -574,13 +574,13 @@ def test_base_path_sequence_insert(seed_dynamic_data, _db):
 def test_delete_grant(_db, seed_fund_without_assessment):
     """Test that the delete endpoint redirects to grant table page"""
     test_fund: Fund = seed_fund_without_assessment["funds"][0]
-    output: Fund = _db.session.get(Fund, test_fund.fund_id,
-                                   options=[joinedload(Fund.rounds).joinedload(Round.sections)])
+    output: Fund = _db.session.get(
+        Fund, test_fund.fund_id, options=[joinedload(Fund.rounds).joinedload(Round.sections)]
+    )
     assert output is not None, "No values present in the db"
     delete_selected_fund(test_fund.fund_id)
     _db.session.commit()
-    output_f = _db.session.get(Fund, test_fund.fund_id,
-                               options=[joinedload(Fund.rounds).joinedload(Round.sections)])
+    output_f = _db.session.get(Fund, test_fund.fund_id, options=[joinedload(Fund.rounds).joinedload(Round.sections)])
     assert output_f is None, "Grant delete did not happened"
     output_r = _db.session.query(Round).all()
     assert not output_r, "Round delete did not happened"
@@ -595,13 +595,13 @@ def test_delete_grant(_db, seed_fund_without_assessment):
 def test_delete_application(_db, seed_fund_without_assessment):
     """Test that the delete endpoint redirects application table page"""
     test_round: Round = seed_fund_without_assessment["rounds"][0]
-    output: Fund = _db.session.get(Fund, test_round.fund_id,
-                                   options=[joinedload(Fund.rounds).joinedload(Round.sections)])
+    output: Fund = _db.session.get(
+        Fund, test_round.fund_id, options=[joinedload(Fund.rounds).joinedload(Round.sections)]
+    )
     assert output is not None, "No values present in the db"
     delete_selected_round(test_round.round_id)
     _db.session.commit()
-    output_f = _db.session.get(Fund, test_round.fund_id,
-                               options=[joinedload(Fund.rounds).joinedload(Round.sections)])
+    output_f = _db.session.get(Fund, test_round.fund_id, options=[joinedload(Fund.rounds).joinedload(Round.sections)])
     assert output_f is not None, "Grant deleted"
     output_r = _db.session.query(Round).all()
     assert not output_r, "Round delete did not happened"

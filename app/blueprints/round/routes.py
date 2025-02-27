@@ -40,8 +40,9 @@ def view_all_rounds():
     """
     Renders a list of rounds in the application page
     """
-    return render_template("view_all_rounds.html",
-                           pagination=get_paginated_rounds(page=int(request.args.get("page", 1))))
+    return render_template(
+        "view_all_rounds.html", pagination=get_paginated_rounds(page=int(request.args.get("page", 1)))
+    )
 
 
 @round_bp.route("/select-grant", methods=["GET", "POST"])

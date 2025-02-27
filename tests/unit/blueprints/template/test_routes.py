@@ -68,7 +68,7 @@ def test_template_details_view(flask_test_client, seed_dynamic_data):
     html = response.data.decode("utf-8")
 
     # Title component availability check
-    assert 'Back' in html, "Back button is missing"
+    assert "Back" in html, "Back button is missing"
     assert "Preview template (opens in a new tab)" in html, "Preview template is missing"
     assert f"/preview/{form.form_id}" in html, "Preview link is missing"
 

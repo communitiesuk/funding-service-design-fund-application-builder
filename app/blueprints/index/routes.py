@@ -74,11 +74,11 @@ def download_form_json(form_id):
     )
 
 
-@index_bp.route('/back')
+@index_bp.route("/back")
 def go_back():
     # If there are previous pages, pop the last one and redirect
-    if len(session['visited_pages']) > 1:
-        history = session['visited_pages']
+    if len(session["visited_pages"]) > 1:
+        history = session["visited_pages"]
         history.pop()  # Remove the current page
         prev_page = history[-1]
         session["visited_pages"] = history

@@ -20,7 +20,7 @@ from app.db.models import (
 from app.db.models.fund import FundingType
 from app.shared.data_classes import Condition, ConditionValue
 
-#NOSONAR Ignore since this data is related to unit tests
+# NOSONAR Ignore since this data is related to unit tests
 BASIC_FUND_INFO = {
     "name_json": {"en": "Unit Test Fund"},
     "title_json": {"en": "funding to improve testing"},
@@ -31,7 +31,7 @@ BASIC_FUND_INFO = {
     "ggis_scheme_reference_number": "G2-SCH-0000092414",
 }
 
-#NOSONAR Ignore since this data is related to unit tests
+# NOSONAR Ignore since this data is related to unit tests
 BASIC_ROUND_INFO = {
     "audit_info": {"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
     "opens": "2024-10-01T11:59:00",
@@ -42,7 +42,7 @@ BASIC_ROUND_INFO = {
     "project_name_field_id": 1,
     "prospectus_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
     "privacy_notice_link": "https://www.gov.uk/government/organisations/"
-                           "ministry-of-housing-communities-local-government",
+    "ministry-of-housing-communities-local-government",
     "contact_email": "help@fab.gov.uk",
     "instructions_json": {},
     "feedback_link": "https://www.gov.uk/government/organisations/ministry-of-housing-communities-local-government",
@@ -74,7 +74,8 @@ page_four_id = uuid4()
 page_five_id = uuid4()
 alt_page_id = uuid4()
 
-#NOSONAR Ignore since this data is related to unit tests
+
+# NOSONAR Ignore since this data is related to unit tests
 def init_salmon_fishing_fund():
     organisation_uuid = uuid4()
     o: Organisation = Organisation(
@@ -358,7 +359,8 @@ def init_salmon_fishing_fund():
         "organisations": [o],
     }
 
-#NOSONAR Ignore since this data is related to unit tests
+
+# NOSONAR Ignore since this data is related to unit tests
 def init_unit_test_data() -> dict:
     organisation_uuid = uuid4()
     o: Organisation = Organisation(
@@ -484,7 +486,8 @@ def init_unit_test_data() -> dict:
         "themes": [t1],
     }
 
-#NOSONAR Ignore since this data is related to unit tests
+
+# NOSONAR Ignore since this data is related to unit tests
 def fund_without_assessment() -> dict:
     organisation_uuid = uuid4()
     o: Organisation = Organisation(
@@ -617,7 +620,7 @@ def fund_without_assessment() -> dict:
         "sections": [f2_r1_s1, f2_r1_s2],
         "forms": [f2_r1_s1_f1, f2_r1_s1_f2],
         "pages": [f2_r1_s1_f1_p1, f2_r1_s1_f1_p2],
-        "components": [f2_r1_s1_f1_p1_c1, f2_r1_s1_f1_p1_c2_with_list]
+        "components": [f2_r1_s1_f1_p1_c1, f2_r1_s1_f1_p1_c2_with_list],
     }
 
 

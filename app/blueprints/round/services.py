@@ -140,9 +140,9 @@ def update_existing_round(round_obj, form, user="dummy_user"):
     round_obj.eligibility_config = {"has_eligibility": form.eligibility_config.data}
     round_obj.eoi_decision_schema = {
         "en": convert_form_data_to_json(form.eoi_decision_schema_en.data),
-        "cy": convert_form_data_to_json(
-            form.eoi_decision_schema_cy.data) if form.eoi_decision_schema_cy.data
-                                                 and form.eoi_decision_schema_cy.data.lower() != "none" else None,
+        "cy": convert_form_data_to_json(form.eoi_decision_schema_cy.data)
+        if form.eoi_decision_schema_cy.data and form.eoi_decision_schema_cy.data.lower() != "none"
+        else None,
     }
     round_obj.audit_info = {"user": user, "timestamp": datetime.now().isoformat(), "action": "update"}
     update_round(round_obj)

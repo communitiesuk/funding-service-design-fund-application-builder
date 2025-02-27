@@ -127,7 +127,7 @@ def view_all_questions(round_id):
         fund=fund,
         question_html=html,
         title=f"All Questions for {fund.short_name} - {round.short_name}",
-        all_questions_view=True
+        all_questions_view=True,
     )
 
 
@@ -264,5 +264,5 @@ def view_form_questions(round_id, section_id, form_id):
         fund=fund,
         question_html=html,
         title=start_page.name_in_apply_json["en"],
-        all_questions_view=False
+        all_questions_view=False,
     )

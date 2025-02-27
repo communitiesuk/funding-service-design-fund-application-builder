@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request
 from flask_talisman import Talisman
 from fsd_utils import init_sentry

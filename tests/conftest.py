@@ -4,9 +4,7 @@ pytest_plugins = ["fsd_test_utils.fixtures.db_fixtures"]
 
 
 def pytest_addoption(parser):
-    parser.addoption(
-        "--e2e", action="store_true", default=False, help="Run end-to-end tests"
-    )
+    parser.addoption("--e2e", action="store_true", default=False, help="Run end-to-end tests")
     parser.addoption(
         "--e2e-aws-vault-profile",
         action="store",

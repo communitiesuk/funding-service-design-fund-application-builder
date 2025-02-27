@@ -30,10 +30,11 @@ TEMPLATE_TABLE = "template_table"
 
 @template_bp.route("", methods=["GET"])
 def view_templates():
-    return render_template("view_all_templates.html",
-                           form_designer_url=current_app.config["FORM_DESIGNER_URL_REDIRECT"] + "/app",
-                           pagination=get_paginated_forms(page=int(request.args.get("page", 1)))
-                           )
+    return render_template(
+        "view_all_templates.html",
+        form_designer_url=current_app.config["FORM_DESIGNER_URL_REDIRECT"] + "/app",
+        pagination=get_paginated_forms(page=int(request.args.get("page", 1))),
+    )
 
 
 @template_bp.route("/create", methods=["GET", "POST"])

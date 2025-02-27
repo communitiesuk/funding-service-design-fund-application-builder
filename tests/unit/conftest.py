@@ -119,7 +119,7 @@ def flask_test_client(app):
         upgrade()
         with app.test_client() as test_client:
             with test_client.session_transaction() as session:
-                session['visited_pages'] = []  # Initialize the session for the test
+                session["visited_pages"] = []  # Initialize the session for the test
             yield test_client
 
 

@@ -40,11 +40,11 @@ def get_all_pages_in_parent_form(db, page_id):
 
 
 def flash_message(
-        message: str,
-        href: str = None,
-        href_display_name: str = None,
-        next_href: str = None,
-        next_href_display_name: str = None,
+    message: str,
+    href: str = None,
+    href_display_name: str = None,
+    next_href: str = None,
+    next_href_display_name: str = None,
 ):
     """
     Displays custom flash message.

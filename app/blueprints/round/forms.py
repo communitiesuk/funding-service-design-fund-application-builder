@@ -28,7 +28,11 @@ class RoundForm(FlaskForm):
         description="For example, Round 3",
         validators=[DataRequired(message="Enter the application round")],
     )
-    title_cy = StringField("Application round (Welsh)", widget=GovTextInput(), description="For example, Round 3", )
+    title_cy = StringField(
+        "Application round (Welsh)",
+        widget=GovTextInput(),
+        description="For example, Round 3",
+    )
     short_name = StringField(
         "Round short name",
         widget=GovTextInput(),
@@ -76,7 +80,7 @@ class RoundForm(FlaskForm):
         validators=[
             FlexibleUrl(
                 message="Assessor guidance link must be in the correct website format. "
-                        "For example, www.sharepoint.co.uk/assessorguidance"
+                "For example, www.sharepoint.co.uk/assessorguidance"
                 # noqa: E501
             )
         ],
@@ -94,7 +98,7 @@ class RoundForm(FlaskForm):
         validators=[
             FlexibleUrl(
                 message="Feedback link must be in the correct website format. For example, "
-                        "www.grantapplicationfeedback.com"
+                "www.grantapplicationfeedback.com"
                 # noqa: E501
             )
         ],

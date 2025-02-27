@@ -37,14 +37,17 @@ def get_all_rounds() -> list[Round]:
     stmt = select(Round).join(Round.fund).order_by(cast(Fund.title_json["en"], String))
     return db.session.scalars(stmt).all()
 
+
 def get_paginated_rounds(page: int, items_per_page: int = 20) -> Pagination:
     stmt = select(Round).join(Round.fund).order_by(cast(Fund.title_json["en"], String))
     return db.paginate(stmt, page=page, per_page=items_per_page)
 
+
 def _delete_sections_for_round(round_detail: Round):
     for section_detail in round_detail.sections:
-        lizt_ids = [component.list_id for form in section_detail.forms for page in form.pages for component in
-                    page.components]
+        lizt_ids = [
+            component.list_id for form in section_detail.forms for page in form.pages for component in page.components
+        ]
         page_ids = [page.page_id for form in section_detail.forms for page in form.pages]
         form_ids = [form.form_id for form in section_detail.forms]
         section_ids = [section_detail.section_id]
