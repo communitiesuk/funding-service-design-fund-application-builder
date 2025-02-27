@@ -49,41 +49,41 @@ def test_human_to_kebab(input, exp_output):
     "pages, exp_result",
     [
         (
-                [{"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]}],
-                [
-                    {
-                        "name": "greetings_list",
-                        "type": "string",
-                        "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
-                    }
-                ],
+            [{"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]}],
+            [
+                {
+                    "name": "greetings_list",
+                    "type": "string",
+                    "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
+                }
+            ],
         ),
         (
-                [
-                    {"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]},
-                    {"components": [{"metadata": {}}]},
-                ],
-                [
-                    {
-                        "name": "greetings_list",
-                        "type": "string",
-                        "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
-                    }
-                ],
+            [
+                {"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]},
+                {"components": [{"metadata": {}}]},
+            ],
+            [
+                {
+                    "name": "greetings_list",
+                    "type": "string",
+                    "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
+                }
+            ],
         ),
         (
-                [
-                    {"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]},
-                    {"components": [{"metadata": {}}]},
-                    {"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]},
-                ],
-                [
-                    {
-                        "name": "greetings_list",
-                        "type": "string",
-                        "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
-                    },
-                ],
+            [
+                {"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]},
+                {"components": [{"metadata": {}}]},
+                {"components": [{"list": "greetings_list", "metadata": {"fund_builder_list_id": 123}}]},
+            ],
+            [
+                {
+                    "name": "greetings_list",
+                    "type": "string",
+                    "items": [{"text": "Hello", "value": "h"}, {"text": "Goodbye", "value": "g"}],
+                },
+            ],
         ),
     ],
 )
@@ -105,30 +105,30 @@ def test_build_lists(mocker, pages, exp_result):
     "input_page, exp_result",
     [
         (
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-single-name",
-                    name_in_apply_json={"en": "Organisation Name"},
-                    form_index=1,
-                    components=[mock_c_1],
-                ),
-                {
-                    "path": "/organisation-single-name",
-                    "title": "Organisation Name",
-                    "components": [
-                        {
-                            "name": "organisation_name",
-                            "options": {},
-                            "type": "TextField",
-                            "title": "Organisation name",
-                            "hint": "This must match your registered legal organisation name",
-                            "schema": {},
-                            "metadata": {},
-                        }
-                    ],
-                    "next": [],
-                },
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[mock_c_1],
+            ),
+            {
+                "path": "/organisation-single-name",
+                "title": "Organisation Name",
+                "components": [
+                    {
+                        "name": "organisation_name",
+                        "options": {},
+                        "type": "TextField",
+                        "title": "Organisation name",
+                        "hint": "This must match your registered legal organisation name",
+                        "schema": {},
+                        "metadata": {},
+                    }
+                ],
+                "next": [],
+            },
         )
     ],
 )
@@ -155,45 +155,45 @@ def test_build_page_controller_not_specified():
     "input_page",
     [
         (
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-single-name",
-                    name_in_apply_json={"en": "Organisation Name"},
-                    form_index=1,
-                    components=[mock_c_1],
-                )
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[mock_c_1],
+            )
         ),
         (
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-single-name",
-                    name_in_apply_json={"en": "Organisation Name"},
-                    form_index=1,
-                    components=[mock_c_1, mock_c_2],
-                )
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[mock_c_1, mock_c_2],
+            )
         ),
         (
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-single-name",
-                    name_in_apply_json={"en": "Organisation Name"},
-                    form_index=1,
-                    components=[],
-                )
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="organisation-single-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+                components=[],
+            )
         ),
         (
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="page-with-options",
-                    name_in_apply_json={"en": "Page with Options Name"},
-                    form_index=1,
-                    components=[],
-                    options={"first": "option"},
-                )
+            Page(
+                page_id=uuid4(),
+                form_id=uuid4(),
+                display_path="page-with-options",
+                name_in_apply_json={"en": "Page with Options Name"},
+                form_index=1,
+                components=[],
+                options={"first": "option"},
+            )
         ),
     ],
 )
@@ -216,46 +216,46 @@ id2 = uuid4()
     [
         # single condition
         (
-                Component(
-                    component_id=id,
-                    title="org type",
-                    type=ComponentType.TEXT_FIELD,
-                    conditions=[
-                        asdict(test_condition_org_type_a),
-                    ],
-                    runner_component_name="org_type",
-                ),
-                [test_form_json_condition_org_type_a],
+            Component(
+                component_id=id,
+                title="org type",
+                type=ComponentType.TEXT_FIELD,
+                conditions=[
+                    asdict(test_condition_org_type_a),
+                ],
+                runner_component_name="org_type",
+            ),
+            [test_form_json_condition_org_type_a],
         ),
         # 2 conditions
         (
-                Component(
-                    component_id=id2,
-                    title="test_title_2",
-                    type=ComponentType.TEXT_FIELD,
-                    conditions=[
-                        asdict(test_condition_org_type_a),
-                        asdict(test_condition_org_type_b),
-                    ],
-                    runner_component_name="test_name",
-                ),
-                [
-                    test_form_json_condition_org_type_a,
-                    test_form_json_condition_org_type_b,
+            Component(
+                component_id=id2,
+                title="test_title_2",
+                type=ComponentType.TEXT_FIELD,
+                conditions=[
+                    asdict(test_condition_org_type_a),
+                    asdict(test_condition_org_type_b),
                 ],
+                runner_component_name="test_name",
+            ),
+            [
+                test_form_json_condition_org_type_a,
+                test_form_json_condition_org_type_b,
+            ],
         ),
         # single complex condition
         (
-                Component(
-                    component_id=id2,
-                    title="test_title_2",
-                    type=ComponentType.TEXT_FIELD,
-                    conditions=[asdict(test_condition_org_type_c)],
-                    runner_component_name="test_name",
-                ),
-                [
-                    test_form_json_condition_org_type_c,
-                ],
+            Component(
+                component_id=id2,
+                title="test_title_2",
+                type=ComponentType.TEXT_FIELD,
+                conditions=[asdict(test_condition_org_type_c)],
+                runner_component_name="test_name",
+            ),
+            [
+                test_form_json_condition_org_type_c,
+            ],
         ),
     ],
 )
@@ -273,136 +273,136 @@ list_id = uuid4()
     "component_to_build, exp_result",
     [
         (
-                Component(
-                    component_id=uuid4(),
-                    type=ComponentType.TEXT_FIELD,
-                    title="Test Title",
-                    hint_text="This must be a hint",
-                    page_id=None,
-                    page_index=1,
-                    theme_id=None,
-                    runner_component_name="test-name",
-                    options={
-                        "hideTitle": False,
-                        "classes": "govuk-!-width-full",
-                    },
-                ),
-                {
-                    "name": "test-name",
-                    "options": {
-                        "hideTitle": False,
-                        "classes": "govuk-!-width-full",
-                    },
-                    "type": "TextField",
-                    "title": "Test Title",
-                    "hint": "This must be a hint",
-                    "schema": {},
-                    "metadata": {},
+            Component(
+                component_id=uuid4(),
+                type=ComponentType.TEXT_FIELD,
+                title="Test Title",
+                hint_text="This must be a hint",
+                page_id=None,
+                page_index=1,
+                theme_id=None,
+                runner_component_name="test-name",
+                options={
+                    "hideTitle": False,
+                    "classes": "govuk-!-width-full",
                 },
+            ),
+            {
+                "name": "test-name",
+                "options": {
+                    "hideTitle": False,
+                    "classes": "govuk-!-width-full",
+                },
+                "type": "TextField",
+                "title": "Test Title",
+                "hint": "This must be a hint",
+                "schema": {},
+                "metadata": {},
+            },
         ),
         (
-                Component(
-                    component_id=uuid4(),
-                    type=ComponentType.LIST_FIELD,
-                    title="Test Title",
-                    hint_text="This must be a hint",
-                    page_id=None,
-                    page_index=1,
-                    theme_id=None,
-                    runner_component_name="test-name",
-                    options={},
-                    lizt=Lizt(name="test-list", list_id=list_id),
-                    list_id=list_id,
-                ),
-                {
-                    "name": "test-name",
-                    "options": {},
-                    "type": "List",
-                    "title": "Test Title",
-                    "hint": "This must be a hint",
-                    "schema": {},
-                    "metadata": {"fund_builder_list_id": str(list_id)},
-                    "list": "test-list",
-                    "values": {"type": "listRef"},
-                },
+            Component(
+                component_id=uuid4(),
+                type=ComponentType.LIST_FIELD,
+                title="Test Title",
+                hint_text="This must be a hint",
+                page_id=None,
+                page_index=1,
+                theme_id=None,
+                runner_component_name="test-name",
+                options={},
+                lizt=Lizt(name="test-list", list_id=list_id),
+                list_id=list_id,
+            ),
+            {
+                "name": "test-name",
+                "options": {},
+                "type": "List",
+                "title": "Test Title",
+                "hint": "This must be a hint",
+                "schema": {},
+                "metadata": {"fund_builder_list_id": str(list_id)},
+                "list": "test-list",
+                "values": {"type": "listRef"},
+            },
         ),
         (
-                Component(
-                    component_id=uuid4(),
-                    type=ComponentType.MULTI_INPUT_FIELD,
-                    title="Test Title",
-                    hint_text="This must be a hint",
-                    page_id=None,
-                    page_index=1,
-                    theme_id=None,
-                    runner_component_name="test-name",
-                    options={},
-                    lizt=None,
-                    list_id=None,
-                    children=[
-                        {"name": "GLQlOh", "options": {}, "type": "TextField", "title": "Describe the cost"},
-                        {
-                            "name": "JtwkMy",
-                            "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
-                            "type": "NumberField",
-                            "title": "Amount",
-                            "hint": "",
-                            "schema": {},
-                        },
-                        {
-                            "name": "LeTLDo",
-                            "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
-                            "type": "NumberField",
-                            "title": "How much money from the COF25 grant will you use to pay for this cost?",
-                            "hint": "",
-                            "schema": {},
-                        },
-                        {
-                            "name": "pHZDWT",
-                            "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
-                            "type": "NumberField",
-                            "title": "How much of the match funding will you use to pay for this cost?",
-                            "hint": "",
-                            "schema": {},
-                        },
-                    ],
-                ),
-                {
-                    "name": "test-name",
-                    "options": {},
-                    "type": "MultiInputField",
-                    "title": "Test Title",
-                    "hint": "This must be a hint",
-                    "schema": {},
-                    "metadata": {},
-                    "children": [
-                        {"name": "GLQlOh", "options": {}, "type": "TextField", "title": "Describe the cost"},
-                        {
-                            "name": "JtwkMy",
-                            "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
-                            "type": "NumberField",
-                            "title": "Amount",
-                            "hint": "",
-                            "schema": {},
-                        },
-                        {
-                            "name": "LeTLDo",
-                            "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
-                            "type": "NumberField",
-                            "title": "How much money from the COF25 grant will you use to pay for this cost?",
-                            "hint": "",
-                            "schema": {},
-                        },
-                        {
-                            "name": "pHZDWT",
-                            "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
-                            "type": "NumberField",
-                            "title": "How much of the match funding will you use to pay for this cost?",
-                            "hint": "",
-                            "schema": {},
-                        },
-                    ],
-                },
+            Component(
+                component_id=uuid4(),
+                type=ComponentType.MULTI_INPUT_FIELD,
+                title="Test Title",
+                hint_text="This must be a hint",
+                page_id=None,
+                page_index=1,
+                theme_id=None,
+                runner_component_name="test-name",
+                options={},
+                lizt=None,
+                list_id=None,
+                children=[
+                    {"name": "GLQlOh", "options": {}, "type": "TextField", "title": "Describe the cost"},
+                    {
+                        "name": "JtwkMy",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "Amount",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "LeTLDo",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much money from the COF25 grant will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "pHZDWT",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much of the match funding will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                ],
+            ),
+            {
+                "name": "test-name",
+                "options": {},
+                "type": "MultiInputField",
+                "title": "Test Title",
+                "hint": "This must be a hint",
+                "schema": {},
+                "metadata": {},
+                "children": [
+                    {"name": "GLQlOh", "options": {}, "type": "TextField", "title": "Describe the cost"},
+                    {
+                        "name": "JtwkMy",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "Amount",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "LeTLDo",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much money from the COF25 grant will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                    {
+                        "name": "pHZDWT",
+                        "options": {"prefix": "£", "classes": "govuk-!-width-one-half"},
+                        "type": "NumberField",
+                        "title": "How much of the match funding will you use to pay for this cost?",
+                        "hint": "",
+                        "schema": {},
+                    },
+                ],
+            },
         ),
     ],
 )
@@ -416,190 +416,190 @@ def test_build_component(component_to_build, exp_result):
     [
         # Simple flow of 1 page then summary (summary not in input pages)
         (
-                [
-                    Page(
-                        page_id=uuid4(),
-                        form_id=uuid4(),
-                        display_path="organisation-single-name",
-                        name_in_apply_json={"en": "Organisation Name"},
-                        form_index=1,
-                    )
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-single-name",
+                    name_in_apply_json={"en": "Organisation Name"},
+                    form_index=1,
+                )
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-single-name",
+                        "title": "Organisation Name",
+                        "components": [
+                            {
+                                "name": "reuse-organisation-name",
+                                "options": {
+                                    "hideTitle": False,
+                                    "classes": "govuk-!-width-full",
+                                },
+                                "type": "TextField",
+                                "title": "Organisation name",
+                                "hint": "This must match your registered legal organisation name",
+                                "schema": {},
+                            }
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
                 ],
-                {
-                    "conditions": [],
-                    "pages": [
-                        {
-                            "path": "/organisation-single-name",
-                            "title": "Organisation Name",
-                            "components": [
-                                {
-                                    "name": "reuse-organisation-name",
-                                    "options": {
-                                        "hideTitle": False,
-                                        "classes": "govuk-!-width-full",
-                                    },
-                                    "type": "TextField",
-                                    "title": "Organisation name",
-                                    "hint": "This must match your registered legal organisation name",
-                                    "schema": {},
-                                }
-                            ],
-                            "next": [],
-                            "options": {},
-                        },
-                    ],
-                },
-                {
-                    "/organisation-single-name": [{"path": "/summary"}],
-                },
+            },
+            {
+                "/organisation-single-name": [{"path": "/summary"}],
+            },
         ),
         # 1 page then summary (summary is in input pages)
         (
-                [
-                    Page(
-                        page_id=uuid4(),
-                        form_id=uuid4(),
-                        display_path="organisation-single-name",
-                        name_in_apply_json={"en": "Organisation Name"},
-                        form_index=1,
-                        default_next_page_id="summary-id",
-                    ),
-                    Page(
-                        page_id="summary-id",
-                        form_id=uuid4(),
-                        display_path="summary-page",
-                        name_in_apply_json={"en": "Summary Page"},
-                        form_index=1,
-                        controller="summary.js",
-                    ),
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-single-name",
+                    name_in_apply_json={"en": "Organisation Name"},
+                    form_index=1,
+                    default_next_page_id="summary-id",
+                ),
+                Page(
+                    page_id="summary-id",
+                    form_id=uuid4(),
+                    display_path="summary-page",
+                    name_in_apply_json={"en": "Summary Page"},
+                    form_index=1,
+                    controller="summary.js",
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-single-name",
+                        "title": "Organisation Name",
+                        "components": [
+                            {
+                                "name": "reuse-organisation-name",
+                                "options": {
+                                    "hideTitle": False,
+                                    "classes": "govuk-!-width-full",
+                                },
+                                "type": "TextField",
+                                "title": "Organisation name",
+                                "hint": "This must match your registered legal organisation name",
+                                "schema": {},
+                            }
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/summary-page",
+                        "title": "Summary Page",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                        "controller": "summary.js",
+                    },
                 ],
-                {
-                    "conditions": [],
-                    "pages": [
-                        {
-                            "path": "/organisation-single-name",
-                            "title": "Organisation Name",
-                            "components": [
-                                {
-                                    "name": "reuse-organisation-name",
-                                    "options": {
-                                        "hideTitle": False,
-                                        "classes": "govuk-!-width-full",
-                                    },
-                                    "type": "TextField",
-                                    "title": "Organisation name",
-                                    "hint": "This must match your registered legal organisation name",
-                                    "schema": {},
-                                }
-                            ],
-                            "next": [],
-                            "options": {},
-                        },
-                        {
-                            "path": "/summary-page",
-                            "title": "Summary Page",
-                            "components": [],
-                            "next": [],
-                            "options": {},
-                            "controller": "summary.js",
-                        },
-                    ],
-                },
-                {
-                    "/organisation-single-name": [{"path": "/summary-page"}],
-                    "/summary-page": [],
-                },
+            },
+            {
+                "/organisation-single-name": [{"path": "/summary-page"}],
+                "/summary-page": [],
+            },
         ),
         # Simple flow of 2 pages then summary
         (
-                [
-                    Page(
-                        page_id=uuid4(),
-                        form_id=uuid4(),
-                        display_path="organisation-single-name",
-                        name_in_apply_json={"en": "Organisation Name"},
-                        form_index=1,
-                        default_next_page_id=id2,
-                    ),
-                    Page(
-                        page_id=id2,
-                        form_id=uuid4(),
-                        display_path="organisation-charitable-objects",
-                        name_in_apply_json={"en": "What are your organisation's charitable objects?"},
-                        form_index=1,
-                    ),
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-single-name",
+                    name_in_apply_json={"en": "Organisation Name"},
+                    form_index=1,
+                    default_next_page_id=id2,
+                ),
+                Page(
+                    page_id=id2,
+                    form_id=uuid4(),
+                    display_path="organisation-charitable-objects",
+                    name_in_apply_json={"en": "What are your organisation's charitable objects?"},
+                    form_index=1,
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-single-name",
+                        "title": "Organisation Name",
+                        "components": [
+                            {
+                                "name": "reuse-organisation-name",
+                                "options": {
+                                    "hideTitle": False,
+                                    "classes": "govuk-!-width-full",
+                                },
+                                "type": "TextField",
+                                "title": "Organisation name",
+                                "hint": "This must match your registered legal organisation name",
+                                "schema": {},
+                            },
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
+                    {
+                        "path": "/organisation-charitable-objects",
+                        "title": "Organisation Charitable Objects",
+                        "components": [
+                            {
+                                "name": "reuse-charitable-objects",
+                                "options": {"hideTitle": True, "maxWords": "500"},
+                                "type": "FreeTextField",
+                                "title": "What are your organisation's charitable objects?",
+                                "hint": "You can find this in your organisation's governing document.",
+                            },
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
                 ],
-                {
-                    "conditions": [],
-                    "pages": [
-                        {
-                            "path": "/organisation-single-name",
-                            "title": "Organisation Name",
-                            "components": [
-                                {
-                                    "name": "reuse-organisation-name",
-                                    "options": {
-                                        "hideTitle": False,
-                                        "classes": "govuk-!-width-full",
-                                    },
-                                    "type": "TextField",
-                                    "title": "Organisation name",
-                                    "hint": "This must match your registered legal organisation name",
-                                    "schema": {},
-                                },
-                            ],
-                            "next": [],
-                            "options": {},
-                        },
-                        {
-                            "path": "/organisation-charitable-objects",
-                            "title": "Organisation Charitable Objects",
-                            "components": [
-                                {
-                                    "name": "reuse-charitable-objects",
-                                    "options": {"hideTitle": True, "maxWords": "500"},
-                                    "type": "FreeTextField",
-                                    "title": "What are your organisation's charitable objects?",
-                                    "hint": "You can find this in your organisation's governing document.",
-                                },
-                            ],
-                            "next": [],
-                            "options": {},
-                        },
-                    ],
-                },
-                {
-                    "/organisation-single-name": [{"path": "/organisation-charitable-objects"}],
-                    "/organisation-charitable-objects": [{"path": "/summary"}],
-                },
+            },
+            {
+                "/organisation-single-name": [{"path": "/organisation-charitable-objects"}],
+                "/organisation-charitable-objects": [{"path": "/summary"}],
+            },
         ),
         # Just a summary page
         (
-                [
-                    Page(
-                        page_id=uuid4(),
-                        form_id=uuid4(),
-                        display_path="summary",
-                        name_in_apply_json={"en": "Summary"},
-                        form_index=1,
-                        controller="summary.js",
-                    )
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="summary",
+                    name_in_apply_json={"en": "Summary"},
+                    form_index=1,
+                    controller="summary.js",
+                )
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/summary",
+                        "title": "Summary",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
                 ],
-                {
-                    "conditions": [],
-                    "pages": [
-                        {
-                            "path": "/summary",
-                            "title": "Summary",
-                            "components": [],
-                            "next": [],
-                            "options": {},
-                        },
-                    ],
-                },
-                {
-                    "/summary": [],
-                },
+            },
+            {
+                "/summary": [],
+            },
         ),
     ],
 )
@@ -616,254 +616,254 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
     [
         # One page, 2 possible nexts, both based on defined conditions
         (
-                [
-                    Page(
-                        page_id=uuid4(),
-                        form_id=uuid4(),
-                        display_path="organisation-type",
-                        name_in_apply_json={"en": "Organisation Type"},
-                        form_index=1,
-                        components=[
-                            Component(
-                                component_id=id2,
-                                title="org_type",
-                                type=ComponentType.RADIOS_FIELD,
-                                conditions=[
-                                    asdict(test_condition_org_type_c),
-                                    asdict(test_condition_org_type_b),
-                                ],
-                                runner_component_name="test_c_1",
-                            )
-                        ],
-                    ),
-                    test_page_object_org_type_b,
-                    test_page_object_org_type_c,
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(test_condition_org_type_c),
+                                asdict(test_condition_org_type_b),
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                ),
+                test_page_object_org_type_b,
+                test_page_object_org_type_c,
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    deepcopy(test_form_json_page_org_type_b),
+                    deepcopy(test_form_json_page_org_type_c),
                 ],
-                {
-                    "conditions": [],
-                    "pages": [
-                        {
-                            "path": "/organisation-type",
-                            "title": "Organisation Type",
-                            "components": [],
-                            "next": [],
-                            "options": {},
-                        },
-                        deepcopy(test_form_json_page_org_type_b),
-                        deepcopy(test_form_json_page_org_type_c),
-                    ],
-                },
-                {
-                    "/organisation-type": [
-                        {
-                            "path": "/org-type-c",
-                            "condition": "org_type_c",
-                        },
-                        {
-                            "path": "/org-type-b",
-                            "condition": "org_type_b",
-                        },
-                    ],
-                    "/org-type-b": [{"path": "/summary"}],
-                    "/org-type-c": [{"path": "/summary"}],
-                },
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/org-type-c",
+                        "condition": "org_type_c",
+                    },
+                    {
+                        "path": "/org-type-b",
+                        "condition": "org_type_b",
+                    },
+                ],
+                "/org-type-b": [{"path": "/summary"}],
+                "/org-type-c": [{"path": "/summary"}],
+            },
         ),
         # One page, 2 possible nexts, based on a condition and a default (summary)
         (
-                [
-                    Page(
-                        page_id=uuid4(),
-                        form_id=uuid4(),
-                        display_path="organisation-type",
-                        name_in_apply_json={"en": "Organisation Type"},
-                        form_index=1,
-                        default_next_page_id="summary-id",
-                        components=[
-                            Component(
-                                component_id=id2,
-                                title="org_type",
-                                type=ComponentType.RADIOS_FIELD,
-                                conditions=[
-                                    asdict(test_condition_org_type_b),
-                                ],
-                                runner_component_name="test_c_1",
-                            )
-                        ],
-                    ),
-                    test_page_object_org_type_b,
-                    Page(
-                        page_id="summary-id",
-                        form_id=uuid4(),
-                        display_path="summary",
-                        name_in_apply_json={"en": "Summary"},
-                        form_index=2,
-                        controller="summary.js",
-                    ),
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    default_next_page_id="summary-id",
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(test_condition_org_type_b),
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                ),
+                test_page_object_org_type_b,
+                Page(
+                    page_id="summary-id",
+                    form_id=uuid4(),
+                    display_path="summary",
+                    name_in_apply_json={"en": "Summary"},
+                    form_index=2,
+                    controller="summary.js",
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    deepcopy(test_form_json_page_org_type_b),
+                    {
+                        "path": "/summary",
+                        "title": "Summary",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                        "controller": "summary.js",
+                    },
                 ],
-                {
-                    "conditions": [],
-                    "pages": [
-                        {
-                            "path": "/organisation-type",
-                            "title": "Organisation Type",
-                            "components": [],
-                            "next": [],
-                            "options": {},
-                        },
-                        deepcopy(test_form_json_page_org_type_b),
-                        {
-                            "path": "/summary",
-                            "title": "Summary",
-                            "components": [],
-                            "next": [],
-                            "options": {},
-                            "controller": "summary.js",
-                        },
-                    ],
-                },
-                {
-                    "/organisation-type": [
-                        {
-                            "path": "/summary",
-                        },
-                        {
-                            "path": "/org-type-b",
-                            "condition": "org_type_b",
-                        },
-                    ],
-                    "/org-type-b": [{"path": "/summary"}],
-                    "/summary": [],
-                },
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/summary",
+                    },
+                    {
+                        "path": "/org-type-b",
+                        "condition": "org_type_b",
+                    },
+                ],
+                "/org-type-b": [{"path": "/summary"}],
+                "/summary": [],
+            },
         ),  # One page, 2 possible nexts, based on a condition and a default
         (
-                [
-                    Page(
-                        page_id=uuid4(),
-                        form_id=uuid4(),
-                        display_path="organisation-type",
-                        name_in_apply_json={"en": "Organisation Type"},
-                        form_index=1,
-                        default_next_page_id="page-2",
-                        components=[
-                            Component(
-                                component_id=id2,
-                                title="org_type",
-                                type=ComponentType.RADIOS_FIELD,
-                                conditions=[
-                                    asdict(test_condition_org_type_b),
-                                ],
-                                runner_component_name="test_c_1",
-                            )
-                        ],
-                    ),
-                    test_page_object_org_type_b,
-                    Page(
-                        page_id="page-2",
-                        form_id=uuid4(),
-                        display_path="page_2",
-                        name_in_apply_json={"en": "Page 2"},
-                        form_index=2,
-                    ),
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    default_next_page_id="page-2",
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(test_condition_org_type_b),
+                            ],
+                            runner_component_name="test_c_1",
+                        )
+                    ],
+                ),
+                test_page_object_org_type_b,
+                Page(
+                    page_id="page-2",
+                    form_id=uuid4(),
+                    display_path="page_2",
+                    name_in_apply_json={"en": "Page 2"},
+                    form_index=2,
+                ),
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
+                    deepcopy(test_form_json_page_org_type_b),
+                    {
+                        "path": "/page_2",
+                        "title": "Page 2",
+                        "components": [],
+                        "next": [],
+                        "options": {},
+                    },
                 ],
-                {
-                    "conditions": [],
-                    "pages": [
-                        {
-                            "path": "/organisation-type",
-                            "title": "Organisation Type",
-                            "components": [],
-                            "next": [],
-                            "options": {},
-                        },
-                        deepcopy(test_form_json_page_org_type_b),
-                        {
-                            "path": "/page_2",
-                            "title": "Page 2",
-                            "components": [],
-                            "next": [],
-                            "options": {},
-                        },
-                    ],
-                },
-                {
-                    "/organisation-type": [
-                        {
-                            "path": "/page_2",
-                        },
-                        {
-                            "path": "/org-type-b",
-                            "condition": "org_type_b",
-                        },
-                    ],
-                    "/org-type-b": [{"path": "/summary"}],
-                    "/page_2": [{"path": "/summary"}],
-                    "/summary": [],
-                },
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/page_2",
+                    },
+                    {
+                        "path": "/org-type-b",
+                        "condition": "org_type_b",
+                    },
+                ],
+                "/org-type-b": [{"path": "/summary"}],
+                "/page_2": [{"path": "/summary"}],
+                "/summary": [],
+            },
         ),
         # # One page, 3 possible nexts based on complex conditions (coordinators)
         (
-                [
-                    Page(
-                        page_id=uuid4(),
-                        form_id=uuid4(),
-                        display_path="organisation-type",
-                        name_in_apply_json={"en": "Organisation Type"},
-                        form_index=1,
-                        components=[
-                            Component(
-                                component_id=id2,
-                                title="org_type",
-                                type=ComponentType.RADIOS_FIELD,
-                                conditions=[
-                                    asdict(test_condition_org_type_a),
-                                    asdict(test_condition_org_type_b),
-                                    asdict(test_condition_org_type_c),
-                                ],
-                                runner_component_name="org_type_component",
-                            )
-                        ],
-                    ),
-                    test_page_object_org_type_a,
-                    test_page_object_org_type_b,
-                    test_page_object_org_type_c,
-                ],
-                {
-                    "conditions": [],
-                    "pages": [
-                        {
-                            "path": "/organisation-type",
-                            "title": "Organisation Type",
-                            "components": [
-                                {},  # don't care about these right now...
-                                {},
+            [
+                Page(
+                    page_id=uuid4(),
+                    form_id=uuid4(),
+                    display_path="organisation-type",
+                    name_in_apply_json={"en": "Organisation Type"},
+                    form_index=1,
+                    components=[
+                        Component(
+                            component_id=id2,
+                            title="org_type",
+                            type=ComponentType.RADIOS_FIELD,
+                            conditions=[
+                                asdict(test_condition_org_type_a),
+                                asdict(test_condition_org_type_b),
+                                asdict(test_condition_org_type_c),
                             ],
-                            "next": [],
-                            "options": {},
-                        },
-                        deepcopy(test_form_json_page_org_type_a),
-                        deepcopy(test_form_json_page_org_type_b),
-                        deepcopy(test_form_json_page_org_type_c),
+                            runner_component_name="org_type_component",
+                        )
                     ],
-                },
-                {
-                    "/organisation-type": [
-                        {
-                            "path": "/org-type-a",
-                            "condition": "org_type_a",
-                        },
-                        {
-                            "path": "/org-type-b",
-                            "condition": "org_type_b",
-                        },
-                        {
-                            "path": "/org-type-c",
-                            "condition": "org_type_c",
-                        },
-                    ],
-                    "/org-type-a": [{"path": "/summary"}],
-                    "/org-type-b": [{"path": "/summary"}],
-                    "/org-type-c": [{"path": "/summary"}],
-                },
+                ),
+                test_page_object_org_type_a,
+                test_page_object_org_type_b,
+                test_page_object_org_type_c,
+            ],
+            {
+                "conditions": [],
+                "pages": [
+                    {
+                        "path": "/organisation-type",
+                        "title": "Organisation Type",
+                        "components": [
+                            {},  # don't care about these right now...
+                            {},
+                        ],
+                        "next": [],
+                        "options": {},
+                    },
+                    deepcopy(test_form_json_page_org_type_a),
+                    deepcopy(test_form_json_page_org_type_b),
+                    deepcopy(test_form_json_page_org_type_c),
+                ],
+            },
+            {
+                "/organisation-type": [
+                    {
+                        "path": "/org-type-a",
+                        "condition": "org_type_a",
+                    },
+                    {
+                        "path": "/org-type-b",
+                        "condition": "org_type_b",
+                    },
+                    {
+                        "path": "/org-type-c",
+                        "condition": "org_type_c",
+                    },
+                ],
+                "/org-type-a": [{"path": "/summary"}],
+                "/org-type-b": [{"path": "/summary"}],
+                "/org-type-c": [{"path": "/summary"}],
+            },
         ),
     ],
 )
@@ -880,33 +880,33 @@ def test_build_navigation_with_conditions(mocker, input_pages, input_partial_jso
     "input_form, exp_results",
     [
         (
-                mock_form_1,
-                {
-                    "startPage": "/intro-a-test-form",
-                    "pages": [
-                        {
-                            "path": "/intro-a-test-form",
-                            "title": "A test form",
-                            "next": [{"path": "/test-display-path"}],
-                        },
-                        {
-                            "path": "/test-display-path",
-                            "title": "A test page",
-                            "next": [
-                                {
-                                    "path": "/summary",
-                                },
-                            ],
-                            "exp_component_count": 2,
-                        },
-                        {
-                            "path": "/summary",
-                            "title": "Check your answers",
-                            "next": [],
-                            "exp_component_count": 0,
-                        },
-                    ],
-                },
+            mock_form_1,
+            {
+                "startPage": "/intro-a-test-form",
+                "pages": [
+                    {
+                        "path": "/intro-a-test-form",
+                        "title": "A test form",
+                        "next": [{"path": "/test-display-path"}],
+                    },
+                    {
+                        "path": "/test-display-path",
+                        "title": "A test page",
+                        "next": [
+                            {
+                                "path": "/summary",
+                            },
+                        ],
+                        "exp_component_count": 2,
+                    },
+                    {
+                        "path": "/summary",
+                        "title": "Check your answers",
+                        "next": [],
+                        "exp_component_count": 0,
+                    },
+                ],
+            },
         ),
     ],
 )
@@ -932,45 +932,45 @@ def test_build_form(input_form, exp_results):
     "input_content, input_form, expected_title, expected_path, expected_next, expected_content",
     [
         (
-                "2 pages",
-                Form(
-                    name_in_apply_json={"en": "Test Form"},
-                    pages=[
-                        Page(name_in_apply_json={"en": "Page 1"}, display_path="page-1"),
-                        Page(name_in_apply_json={"en": "Page 2"}, display_path="page-2"),
-                    ],
-                ),
-                "Test Form",
-                "/intro-test-form",
-                [{"path": "/page-1"}],
-                (
-                        '<p class="govuk-body">2 pages</p>'
-                        '<p class="govuk-body">We will ask you about:</p> <ul>'
-                        "<li>Page 1</li><li>Page 2</li></ul>"
-                ),
+            "2 pages",
+            Form(
+                name_in_apply_json={"en": "Test Form"},
+                pages=[
+                    Page(name_in_apply_json={"en": "Page 1"}, display_path="page-1"),
+                    Page(name_in_apply_json={"en": "Page 2"}, display_path="page-2"),
+                ],
+            ),
+            "Test Form",
+            "/intro-test-form",
+            [{"path": "/page-1"}],
+            (
+                '<p class="govuk-body">2 pages</p>'
+                '<p class="govuk-body">We will ask you about:</p> <ul>'
+                "<li>Page 1</li><li>Page 2</li></ul>"
+            ),
         ),
         (
-                "Single page",
-                Form(
-                    name_in_apply_json={"en": "Another Form"},
-                    pages=[Page(name_in_apply_json={"en": "Details Page"}, display_path="details-page")],
-                ),
-                "Another Form",
-                "/intro-another-form",
-                [{"path": "/details-page"}],
-                (
-                        '<p class="govuk-body">Single page</p>'
-                        '<p class="govuk-body">We will ask you about:</p> <ul>'
-                        "<li>Details Page</li></ul>"
-                ),
+            "Single page",
+            Form(
+                name_in_apply_json={"en": "Another Form"},
+                pages=[Page(name_in_apply_json={"en": "Details Page"}, display_path="details-page")],
+            ),
+            "Another Form",
+            "/intro-another-form",
+            [{"path": "/details-page"}],
+            (
+                '<p class="govuk-body">Single page</p>'
+                '<p class="govuk-body">We will ask you about:</p> <ul>'
+                "<li>Details Page</li></ul>"
+            ),
         ),
         (
-                "Form with no pages",
-                Form(name_in_apply_json={"en": "Another Form"}, pages=[]),
-                "Another Form",
-                "/intro-another-form",
-                [],
-                ('<p class="govuk-body">Form with no pages</p>'),
+            "Form with no pages",
+            Form(name_in_apply_json={"en": "Another Form"}, pages=[]),
+            "Another Form",
+            "/intro-another-form",
+            [],
+            ('<p class="govuk-body">Form with no pages</p>'),
         ),
     ],
 )

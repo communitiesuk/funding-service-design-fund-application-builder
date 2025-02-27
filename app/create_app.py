@@ -1,6 +1,4 @@
-import uuid
-
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, request
 from flask_talisman import Talisman
 from fsd_utils import init_sentry
 from fsd_utils.authentication.decorators import SupportedApp, check_internal_user, login_required

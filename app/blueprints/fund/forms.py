@@ -32,7 +32,9 @@ class FundForm(FlaskForm):
         validators=[DataRequired(message="Enter the grant name")],
     )
     name_cy = StringField(
-        "Grant name (Welsh)", widget=GovTextInput(), description="For example, Community Ownership Fund",
+        "Grant name (Welsh)",
+        widget=GovTextInput(),
+        description="For example, Community Ownership Fund",
     )
     short_name = StringField(
         "Grant short name",
@@ -94,7 +96,7 @@ class FundForm(FlaskForm):
             for field, message in [
                 (self.description_cy, "Enter the Welsh grant description"),
                 (self.name_cy, "Enter the Welsh grant name"),
-                (self.title_cy, "Enter the Welsh application name")
+                (self.title_cy, "Enter the Welsh application name"),
             ]:
                 if not field.data or not field.data.strip():
                     field.errors.append(message)

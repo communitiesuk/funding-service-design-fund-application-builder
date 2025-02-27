@@ -10,7 +10,7 @@ from flask import (
 
 from app.blueprints.fund.forms import FundForm
 from app.db.models.fund import Fund, FundingType
-from app.db.queries.fund import add_fund, get_fund_by_id, update_fund, get_paginated_funds
+from app.db.queries.fund import add_fund, get_fund_by_id, get_paginated_funds, update_fund
 from app.shared.helpers import flash_message
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -34,8 +34,7 @@ def view_all_funds():
     """
     Renders list of grants in the grant page
     """
-    return render_template("view_all_funds.html",
-                           pagination=get_paginated_funds(page=int(request.args.get("page", 1))))
+    return render_template("view_all_funds.html", pagination=get_paginated_funds(page=int(request.args.get("page", 1))))
 
 
 @fund_bp.route("/<uuid:fund_id>", methods=["GET"])
