@@ -53,7 +53,7 @@ def test_generalized_table_template_with_existing_templates(flask_test_client):
     assert "Apply for funding to save an asset in your community" in html, (
         "Tasklist name and table component is missing"
     )
-    assert "Edit details" in html, "Edit action is missing"
+    assert "Preview in a new tab" in html, "Preview action is missing"
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
