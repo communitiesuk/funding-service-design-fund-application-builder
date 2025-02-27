@@ -64,6 +64,6 @@ dev = [
     "pytest==8.3.4",
     "python-dotenv==1.0.1",
     "ruff==0.9.7",
-    "pytest-playwright==0.6.2",
+    "pytest-playwright==0.7.0",
     "pytest-xdist==3.6.1",
 ]
