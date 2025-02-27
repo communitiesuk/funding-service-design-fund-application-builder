@@ -11,10 +11,10 @@ class SectionForm(FlaskForm):
     round_id = HiddenField("Round ID")
     section_id = HiddenField("Section ID")
     name_in_apply_en = StringField(
-        "Name", widget=GovTextInput(), validators=[DataRequired(message="Enter the section name")]
+        "", widget=GovTextInput(), validators=[DataRequired(message="Enter the section name")]
     )
     template_id = SelectField(
-        "Create form from template",
+        "Add a task",
         widget=GovSelect(),
         validators=[DataRequired(message="Select a template")],
     )
@@ -27,7 +27,7 @@ class SectionForm(FlaskForm):
         self.template_id.choices = choices
 
     add_form = SubmitField("Add", widget=GovSubmitInput())
-    save_section = SubmitField("Save", widget=GovSubmitInput())
+    save_section = SubmitField("Save and continue", widget=GovSubmitInput())
 
     def validate(self, extra_validators=None):
         form_status = True
