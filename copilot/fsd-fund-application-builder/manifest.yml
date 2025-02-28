@@ -62,8 +62,15 @@ secrets:
 # You can override any of the values defined above by environment.
 environments:
   dev:
+    variables:
+      FUND_APPLICATION_BUILDER_HOST: "https://fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
+      AUTHENTICATOR_HOST: "https://account.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
+      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
+      FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
     count:
       spot: 1
+    http:
+      alias: ['fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk', 'fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk']
     sidecars:
       nginx:
         port: 8087
