@@ -33,7 +33,7 @@ def domains(request: pytest.FixtureRequest, get_e2e_params) -> str:
         case "local":
             return "https://fund-application-builder.levellingup.gov.localhost:3011"
         case "dev":
-            return "https://fund-application-builder.dev.access-funding.test.levellingup.gov.uk"
+            return "https://fund-application-builder.access-funding.dev.communities.gov.uk"
         case "test":
             return "https://fund-application-builder.test.access-funding.test.levellingup.gov.uk"
         case _:
