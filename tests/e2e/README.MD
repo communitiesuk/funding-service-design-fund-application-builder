@@ -48,9 +48,3 @@ In this case, `fsd-dev` is the name of the profile in the aws-vault config file 
     role_arn=arn:aws:iam::123123123123:role/developer
     mfa_serial=arn:aws:iam::123123123123:mfa/user.name
 ```
-
-## Parallel test runs
-
-By default the tests are set to spawn 3 workers and run in parallel. This is configured
-in [pyproject.toml](../pyproject.toml) under the pytest options. The project
-installs [pytest-xdist](https://pytest-xdist.readthedocs.io/en/stable/index.html) to enable this.
