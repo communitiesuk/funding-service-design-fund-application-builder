@@ -68,8 +68,6 @@ environments:
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
     count:
       spot: 1
-    http:
-      alias: ['fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk', 'fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk']
     sidecars:
       nginx:
         port: 8087
@@ -82,6 +80,7 @@ environments:
           BASIC_AUTH_USERNAME: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/BASIC_AUTH_USERNAME
           BASIC_AUTH_PASSWORD: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/BASIC_AUTH_PASSWORD
     http:
+      alias: ['fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk', 'fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk']
       target_container: nginx
       healthcheck:
         path: /healthcheck
@@ -105,6 +104,7 @@ environments:
       healthcheck:
         path: /healthcheck
         port: 8080
+      alias: ['fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk', 'fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk']
   uat:
     variables:
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.test.access-funding.test.levellingup.gov.uk"
