@@ -46,7 +46,6 @@ network:
 variables:
   FUND_APPLICATION_BUILDER_HOST: "https://fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
   AUTHENTICATOR_HOST: "https://authenticator.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
-  COOKIE_DOMAIN: ".test.levellingup.gov.uk"
   FLASK_ENV: ${COPILOT_ENVIRONMENT_NAME}
   FORM_RUNNER_EXTERNAL_HOST: "https://forms.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
   FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
