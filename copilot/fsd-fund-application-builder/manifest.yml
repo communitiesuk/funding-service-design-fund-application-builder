@@ -104,7 +104,6 @@ environments:
       healthcheck:
         path: /healthcheck
         port: 8080
-      alias: ['fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk', 'fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk']
   uat:
     variables:
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.test.access-funding.test.levellingup.gov.uk"
