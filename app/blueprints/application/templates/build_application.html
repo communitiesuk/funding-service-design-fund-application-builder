@@ -14,31 +14,42 @@
     </div>
     <ul class="app-task-list__items">
         {% for section in round.sections %}
-        <li class="">
+        <li class="task-list__new-design govuk-!-margin-bottom-2">
                 <span class="app-task-list__task-name">
                     <h3 class="govuk-heading-m">{{ section.index }}. {{ section.name_in_apply_json["en"] }}</h3>
                 </span>
                 <span class="app-task-list__task-actions">
-                    <a class="govuk-link--no-visited-state" href='{{ url_for("application_bp.section", round_id=round.round_id, section_id=section.section_id) }}'>Edit</a>
-                    <a class="govuk-link--no-visited-state govuk-!-margin-left-2" href='{{ url_for("application_bp.delete_section",round_id=round.round_id, section_id=section.section_id) }}'>Remove</a>
-                    {% if section.index > 1 %}
-                        <a class="govuk-link--no-visited-state govuk-!-margin-left-2" href='{{ url_for("application_bp.move_section_up_route",round_id=round.round_id, section_id=section.section_id) }}'>Move up</a>
+                    {% if section.index == round.sections | length %}
+                        <span class="govuk-!-font-size-19 govuk-!-margin-right-2 disabled-link">Down</span>
+                    {% else %}
+                        <a class="govuk-!-font-size-19 govuk-!-margin-right-2 govuk-link--no-visited-state"
+                           href='{{ url_for("application_bp.move_section_down_route",round_id=round.round_id, section_id=section.section_id) }}'>Down</a>
                     {% endif %}
-                    {% if section.index < round.sections | length %}
-                        <a class="govuk-link--no-visited-state govuk-!-margin-left-2" href='{{ url_for("application_bp.move_section_down_route",round_id=round.round_id, section_id=section.section_id) }}'> Move down</a>
+                    {% if section.index == 1 %}
+                        <span class="govuk-!-font-size-19 govuk-!-margin-right-2 disabled-link">Up</span>
+                    {% else %}
+                        <a class="govuk-!-font-size-19 govuk-!-margin-right-2 govuk-link--no-visited-state"
+                           href='{{ url_for("application_bp.move_section_up_route",round_id=round.round_id, section_id=section.section_id) }}'>Up</a>
                     {% endif %}
+                    <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0"
+                       href='{{ url_for("application_bp.section", round_id=round.round_id, section_id=section.section_id) }}'>Edit</a>
                 </span>
+        </li>
+        <li>
                 <ul class="app-task-list__items">
                     {% for form in section.forms %}
                         <li class="app-task-list__item task-list__new-design">
                             <span class="app-task-list__task-name">
                                 <h3 class="govuk-body">
-                                    {{ form.name_in_apply_json["en"] }}
+                                    <a class="govuk-link govuk-link--no-visited-state"
+                                       target="_blank"
+                                       href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
+                                        {{ form.name_in_apply_json["en"] }} (previews in a new tab)
+                                    </a>
                                 </h3>
                             </span>
                             <span class="app-task-list__task-actions">
-                                <a class="govuk-link--no-visited-state" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions</a>
-                                <a class="govuk-link--no-visited-state govuk-!-margin-left-2" target="_blank" href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>Preview</a>
+                                <a class="govuk-link--no-visited-state govuk-!-font-size-19" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions</a>
                             </span>
                         </li>
                     {% endfor %}

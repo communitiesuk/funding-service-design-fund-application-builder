@@ -82,7 +82,7 @@ def test_update_section_name(flask_test_client, seed_dynamic_data):
     data = {"name_in_apply_en": "section 1", "save_section": True}
     response = submit_form(flask_test_client, url, data, follow_redirects=True)
     soup = BeautifulSoup(response.data, "html.parser")
-    edit_section_link = soup.find("a", class_="govuk-link--no-visited-state", string="Edit").get("href")
+    edit_section_link = soup.find("a", class_="govuk-button--secondary", string="Edit").get("href")
     data = {
         "name_in_apply_en": "section updated",
         "save_section": True,
@@ -103,7 +103,7 @@ def test_update_section_empty_template_section_name(flask_test_client, seed_dyna
     data = {"name_in_apply_en": "section 1", "save_section": True}
     response = submit_form(flask_test_client, url, data, follow_redirects=True)
     soup = BeautifulSoup(response.data, "html.parser")
-    edit_section_link = soup.find("a", class_="govuk-link--no-visited-state", string="Edit").get("href")
+    edit_section_link = soup.find("a", class_="govuk-button--secondary", string="Edit").get("href")
     data = {"name_in_apply_en": "", "add_form": True, "section_id": edit_section_link.split("/")[-1], "template_id": ""}
 
     response = submit_form(flask_test_client, edit_section_link, data, follow_redirects=False)
@@ -134,7 +134,7 @@ def test_update_template_form(flask_test_client, seed_dynamic_data):
     data = {"name_in_apply_en": "section 1", "save_section": True}
     response = submit_form(flask_test_client, url, data, follow_redirects=True)
     soup = BeautifulSoup(response.data, "html.parser")
-    edit_section_link = soup.find("a", class_="govuk-link--no-visited-state", string="Edit").get("href")
+    edit_section_link = soup.find("a", class_="govuk-button--secondary", string="Edit").get("href")
     data = {
         "name_in_apply_en": "",
         "add_form": True,
