@@ -16,7 +16,7 @@ class DashboardPage(PageBase):
         if self.base_url:
             self.page.goto(f"{self.base_url}/dashboard")
 
-    def then_load_dashboard(self):
+    def then_load_components_on_dashboard(self):
         self.add_a_new_grant = self.page.get_by_role("link", name="1. Add a new grant")
         self.setup_a_new_application = self.page.get_by_role("link", name="2. Set up a new application")
         self.design_your_application = self.page.get_by_role("link", name="3. Design your application")
@@ -34,7 +34,7 @@ class DashboardPage(PageBase):
     def then_click_view_and_create_template(self):
         self.view_and_create_template.click()
 
-    def finally_validate_success_message(self):
+    def and_validate_success_message(self):
         banner = self.page.locator(".govuk-notification-banner--success")
         expect(banner.get_by_role("heading", name="New grant added successfully")).to_be_visible()
         expect(banner.locator("a")).to_have_count(2)

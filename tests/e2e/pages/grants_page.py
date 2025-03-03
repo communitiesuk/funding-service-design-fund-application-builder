@@ -13,7 +13,7 @@ class GrantsPage(PageBase):
         if self.base_url:
             self.page.goto(f"{self.base_url}/grants")
 
-    def then_load_grants(self):
+    def then_load_components_on_grants(self):
         self.add_new_grant = self.page.get_by_role("button", name="Add new grant")
 
     def then_click_add_new_grant(self):

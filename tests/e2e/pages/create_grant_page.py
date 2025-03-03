@@ -24,7 +24,7 @@ class CreateGrantPage(PageBase):
         if self.base_url:
             self.page.goto(f"{self.base_url}/grants/create")
 
-    def then_load_create_grant_page(self):
+    def then_load_components_on_create_grant_page(self):
         self.is_welsh = self.page.get_by_role("group", name="Is this grant available in Welsh?")
         self.grant_name = self.page.get_by_role("textbox", name="Grant name")
         self.grant_short_name = self.page.get_by_role("textbox", name="Grant short name")

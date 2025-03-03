@@ -1,3 +1,4 @@
+import base64
 import json
 import subprocess
 from typing import Literal, Protocol
@@ -10,10 +11,17 @@ class EndToEndTestSecrets(Protocol):
     @property
     def HTTP_BASIC_AUTH(self) -> HttpCredentials | None: ...
 
+    @property
+    def JWT_SIGNING_KEY(self) -> str | None: ...
+
 
 class LocalEndToEndSecrets:
     @property
     def HTTP_BASIC_AUTH(self) -> None:
+        return None
+
+    @property
+    def JWT_SIGNING_KEY(self) -> None:
         return None
 
 
@@ -65,3 +73,10 @@ class AWSEndToEndSecrets:
                 f"/copilot/pre-award/{self.e2e_env}/secrets/BASIC_AUTH_PASSWORD"
             ),
         }
+
+    @property
+    def JWT_SIGNING_KEY(self) -> str:
+        base64_value = self._read_aws_parameter_store_value(
+            f"/copilot/pre-award/{self.e2e_env}/secrets/RSA256_PRIVATE_KEY_BASE64"
+        )
+        return base64.b64decode(base64_value).decode()
