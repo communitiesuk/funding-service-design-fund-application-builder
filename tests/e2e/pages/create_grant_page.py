@@ -6,44 +6,30 @@ from tests.e2e.pages.page_base import PageBase
 
 
 class CreateGrantPage(PageBase):
-    is_welsh: Locator
-    grant_name: Locator
-    grant_short_name: Locator
-    application_name: Locator
-    grant_description: Locator
-    grant_type: Locator
-    ggis_field: Locator
-    save_and_continue: Locator
-    cancel: Locator
-    save_and_return_home: Locator
-
     def __init__(self, page: Page, base_url: str = None):
         super().__init__(page, base_url)
+        # Initialize locators
+        self.is_welsh: Locator = self.page.get_by_role("group", name="Is this grant available in Welsh?")
+        self.grant_name: Locator = self.page.get_by_role("textbox", name="Grant name")
+        self.grant_short_name: Locator = self.page.get_by_role("textbox", name="Grant short name")
+        self.application_name: Locator = self.page.get_by_role("textbox", name="Application name")
+        self.grant_description: Locator = self.page.get_by_role("textbox", name="Grant description")
+        self.grant_type: Locator = self.page.get_by_role("group", name="Funding type")
+        self.ggis_field: Locator = self.page.get_by_role("textbox", name="GGIS scheme reference number")
 
-    def when_goto_create_grant_page(self):
+        self.save_and_continue: Locator = self.page.get_by_role("button", name="Save and continue")
+        self.cancel: Locator = self.page.get_by_role("link", name="Cancel")
+        self.save_and_return_home: Locator = self.page.get_by_role("button", name="Save and return home")
+
+    def go_to_create_grant_page(self):
+        """Navigates to the Create Grant page and waits for it to load."""
         if self.base_url:
             self.page.goto(f"{self.base_url}/grants/create")
-
-    def then_load_components_on_create_grant_page(self):
-        self.is_welsh = self.page.get_by_role("group", name="Is this grant available in Welsh?")
-        self.grant_name = self.page.get_by_role("textbox", name="Grant name")
-        self.grant_short_name = self.page.get_by_role("textbox", name="Grant short name")
-        self.application_name = self.page.get_by_role("textbox", name="Application name")
-        self.grant_description = self.page.get_by_role("textbox", name="Grant description")
-        self.grant_type = self.page.get_by_role("group", name="Funding type")
-        self.ggis_field = self.page.get_by_role("textbox", name="GGIS scheme reference number")
-
-        self.save_and_continue = self.page.get_by_role("button", name="Save and continue")
-        self.cancel = self.page.get_by_role("link", name="Cancel")
-        self.save_and_return_home = self.page.get_by_role("button", name="Save and return home")
-
-    def _select_grant_type(self, type: Literal["COMPETITIVE", "UNCOMPETED", "EOI"]):
-        self.grant_type.get_by_role("radio", name=type).check()
-
-    def _select_is_welsh(self, type: Literal["Yes", "No"]):
-        self.is_welsh.get_by_role("radio", name=type).check()
+            self.page.wait_for_load_state("networkidle")
+        return self
 
     def then_fill_non_welsh_competitive_grant_details(self):
+        """Fills in the grant form with fake competitive grant details."""
         self._select_is_welsh("No")
         self.grant_name.fill(self.fake.company())
         self.grant_short_name.fill(self.fake.word()[:5])
@@ -51,6 +37,22 @@ class CreateGrantPage(PageBase):
         self.grant_description.fill(self.fake.paragraph())
         self._select_grant_type("COMPETITIVE")
         self.ggis_field.fill(self.fake.uuid4())
+        return self
 
     def then_click_save_and_return_home(self):
+        """Clicks the 'Save and return home' button."""
         self.save_and_return_home.click()
+
+        from tests.e2e.pages.dashboard_page import DashboardPage
+
+        return DashboardPage(self.page)
+
+    def _select_grant_type(self, type: Literal["COMPETITIVE", "UNCOMPETED", "EOI"]):
+        """Selects the grant type."""
+        self.grant_type.get_by_role("radio", name=type).check()
+        return self
+
+    def _select_is_welsh(self, option: Literal["Yes", "No"]):
+        """Selects whether the grant is available in Welsh."""
+        self.is_welsh.get_by_role("radio", name=option).check()
+        return self
