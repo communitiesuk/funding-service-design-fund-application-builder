@@ -10,7 +10,7 @@ class CreateGrantPage(PageBase):
         super().__init__(page, base_url)
         # Initialize locators
         self.is_welsh: Locator = self.page.get_by_role("group", name="Is this grant available in Welsh?")
-        self.grant_name: Locator = self.page.get_by_role("textbox", name="Grant name")
+        self.grant_name: Locator = self.page.get_by_role("textbox", name="Grant name", exact=True)
         self.grant_short_name: Locator = self.page.get_by_role("textbox", name="Grant short name")
         self.application_name: Locator = self.page.get_by_role("textbox", name="Application name")
         self.grant_description: Locator = self.page.get_by_role("textbox", name="Grant description")

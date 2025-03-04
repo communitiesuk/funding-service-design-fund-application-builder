@@ -104,7 +104,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
-    { name = "urllib3", marker = "python_full_version >= '3.10.0' and python_full_version < '3.11'" },
+    { name = "urllib3", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8c/66/01d63edf404b2ef2c5594701565ac0c031ce7253231298d423e2514566b8/botocore-1.34.144.tar.gz", hash = "sha256:4215db28d25309d59c99507f1f77df9089e5bebbad35f6e19c7c44ec5383a3e8", size = 12618703 }
 wheels = [
@@ -293,9 +293,9 @@ dependencies = [
     { name = "pathspec" },
     { name = "pyyaml" },
     { name = "regex" },
-    { name = "tomli", marker = "python_full_version >= '3.10.0' and python_full_version < '3.11'" },
+    { name = "tomli", marker = "python_full_version == '3.10.*'" },
     { name = "tqdm" },
-    { name = "typing-extensions", marker = "python_full_version >= '3.10.0' and python_full_version < '3.11'" },
+    { name = "typing-extensions", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/74/89/ecf5be9f5c59a0c53bcaa29671742c5e269cc7d0e2622e3f65f41df251bf/djlint-1.36.4.tar.gz", hash = "sha256:17254f218b46fe5a714b224c85074c099bcb74e3b2e1f15c2ddc2cf415a408a1", size = 47849 }
 wheels = [
@@ -757,7 +757,7 @@ version = "1.14.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mypy-extensions" },
-    { name = "tomli", marker = "python_full_version >= '3.10.0' and python_full_version < '3.11'" },
+    { name = "tomli", marker = "python_full_version == '3.10.*'" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b9/eb/2c92d8ea1e684440f54fa49ac5d9a5f19967b7b472a281f419e69a8d228e/mypy-1.14.1.tar.gz", hash = "sha256:7ec88144fe9b510e8475ec2f5f251992690fcf89ccb4500b214b4226abcd32d6", size = 3216051 }
@@ -929,11 +929,11 @@ version = "8.3.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "exceptiongroup", marker = "python_full_version >= '3.10.0' and python_full_version < '3.11'" },
+    { name = "exceptiongroup", marker = "python_full_version == '3.10.*'" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
-    { name = "tomli", marker = "python_full_version >= '3.10.0' and python_full_version < '3.11'" },
+    { name = "tomli", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ae/3c/c9d525a414d506893f0cd8a8d0de7706446213181570cdbd766691164e40/pytest-8.3.5.tar.gz", hash = "sha256:f4efe70cc14e511565ac476b57c279e12a855b11f48f212af1080ef2263d3845", size = 1450891 }
 wheels = [
@@ -959,7 +959,7 @@ version = "1.1.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pytest" },
-    { name = "tomli", marker = "python_full_version >= '3.10.0' and python_full_version < '3.11'" },
+    { name = "tomli", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1f/31/27f28431a16b83cab7a636dce59cf397517807d247caa38ee67d65e71ef8/pytest_env-1.1.5.tar.gz", hash = "sha256:91209840aa0e43385073ac464a554ad2947cc2fd663a9debf88d03b01e0cc1cf", size = 8911 }
 wheels = [
@@ -1091,7 +1091,7 @@ name = "redis"
 version = "4.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "async-timeout", marker = "python_full_version >= '3.10.0' and python_full_version < '3.11'" },
+    { name = "async-timeout", marker = "python_full_version == '3.10.*'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/73/88/63d802c2b18dd9eaa5b846cbf18917c6b2882f20efda398cc16a7500b02c/redis-4.6.0.tar.gz", hash = "sha256:585dc516b9eb042a619ef0a39c3d7d55fe81bdb4df09a52c9cdde0d07bf1aa7d", size = 4561721 }
 wheels = [
@@ -1276,7 +1276,7 @@ name = "sqlalchemy"
 version = "2.0.38"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "greenlet", marker = "(platform_machine == 'AMD64' and python_full_version >= '3.10.0' and python_full_version < '3.11') or (platform_machine == 'WIN32' and python_full_version >= '3.10.0' and python_full_version < '3.11') or (platform_machine == 'aarch64' and python_full_version >= '3.10.0' and python_full_version < '3.11') or (platform_machine == 'amd64' and python_full_version >= '3.10.0' and python_full_version < '3.11') or (platform_machine == 'ppc64le' and python_full_version >= '3.10.0' and python_full_version < '3.11') or (platform_machine == 'win32' and python_full_version >= '3.10.0' and python_full_version < '3.11') or (platform_machine == 'x86_64' and python_full_version >= '3.10.0' and python_full_version < '3.11')" },
+    { name = "greenlet", marker = "(platform_machine == 'AMD64' and python_full_version == '3.10.*') or (platform_machine == 'WIN32' and python_full_version == '3.10.*') or (platform_machine == 'aarch64' and python_full_version == '3.10.*') or (platform_machine == 'amd64' and python_full_version == '3.10.*') or (platform_machine == 'ppc64le' and python_full_version == '3.10.*') or (platform_machine == 'win32' and python_full_version == '3.10.*') or (platform_machine == 'x86_64' and python_full_version == '3.10.*')" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e4/08/9a90962ea72acd532bda71249a626344d855c4032603924b1b547694b837/sqlalchemy-2.0.38.tar.gz", hash = "sha256:e5a4d82bdb4bf1ac1285a68eab02d253ab73355d9f0fe725a97e1e0fa689decb", size = 9634782 }

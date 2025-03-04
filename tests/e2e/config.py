@@ -1,6 +1,7 @@
 import base64
 import json
 import subprocess
+from pathlib import Path
 from typing import Literal, Protocol
 
 import boto3
@@ -21,8 +22,14 @@ class LocalEndToEndSecrets:
         return None
 
     @property
-    def JWT_SIGNING_KEY(self) -> None:
-        return None
+    def JWT_SIGNING_KEY(self) -> str:
+        _test_private_key_path = (
+            str(Path(__file__).parent.parent) + "/e2e/keys/rsa256/private.pem"  # pragma: allowlist secret
+        )
+        with open(_test_private_key_path, mode="r") as private_key_file:
+            rsa256_private_key = private_key_file.read()
+
+        return rsa256_private_key
 
 
 class AWSEndToEndSecrets:
