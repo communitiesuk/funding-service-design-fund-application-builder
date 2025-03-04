@@ -190,6 +190,7 @@ def section(round_id, section_id=None):
         section = get_section_by_id(section_id=section_id)
         new_section_index = max(len(section.forms) + 1, 1)
         clone_single_form(form_id=form.template_id.data, new_section_id=section_id, section_index=new_section_index)
+        form.template_id.data = ""  # Reset the template_id field to default after adding
 
     if section_id:
         existing_section = get_section_by_id(section_id)
