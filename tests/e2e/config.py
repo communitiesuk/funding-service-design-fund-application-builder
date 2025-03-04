@@ -1,5 +1,7 @@
+import base64
 import json
 import subprocess
+from pathlib import Path
 from typing import Literal, Protocol
 
 import boto3
@@ -10,11 +12,24 @@ class EndToEndTestSecrets(Protocol):
     @property
     def HTTP_BASIC_AUTH(self) -> HttpCredentials | None: ...
 
+    @property
+    def JWT_SIGNING_KEY(self) -> str | None: ...
+
 
 class LocalEndToEndSecrets:
     @property
     def HTTP_BASIC_AUTH(self) -> None:
         return None
+
+    @property
+    def JWT_SIGNING_KEY(self) -> str:
+        _test_private_key_path = (
+            str(Path(__file__).parent.parent) + "/e2e/keys/rsa256/private.pem"  # pragma: allowlist secret
+        )
+        with open(_test_private_key_path, mode="r") as private_key_file:
+            rsa256_private_key = private_key_file.read()
+
+        return rsa256_private_key
 
 
 class AWSEndToEndSecrets:
@@ -65,3 +80,10 @@ class AWSEndToEndSecrets:
                 f"/copilot/pre-award/{self.e2e_env}/secrets/BASIC_AUTH_PASSWORD"
             ),
         }
+
+    @property
+    def JWT_SIGNING_KEY(self) -> str:
+        base64_value = self._read_aws_parameter_store_value(
+            f"/copilot/pre-award/{self.e2e_env}/secrets/RSA256_PRIVATE_KEY_BASE64"
+        )
+        return base64.b64decode(base64_value).decode()

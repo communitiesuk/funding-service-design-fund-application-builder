@@ -22,4 +22,4 @@ repos:
             "--disable-plugin",
             "Base64HighEntropyString",
           ]
-        exclude: .env.development
+        exclude: 'tests/e2e/keys/.*'
