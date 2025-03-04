@@ -1,3 +1,5 @@
+import random
+import string
 from typing import Literal
 
 from playwright.sync_api import Locator, Page
@@ -10,7 +12,7 @@ class CreateGrantPage(PageBase):
         super().__init__(page, base_url)
         # Initialize locators
         self.is_welsh: Locator = self.page.get_by_role("group", name="Is this grant available in Welsh?")
-        self.grant_name: Locator = self.page.get_by_role("textbox", name="Grant name", exact=True)
+        self.grant_name_tb: Locator = self.page.get_by_role("textbox", name="Grant name", exact=True)
         self.grant_short_name: Locator = self.page.get_by_role("textbox", name="Grant short name", exact=True)
         self.application_name: Locator = self.page.get_by_role("textbox", name="Application name", exact=True)
         self.grant_description: Locator = self.page.get_by_role("textbox", name="Grant description", exact=True)
@@ -29,19 +31,23 @@ class CreateGrantPage(PageBase):
 
     def then_fill_non_welsh_competitive_grant_details(self):
         """Fills in the grant form with fake competitive grant details."""
+        self.grant_name = f"E2E-{self.fake.company()}"
         self._select_is_welsh("No")
-        self.grant_name.fill(self.fake.company())
-        self.grant_short_name.fill(self.fake.word()[:5])
+        self.grant_name_tb.fill(self.grant_name)
+        self.grant_short_name.fill("".join(random.choices(string.ascii_letters + string.digits, k=6)))
         self.application_name.fill(self.fake.bs())
         self.grant_description.fill(self.fake.paragraph())
         self._select_grant_type("COMPETITIVE")
         self.ggis_field.fill(self.fake.uuid4())
         return self
 
+    def and_click_save_and_return_home(self):
+        self.save_and_return_home.click()
+        return self
+
     def then_click_save_and_return_home(self):
         """Clicks the 'Save and return home' button."""
         self.save_and_return_home.click()
-
         from tests.e2e.pages.dashboard_page import DashboardPage
 
         return DashboardPage(self.page)

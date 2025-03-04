@@ -6,13 +6,14 @@ import uuid
 
 import jwt
 import pytest
-from playwright.sync_api import BrowserContext
+from playwright.sync_api import BrowserContext, Page
 from pytest import FixtureRequest
 from pytest_playwright.pytest_playwright import CreateContextCallback
 
 from config import Config
 from tests.e2e.config import AWSEndToEndSecrets, EndToEndTestSecrets, LocalEndToEndSecrets
 from tests.e2e.dataclass import Account, FabDomains
+from tests.e2e.pages.dashboard_page import DashboardPage
 
 
 @pytest.fixture
@@ -45,7 +46,7 @@ def domains(request: pytest.FixtureRequest, get_e2e_params) -> FabDomains:
         case "dev":
             return FabDomains(
                 fab_url="https://fund-application-builder.access-funding.dev.communities.gov.uk",
-                cookie_domain=".dev.access-funding.test.levellingup.gov.uk",
+                cookie_domain=".access-funding.dev.communities.gov.uk",
             )
         case "test":
             return FabDomains(
@@ -132,6 +133,23 @@ def user_auth(
     )
 
     return Account(email_address=email_address, roles=user_roles)
+
+
+@pytest.fixture(scope="function")
+def created_grant(page: Page, domains: FabDomains, user_auth):
+    """
+    Fixture to create a grant once per test session
+    Returns the created grant details
+    """
+    create_grant = (
+        DashboardPage(page, domains.fab_url)
+        .when_goto_dashboard()
+        .then_click_add_a_new_grant()
+        .then_fill_non_welsh_competitive_grant_details()
+        .and_click_save_and_return_home()
+    )
+
+    return {"grant_name": create_grant.grant_name}
 
 
 def _generate_email_address(

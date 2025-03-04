@@ -13,7 +13,7 @@ def test_add_new_grant_from_dashboard_and_back_to_dashboard(page: Page, domains:
         .then_click_add_a_new_grant()
         .then_fill_non_welsh_competitive_grant_details()
         .then_click_save_and_return_home()
-        .and_validate_success_message()
+        .and_validate_grant_success_message()
     )
 
 
@@ -25,5 +25,5 @@ def test_add_new_grant_from_grants_and_back_to_dashboard(page: Page, domains: Fa
         .then_click_add_new_grant()
         .then_fill_non_welsh_competitive_grant_details()
         .then_click_save_and_return_home()
-        .and_validate_success_message()
+        .and_validate_grant_success_message()
     )
