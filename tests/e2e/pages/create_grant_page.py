@@ -11,9 +11,9 @@ class CreateGrantPage(PageBase):
         # Initialize locators
         self.is_welsh: Locator = self.page.get_by_role("group", name="Is this grant available in Welsh?")
         self.grant_name: Locator = self.page.get_by_role("textbox", name="Grant name", exact=True)
-        self.grant_short_name: Locator = self.page.get_by_role("textbox", name="Grant short name")
-        self.application_name: Locator = self.page.get_by_role("textbox", name="Application name")
-        self.grant_description: Locator = self.page.get_by_role("textbox", name="Grant description")
+        self.grant_short_name: Locator = self.page.get_by_role("textbox", name="Grant short name", exact=True)
+        self.application_name: Locator = self.page.get_by_role("textbox", name="Application name", exact=True)
+        self.grant_description: Locator = self.page.get_by_role("textbox", name="Grant description", exact=True)
         self.grant_type: Locator = self.page.get_by_role("group", name="Funding type")
         self.ggis_field: Locator = self.page.get_by_role("textbox", name="GGIS scheme reference number")
 
