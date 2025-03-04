@@ -13,7 +13,6 @@ class GrantsPage(PageBase):
         """Navigates to the Grants page and waits for it to load."""
         if self.base_url:
             self.page.goto(f"{self.base_url}/grants")
-            self.page.wait_for_load_state("networkidle")
         return self
 
     def then_click_add_new_grant(self):

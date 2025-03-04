@@ -16,7 +16,6 @@ class DashboardPage(PageBase):
         """Navigates to the Dashboard page and waits for it to load."""
         if self.base_url:
             self.page.goto(f"{self.base_url}/dashboard")
-            self.page.wait_for_load_state("networkidle")
         return self
 
     def then_click_add_a_new_grant(self):

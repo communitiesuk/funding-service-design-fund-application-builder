@@ -25,7 +25,6 @@ class CreateGrantPage(PageBase):
         """Navigates to the Create Grant page and waits for it to load."""
         if self.base_url:
             self.page.goto(f"{self.base_url}/grants/create")
-            self.page.wait_for_load_state("networkidle")
         return self
 
     def then_fill_non_welsh_competitive_grant_details(self):
