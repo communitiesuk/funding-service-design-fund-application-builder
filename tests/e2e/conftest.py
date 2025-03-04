@@ -50,8 +50,8 @@ def domains(request: pytest.FixtureRequest, get_e2e_params) -> FabDomains:
             )
         case "test":
             return FabDomains(
-                fab_url="https://fund-application-builder.test.access-funding.test.levellingup.gov.uk",
-                cookie_domain=".test.access-funding.test.levellingup.gov.uk",
+                fab_url="https://fund-application-builder.access-funding.test.communities.gov.uk",
+                cookie_domain=".access-funding.test.communities.gov.uk",
             )
         case _:
             raise ValueError(f"not configured for {e2e_env}")
