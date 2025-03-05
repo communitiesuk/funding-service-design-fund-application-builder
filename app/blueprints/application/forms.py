@@ -11,7 +11,7 @@ class SectionForm(FlaskForm):
     round_id = HiddenField("Round ID")
     section_id = HiddenField("Section ID")
     name_in_apply_en = StringField(
-        "", widget=GovTextInput(), validators=[DataRequired(message="Enter the section name")]
+        "Section name", widget=GovTextInput(), validators=[DataRequired(message="Enter the section name")]
     )
     template_id = SelectField(
         "Add a task",
