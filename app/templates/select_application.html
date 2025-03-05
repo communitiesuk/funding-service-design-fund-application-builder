@@ -28,14 +28,14 @@
                 {{ form.round_id(params={"label": {"isPageHeading": true, "classes": "govuk-label--l", "html": labelHtml }, "formGroup": {"afterInput": {"html": hintHtml } } })  }}
                 <div class="govuk-button-group">
                     {{ govukButton({
-          "text": "Continue",
-          "type": "submit"
-        }) }}
+                      "text": "Continue",
+                      "type": "submit"
+                    }) }}
                     {{ govukButton({
-          "text": "Cancel",
-          "href": url_for("index_bp.dashboard"),
-          "classes": "govuk-button--secondary"
-        }) }}
+                      "text": "Cancel",
+                      "href": url_for("index_bp.dashboard"),
+                      "classes": "govuk-button--secondary"
+                    }) }}
                 </div>
             </form>
         </div>

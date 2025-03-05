@@ -28,14 +28,14 @@
 
                 <div class="govuk-button-group">
                     {{ govukButton({
-          "text": "Continue",
-          "type": "submit"
-        }) }}
+                      "text": "Continue",
+                      "type": "submit"
+                    }) }}
                     {{ govukButton({
-          "text": "Cancel",
-          "href": back_link,
-          "classes": "govuk-button--secondary"
-        }) }}
+                      "text": "Cancel",
+                      "href": url_for("index_bp.dashboard"),
+                      "classes": "govuk-button--secondary"
+                    }) }}
                 </div>
             </form>
         </div>
