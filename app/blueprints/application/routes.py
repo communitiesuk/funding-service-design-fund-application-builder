@@ -68,7 +68,7 @@ def select_fund():
         return redirect(url_for("application_bp.select_application", fund_id=form.fund_id.data))
     select_items = [{"value": value, "text": text} for value, text in choices]
     return render_template(
-        "select_fund.html", form=form, select_items=select_items, back_link=url_for("index_bp.dashboard")
+        "select_fund.html", form=form, select_items=select_items, cancel_url=url_for(INDEX_BP_DASHBOARD)
     )
 
 
