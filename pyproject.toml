@@ -54,7 +54,7 @@ mccabe.max-complexity = 12
 
 [dependency-groups]
 dev = [
-    "debugpy==1.8.12",
+    "debugpy==1.8.13",
     "djlint==1.36.4",
     "invoke==2.2.0",
     "pre-commit==4.1.0",
