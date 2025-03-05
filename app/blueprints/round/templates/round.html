@@ -48,16 +48,16 @@
                     <div class="govuk-heading-m">Assessment details</div>
                     {{ form.assessment_start() }}
                     {{ form.assessment_deadline() }}
-                    {{ form.guidance_url }}
+                    {{ form.guidance_url(params={"type": "url"}) }}
                     <div class="govuk-heading-m">Applicant support details</div>
                     {{ form.contact_email }}
                     {{ form.instructions_en }}
                     {{ form.instructions_cy(params={"classes":"welsh-field"}) }}
                     {{ form.application_guidance_en }}
                     {{ form.application_guidance_cy(params={"classes": "welsh-field"}) }}
-                    {{ form.feedback_link }}
-                    {{ form.prospectus_link }}
-                    {{ form.privacy_notice_link }}
+                    {{ form.feedback_link(params={"type": "url"}) }}
+                    {{ form.prospectus_link(params={"type": "url"}) }}
+                    {{ form.privacy_notice_link(params={"type": "url"}) }}
                     <div class="govuk-heading-m">Advanced settings</div>
                     {{ form.project_name_field_id }}
                     {{ form.eoi_decision_schema_en }}
