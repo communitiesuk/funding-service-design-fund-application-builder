@@ -14,7 +14,7 @@ dependencies = [
     "flask-wtf==1.2.2",
     "flask==3.1.0",
     "flask-talisman==1.1.0",
-    "funding-service-design-utils==6.0.2",
+    "funding-service-design-utils==6.1.0",
     "jsonschema==4.23.0",
     "psycopg2-binary==2.9.10",
     "requests==2.32.3",
