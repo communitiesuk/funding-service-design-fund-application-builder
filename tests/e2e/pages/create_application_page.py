@@ -48,6 +48,12 @@ class CreateApplicationPage(PageBase):
 
         return DashboardPage(self.page)
 
+    def when_click_save_and_continue(self):
+        self.save_and_continue.click()
+        from tests.e2e.pages.applications_page import ApplicationsPage
+
+        return ApplicationsPage(self.page)
+
     def then_then_verify_on_create_application(self):
         expect(self.title).to_be_visible()
         return self
