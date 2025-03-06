@@ -112,7 +112,7 @@ environments:
         port: 8080
   uat:
     variables:
-      FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.test.access-funding.test.levellingup.gov.uk"
+      FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.test.communities.gov.uk"
     count:
       range: 2-4
       cooldown:
