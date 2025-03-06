@@ -11,6 +11,7 @@ class CreateApplicationPage(PageBase):
         super().__init__(page, base_url)
         # Initialize locators
         self.title = self.page.get_by_role("heading", name="Create a new application")
+        self.grant_name = self.page.locator("text=Grant:").text_content()
         self.application_round: Locator = self.page.get_by_role("textbox", name="Application round", exact=True)
         self.round_short_name: Locator = self.page.get_by_role("textbox", name="Round short name", exact=True)
 
@@ -56,6 +57,10 @@ class CreateApplicationPage(PageBase):
 
     def then_verify_on_create_application(self):
         expect(self.title).to_be_visible()
+        return self
+
+    def and_verify_grant_on_create_application(self, grant_name: str):
+        assert grant_name in self.grant_name, "Given grant name is not in the create application page"
         return self
 
     def _fill_date_time_field(self, fieldset: Locator):

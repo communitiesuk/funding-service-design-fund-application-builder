@@ -141,15 +141,13 @@ def created_grant(page: Page, domains: FabDomains, user_auth):
     Fixture to create a grant once per test session
     Returns the created grant details
     """
-    create_grant = (
+    return (
         DashboardPage(page, domains.fab_url)
         .given_user_is_on_dashboard()
         .when_click_add_a_new_grant()
         .when_fill_non_welsh_competitive_grant_details()
         .when_click_save_and_return_home(return_self=True)
     )
-
-    return {"grant_name": create_grant.grant_name}
 
 
 def _generate_email_address(

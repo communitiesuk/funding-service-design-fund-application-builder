@@ -10,7 +10,7 @@ class ApplicationsPage(PageBase):
         self.title = self.page.get_by_role("heading", name="Applications")
         self.create_new_application = self.page.get_by_role("button", name="Create new application")
 
-    def when_goto_applications(self):
+    def given_goto_applications(self):
         if self.base_url:
             self.page.goto(f"{self.base_url}/rounds")
         return self
@@ -21,7 +21,7 @@ class ApplicationsPage(PageBase):
 
         return SelectGrantPage(self.page)
 
-    def then_verify_on_application(self):
+    def then_verify_on_applications(self):
         expect(self.title).to_be_visible()
         return self
 

@@ -29,10 +29,8 @@ class SelectGrantPage(PageBase):
                 if grant_name.lower() in option["label"].lower() or grant_name.lower() in option["value"].lower()
             ]
             if not matching_grants:
-                print(f"Warning: Grant '{grant_name}' not found. Selecting a random grant.")
-                selected_grant = random.choice(grant_options)
-            else:
-                selected_grant = matching_grants[0]
+                raise ValueError(f"Error: Grant '{grant_name}' not found. No matching grants available.")
+            selected_grant = matching_grants[0]
         self.select_grant.select_option(value=selected_grant["value"])
         return self
 
