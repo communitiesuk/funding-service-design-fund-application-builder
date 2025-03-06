@@ -67,7 +67,11 @@ def select_fund():
     if form.fund_id.errors:
         error = {"titleText": "There is a problem", "errorList": [{"text": form.fund_id.errors[0], "href": "#fund_id"}]}
     select_items = [{"value": value, "text": text} for value, text in choices]
-    return render_template("select_fund.html", form=form, error=error, select_items=select_items)
+
+    action = request.args.get("action")
+    cancel_url = _create_round_get_previous_url(action)
+
+    return render_template("select_fund.html", form=form, error=error, select_items=select_items, cancel_url=cancel_url)
 
 
 def _create_round_get_previous_url(action):
