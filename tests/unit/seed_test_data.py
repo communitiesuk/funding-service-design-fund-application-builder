@@ -65,6 +65,7 @@ BASIC_ROUND_INFO = {
         "is_research_survey_optional": False,
     },
     "eligibility_config": {"has_eligibility": False},
+    "status": "In progress",
 }
 
 page_one_id = uuid4()
@@ -410,6 +411,7 @@ def init_unit_test_data() -> dict:
         },
         eligibility_config={"has_eligibility": False},
         eoi_decision_schema={"en": {"valid": True}, "cy": {"valid": False}},
+        status="In progress",
     )
 
     s1: Section = Section(
@@ -537,6 +539,7 @@ def fund_without_assessment() -> dict:
         },
         eligibility_config={"has_eligibility": False},
         eoi_decision_schema={"en": {"valid": True}, "cy": {"valid": False}},
+        status="In progress",
     )
 
     f2_r1_s1: Section = Section(
