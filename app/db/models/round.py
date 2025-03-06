@@ -73,6 +73,7 @@ class Round(BaseModel):
         Integer,
         server_default=base_path_seq.next_value(),
     )
+    status = Column(String(), default="In progress", nullable=False)
 
     fund: Mapped["Fund"] = relationship("Fund", back_populates="rounds")
 
