@@ -110,7 +110,17 @@ def mark_application_complete(round_id):
     round_ = get_round_by_id(round_id)
     round_.status = "Complete"
     update_round(round_)
-    return redirect(url_for("application_bp.build_application", round_id=round_id))
+    return redirect(url_for("application_bp.application_complete", round_id=round_id))
+
+
+@application_bp.route("/<round_id>/complete", methods=["GET"])
+def application_complete(round_id):
+    """
+    Shows the confirmation page after marking an application as complete
+    """
+    round_ = get_round_by_id(round_id)
+    fund = get_fund_by_id(round_.fund_id)
+    return render_template("application_complete.html", round=round_, fund=fund)
 
 
 @application_bp.route("/<round_id>/mark-in-progress", methods=["GET"])

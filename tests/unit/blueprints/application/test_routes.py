@@ -167,9 +167,14 @@ def test_mark_application_complete(flask_test_client, seed_dynamic_data):
     # Ensure the round starts with "In progress" status
     assert test_round.status == "In progress"
 
-    # Call the endpoint to mark application as complete
+    # Call the endpoint to mark application as complete (don't follow redirects)
     url = f"/rounds/{test_round.round_id}/mark-complete"
-    response = flask_test_client.get(url, follow_redirects=True)
+    response = flask_test_client.get(url, follow_redirects=False)
+    assert response.status_code == 302  # Should be a redirect
+
+    # Now manually go to the build_application page to check the status
+    app_url = f"/rounds/{test_round.round_id}/sections"
+    response = flask_test_client.get(app_url)
     assert response.status_code == 200
 
     # Check the page content reflects the completed status
@@ -202,6 +207,57 @@ def test_mark_application_complete(flask_test_client, seed_dynamic_data):
     assert len(up_links) == 0
     down_links = soup.find_all("a", string="Down")
     assert len(down_links) == 0
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_application_complete_page(flask_test_client, seed_dynamic_data):
+    """Test the application complete confirmation page"""
+    test_round = seed_dynamic_data["rounds"][0]
+
+    # Call the endpoint to mark application as complete and follow redirects
+    url = f"/rounds/{test_round.round_id}/mark-complete"
+    response = flask_test_client.get(url, follow_redirects=True)
+    assert response.status_code == 200
+
+    # Check the confirmation page content
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    # Check for the confirmation panel
+    panel = soup.find("div", class_="govuk-panel--confirmation")
+    assert panel is not None
+
+    # Check panel title
+    panel_title = panel.find("h1", class_="govuk-panel__title")
+    assert panel_title is not None
+    assert panel_title.text.strip() == "Application marked as complete"
+
+    # Check for the status change text
+    status_text = soup.find(
+        "p",
+        class_="govuk-body",
+        string=lambda text: "status of this application has been changed" in text if text else False,
+    )
+    assert status_text is not None
+
+    # Check for the "What happens next" heading
+    next_heading = soup.find("h3", class_="govuk-heading-m", string="What happens next")
+    assert next_heading is not None
+
+    # Check for the bullet points
+    bullet_list = soup.find("ul", class_="govuk-list--bullet")
+    assert bullet_list is not None
+    bullet_points = bullet_list.find_all("li")
+    assert len(bullet_points) == 2
+
+    # Check for the back to application link
+    back_link = soup.find("a", string="Back to application")
+    assert back_link is not None
+
+    # Check for the back to home button
+    home_button = soup.find(
+        "a", class_="govuk-button--secondary", string=lambda text: "Back to home" in text if text else False
+    )
+    assert home_button is not None
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
