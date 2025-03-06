@@ -28,7 +28,9 @@ def protect_private_routes(flask_app: Flask) -> Flask:
         if endpoint in PUBLIC_ROUTES:
             continue
         flask_app.view_functions[endpoint] = login_required(
-            check_internal_user(view_func), return_app=SupportedApp.FUND_APPLICATION_BUILDER
+            check_internal_user(view_func),
+            roles_required=["FSD_ADMIN"],
+            return_app=SupportedApp.FUND_APPLICATION_BUILDER,
         )
     return flask_app
 
