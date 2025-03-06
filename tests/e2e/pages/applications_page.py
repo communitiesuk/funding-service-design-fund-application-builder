@@ -25,7 +25,7 @@ class ApplicationsPage(PageBase):
         expect(self.title).to_be_visible()
         return self
 
-    def then_validate_application_success_message(self):
+    def and_validate_application_success_message(self):
         banner = self.page.locator(".govuk-notification-banner--success")
         expect(banner.get_by_role("heading", name="New application created")).to_be_visible()
         expect(banner.locator("a")).to_have_count(1)

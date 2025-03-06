@@ -36,19 +36,17 @@ class CreateGrantPage(PageBase):
         self.ggis_field.fill(self.fake.uuid4())
         return self
 
-    def when_click_save_and_return_home(self):
+    def when_click_save_and_return_home(self, return_self=False):
         """Clicks the 'Save and return home' button."""
         self.save_and_return_home.click()
+        if return_self:
+            return self
         from tests.e2e.pages.dashboard_page import DashboardPage
 
         return DashboardPage(self.page)
 
     def then_verify_on_create_grant(self):
         expect(self.title).to_be_visible()
-        return self
-
-    def and_click_save_and_return_home(self):
-        self.save_and_return_home.click()
         return self
 
     def _select_grant_type(self, type: Literal["COMPETITIVE", "UNCOMPETED", "EOI"]):

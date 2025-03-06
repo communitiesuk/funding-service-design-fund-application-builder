@@ -146,7 +146,7 @@ def created_grant(page: Page, domains: FabDomains, user_auth):
         .given_user_is_on_dashboard()
         .when_click_add_a_new_grant()
         .when_fill_non_welsh_competitive_grant_details()
-        .and_click_save_and_return_home()
+        .when_click_save_and_return_home(return_self=True)
     )
 
     return {"grant_name": create_grant.grant_name}

@@ -54,7 +54,7 @@ class CreateApplicationPage(PageBase):
 
         return ApplicationsPage(self.page)
 
-    def then_then_verify_on_create_application(self):
+    def then_verify_on_create_application(self):
         expect(self.title).to_be_visible()
         return self
 
