@@ -1,7 +1,7 @@
 import random
 import string
 
-from playwright.sync_api import Locator, Page
+from playwright.sync_api import Locator, Page, expect
 
 from tests.e2e.pages.page_base import PageBase
 
@@ -10,6 +10,7 @@ class CreateApplicationPage(PageBase):
     def __init__(self, page: Page, base_url: str = None):
         super().__init__(page, base_url)
         # Initialize locators
+        self.title = self.page.get_by_role("heading", name="Create a new application")
         self.application_round: Locator = self.page.get_by_role("textbox", name="Application round", exact=True)
         self.round_short_name: Locator = self.page.get_by_role("textbox", name="Round short name", exact=True)
 
@@ -27,7 +28,7 @@ class CreateApplicationPage(PageBase):
         self.cancel: Locator = self.page.get_by_role("link", name="Cancel")
         self.save_and_return_home: Locator = self.page.get_by_role("button", name="Save and return home")
 
-    def then_fill_application_details(self):
+    def when_fill_application_details(self):
         self.application_name = self.fake.sentence(nb_words=3)
         self.application_round.fill(self.application_name)
         self.round_short_name.fill("".join(random.choices(string.ascii_letters + string.digits, k=6)))
@@ -41,11 +42,15 @@ class CreateApplicationPage(PageBase):
         self.project_name_field_id.fill(self.fake.uuid4())
         return self
 
-    def then_click_save_and_return_home(self):
+    def when_click_save_and_return_home(self):
         self.save_and_return_home.click()
         from tests.e2e.pages.dashboard_page import DashboardPage
 
         return DashboardPage(self.page)
+
+    def then_then_verify_on_create_application(self):
+        expect(self.title).to_be_visible()
+        return self
 
     def _fill_date_time_field(self, fieldset: Locator):
         # Generate fake date and time values

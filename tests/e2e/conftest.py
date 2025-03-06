@@ -143,9 +143,9 @@ def created_grant(page: Page, domains: FabDomains, user_auth):
     """
     create_grant = (
         DashboardPage(page, domains.fab_url)
-        .when_goto_dashboard()
-        .then_click_add_a_new_grant()
-        .then_fill_non_welsh_competitive_grant_details()
+        .given_user_is_on_dashboard()
+        .when_click_add_a_new_grant()
+        .when_fill_non_welsh_competitive_grant_details()
         .and_click_save_and_return_home()
     )
 

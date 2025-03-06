@@ -1,6 +1,6 @@
 import random
 
-from playwright.sync_api import Locator, Page
+from playwright.sync_api import Locator, Page, expect
 
 from tests.e2e.pages.create_application_page import CreateApplicationPage
 from tests.e2e.pages.page_base import PageBase
@@ -13,7 +13,7 @@ class SelectGrantPage(PageBase):
         self.select_grant: Locator = self.page.get_by_role("combobox", name="Select or add a grant")
         self.continue_btn: Locator = self.page.get_by_role("button", name="Continue")
 
-    def then_select_a_grant(self, grant_name: str = None):
+    def when_select_a_grant(self, grant_name: str = None):
         """Select a grant from the dropdown."""
         self.select_grant.wait_for(state="visible")
         grant_options = [
@@ -36,6 +36,10 @@ class SelectGrantPage(PageBase):
         self.select_grant.select_option(value=selected_grant["value"])
         return self
 
-    def then_click_continue(self):
+    def when_click_continue(self):
         self.continue_btn.click()
         return CreateApplicationPage(self.page)
+
+    def then_verify_on_select_grant(self):
+        expect(self.select_grant).to_be_visible()
+        return self
