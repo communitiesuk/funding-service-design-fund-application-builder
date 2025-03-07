@@ -46,6 +46,13 @@ class CreateGrantPage(PageBase):
 
         return DashboardPage(self.page, metadata=self.metadata)
 
+    def when_click_save_and_continue(self):
+        """Clicks the 'Save and continue' button."""
+        self.save_and_continue.click()
+        from tests.e2e.pages.create_application_page import CreateApplicationPage
+
+        return CreateApplicationPage(self.page, metadata=self.metadata)
+
     def then_verify_on_create_grant(self):
         expect(self.title).to_be_visible()
         return self
