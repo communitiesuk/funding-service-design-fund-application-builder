@@ -1,0 +1,45 @@
+name: Run e2e (browser) tests
+on:
+  workflow_call:
+    inputs:
+      copilot_environment:
+        description: "Copilot environment to deploy to"
+        type: string
+        default: dev
+  workflow_dispatch:
+    inputs:
+      copilot_environment:
+        description: "Copilot environment to deploy to"
+        type: choice
+        options:
+          - dev
+          - test
+        default: dev
+
+jobs:
+  run_tests:
+    name: e2e tests
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read  # This is required for actions/checkout
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.copilot_environment }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5
+        with:
+          enable-cache: true
+          github-token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+      - name: Install playwright browsers
+        run: uv run --frozen playwright install --with-deps
+      - name: Setup AWS credentials
+        uses: communitiesuk/funding-service-design-workflows/.github/actions/copilot_setup@main
+        with:
+          copilot_environment: ${{ inputs.copilot_environment }}
+          AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
+      - name: Run tests
+        run: uv run --frozen pytest --e2e --e2e-env ${{ inputs.copilot_environment }}
+        env:
+          E2E_DEVTEST_BASIC_AUTH_USERNAME: ${{ secrets.E2E_DEVTEST_BASIC_AUTH_USERNAME }}
+          E2E_DEVTEST_BASIC_AUTH_PASSWORD: ${{ secrets.E2E_DEVTEST_BASIC_AUTH_USERNAME }}

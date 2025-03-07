@@ -51,24 +51,18 @@ jobs:
       image_location: ${{ needs.paketo_build.outputs.image_location }}
       notify_slack: false
 
-  # post_dev_deploy_tests:
-  #   needs: dev_deploy
-  #   concurrency:
-  #     group: 'fsd-preaward-dev'
-  #     cancel-in-progress: false
-  #   secrets:
-  #     FSD_GH_APP_ID: ${{ secrets.FSD_GH_APP_ID }}
-  #     FSD_GH_APP_KEY: ${{ secrets.FSD_GH_APP_KEY }}
-  #   uses: communitiesuk/funding-service-design-workflows/.github/workflows/post-deploy.yml@main
-  #   with:
-  #     run_performance_tests: ${{ inputs.run_performance_tests || true }}
-  #     run_e2e_tests_assessment: ${{ inputs.run_e2e_tests_assessment || false }}
-  #     run_e2e_tests_application: ${{ inputs.run_e2e_tests_application || false }}
-  #     app_name: fund-application-builder
-  #     environment: dev
+  dev_e2e_test:
+    # Do not run these against the prod environment without addressing the auth/JWT self-signing done by e2e tests.
+    if: ${{ contains(fromJSON(needs.setup.outputs.jobs_to_run), 'dev') }}
+    name: Run end-to-end (browser) tests
+    needs: [ dev_deploy ]
+    uses: ./.github/workflows/test_e2e.yml
+    with:
+      copilot_environment: 'dev'
+    secrets: inherit #pragma: allowlist secret
 
   test_deploy:
-    needs: [ dev_deploy, paketo_build, setup ]
+    needs: [ dev_deploy, dev_e2e_test, paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'test') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
@@ -100,7 +94,7 @@ jobs:
   #     environment: test
 
   uat_deploy:
-    needs: [ dev_deploy, test_deploy, paketo_build, setup ]
+    needs: [ dev_deploy, dev_e2e_test, test_deploy, paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'uat') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
