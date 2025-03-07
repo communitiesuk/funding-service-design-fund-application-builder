@@ -4,8 +4,8 @@ from tests.e2e.pages.page_base import PageBase
 
 
 class DashboardPage(PageBase):
-    def __init__(self, page: Page, base_url: str = None):
-        super().__init__(page, base_url)
+    def __init__(self, page: Page, base_url: str = None, metadata=None):
+        super().__init__(page, base_url, metadata)
         # Initialize locators
         self.title = self.page.get_by_role("heading", name="Creating a new grant application")
         self.add_a_new_grant = self.page.get_by_role("link", name="1. Add a new grant")
@@ -24,14 +24,14 @@ class DashboardPage(PageBase):
         self.add_a_new_grant.click()
         from tests.e2e.pages.create_grant_page import CreateGrantPage
 
-        return CreateGrantPage(self.page)
+        return CreateGrantPage(self.page, self.metadata)
 
     def when_click_set_up_a_new_application(self):
         """Clicks the 'Add a new grant' button."""
         self.setup_a_new_application.click()
         from tests.e2e.pages.select_grant_page import SelectGrantPage
 
-        return SelectGrantPage(self.page)
+        return SelectGrantPage(self.page, self.metadata)
 
     def then_verify_on_dashboard(self):
         expect(self.title).to_be_visible()

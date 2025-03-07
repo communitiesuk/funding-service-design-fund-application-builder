@@ -4,8 +4,8 @@ from tests.e2e.pages.page_base import PageBase
 
 
 class GrantsPage(PageBase):
-    def __init__(self, page: Page, base_url: str = None):
-        super().__init__(page, base_url)
+    def __init__(self, page: Page, base_url: str = None, metadata=None):
+        super().__init__(page, base_url, metadata)
         # Initialize locators
         self.title = self.page.get_by_role("heading", name="Grants")
         self.add_new_grant = self.page.get_by_role("button", name="Add new grant")
@@ -21,7 +21,7 @@ class GrantsPage(PageBase):
         self.add_new_grant.click()
         from tests.e2e.pages.create_grant_page import CreateGrantPage
 
-        return CreateGrantPage(self.page)
+        return CreateGrantPage(self.page, self.metadata)
 
     def then_verify_on_grants(self):
         expect(self.title).to_be_visible()
