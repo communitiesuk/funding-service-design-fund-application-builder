@@ -58,7 +58,7 @@ def test_add_application_from_applications_page_and_goback_application_page(
         .when_click_continue()
         .then_verify_on_create_application()
         .when_fill_application_details()
-        .when_click_save_and_continue()
+        .when_click_save_and_continue_and_goto_applications()
         .then_verify_on_applications()
         .and_validate_application_success_message()
     )
