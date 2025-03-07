@@ -7,8 +7,8 @@ from tests.e2e.pages.page_base import PageBase
 
 
 class SelectGrantPage(PageBase):
-    def __init__(self, page: Page, base_url: str = None):
-        super().__init__(page, base_url)
+    def __init__(self, page: Page, base_url: str = None, metadata=None):
+        super().__init__(page, base_url=base_url, metadata=metadata)
         # Initialize locators
         self.select_grant: Locator = self.page.get_by_role("combobox", name="Select or add a grant")
         self.continue_btn: Locator = self.page.get_by_role("button", name="Continue")
@@ -36,7 +36,7 @@ class SelectGrantPage(PageBase):
 
     def when_click_continue(self):
         self.continue_btn.click()
-        return CreateApplicationPage(self.page)
+        return CreateApplicationPage(self.page, metadata=self.metadata)
 
     def then_verify_on_select_grant(self):
         expect(self.select_grant).to_be_visible()
