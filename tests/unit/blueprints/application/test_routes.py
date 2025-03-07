@@ -157,3 +157,147 @@ def test_update_template_form(flask_test_client, seed_dynamic_data):
 
     # Assert that the search text is found in at least one <h3> tag
     assert found, "Template Form not found"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_mark_application_complete(flask_test_client, seed_dynamic_data):
+    """Test marking an application as complete"""
+    test_round = seed_dynamic_data["rounds"][0]
+
+    # Ensure the round starts with "In progress" status
+    assert test_round.status == "In progress"
+
+    # Call the endpoint to mark application as complete (don't follow redirects)
+    url = f"/rounds/{test_round.round_id}/mark-complete"
+    response = flask_test_client.get(url, follow_redirects=False)
+    assert response.status_code == 302  # Should be a redirect
+
+    # Now manually go to the build_application page to check the status
+    app_url = f"/rounds/{test_round.round_id}/sections"
+    response = flask_test_client.get(app_url)
+    assert response.status_code == 200
+
+    # Check the page content reflects the completed status
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    # Title should be "View application"
+    assert soup.find("h1", class_="govuk-heading-l").text.strip() == "View application"
+
+    # Status tag should be green
+    status_tag = soup.find("span", class_="govuk-tag")
+    assert "govuk-tag--green" in status_tag["class"]
+    assert status_tag.text.strip() == "Complete"
+
+    # "Edit application" button should be visible
+    edit_button = soup.find("a", string=lambda text: "Edit application" in text if text else False)
+    assert edit_button is not None
+
+    # "Mark application complete" button should NOT be visible
+    complete_button = soup.find("a", string=lambda text: "Mark application complete" in text if text else False)
+    assert complete_button is None
+
+    # "Add section" button should NOT be visible
+    add_section_button = soup.find("a", string=lambda text: "Add section" in text if text else False)
+    assert add_section_button is None
+
+    # "Edit", "Up", "Down" buttons for sections should NOT be visible
+    edit_buttons = soup.find_all("a", string="Edit")
+    assert len(edit_buttons) == 0
+    up_links = soup.find_all("a", string="Up")
+    assert len(up_links) == 0
+    down_links = soup.find_all("a", string="Down")
+    assert len(down_links) == 0
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_application_complete_page(flask_test_client, seed_dynamic_data):
+    """Test the application complete confirmation page"""
+    test_round = seed_dynamic_data["rounds"][0]
+
+    # Call the endpoint to mark application as complete and follow redirects
+    url = f"/rounds/{test_round.round_id}/mark-complete"
+    response = flask_test_client.get(url, follow_redirects=True)
+    assert response.status_code == 200
+
+    # Check the confirmation page content
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    # Check for the confirmation panel
+    panel = soup.find("div", class_="govuk-panel--confirmation")
+    assert panel is not None
+
+    # Check panel title
+    panel_title = panel.find("h1", class_="govuk-panel__title")
+    assert panel_title is not None
+    assert panel_title.text.strip() == "Application marked as complete"
+
+    # Check for the status change text
+    status_text = soup.find(
+        "p",
+        class_="govuk-body",
+        string=lambda text: "status of this application has been changed" in text if text else False,
+    )
+    assert status_text is not None
+
+    # Check for the "What happens next" heading
+    next_heading = soup.find("h3", class_="govuk-heading-m", string="What happens next")
+    assert next_heading is not None
+
+    # Check for the bullet points
+    bullet_list = soup.find("ul", class_="govuk-list--bullet")
+    assert bullet_list is not None
+    bullet_points = bullet_list.find_all("li")
+    assert len(bullet_points) == 2
+
+    # Check for the back to application link
+    back_link = soup.find("a", string="Back to application")
+    assert back_link is not None
+
+    # Check for the back to home button
+    home_button = soup.find(
+        "a", class_="govuk-button--secondary", string=lambda text: "Back to home" in text if text else False
+    )
+    assert home_button is not None
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_mark_application_in_progress(flask_test_client, seed_dynamic_data):
+    """Test marking a complete application as in progress"""
+    test_round = seed_dynamic_data["rounds"][0]
+
+    # First mark the application as complete
+    flask_test_client.get(f"/rounds/{test_round.round_id}/mark-complete")
+
+    # Then mark it back as in progress
+    url = f"/rounds/{test_round.round_id}/mark-in-progress"
+    response = flask_test_client.get(url, follow_redirects=True)
+    assert response.status_code == 200
+
+    # Check the page content reflects the in-progress status
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    # Title should be "Build application"
+    assert soup.find("h1", class_="govuk-heading-l").text.strip() == "Build application"
+
+    # Status tag should be blue
+    status_tag = soup.find("span", class_="govuk-tag")
+    assert "govuk-tag--blue" in status_tag["class"]
+    assert status_tag.text.strip() == "In progress"
+
+    # "Edit application" button should NOT be visible
+    edit_button = soup.find("a", string=lambda text: "Edit application" in text if text else False)
+    assert edit_button is None
+
+    # "Mark application complete" button should be visible
+    complete_button = soup.find("a", string=lambda text: "Mark application complete" in text if text else False)
+    assert complete_button is not None
+
+    # "Add section" button should be visible
+    add_section_button = soup.find("a", string=lambda text: "Add section" in text if text else False)
+    assert add_section_button is not None
+
+    # If there are sections, "Edit", "Up", "Down" buttons should be visible
+    # We need to create a section first to test this
+    if len(seed_dynamic_data["rounds"][0].sections) > 0:
+        edit_buttons = soup.find_all("a", string="Edit")
+        assert len(edit_buttons) > 0

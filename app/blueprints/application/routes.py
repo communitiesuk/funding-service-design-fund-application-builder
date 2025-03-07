@@ -30,7 +30,7 @@ from app.db.queries.application import (
 )
 from app.db.queries.clone import clone_single_form
 from app.db.queries.fund import get_all_funds, get_fund_by_id
-from app.db.queries.round import get_round_by_id
+from app.db.queries.round import get_round_by_id, update_round
 from app.export_config.generate_all_questions import generate_html
 from app.export_config.generate_assessment_config import (
     generate_assessment_config_for_round,
@@ -100,6 +100,38 @@ def build_application(round_id):
         else url_for("round_bp.view_all_rounds")
     )
     return render_template("build_application.html", round=round, fund=fund, back_link=back_link)
+
+
+@application_bp.route("/<round_id>/mark-complete", methods=["GET"])
+def mark_application_complete(round_id):
+    """
+    Marks an application as complete
+    """
+    round_ = get_round_by_id(round_id)
+    round_.status = "Complete"
+    update_round(round_)
+    return redirect(url_for("application_bp.application_complete", round_id=round_id))
+
+
+@application_bp.route("/<round_id>/complete", methods=["GET"])
+def application_complete(round_id):
+    """
+    Shows the confirmation page after marking an application as complete
+    """
+    round_ = get_round_by_id(round_id)
+    fund = get_fund_by_id(round_.fund_id)
+    return render_template("application_complete.html", round=round_, fund=fund)
+
+
+@application_bp.route("/<round_id>/mark-in-progress", methods=["GET"])
+def mark_application_in_progress(round_id):
+    """
+    Sets an application status back to 'In progress'
+    """
+    round_ = get_round_by_id(round_id)
+    round_.status = "In progress"
+    update_round(round_)
+    return redirect(url_for("application_bp.build_application", round_id=round_id))
 
 
 @application_bp.route("/<round_id>/sections/all-questions", methods=["GET"])

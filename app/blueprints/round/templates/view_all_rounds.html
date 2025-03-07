@@ -36,24 +36,32 @@
             Apply for {{ round.fund.title_json["en"] }}</a>
         {% endset %}
 
+        {% set status_html %}
+        <span class="govuk-tag {% if round.status == 'Complete' %}govuk-tag--green{% else %}govuk-tag--blue{% endif %}">
+            {{ round.status }}
+        </span>
+        {% endset %}
 
-        {% set build_application_link %}
+        {% set action_link %}
         <a class='govuk-link govuk-link--no-visited-state'
-           href='{{ url_for("application_bp.build_application", round_id=round.round_id) }}'>Build application</a>
+        href='{{ url_for("application_bp.build_application", round_id=round.round_id) }}'>
+            {% if round.status == 'Complete' %}View application{% else %}Build application{% endif %}
+        </a>
         {% endset %}
 
         {% set table_rows.items = table_rows.items + [[
             {"html": round_detail_link},
             {"text": round.fund.name_json["en"]},
             {"classes": "govuk-!-width-one-quarter", "text": round.title_json["en"]},
-            {"classes": "govuk-!-text-align-right fab-nowrap","html": build_application_link,}
-                            ]] %}
+            {"html": status_html},
+            {"classes": "govuk-!-text-align-right fab-nowrap","html": action_link,}
+                        ]] %}
         {% endfor %}
 
         {{ govukTable({
                 "captionClasses": "govuk-table__caption--m",
                 "firstCellIsHeader": false,
-                "head": [{"text": "Application name"}, {"text": "Grant"}, {"text": "Round"}, {"text": ""}],
+                "head": [{"text": "Application name"}, {"text": "Grant"}, {"text": "Round"}, {"text": "Status"}, {"text": ""}],
                 "rows": table_rows.items
             }) }}
     </div>
