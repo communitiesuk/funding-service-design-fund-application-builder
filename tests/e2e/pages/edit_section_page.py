@@ -20,10 +20,21 @@ class EditSectionPage(PageBase):
             {"label": option.text_content(), "value": option.get_attribute("value")}
             for option in self.add_a_task.locator("option").all()[1:]
         ]
-        if not task_options:
-            raise ValueError("Error: No any question templates available")
-        selected_grant = random.choice(task_options)
-        self.add_a_task.select_option(value=selected_grant["value"])
+        if self.metadata and self.metadata.get("template_name") is None:
+            selected_task = random.choice(task_options)
+        else:
+            matching_tasks = [
+                option
+                for option in task_options
+                if self.metadata.get("template_name").lower() in option["label"].lower()
+                or self.metadata.get("template_name").lower() in option["value"].lower()
+            ]
+            if not matching_tasks:
+                raise ValueError(
+                    f"Error: Template '{self.metadata.get('template_name')}' not found. No matching template available."
+                )
+            selected_task = matching_tasks[0]
+        self.add_a_task.select_option(value=selected_task["value"])
         return self
 
     def when_click_add(self):
