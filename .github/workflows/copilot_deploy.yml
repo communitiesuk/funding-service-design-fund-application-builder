@@ -5,14 +5,18 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description:  Which AWS Account to use
+        description: Which AWS Account to use
         type: choice
         required: true
         options:
-        - dev
-        - test
-        - uat
-
+          - dev
+          - test
+          - uat
+      run_e2e_tests:
+        required: false
+        default: true
+        type: boolean
+        description: Run python e2e tests
   push:
 
 jobs:
@@ -53,13 +57,13 @@ jobs:
 
   dev_e2e_test:
     # Do not run these against the prod environment without addressing the auth/JWT self-signing done by e2e tests.
-    if: ${{ contains(fromJSON(needs.setup.outputs.jobs_to_run), 'dev') }}
+    if: ${{ contains(fromJSON(needs.setup.outputs.jobs_to_run), 'dev') && inputs.run_e2e_tests == true }}
     name: Run end-to-end (browser) tests
     needs: [ dev_deploy ]
     uses: ./.github/workflows/test_e2e.yml
     with:
       copilot_environment: 'dev'
-    secrets: inherit #pragma: allowlist secret
+    secrets: inherit # pragma: allowlist secret
 
   test_deploy:
     needs: [ dev_deploy, dev_e2e_test, paketo_build, setup ]
@@ -76,22 +80,15 @@ jobs:
       image_location: ${{ needs.paketo_build.outputs.image_location }}
       notify_slack: true
 
-  # post_test_deploy_tests:
-  #   needs: test_deploy
-  #   if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'test') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
-  #   concurrency:
-  #     group: 'fsd-preaward-test'
-  #     cancel-in-progress: false
-  #   secrets:
-  #     FSD_GH_APP_ID: ${{ secrets.FSD_GH_APP_ID }}
-  #     FSD_GH_APP_KEY: ${{ secrets.FSD_GH_APP_KEY }}
-  #   uses: communitiesuk/funding-service-design-workflows/.github/workflows/post-deploy.yml@main
-  #   with:
-  #     run_performance_tests: ${{ inputs.run_performance_tests || false }}
-  #     run_e2e_tests_assessment: ${{ inputs.run_e2e_tests_assessment || false }}
-  #     run_e2e_tests_application: ${{ inputs.run_e2e_tests_application || true }}
-  #     app_name: fund-application-builder
-  #     environment: test
+  test_e2e_test:
+    # Do not run these against the prod environment without addressing the auth/JWT self-signing done by e2e tests.
+    if: ${{ contains(fromJSON(needs.setup.outputs.jobs_to_run), 'test') && inputs.run_e2e_tests == true }}
+    name: Run end-to-end (browser) tests
+    needs: [ dev_deploy ]
+    uses: ./.github/workflows/test_e2e.yml
+    with:
+      copilot_environment: 'test'
+    secrets: inherit # pragma: allowlist secret
 
   uat_deploy:
     needs: [ dev_deploy, dev_e2e_test, test_deploy, paketo_build, setup ]
