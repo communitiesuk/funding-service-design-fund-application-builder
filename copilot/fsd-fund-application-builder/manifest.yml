@@ -12,7 +12,7 @@ http:
   # To match all requests you can use the "/" path.
   path: "/"
   healthcheck: "/healthcheck"
-  alias: fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk
+  alias: ['fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk', 'fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk']
 
 # Configuration for your containers and service.
 image:
@@ -80,7 +80,6 @@ environments:
           BASIC_AUTH_USERNAME: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/BASIC_AUTH_USERNAME
           BASIC_AUTH_PASSWORD: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/BASIC_AUTH_PASSWORD
     http:
-      alias: ['fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk', 'fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk']
       target_container: nginx
       healthcheck:
         path: /healthcheck
@@ -105,7 +104,6 @@ environments:
           BASIC_AUTH_USERNAME: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/BASIC_AUTH_USERNAME
           BASIC_AUTH_PASSWORD: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/BASIC_AUTH_PASSWORD
     http:
-      alias: ['fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk', 'fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk']
       target_container: nginx
       healthcheck:
         path: /healthcheck
