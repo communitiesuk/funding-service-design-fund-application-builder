@@ -70,7 +70,9 @@ def create_template():
                 print(e)
                 form.file.errors.append("Upload a valid JSON file")
                 return render_template("template.html", **params)
-        return redirect(url_for("template_bp.view_templates"))
+        if form.save_and_continue.data:
+            return redirect(url_for("template_bp.view_templates"))
+        return redirect(url_for(INDEX_BP_DASHBOARD))
     return render_template("template.html", **params)
 
 
