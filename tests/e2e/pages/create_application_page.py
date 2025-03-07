@@ -50,7 +50,7 @@ class CreateApplicationPage(PageBase):
 
         return DashboardPage(self.page, metadata=self.metadata)
 
-    def when_click_save_and_continue(self):
+    def when_click_save_and_continue_and_goto_applications(self):
         self.save_and_continue.click()
         from tests.e2e.pages.applications_page import ApplicationsPage
 
