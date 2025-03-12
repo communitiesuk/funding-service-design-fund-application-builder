@@ -4,6 +4,7 @@
 {% set active_item_identifier = "grants" %}
 
 {%- from "macros/pagination.html" import Pagination -%}
+{%- from "macros/search.html" import SearchBar -%}
 {%- from "govuk_frontend_jinja/components/button/macro.html" import govukButton -%}
 {% from "govuk_frontend_jinja/components/table/macro.html" import govukTable %}
 
@@ -25,6 +26,9 @@
             }) }}
     </div>
 </div>
+
+{{ SearchBar("grants", search_term) }}
+
 <div class="govuk-grid-row">
     {% set table_rows = namespace(items=[]) %}
     {% for fund in pagination.items %}
