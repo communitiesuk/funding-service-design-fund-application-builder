@@ -27,10 +27,16 @@ def get_all_child_nexts(page: dict, child_nexts: list, all_pages: dict):
         all_pages (dict): _description_
     """
     # TODO write tests
+    # Add all next paths to the set
     child_nexts.update([n for n in page["next_paths"]])
+
     for next_page_path in page["next_paths"]:
-        next_page = next(p for p in all_pages if p["path"] == next_page_path)
-        get_all_child_nexts(next_page, child_nexts, all_pages)
+        # Find the next page safely using list comprehension
+        matching_pages = [p for p in all_pages if p["path"] == next_page_path]
+
+        # If found, recursively process
+        if matching_pages:
+            get_all_child_nexts(matching_pages[0], child_nexts, all_pages)
 
 
 def get_all_possible_previous(page_path: str, results: list, all_pages: dict):
@@ -43,8 +49,19 @@ def get_all_possible_previous(page_path: str, results: list, all_pages: dict):
     """
 
     # TODO write tests
+
+    # Skip processing for non-existent page paths or special paths
+    # This early return prevents processing paths that don't exist in all_pages
+    if not any(page["path"] == page_path for page in all_pages):
+        return
+
+    # Find all pages that directly lead to this page
     direct_prev = [prev["path"] for prev in all_pages if page_path in prev["next_paths"]]
+
+    # Add them to the results
     results.update(direct_prev)
+
+    # For each previous page, recursively find its previous pages
     for prev in direct_prev:
         get_all_possible_previous(prev, results, all_pages)
 
@@ -103,15 +120,23 @@ def generate_metadata(full_form_data: dict) -> dict:
         # all the immediate next paths of the direct previous (aka siblings)
         direct_next_of_direct_previous = set()
         for direct_prev in p["all_direct_previous"]:
-            prev_page = next(prev for prev in cutdown["all_pages"] if prev["path"] == direct_prev)
-            direct_next_of_direct_previous.update(prev_page["next_paths"])
+            # Find the page safely
+            matching_pages = [page for page in cutdown["all_pages"] if page["path"] == direct_prev]
+            if matching_pages:
+                direct_next_of_direct_previous.update(matching_pages[0]["next_paths"])
         p["direct_next_of_direct_previous"] = list(direct_next_of_direct_previous)
 
         # get all the descendents (possible next anywhere after) of the siblings
         all_possible_next_of_siblings = set()
         for sibling in p["direct_next_of_direct_previous"]:
-            sibling_page = next(page for page in cutdown["all_pages"] if page["path"] == sibling)
-            get_all_child_nexts(sibling_page, all_possible_next_of_siblings, cutdown["all_pages"])
+            # Skip paths that don't exist in our valid pages
+            valid_paths = {page["path"] for page in cutdown["all_pages"]}
+            if sibling not in valid_paths:
+                continue
+
+            matching_pages = [page for page in cutdown["all_pages"] if page["path"] == sibling]
+            if matching_pages:
+                get_all_child_nexts(matching_pages[0], all_possible_next_of_siblings, cutdown["all_pages"])
         p["all_possible_next_of_siblings"] = list(all_possible_next_of_siblings)
 
         # everything that could come anywhere before this page
@@ -122,8 +147,13 @@ def generate_metadata(full_form_data: dict) -> dict:
         # get everything that is directly after all the possible previous to this page
         all_possible_previous_direct_next = set()
         for prev in p["all_possible_previous"]:
-            prev_page = next(page for page in cutdown["all_pages"] if page["path"] == prev)
-            all_possible_previous_direct_next.update(prev_page["next_paths"])
+            # Skip paths that don't exist in our valid pages
+            if prev not in valid_paths:
+                continue
+
+            matching_pages = [page for page in cutdown["all_pages"] if page["path"] == prev]
+            if matching_pages:
+                all_possible_previous_direct_next.update(matching_pages[0]["next_paths"])
         p["all_possible_previous_direct_next"] = list(all_possible_previous_direct_next)
 
         # everything that could come after this page
@@ -132,6 +162,52 @@ def generate_metadata(full_form_data: dict) -> dict:
         p["all_possible_after"] = list(all_possible_after)
 
     return metadata
+
+
+def is_return_point_for_siblings(page: dict, next_path: str, all_pages: dict) -> bool:
+    """Determines if next page is a return point for all siblings of the current page."""
+    for sibling in page["direct_next_of_direct_previous"]:
+        # don't look at this page
+        if sibling == page["path"]:
+            continue
+
+        # Safely find the sibling page
+        sibling_matching_pages = [p for p in all_pages if p["path"] == sibling]
+        if not sibling_matching_pages:
+            continue
+
+        sibling_page = sibling_matching_pages[0]
+
+        if next_path not in sibling_page["all_possible_after"]:
+            return False
+
+    return True
+
+
+def determine_next_hierarchy_level(
+    page: dict, next_path: str, next_page: dict, idx: int, start_page: bool, all_pages: dict
+) -> int:
+    """Calculates the hierarchy level for the next page."""
+    # Default is same level
+    next_idx = idx
+
+    # if we have more than one possible next page, go to next level
+    if len(page["next_paths"]) > 1 or start_page is True:
+        next_idx = idx + 1
+
+    # if this next path is also a next path of the immediate previous, go back a level
+    elif next_path in page["direct_next_of_direct_previous"]:
+        next_idx = idx - 1
+
+    elif next_path in page["all_possible_previous_direct_next"]:
+        next_idx = idx - 1
+
+    # if this page and all it's siblings eventually go back to this same next page, go back a level
+    elif len(page["direct_next_of_direct_previous"]) > 1 and len(next_page["all_direct_previous"]) > 1:
+        if is_return_point_for_siblings(page, next_path, all_pages):
+            next_idx = idx - 1
+
+    return next_idx
 
 
 def build_hierarchy_levels_for_page(page: dict, results: dict, idx: int, all_pages: dict, start_page: bool = False):
@@ -160,39 +236,20 @@ def build_hierarchy_levels_for_page(page: dict, results: dict, idx: int, all_pag
 
     # loop through every page that comes after this page
     for next_path in [n for n in page["next_paths"]]:
-        # default is same level
-        next_idx = idx
-        next_page = next(p for p in all_pages if p["path"] == next_path)
+        # Skip special paths that are added dynamically later
+        if next_path == "/summary":
+            continue
 
-        # if we have more than one possible next page, go to next level
-        if len(page["next_paths"]) > 1 or start_page is True:
-            next_idx = idx + 1
+        # Safely find the next page
+        matching_pages = [p for p in all_pages if p["path"] == next_path]
+        if not matching_pages:
+            print(f"Warning: Page with path '{next_path}' referenced but not found in all_pages")
+            continue
 
-        # if this next path is also a next path of the immediate previous, go back a level
-        elif next_path in page["direct_next_of_direct_previous"]:
-            next_idx = idx - 1
+        next_page = matching_pages[0]
 
-        elif next_path in page["all_possible_previous_direct_next"]:
-            next_idx = idx - 1
-
-        # if this page and all it's siblings eventually go back to this same next page, go back a level
-        elif len(page["direct_next_of_direct_previous"]) <= 1:
-            pass
-        elif len(next_page["all_direct_previous"]) == 1:
-            pass
-        else:
-            # Determine whether this next page is the return point for this page and all it's siblings
-            is_in_descendents_of_all_siblings = True
-            for sibling in page["direct_next_of_direct_previous"]:
-                # don't look at this page
-                if sibling == page["path"]:
-                    continue
-                sibling_page = next(p for p in all_pages if p["path"] == sibling)
-                if next_path not in sibling_page["all_possible_after"]:
-                    is_in_descendents_of_all_siblings = False
-
-            if is_in_descendents_of_all_siblings:
-                next_idx = idx - 1
+        # Determine the hierarchy level for the next page
+        next_idx = determine_next_hierarchy_level(page, next_path, next_page, idx, start_page, all_pages)
 
         build_hierarchy_levels_for_page(next_page, results, next_idx, all_pages)
 
@@ -484,8 +541,26 @@ def generate_print_headings_for_page(
     # Go through and do the same for all the pages after this one
     sibling_tracker = 0
     for next_page_path in page["next_paths"]:
-        next_page = next(p for p in form_metadata["all_pages"] if p["path"] == next_page_path)
-        next_form_json_page = next(p for p in form_metadata["full_json"]["pages"] if p["path"] == next_page_path)
+        # Skip special paths that are added dynamically later
+        if next_page_path == "/summary":
+            continue
+
+        # Safely get the next page from all_pages
+        matching_pages = [p for p in form_metadata["all_pages"] if p["path"] == next_page_path]
+        if not matching_pages:
+            print(f"Warning: Page with path '{next_page_path}' referenced but not found in all_pages")
+            continue
+
+        next_page = matching_pages[0]
+
+        # Safely get the next page from full_json["pages"]
+        matching_json_pages = [p for p in form_metadata["full_json"]["pages"] if p["path"] == next_page_path]
+        if not matching_json_pages:
+            print(f"Warning: Page with path '{next_page_path}' referenced but not found in full_json")
+            continue
+
+        next_form_json_page = matching_json_pages[0]
+
         generate_print_headings_for_page(
             page=next_page,
             form_metadata=form_metadata,
