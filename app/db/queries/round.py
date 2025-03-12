@@ -1,6 +1,6 @@
 from flask import current_app
 from flask_sqlalchemy.pagination import Pagination
-from sqlalchemy import String, cast, select
+from sqlalchemy import String, cast, select, text
 from sqlalchemy.orm import joinedload
 
 from app.db import db
@@ -38,8 +38,14 @@ def get_all_rounds() -> list[Round]:
     return db.session.scalars(stmt).all()
 
 
-def get_paginated_rounds(page: int, items_per_page: int = 20) -> Pagination:
-    stmt = select(Round).join(Round.fund).order_by(cast(Fund.title_json["en"], String))
+def get_paginated_rounds(page: int, search_term: str = None, items_per_page: int = 20) -> Pagination:
+    stmt = select(Round).join(Round.fund)
+
+    if search_term:
+        search_expr = text("('Apply for ' || cast(fund.title_json->>'en' as text)) ILIKE :search")
+        stmt = stmt.where(search_expr.bindparams(search=f"%{search_term}%"))
+
+    stmt = stmt.order_by(cast(Fund.title_json["en"], String))
     return db.paginate(stmt, page=page, per_page=items_per_page)
 
 
