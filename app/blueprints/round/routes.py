@@ -103,7 +103,7 @@ def create_round():
             flash_message(
                 message="New application created",
                 href=url_for(ROUND_DETAILS, round_id=new_round.round_id),
-                href_display_name=fund.title_json["en"],
+                href_display_name=new_round.title_json["en"],
                 next_href=url_for(BUILD_APPLICATION, round_id=new_round.round_id),
                 next_href_display_name="Design your application",
             )
@@ -112,7 +112,7 @@ def create_round():
         flash_message(
             message="New application created",
             href=url_for(ROUND_DETAILS, round_id=new_round.round_id),
-            href_display_name=fund.title_json["en"],
+            href_display_name=new_round.title_json["en"],
         )
 
         if request.args.get("action") == "applications_table":
