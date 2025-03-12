@@ -33,8 +33,14 @@ def get_all_funds() -> list[Fund]:
     return db.session.scalars(stmt).all()
 
 
-def get_paginated_funds(page: int, items_per_page: int = 20) -> Pagination:
-    stmt = select(Fund).order_by(cast(Fund.name_json["en"], String))
+def get_paginated_funds(page: int, search_term: str = None, items_per_page: int = 20) -> Pagination:
+    stmt = select(Fund)
+
+    if search_term:
+        # Case-insensitive search on the name field
+        stmt = stmt.where(cast(Fund.name_json["en"], String).ilike(f"%{search_term}%"))
+
+    stmt = stmt.order_by(cast(Fund.name_json["en"], String))
     return db.paginate(stmt, page=page, per_page=items_per_page)
 
 
