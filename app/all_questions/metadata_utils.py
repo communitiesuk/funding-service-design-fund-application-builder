@@ -164,6 +164,52 @@ def generate_metadata(full_form_data: dict) -> dict:
     return metadata
 
 
+def is_return_point_for_siblings(page: dict, next_path: str, all_pages: dict) -> bool:
+    """Determines if next page is a return point for all siblings of the current page."""
+    for sibling in page["direct_next_of_direct_previous"]:
+        # don't look at this page
+        if sibling == page["path"]:
+            continue
+
+        # Safely find the sibling page
+        sibling_matching_pages = [p for p in all_pages if p["path"] == sibling]
+        if not sibling_matching_pages:
+            continue
+
+        sibling_page = sibling_matching_pages[0]
+
+        if next_path not in sibling_page["all_possible_after"]:
+            return False
+
+    return True
+
+
+def determine_next_hierarchy_level(
+    page: dict, next_path: str, next_page: dict, idx: int, start_page: bool, all_pages: dict
+) -> int:
+    """Calculates the hierarchy level for the next page."""
+    # Default is same level
+    next_idx = idx
+
+    # if we have more than one possible next page, go to next level
+    if len(page["next_paths"]) > 1 or start_page is True:
+        next_idx = idx + 1
+
+    # if this next path is also a next path of the immediate previous, go back a level
+    elif next_path in page["direct_next_of_direct_previous"]:
+        next_idx = idx - 1
+
+    elif next_path in page["all_possible_previous_direct_next"]:
+        next_idx = idx - 1
+
+    # if this page and all it's siblings eventually go back to this same next page, go back a level
+    elif len(page["direct_next_of_direct_previous"]) > 1 and len(next_page["all_direct_previous"]) > 1:
+        if is_return_point_for_siblings(page, next_path, all_pages):
+            next_idx = idx - 1
+
+    return next_idx
+
+
 def build_hierarchy_levels_for_page(page: dict, results: dict, idx: int, all_pages: dict, start_page: bool = False):
     """Recursively builds up a dict containing the path of each page, and it's level in the hierarchy of the page
     Format of results:
@@ -202,45 +248,8 @@ def build_hierarchy_levels_for_page(page: dict, results: dict, idx: int, all_pag
 
         next_page = matching_pages[0]
 
-        # Default is same level
-        next_idx = idx
-
-        # if we have more than one possible next page, go to next level
-        if len(page["next_paths"]) > 1 or start_page is True:
-            next_idx = idx + 1
-
-        # if this next path is also a next path of the immediate previous, go back a level
-        elif next_path in page["direct_next_of_direct_previous"]:
-            next_idx = idx - 1
-
-        elif next_path in page["all_possible_previous_direct_next"]:
-            next_idx = idx - 1
-
-        # if this page and all it's siblings eventually go back to this same next page, go back a level
-        elif len(page["direct_next_of_direct_previous"]) <= 1:
-            pass
-        elif len(next_page["all_direct_previous"]) == 1:
-            pass
-        else:
-            # Determine whether this next page is the return point for this page and all it's siblings
-            is_in_descendents_of_all_siblings = True
-            for sibling in page["direct_next_of_direct_previous"]:
-                # don't look at this page
-                if sibling == page["path"]:
-                    continue
-
-                # Safely find the sibling page
-                sibling_matching_pages = [p for p in all_pages if p["path"] == sibling]
-                if not sibling_matching_pages:
-                    continue
-
-                sibling_page = sibling_matching_pages[0]
-
-                if next_path not in sibling_page["all_possible_after"]:
-                    is_in_descendents_of_all_siblings = False
-
-            if is_in_descendents_of_all_siblings:
-                next_idx = idx - 1
+        # Determine the hierarchy level for the next page
+        next_idx = determine_next_hierarchy_level(page, next_path, next_page, idx, start_page, all_pages)
 
         build_hierarchy_levels_for_page(next_page, results, next_idx, all_pages)
 
