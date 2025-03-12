@@ -14,7 +14,7 @@ class EditSectionPage(PageBase):
         self.add = self.page.get_by_role("button", name="Add")
         self.save_and_continue = self.page.get_by_role("button", name="Save and continue")
 
-    def when_adding_some_existing_templates(self):
+    def when_add_template(self):
         self.add_a_task.wait_for(state="visible")
         task_options = [
             {"label": option.text_content(), "value": option.get_attribute("value")}

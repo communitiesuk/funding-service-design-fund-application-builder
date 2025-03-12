@@ -26,10 +26,10 @@ class CreateGrantPage(PageBase):
 
     def when_fill_non_welsh_competitive_grant_details(self):
         """Fills in the grant form with fake competitive grant details."""
-        self.grant_name = f"E2E-{self.fake.company()}"
-        self.update_metadata("grant_name", self.grant_name)
+        grant_name = f"E2E-{self.fake.company()}"
+        self.update_metadata("grant_name", grant_name)
         self._select_is_welsh("No")
-        self.grant_name_tb.fill(self.grant_name)
+        self.grant_name_tb.fill(grant_name)
         self.grant_short_name.fill("".join(random.choices(string.ascii_letters + string.digits, k=6)))
         self.application_name.fill(self.fake.bs())
         self.grant_description.fill(self.fake.paragraph())

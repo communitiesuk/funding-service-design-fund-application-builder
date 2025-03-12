@@ -37,6 +37,15 @@ class DashboardPage(PageBase):
         expect(self.title).to_be_visible()
         return self
 
+    def and_validate_template_upload_success_message(self):
+        banner = self.page.locator(".govuk-notification-banner--success")
+        expect(banner.get_by_role("heading", name="Template uploaded")).to_be_visible()
+        expect(banner.locator("a")).to_have_count(1)
+        template_name = banner.locator("a").first.inner_text()
+        template_name_metadata = self.metadata.get("template_name")
+        assert template_name == f"View {template_name_metadata}"
+        return self
+
     def and_validate_grant_success_message(self):
         """Validate the grant success message"""
         banner = self.page.locator(".govuk-notification-banner--success")

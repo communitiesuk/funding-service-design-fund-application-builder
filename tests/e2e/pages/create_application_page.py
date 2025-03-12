@@ -30,9 +30,9 @@ class CreateApplicationPage(PageBase):
         self.save_and_return_home: Locator = self.page.get_by_role("button", name="Save and return home")
 
     def when_fill_application_details(self):
-        self.application_name = f"E2E-{self.fake.sentence(nb_words=3)}"
-        self.update_metadata("application_name", self.application_name)
-        self.application_round.fill(self.application_name)
+        application_name = f"E2E-{self.fake.sentence(nb_words=3)}"
+        self.update_metadata("application_name", application_name)
+        self.application_round.fill(application_name)
         self.round_short_name.fill("".join(random.choices(string.ascii_letters + string.digits, k=6)))
         self._fill_date_time_field(self.application_round_open)
         self._fill_date_time_field(self.application_round_close)
@@ -50,20 +50,31 @@ class CreateApplicationPage(PageBase):
 
         return DashboardPage(self.page, metadata=self.metadata)
 
-    def when_click_save_and_continue_and_goto_build_application(self):
+    def when_click_save_and_continue(self):
         self.save_and_continue.click()
-        from tests.e2e.pages.build_application_page import BuildApplicationPage
+        return self
 
-        return BuildApplicationPage(self.page, metadata=self.metadata)
-
-    def when_click_save_and_continue_and_goto_applications(self):
-        self.save_and_continue.click()
+    def then_expect_applications(self):
         from tests.e2e.pages.applications_page import ApplicationsPage
 
         return ApplicationsPage(self.page, metadata=self.metadata)
 
+    def then_expect_build_application(self):
+        from tests.e2e.pages.build_application_page import BuildApplicationPage
+
+        return BuildApplicationPage(self.page, metadata=self.metadata)
+
     def then_verify_on_create_application(self):
         expect(self.title).to_be_visible()
+        return self
+
+    def and_validate_grant_success_message(self):
+        banner = self.page.locator(".govuk-notification-banner--success")
+        expect(banner.get_by_role("heading", name="New grant added successfully")).to_be_visible()
+        expect(banner.locator("a")).to_have_count(1)
+        grant_link_name = banner.locator("a").first.inner_text()
+        grant_name_metadata = self.metadata.get("grant_name")
+        assert grant_link_name == f"View {grant_name_metadata}"
         return self
 
     def and_verify_grant_on_create_application(self, grant_name: str):

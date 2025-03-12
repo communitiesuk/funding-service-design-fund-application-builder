@@ -11,4 +11,10 @@ class PageBase:
 
     def update_metadata(self, key, value):
         """Update shared data dictionary"""
-        self.metadata[key] = value
+        if key in self.metadata:
+            if isinstance(self.metadata[key], list) and isinstance(value, list):
+                self.metadata[key].extend(value)
+            else:
+                self.metadata[key] = value
+        else:
+            self.metadata[key] = value
