@@ -17,12 +17,6 @@ class UploadNewTemplatePage(PageBase):
         self.save_and_continue = self.page.get_by_role("button", name="Save and continue")
         self.save_and_return_home = self.page.get_by_role("button", name="Save and return home")
 
-    def given_user_is_on_templates(self):
-        """Navigates to the Templates page and waits for it to load."""
-        if self.base_url:
-            self.page.goto(f"{self.base_url}/templates")
-        return self
-
     def when_click_save_and_continue(self):
         """Clicks the 'Add new grant' button."""
         self.save_and_continue.click()
@@ -37,9 +31,9 @@ class UploadNewTemplatePage(PageBase):
         return self
 
     def when_adding_template_details(self):
-        self.template_name_txt = f"E2E-{self.fake.name()}"
-        self.update_metadata("template_name", self.template_name_txt)
-        self.template_name.fill(self.template_name_txt)
+        template_name_txt = f"E2E-{self.fake.name()}"
+        self.update_metadata("template_name", template_name_txt)
+        self.template_name.fill(template_name_txt)
         self.task_name.fill(f"E2E-{self.fake.name()}")
         return self
 

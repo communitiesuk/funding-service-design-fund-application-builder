@@ -9,6 +9,6 @@ class CompleteApplicationPage(PageBase):
         # Initialize locators
         self.title = self.page.get_by_role("heading", name="Application marked as complete")
 
-    def then_verify_application_is_completed(self):
+    def then_verify_on_application_complete(self):
         expect(self.title).to_be_visible()
         return self

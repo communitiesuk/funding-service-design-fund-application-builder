@@ -1,52 +1,11 @@
 from playwright.sync_api import Page
 
 from tests.e2e.dataclass import FabDomains
-from tests.e2e.pages.dashboard_page import DashboardPage
 from tests.e2e.pages.templates_page import TemplatesPage
 
 
-# TC-005-[1]: Build application from dashboard view with existing templates in the system
-def test_build_application_from_dashboard_view_and_with_existing_templates(page: Page, domains: FabDomains, user_auth):
-    (
-        DashboardPage(page, domains.fab_url)
-        .given_user_is_on_dashboard()
-        .then_verify_on_dashboard()
-        .when_click_add_a_new_grant()
-        .then_verify_on_create_grant()
-        .when_fill_non_welsh_competitive_grant_details()
-        .when_click_save_and_continue()
-        .then_verify_on_create_application()
-        .when_fill_application_details()
-        .when_click_save_and_continue_and_goto_build_application()
-        .then_verify_on_build_application()
-        # adding a section 01
-        .when_click_add_section()
-        .then_verify_on_create_section()
-        .when_add_a_section()
-        .when_save_and_continue()
-        .then_verify_on_build_application()
-        # adding a section 02
-        .when_click_add_section()
-        .then_verify_on_create_section()
-        .when_add_a_section()
-        .when_save_and_continue()
-        .then_verify_on_build_application()
-        .when_click_edit_first_section()
-        .then_verify_on_edit_section()
-        # adding questions to section -1
-        .when_adding_some_existing_templates()
-        .when_click_add()
-        .when_adding_some_existing_templates()
-        .when_click_add()
-        .when_click_save_and_continue()
-        .then_verify_on_build_application()
-        .when_click_mark_application_complete()
-        .then_verify_application_is_completed()
-    )
-
-
-# TC-005-[2]: Build application from dashboard view with adding new templates
-def test_build_application_from_dashboard_view_and_with_adding_templates(page: Page, domains: FabDomains, user_auth):
+# TC-005: Build application from dashboard view with adding new templates
+def test_e2e_grant_creation_to_application_completion_flow(page: Page, domains: FabDomains, user_auth):
     (
         TemplatesPage(page, domains.fab_url)
         .given_user_is_on_templates()
@@ -57,34 +16,44 @@ def test_build_application_from_dashboard_view_and_with_adding_templates(page: P
         .when_adding_template_details()
         .when_click_save_and_return_home()
         .then_verify_on_dashboard()
+        .and_validate_template_upload_success_message()
         # after template upload, create the grant and application
         .when_click_add_a_new_grant()
         .then_verify_on_create_grant()
         .when_fill_non_welsh_competitive_grant_details()
         .when_click_save_and_continue()
+        # create application
         .then_verify_on_create_application()
+        .and_validate_grant_success_message()
         .when_fill_application_details()
-        .when_click_save_and_continue_and_goto_build_application()
-        .then_verify_on_build_application()
-        # adding a section 01
+        .when_click_save_and_continue()
+        .then_expect_build_application()
+        .and_verify_on_build_application()
+        .and_validate_application_success_message()
+        # build application and adding a section 01
         .when_click_add_section()
         .then_verify_on_create_section()
-        .when_add_a_section()
+        .when_fill_section_details()
         .when_save_and_continue()
         .then_verify_on_build_application()
         # adding a section 02
         .when_click_add_section()
         .then_verify_on_create_section()
-        .when_add_a_section()
+        .when_fill_section_details()
         .when_save_and_continue()
         .then_verify_on_build_application()
         .when_click_edit_first_section()
         .then_verify_on_edit_section()
         # adding questions to section -1
-        .when_adding_some_existing_templates()
+        .when_add_template()
         .when_click_add()
         .when_click_save_and_continue()
         .then_verify_on_build_application()
+        .when_click_down_on_section()
+        .then_verify_section_gone_down()
+        .when_click_up_on_section()
+        .then_verify_section_gone_up()
+        # mark application complete
         .when_click_mark_application_complete()
-        .then_verify_application_is_completed()
+        .then_verify_on_application_complete()
     )

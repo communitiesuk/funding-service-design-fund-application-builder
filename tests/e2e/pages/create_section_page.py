@@ -11,10 +11,10 @@ class CreateSectionPage(PageBase):
         self.section_name_txt = self.page.get_by_role("textbox", name="Section name")
         self.save_and_continue = self.page.get_by_role("button", name="Save and continue")
 
-    def when_add_a_section(self):
-        self.section_name = self.fake.word()
-        self.metadata.setdefault("sections", []).append(self.section_name)
-        self.section_name_txt.fill(self.section_name)
+    def when_fill_section_details(self):
+        section_name = self.fake.word()
+        self.update_metadata("sections", [section_name])
+        self.section_name_txt.fill(section_name)
         return self
 
     def when_save_and_continue(self):

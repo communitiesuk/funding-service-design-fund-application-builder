@@ -9,9 +9,6 @@ class BuildApplicationPage(PageBase):
         # Initialize locators
         self.title = self.page.get_by_role("heading", name="Build application")
         self.add_section = self.page.get_by_role("button", name="Add section")
-
-        self.view_all_application_question = self.page.get_by_role("link", name="View all application questions")
-        self.download_application_zip_file = self.page.get_by_role("link", name="Download application ZIP file")
         self.mark_application_complete = self.page.get_by_role("link", name="Mark application complete")
 
     def when_click_add_section(self):
@@ -22,7 +19,7 @@ class BuildApplicationPage(PageBase):
         return CreateSectionPage(self.page, metadata=self.metadata)
 
     def when_click_edit_first_section(self):
-        assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections section available"
+        assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
         task_element = self.page.get_by_role("heading", name=self.metadata.get("sections")[0])
         task_parent = task_element.locator("xpath=ancestor::li")
         expect(task_parent).to_be_visible()
@@ -43,3 +40,45 @@ class BuildApplicationPage(PageBase):
     def then_verify_on_build_application(self):
         expect(self.title).to_be_visible()
         return self
+
+    def when_click_down_on_section(self):
+        assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
+        task_element = self.page.get_by_role("heading", name=self.metadata.get("sections")[0])
+        task_parent = task_element.locator("xpath=ancestor::li")
+        expect(task_parent).to_be_visible()
+        down_link = task_parent.get_by_role("link", name="Down")
+        expect(down_link).to_be_visible()
+        down_link.click()
+        return self
+
+    def when_click_up_on_section(self):
+        assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
+        task_element = self.page.get_by_role("heading", name=self.metadata.get("sections")[0])
+        task_parent = task_element.locator("xpath=ancestor::li")
+        expect(task_parent).to_be_visible()
+        down_link = task_parent.get_by_role("link", name="Up")
+        expect(down_link).to_be_visible()
+        down_link.click()
+        return self
+
+    def then_verify_section_gone_down(self):
+        first_section = self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2").all()[1]
+        first_section.get_by_role("heading", name=self.metadata.get("sections")[0]).is_visible()
+        return self
+
+    def then_verify_section_gone_up(self):
+        first_section = self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2").all()[0]
+        first_section.get_by_role("heading", name=self.metadata.get("sections")[0]).is_visible()
+        return self
+
+    def and_validate_application_success_message(self):
+        banner = self.page.locator(".govuk-notification-banner--success")
+        expect(banner.get_by_role("heading", name="New application created")).to_be_visible()
+        expect(banner.locator("a")).to_have_count(1)
+        application_link_name = banner.locator("a").first.inner_text()
+        application_name_metadata = self.metadata.get("application_name")
+        assert application_link_name == f"View {application_name_metadata}"
+        return self
+
+    def and_verify_on_build_application(self):
+        return self.then_verify_on_build_application()
