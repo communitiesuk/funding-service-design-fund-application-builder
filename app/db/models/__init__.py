@@ -1,6 +1,6 @@
 from .application_config import Component, ComponentType, Form, FormSection, Lizt, Page, Section
 from .assessment_config import Criteria, Subcriteria, Theme
-from .fund import Fund, Organisation
+from .fund import Fund, FundingType, Organisation
 from .round import Round
 
 __all__ = [
@@ -17,4 +17,5 @@ __all__ = [
     Subcriteria,
     Theme,
     Organisation,
+    FundingType,
 ]
