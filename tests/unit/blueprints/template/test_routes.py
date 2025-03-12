@@ -4,6 +4,7 @@ from io import BytesIO
 from unittest.mock import MagicMock, patch
 
 import pytest
+from bs4 import BeautifulSoup
 from flask import g
 
 from app.db.models import Form
@@ -294,3 +295,76 @@ def test_template_questions_view(flask_test_client, seed_dynamic_data):
     # Title component availability check
     assert "About your organization template" in html, "Template title is missing"
     assert "This template contains the following questions." in html, "Title description is missing"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_template_search_functionality(flask_test_client, _db):
+    test_template = Form(
+        form_id=uuid.uuid4(),
+        name_in_apply_json={"en": "SpecificTestTemplateTask"},
+        template_name="SpecificTestTemplate_QWE789",
+        is_template=True,
+        section_index=1,
+        runner_publish_name="specific-test-template",
+    )
+    _db.session.add(test_template)
+    _db.session.commit()
+
+    try:
+        response = flask_test_client.get("/templates")
+        assert response.status_code == 200
+        soup = BeautifulSoup(response.data, "html.parser")
+
+        # Find label and button
+        search_label = soup.find("label", {"for": "search"})
+        assert search_label is not None
+        assert "Search templates" in search_label.text
+
+        search_button = soup.find("button", {"class": "govuk-button--success"})
+        assert search_button is not None
+        assert "Search" in search_button.text
+
+        # Test 1: No search term - should show all results including our test template
+        response = flask_test_client.get("/templates")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        template_names = [a.text for a in soup.select("tbody a.govuk-link")]
+        assert "SpecificTestTemplate_QWE789" in template_names
+
+        # Test 2: Search for prefix
+        response = flask_test_client.get("/templates?search=SpecificTest")
+        soup = BeautifulSoup(response.data, "html.parser")
+        assert soup.find("input", {"id": "search"}).get("value") == "SpecificTest"
+        assert soup.find("a", string=lambda text: text and "Clear search" in text)
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        template_names = [a.text for a in soup.select("tbody a.govuk-link")]
+        assert "SpecificTestTemplate_QWE789" in template_names
+
+        # Test 3: Search for substring
+        response = flask_test_client.get("/templates?search=QWE789")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        template_names = [a.text for a in soup.select("tbody a.govuk-link")]
+        assert "SpecificTestTemplate_QWE789" in template_names
+
+        # Test 4: Search with different case
+        response = flask_test_client.get("/templates?search=specifictest")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        template_names = [a.text for a in soup.select("tbody a.govuk-link")]
+        assert "SpecificTestTemplate_QWE789" in template_names
+
+        # Test 5: No matches
+        response = flask_test_client.get("/templates?search=NoMatchingTemplateHere")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) == 0
+
+    finally:
+        # Clean up test data
+        _db.session.delete(test_template)
+        _db.session.commit()

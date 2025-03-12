@@ -1,8 +1,11 @@
+import uuid
+from datetime import datetime
+
 import pytest
 from bs4 import BeautifulSoup
 from flask import g, url_for
 
-from app.db.models import Round
+from app.db.models import Fund, FundingType, Round
 from app.db.queries.round import get_round_by_id
 from tests.unit.helpers import submit_form
 
@@ -336,3 +339,97 @@ def test_clone_round(flask_test_client, seed_dynamic_data):
         soup = BeautifulSoup(response.data, "html.parser")
         notification = soup.find("div", {"class": "govuk-notification-banner__content"})
         assert notification.text.strip() == "Error copying application"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_round_search_functionality(flask_test_client, _db):
+    test_fund = Fund(
+        name_json={"en": "Test Fund For Round Search"},
+        title_json={"en": "Test Fund Title"},
+        description_json={"en": "Test fund description"},
+        welsh_available=False,
+        short_name=f"TFR-{datetime.now().strftime('%H%M%S')}",  # Ensure uniqueness
+        audit_info={"user": "test_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+        funding_type=FundingType.COMPETITIVE,
+    )
+    _db.session.add(test_fund)
+    _db.session.flush()
+
+    test_round = Round(
+        round_id=uuid.uuid4(),
+        fund_id=test_fund.fund_id,
+        title_json={"en": "Special Test Round ABC456"},
+        short_name=f"STR-{datetime.now().strftime('%H%M%S')}",  # Ensure uniqueness
+        prospectus_link="https://example.com/prospectus",
+        privacy_notice_link="https://example.com/privacy",
+        project_name_field_id="test_field_id",
+        status="In progress",
+    )
+    _db.session.add(test_round)
+    _db.session.commit()
+
+    expected_application_name = f"Apply for {test_fund.title_json['en']}"
+
+    try:
+        response = flask_test_client.get("/rounds/")
+        assert response.status_code == 200
+        soup = BeautifulSoup(response.data, "html.parser")
+
+        # Helper function to get application names from table (first column)
+        def get_application_names(soup):
+            return [link.text.strip() for link in soup.select("tbody tr td:first-child a")]
+
+        # Find label and button
+        search_label = soup.find("label", {"for": "search"})
+        assert search_label is not None
+        assert "Search applications" in search_label.text
+
+        search_button = soup.find("button", {"class": "govuk-button--success"})
+        assert search_button is not None
+        assert "Search" in search_button.text
+
+        # Test 1: No search term - should show all results including our test round
+        response = flask_test_client.get("/rounds/")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        application_names = get_application_names(soup)
+        assert expected_application_name in application_names
+
+        # Test 2: Search for prefix of fund title
+        response = flask_test_client.get("/rounds/?search=Apply%20for%20Test")
+        soup = BeautifulSoup(response.data, "html.parser")
+        assert soup.find("input", {"id": "search"}).get("value") == "Apply for Test"
+        assert soup.find("a", string=lambda text: text and "Clear search" in text)
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        application_names = get_application_names(soup)
+        assert expected_application_name in application_names
+
+        # Test 3: Search for substring of fund title
+        response = flask_test_client.get("/rounds/?search=Fund%20Title")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        application_names = get_application_names(soup)
+        assert expected_application_name in application_names
+
+        # Test 4: Search with different case
+        response = flask_test_client.get("/rounds/?search=apply%20for%20test")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        application_names = get_application_names(soup)
+        assert expected_application_name in application_names
+
+        # Test 5: No matches
+        response = flask_test_client.get("/rounds/?search=No%20Matching%20Application%20Here")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) == 0
+
+    finally:
+        # Clean up test data
+        _db.session.delete(test_round)
+        _db.session.delete(test_fund)
+        _db.session.commit()
