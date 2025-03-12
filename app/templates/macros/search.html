@@ -1,0 +1,26 @@
+{% macro SearchBar(entity_name, current_search_term="") %}
+<div class="govuk-grid-row govuk-!-margin-bottom-4">
+    <div class="govuk-grid-column-full">
+        <form action="" method="GET" novalidate>
+            <div class="govuk-form-group">
+                <label class="govuk-label" for="search">
+                    Search {{ entity_name }}
+                </label>
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds govuk-!-padding-right-0">
+                        <input class="govuk-input" id="search" name="search" type="text" value="{{ current_search_term }}">
+                    </div>
+                    <div class="govuk-grid-column-one-third govuk-!-padding-left-0" id="search-bar-right">
+                        <button type="submit" class="govuk-button govuk-button--success govuk-!-margin-bottom-0" data-module="govuk-button">
+                            Search
+                        </button>
+                        {% if current_search_term %}
+                        <a href="{{ url_for(request.endpoint) }}" class="govuk-link govuk-link--no-visited-state govuk-!-margin-left-3 govuk-!-font-size-19">Clear search</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endmacro %}
