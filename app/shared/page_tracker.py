@@ -2,7 +2,7 @@ from flask import request, session
 
 from app.blueprints.application.routes import application_bp
 from app.blueprints.fund.routes import fund_bp, view_all_funds
-from app.blueprints.index.routes import dashboard, go_back, index_bp
+from app.blueprints.index.routes import dashboard, go_back, index_bp, preview_form
 from app.blueprints.round.routes import round_bp, view_all_rounds
 from app.blueprints.template.routes import template_bp, view_templates
 
@@ -10,7 +10,10 @@ from app.blueprints.template.routes import template_bp, view_templates
 class PageTracker:
     def __init__(self):
         self.tracked_blueprints = {template_bp.name, index_bp.name, application_bp.name, fund_bp.name, round_bp.name}
-        self.ignore_endpoints = {f"{index_bp.name}.{go_back.__name__}"}
+        self.ignore_endpoints = {
+            f"{index_bp.name}.{go_back.__name__}",
+            f"{index_bp.name}.{preview_form.__name__}",
+        }
         self.reset_endpoints = {
             f"{index_bp.name}.{dashboard.__name__}",
             f"{fund_bp.name}.{view_all_funds.__name__}",
