@@ -1,9 +1,10 @@
+from datetime import datetime
+
 import pytest
 from bs4 import BeautifulSoup
 from flask import g
 
-from app.db.models import Fund
-from app.db.models.fund import FundingType
+from app.db.models import Fund, FundingType
 from app.db.queries.fund import get_fund_by_id
 from tests.unit.helpers import submit_form
 
@@ -395,3 +396,77 @@ def test_update_fund_and_check_optinal_values_not_provided(flask_test_client, se
     # Extract the corresponding value (the text inside the <dd> tag)
     ggis_reference_number = row.find("dd", class_="govuk-summary-list__value").text.strip()
     assert ggis_reference_number == "Not provided"
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_fund_search_functionality(flask_test_client, _db):
+    test_fund = Fund(
+        name_json={"en": "SpecialTestFund_XYZ123"},
+        title_json={"en": "Special Test Fund Title"},
+        description_json={"en": "Test fund description"},
+        welsh_available=False,
+        short_name=f"STF-{datetime.now().strftime('%H%M%S')}",  # Ensure uniqueness
+        audit_info={"user": "test_user", "timestamp": datetime.now().isoformat(), "action": "create"},
+        funding_type=FundingType.COMPETITIVE,
+    )
+    _db.session.add(test_fund)
+    _db.session.commit()
+
+    try:
+        response = flask_test_client.get("/grants/")
+        assert response.status_code == 200
+        soup = BeautifulSoup(response.data, "html.parser")
+
+        # Find label and button
+        search_label = soup.find("label", {"for": "search"})
+        assert search_label is not None
+        assert "Search grants" in search_label.text
+
+        search_button = soup.find("button", {"class": "govuk-button--success"})
+        assert search_button is not None
+        assert "Search" in search_button.text
+
+        # Test 1: No search term - should show all results including our test fund
+        response = flask_test_client.get("/grants/")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        fund_links = [a.text for a in soup.select("tbody a.govuk-link")]
+        assert "SpecialTestFund_XYZ123" in fund_links
+
+        # Test 2: Search for prefix
+        response = flask_test_client.get("/grants/?search=SpecialTest")
+        soup = BeautifulSoup(response.data, "html.parser")
+        assert soup.find("input", {"id": "search"}).get("value") == "SpecialTest"
+        assert soup.find("a", string=lambda text: text and "Clear search" in text)
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        fund_links = [a.text for a in soup.select("tbody a.govuk-link")]
+        assert "SpecialTestFund_XYZ123" in fund_links
+
+        # Test 3: Search for substring
+        response = flask_test_client.get("/grants/?search=XYZ123")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        fund_links = [a.text for a in soup.select("tbody a.govuk-link")]
+        assert "SpecialTestFund_XYZ123" in fund_links
+
+        # Test 4: Search with different case
+        response = flask_test_client.get("/grants/?search=specialtest")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) > 0
+        fund_links = [a.text for a in soup.select("tbody a.govuk-link")]
+        assert "SpecialTestFund_XYZ123" in fund_links
+
+        # Test 5: No matches
+        response = flask_test_client.get("/grants/?search=NoMatchingFundHere")
+        soup = BeautifulSoup(response.data, "html.parser")
+        rows = soup.select("tbody tr")
+        assert len(rows) == 0
+
+    finally:
+        # Clean up test data
+        _db.session.delete(test_fund)
+        _db.session.commit()
