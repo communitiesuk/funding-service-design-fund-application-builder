@@ -53,6 +53,7 @@ variables:
   NOTIFICATION_SERVICE_HOST: http://fsd-notification:8080
   MAINTENANCE_MODE: false
   SENTRY_DSN: https://4128cfd691c439577e8f106968217f72@o1432034.ingest.us.sentry.io/4508496706666497
+  SENTRY_TRACES_SAMPLE_RATE: 0.02
 
 secrets:
   RSA256_PUBLIC_KEY_BASE64: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/RSA256_PUBLIC_KEY_BASE64
@@ -111,6 +112,7 @@ environments:
   uat:
     variables:
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.test.communities.gov.uk"
+      SENTRY_TRACES_SAMPLE_RATE: 1
     count:
       range: 2-4
       cooldown:
