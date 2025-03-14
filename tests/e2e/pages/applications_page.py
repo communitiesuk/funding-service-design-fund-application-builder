@@ -4,8 +4,8 @@ from tests.e2e.pages.page_base import PageBase
 
 
 class ApplicationsPage(PageBase):
-    def __init__(self, page: Page, base_url: str = None):
-        super().__init__(page, base_url)
+    def __init__(self, page: Page, base_url: str = None, metadata=None):
+        super().__init__(page, base_url=base_url, metadata=metadata)
         # Initialize locators
         self.title = self.page.get_by_role("heading", name="Applications")
         self.create_new_application = self.page.get_by_role("button", name="Create new application")
@@ -19,11 +19,14 @@ class ApplicationsPage(PageBase):
         self.create_new_application.click()
         from tests.e2e.pages.select_grant_page import SelectGrantPage
 
-        return SelectGrantPage(self.page)
+        return SelectGrantPage(self.page, metadata=self.metadata)
 
     def then_verify_on_applications(self):
         expect(self.title).to_be_visible()
         return self
+
+    def and_verify_on_applications(self):
+        return self.then_verify_on_applications()
 
     def and_validate_application_success_message(self):
         banner = self.page.locator(".govuk-notification-banner--success")
