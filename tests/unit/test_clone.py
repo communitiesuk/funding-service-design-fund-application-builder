@@ -2,13 +2,14 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Component, ComponentType, Page
+from app.db.models import Component, ComponentType, Lizt, Page
 from app.db.models.application_config import Form, Section
 from app.db.models.round import Round
 from app.db.queries.clone import (
     _fix_cloned_default_pages,
     _initiate_cloned_component,
     _initiate_cloned_form,
+    _initiate_cloned_lizt,
     _initiate_cloned_page,
     _initiate_cloned_section,
     clone_multiple_components,
@@ -145,6 +146,29 @@ def test_initiate_cloned_component(mock_new_uuid):
 # =====================================================================================================================
 # These functions test the clone_XXX functions and DO use the db
 # =====================================================================================================================
+def test_clone_lizt_for_component(flask_test_client, _db):
+    items = [
+        {"text": "Paper or PDF copy", "value": "Paper or PDF copy"},
+        {"text": "Spreadsheet (for example, an Excel file)"},
+    ]
+
+    lizt_component: Lizt = Lizt(list_id=uuid4(), items=items, type="string", is_template=True, title="dataset formats")
+
+    old_id = lizt_component.list_id
+
+    _db.session.bulk_save_objects([lizt_component])
+    _db.session.commit()
+
+    assert _db.session.get(Lizt, old_id)
+
+    result = _initiate_cloned_lizt(lizt_component)
+    assert result
+    new_id = result.list_id
+    assert old_id != new_id
+    assert result.title == lizt_component.title
+    assert result.type == lizt_component.type
+    assert result.items == lizt_component.items
+    assert result.is_template is False
 
 
 def test_clone_single_component(flask_test_client, _db):

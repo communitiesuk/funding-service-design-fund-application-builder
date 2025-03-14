@@ -247,13 +247,8 @@ class Component(BaseModel):
         String(),
         nullable=True,  # None for display only fields
     )  # TODO add validation to make sure it's only letters, numbers and _
-    list_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("list.list_id"),
-        nullable=True,
-    )
-    list_id: Mapped[int | None] = mapped_column(ForeignKey("lizt.list_id"))
-    lizt: Mapped[Lizt | None] = relationship()  # back_populates="used_by")
+    list_id: Mapped[UUID | None] = mapped_column(ForeignKey("lizt.list_id"), nullable=True)
+    lizt: Mapped[Lizt | None] = relationship("Lizt")
 
     def __repr__(self):
         return f"Component({self.title}, {self.type.value})"
