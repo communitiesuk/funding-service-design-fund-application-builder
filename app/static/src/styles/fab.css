@@ -56,9 +56,11 @@
     margin-bottom: 0;
 }
 
-.app-task-list__task-actions {
-    display: inline;
+.app-task-list__task-actions, .flex-align-center {
+    align-items: center;
+    display: flex;
 }
+
 .app-task-list__section {
     display:inline;
 }
@@ -89,11 +91,6 @@
 
 #template_id {
     width: 100%;
-}
-
-.flex-align-center {
-    align-items: center;
-    display: flex;
 }
 
 #select-template-group .govuk-form-group {

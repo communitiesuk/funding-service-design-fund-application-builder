@@ -32,7 +32,7 @@
                 <span class="app-task-list__task-name">
                     <h3 class="govuk-heading-m">{{ section.index }}. {{ section.name_in_apply_json["en"] }}</h3>
                 </span>
-                <span class="app-task-list__task-actions flex-align-center">
+                <span class="app-task-list__task-actions">
                     {% if round.status == 'In progress' %}
                         {% if section.index == round.sections | length %}
                             <span class="govuk-!-font-size-19 govuk-!-margin-right-2 disabled-link">Down</span>
@@ -64,7 +64,7 @@
                                 </a>
                             </h3>
                         </span>
-                        <span class="app-task-list__task-actions flex-align-center">
+                        <span class="app-task-list__task-actions">
                             <a class="govuk-link--no-visited-state govuk-!-font-size-19" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions</a>
                         </span>
                     </li>
