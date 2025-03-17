@@ -32,7 +32,7 @@ jobs:
       db_name: fab_store_test
 
   paketo_build:
-    needs: [ setup ]
+    needs: [ setup, unit_tests ]
     permissions:
       packages: write
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/package.yml@main
@@ -43,7 +43,7 @@ jobs:
       assets_required: true
 
   dev_deploy:
-    needs: [ unit_tests, paketo_build, setup ]
+    needs: [ paketo_build ]
     if: ${{ contains(fromJSON(needs.setup.outputs.jobs_to_run), 'dev') }}
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
@@ -66,7 +66,7 @@ jobs:
     secrets: inherit # pragma: allowlist secret
 
   test_deploy:
-    needs: [ paketo_build, setup ]
+    needs: [ paketo_build ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'test') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
@@ -91,7 +91,7 @@ jobs:
     secrets: inherit # pragma: allowlist secret
 
   uat_deploy:
-    needs: [ test_e2e_test, test_deploy, paketo_build, setup ]
+    needs: [ test_e2e_test ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'uat') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
