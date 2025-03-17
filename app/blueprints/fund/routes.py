@@ -34,7 +34,14 @@ def view_all_funds():
     """
     Renders list of grants in the grant page
     """
-    return render_template("view_all_funds.html", pagination=get_paginated_funds(page=int(request.args.get("page", 1))))
+    search_term = request.args.get("search", "")
+    page = int(request.args.get("page", 1))
+
+    return render_template(
+        "view_all_funds.html",
+        pagination=get_paginated_funds(page=page, search_term=search_term),
+        search_term=search_term,
+    )
 
 
 @fund_bp.route("/<uuid:fund_id>", methods=["GET"])

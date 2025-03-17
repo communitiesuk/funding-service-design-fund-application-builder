@@ -109,3 +109,8 @@
     margin-bottom: 2px;
     margin-left: 15px;
 }
+
+#search-bar-right {
+    display: flex;
+    align-items: center;
+}
