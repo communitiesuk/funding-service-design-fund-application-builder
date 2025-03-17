@@ -1,7 +1,14 @@
 from uuid import uuid4
 
 from app.db import db
-from app.db.models import Component, Form, Page, Round, Section
+from app.db.models import Component, Form, Lizt, Page, Round, Section
+
+
+def _initiate_cloned_lizt(to_clone: Lizt) -> Lizt:
+    clone = Lizt(**to_clone.as_dict())
+    clone.list_id = uuid4()
+    clone.is_template = False
+    return clone
 
 
 def _initiate_cloned_component(to_clone: Component, new_page_id=None, new_theme_id=None):
@@ -57,6 +64,7 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
     cloned_forms = []
     cloned_pages = []
     cloned_components = []
+    cloned_lizts = []
     # loop through forms in this section and clone each one
     for form_to_clone in section_to_clone.forms:
         cloned_form = _initiate_cloned_form(form_to_clone, clone.section_id, section_index=form_to_clone.section_index)
@@ -64,14 +72,16 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
         for page_to_clone in form_to_clone.pages:
             cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=cloned_form.form_id)
             cloned_pages.append(cloned_page)
-            # clone the components on this page
-            cloned_components.extend(
-                _initiate_cloned_components_for_page(page_to_clone.components, cloned_page.page_id)
+            # clone the components and lizts for component on this page
+            cloned_component_list_for_page, cloned_lizts_for_page = _initiate_cloned_components_for_page(
+                page_to_clone.components, cloned_page.page_id
             )
+            cloned_components.extend(cloned_component_list_for_page)
+            cloned_lizts.extend(cloned_lizts_for_page)
 
         cloned_forms.append(cloned_form)
 
-    db.session.add_all([clone, *cloned_forms, *cloned_pages, *cloned_components])
+    db.session.add_all([clone, *cloned_forms, *cloned_pages, *cloned_components, *cloned_lizts])
     cloned_pages = _fix_cloned_default_pages(cloned_pages)
     db.session.commit()
 
@@ -100,11 +110,16 @@ def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> For
 
     cloned_pages = []
     cloned_components = []
+    cloned_lizts = []
     for page_to_clone in form_to_clone.pages:
         cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=clone.form_id)
         cloned_pages.append(cloned_page)
-        cloned_components.extend(_initiate_cloned_components_for_page(page_to_clone.components, cloned_page.page_id))
-    db.session.add_all([clone, *cloned_pages, *cloned_components])
+        cloned_component_list_for_page, cloned_lizt_per_page = _initiate_cloned_components_for_page(
+            page_to_clone.components, cloned_page.page_id
+        )
+        cloned_components.extend(cloned_component_list_for_page)
+        cloned_lizts.extend(cloned_lizt_per_page)
+    db.session.add_all([clone, *cloned_pages, *cloned_components, *cloned_lizts])
     cloned_pages = _fix_cloned_default_pages(cloned_pages)
     db.session.commit()
 
@@ -115,20 +130,28 @@ def _initiate_cloned_components_for_page(
     components_to_clone: list[Component], new_page_id: str = None, new_theme_id: str = None
 ):
     cloned_components = []
+    cloned_lizts = []
     for component_to_clone in components_to_clone:
         cloned_component = _initiate_cloned_component(
             component_to_clone, new_page_id=new_page_id, new_theme_id=None
         )  # TODO how should themes work when cloning?
+        if component_to_clone.list_id:
+            # clone lizt if component has a lizt and map it cloned component
+            cloned_lizt = _initiate_cloned_lizt(component_to_clone.lizt)
+            cloned_component.list_id = cloned_lizt.list_id
+            cloned_lizts.append(cloned_lizt)
         cloned_components.append(cloned_component)
-    return cloned_components
+    return cloned_components, cloned_lizts
 
 
 def clone_single_page(page_id: str, new_form_id=None) -> Page:
     page_to_clone: Page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
     clone = _initiate_cloned_page(page_to_clone, new_form_id)
 
-    cloned_components = _initiate_cloned_components_for_page(page_to_clone.components, new_page_id=clone.page_id)
-    db.session.add_all([clone, *cloned_components])
+    cloned_components, cloned_lizts = _initiate_cloned_components_for_page(
+        page_to_clone.components, new_page_id=clone.page_id
+    )
+    db.session.add_all([clone, *cloned_components, *cloned_lizts])
     db.session.commit()
 
     return clone
@@ -139,6 +162,12 @@ def clone_single_component(component_id: str, new_page_id=None, new_theme_id=Non
         db.session.query(Component).where(Component.component_id == component_id).one_or_none()
     )
     clone = _initiate_cloned_component(component_to_clone, new_page_id, new_theme_id)
+    if component_to_clone.list_id:
+        # clone lizt if component has a lizt and map it cloned component
+        cloned_lizt = _initiate_cloned_lizt(component_to_clone.lizt)
+        clone.list_id = cloned_lizt.list_id
+        db.session.add(cloned_lizt)
+        db.session.commit()
 
     db.session.add(clone)
     db.session.commit()
