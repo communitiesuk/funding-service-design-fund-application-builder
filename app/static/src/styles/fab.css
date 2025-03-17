@@ -87,16 +87,11 @@
     flex: 1;
 }
 
-.app-task-list__task-actions {
-    align-items: center;
-    display: flex;
-}
-
 #template_id {
     width: 100%;
 }
 
-#select-template-group {
+.flex-align-center {
     align-items: center;
     display: flex;
 }
@@ -108,9 +103,4 @@
 #select-template-group .govuk-button {
     margin-bottom: 2px;
     margin-left: 15px;
-}
-
-#search-bar-right {
-    display: flex;
-    align-items: center;
 }

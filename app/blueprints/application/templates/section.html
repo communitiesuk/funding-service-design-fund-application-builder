@@ -55,7 +55,7 @@
                                         </a>
                                     </h3>
                                 </span>
-                                <span class="app-task-list__task-actions">
+                                <span class="app-task-list__task-actions flex-align-center">
                                     {% if app_form.section_index == forms_in_section | length %}
                                         <span class="govuk-!-font-size-19 govuk-!-margin-right-2 disabled-link">Down</span>
                                     {% else %}
@@ -78,7 +78,7 @@
             </div>
             <div class="govuk-grid-row">
                 <div class="govuk-grid-column-full">
-                    <div id="select-template-group">
+                    <div class="flex-align-center" id="select-template-group">
                         {{ form.template_id() }}
                         {{ form.add_form() }}
                     </div>
