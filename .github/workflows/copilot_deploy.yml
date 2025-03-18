@@ -59,14 +59,14 @@ jobs:
     # Do not run these against the prod environment without addressing the auth/JWT self-signing done by e2e tests.
     if: ${{ contains(fromJSON(needs.setup.outputs.jobs_to_run), 'dev') && (github.event_name == 'push' || inputs.run_e2e_tests == true) }}
     name: Run E2E Dev
-    needs: [ dev_deploy ]
+    needs: [ dev_deploy, setup ]
     uses: ./.github/workflows/test_e2e_aws.yml
     with:
       environment: 'dev'
     secrets: inherit # pragma: allowlist secret
 
   test_deploy:
-    needs: [ paketo_build ]
+    needs: [ paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'test') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
@@ -84,14 +84,14 @@ jobs:
     # Do not run these against the prod environment without addressing the auth/JWT self-signing done by e2e tests.
     if: ${{ contains(fromJSON(needs.setup.outputs.jobs_to_run), 'test') && (github.event_name == 'push' || inputs.run_e2e_tests == true) }}
     name: Run E2E Test
-    needs: [ test_deploy ]
+    needs: [ test_deploy, setup ]
     uses: ./.github/workflows/test_e2e_aws.yml
     with:
       environment: 'test'
     secrets: inherit # pragma: allowlist secret
 
   uat_deploy:
-    needs: [ test_e2e_test ]
+    needs: [ test_e2e_test, paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'uat') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
