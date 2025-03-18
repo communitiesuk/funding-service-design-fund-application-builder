@@ -16,20 +16,16 @@ class EditSectionPage(PageBase):
 
     def when_add_template(self):
         self.add_a_task.wait_for(state="visible")
-        options = [
+        task_options = [
             {"label": opt.text_content(), "value": opt.get_attribute("value")}
             for opt in self.add_a_task.locator("option").all()[1:]
         ]
-        template_name = self.metadata.get("template_name") if self.metadata else None
-        selected_template = next(
-            (
-                opt
-                for opt in options
-                if template_name and template_name.lower() in (opt["label"] + opt["value"]).lower()
-            ),
-            random.choice(options),
-        )
-        self.add_a_task.select_option(value=selected_template["value"])
+        template_name = self.metadata.get("template_name")
+        available_template_names = [option["value"] for option in task_options]
+        if template_name and template_name in available_template_names:
+            self.add_a_task.select_option(value=template_name)
+        else:
+            self.add_a_task.select_option(value=random.choice(task_options)["value"])
         return self
 
     def when_click_add(self):

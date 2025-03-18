@@ -62,5 +62,6 @@ def test_e2e_grant_creation_to_application_completion_flow(page: Page, domains: 
         # mark application complete
         .when_click_mark_application_complete()
         .then_verify_on_application_complete()
-        .and_verify_download()
+        .when_click_download()
+        .then_validate_download_success()
     )
