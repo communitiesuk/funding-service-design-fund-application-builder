@@ -16,25 +16,20 @@ class EditSectionPage(PageBase):
 
     def when_add_template(self):
         self.add_a_task.wait_for(state="visible")
-        task_options = [
-            {"label": option.text_content(), "value": option.get_attribute("value")}
-            for option in self.add_a_task.locator("option").all()[1:]
+        options = [
+            {"label": opt.text_content(), "value": opt.get_attribute("value")}
+            for opt in self.add_a_task.locator("option").all()[1:]
         ]
-        if self.metadata and self.metadata.get("template_name") is None:
-            selected_task = random.choice(task_options)
-        else:
-            matching_tasks = [
-                option
-                for option in task_options
-                if self.metadata.get("template_name").lower() in option["label"].lower()
-                or self.metadata.get("template_name").lower() in option["value"].lower()
-            ]
-            if not matching_tasks:
-                raise ValueError(
-                    f"Error: Template '{self.metadata.get('template_name')}' not found. No matching template available."
-                )
-            selected_task = matching_tasks[0]
-        self.add_a_task.select_option(value=selected_task["value"])
+        template_name = self.metadata.get("template_name") if self.metadata else None
+        selected_template = next(
+            (
+                opt
+                for opt in options
+                if template_name and template_name.lower() in (opt["label"] + opt["value"]).lower()
+            ),
+            random.choice(options),
+        )
+        self.add_a_task.select_option(value=selected_template["value"])
         return self
 
     def when_click_add(self):

@@ -80,5 +80,21 @@ class BuildApplicationPage(PageBase):
         assert application_link_name == f"View {application_name_metadata}"
         return self
 
+    def and_validate_section_added_success_message(self):
+        banner = self.page.locator(".govuk-notification-banner--success")
+        expect(banner.get_by_role("heading", name="Section added")).to_be_visible()
+        return self
+
+    def and_validate_section_updated_success_message(self):
+        banner = self.page.locator(".govuk-notification-banner--success")
+        expect(banner.get_by_role("heading", name="Section updated")).to_be_visible()
+        return self
+
+    def and_validate_sections_are_available(self):
+        assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
+        for section in self.metadata.get("sections"):
+            expect(self.page.get_by_role("heading", name=section)).to_be_visible()
+        return self
+
     def and_verify_on_build_application(self):
         return self.then_verify_on_build_application()

@@ -26,11 +26,11 @@ class UploadNewTemplatePage(PageBase):
 
     def when_click_upload_file(self):
         """Clicks the 'Upload a file' button."""
-        _template = str(Path(__file__).parent.parent) + "/fixtures/dataset-information.json"
+        _template = str(Path(__file__).parent.parent) + "/fixtures/example-template.json"
         self.upload_file.set_input_files(_template)
         return self
 
-    def when_adding_template_details(self):
+    def when_fill_template_details(self):
         template_name_txt = f"E2E-{self.fake.name()}"
         self.update_metadata("template_name", template_name_txt)
         self.template_name.fill(template_name_txt)
