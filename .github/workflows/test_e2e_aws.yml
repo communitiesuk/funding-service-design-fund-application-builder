@@ -23,13 +23,13 @@ jobs:
       id-token: write # This is required for requesting the JWT
       contents: read  # This is required for actions/checkout
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v1.47.0-noble
+    container: mcr.microsoft.com/playwright:v1.47.0-noble@sha256:3d41153494e2b12a5a5fa6e26cf1e854c3997d13758754d46e7bf902b5ba09b1
     environment: ${{ inputs.environment }}
     steps:
       - name: Checkout e2e tests
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5
         with:
           enable-cache: true
       - name: Get current date
@@ -37,7 +37,7 @@ jobs:
         id: currentdatetime
         run: echo "datetime=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
       - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT }}:role/GithubCopilotDeploy
           role-session-name: COPILOT_${{ inputs.environment }}_FAB_${{ steps.currentdatetime.outputs.datetime }}
