@@ -62,11 +62,13 @@ class BuildApplicationPage(PageBase):
         return self
 
     def then_verify_section_gone_down(self):
+        expect(self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2")).to_be_visible()
         first_section = self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2").all()[1]
         first_section.get_by_role("heading", name=self.metadata.get("sections")[0]).is_visible()
         return self
 
     def then_verify_section_gone_up(self):
+        expect(self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2")).to_be_visible()
         first_section = self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2").all()[0]
         first_section.get_by_role("heading", name=self.metadata.get("sections")[0]).is_visible()
         return self
