@@ -8,8 +8,8 @@ from tests.e2e.pages.page_base import PageBase
 
 
 class CreateGrantPage(PageBase):
-    def __init__(self, page: Page, base_url: str = None):
-        super().__init__(page, base_url)
+    def __init__(self, page: Page, base_url: str = None, metadata=None):
+        super().__init__(page, base_url=base_url, metadata=metadata)
         # Initialize locators
         self.title = self.page.get_by_role("heading", name="Add a new grant")
         self.is_welsh: Locator = self.page.get_by_role("group", name="Is this grant available in Welsh?")
@@ -26,9 +26,10 @@ class CreateGrantPage(PageBase):
 
     def when_fill_non_welsh_competitive_grant_details(self):
         """Fills in the grant form with fake competitive grant details."""
-        self.grant_name = f"E2E-{self.fake.company()}"
+        grant_name = f"E2E-{self.fake.company()}"
+        self.update_metadata("grant_name", grant_name)
         self._select_is_welsh("No")
-        self.grant_name_tb.fill(self.grant_name)
+        self.grant_name_tb.fill(grant_name)
         self.grant_short_name.fill("".join(random.choices(string.ascii_letters + string.digits, k=6)))
         self.application_name.fill(self.fake.bs())
         self.grant_description.fill(self.fake.paragraph())
@@ -43,7 +44,14 @@ class CreateGrantPage(PageBase):
             return self
         from tests.e2e.pages.dashboard_page import DashboardPage
 
-        return DashboardPage(self.page)
+        return DashboardPage(self.page, metadata=self.metadata)
+
+    def when_click_save_and_continue(self):
+        """Clicks the 'Save and continue' button."""
+        self.save_and_continue.click()
+        from tests.e2e.pages.create_application_page import CreateApplicationPage
+
+        return CreateApplicationPage(self.page, metadata=self.metadata)
 
     def then_verify_on_create_grant(self):
         expect(self.title).to_be_visible()
