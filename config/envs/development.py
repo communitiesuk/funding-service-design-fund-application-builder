@@ -33,7 +33,7 @@ class DevelopmentConfig(Config):
     DEBUG_USER_ACCOUNT_ID = "00000000-0000-0000-0000-000000000000"
 
     # Flask-DebugToolabr
-    DEBUG_TB_ENABLED = True
+    DEBUG_TB_ENABLED = getenv("DEBUG_TB_ENABLED", "true").lower() in ("true", "1", "t", "yes", "y")
     DEBUG_TB_INTERCEPT_REDIRECTS = False
 
     TALISMAN_SETTINGS = copy.deepcopy(Config.TALISMAN_SETTINGS)
