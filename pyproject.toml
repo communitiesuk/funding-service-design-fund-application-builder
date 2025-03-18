@@ -18,7 +18,7 @@ dependencies = [
     "jsonschema==4.23.0",
     "psycopg2-binary==2.9.10",
     "requests==2.32.3",
-    "sentry-sdk==2.22.0",
+    "sentry-sdk==2.23.1",
     "sqlalchemy[mypy]==2.0.39",
     "flask-debugtoolbar==0.16.0",
     #
