@@ -42,6 +42,7 @@ from app.export_config.generate_fund_round_form_jsons import (
 )
 from app.export_config.generate_fund_round_html import generate_all_round_html
 from app.shared.forms import SelectFundForm
+from app.shared.helpers import flash_message
 from config import Config
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -207,6 +208,7 @@ def section(round_id, section_id=None):
                         "name_in_apply_json": {"en": form.name_in_apply_en.data},
                     },
                 )
+                flash_message("Section updated")
             else:
                 insert_new_section(
                     {
@@ -215,7 +217,7 @@ def section(round_id, section_id=None):
                         "index": max(count_existing_sections + 1, 1),
                     }
                 )
-            # flash(f"Saved section {form.name_in_apply_en.data}")
+                flash_message("Section added")
             return redirect(url_for("application_bp.build_application", round_id=round_obj.round_id))
 
         # clone template json if Add button is clicked
