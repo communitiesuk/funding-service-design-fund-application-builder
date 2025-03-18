@@ -66,7 +66,12 @@ def context(
 ):
     e2e_env = get_e2e_params["e2e_env"]
     http_credentials = e2e_test_secrets.HTTP_BASIC_AUTH if e2e_env in {"dev", "test"} else None
-    return new_context(http_credentials=http_credentials)
+
+    viewport = {
+        "width": 1920,
+        "height": 1080,
+    }
+    return new_context(http_credentials=http_credentials, viewport=viewport)
 
 
 @pytest.fixture
