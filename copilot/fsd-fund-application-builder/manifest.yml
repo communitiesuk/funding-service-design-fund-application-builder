@@ -44,17 +44,16 @@ network:
 #
 # Pass environment variables as key value pairs.
 variables:
-  FUND_APPLICATION_BUILDER_HOST: "https://fund-application-builder.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
-  AUTHENTICATOR_HOST: "https://authenticator.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
+  FUND_APPLICATION_BUILDER_HOST: "https://fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
+  AUTHENTICATOR_HOST: "https://account.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
   FLASK_ENV: ${COPILOT_ENVIRONMENT_NAME}
-  FORM_RUNNER_EXTERNAL_HOST: "https://forms.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
-  FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.${COPILOT_ENVIRONMENT_NAME}.access-funding.test.levellingup.gov.uk"
   FORM_RUNNER_INTERNAL_HOST: "http://fsd-form-runner-adapter:3009"
   NOTIFICATION_SERVICE_HOST: http://fsd-notification:8080
   MAINTENANCE_MODE: false
   SENTRY_DSN: https://4128cfd691c439577e8f106968217f72@o1432034.ingest.us.sentry.io/4508496706666497
   SENTRY_TRACES_SAMPLE_RATE: 0.02
-
+  FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
+  FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
 secrets:
   RSA256_PUBLIC_KEY_BASE64: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/RSA256_PUBLIC_KEY_BASE64
   SECRET_KEY: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/SECRET_KEY
@@ -62,11 +61,6 @@ secrets:
 # You can override any of the values defined above by environment.
 environments:
   dev:
-    variables:
-      FUND_APPLICATION_BUILDER_HOST: "https://fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
-      AUTHENTICATOR_HOST: "https://account.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
-      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
-      FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
     count:
       spot: 1
     sidecars:
@@ -86,11 +80,6 @@ environments:
         path: /healthcheck
         port: 8080
   test:
-    variables:
-      FUND_APPLICATION_BUILDER_HOST: "https://fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
-      AUTHENTICATOR_HOST: "https://account.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
-      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
-      FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
     count:
       spot: 2
     sidecars:
@@ -111,6 +100,7 @@ environments:
         port: 8080
   uat:
     variables:
+      # UAT FAB deliberately points to Form Designer test environment.
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.test.communities.gov.uk"
       SENTRY_TRACES_SAMPLE_RATE: 1
     count:
