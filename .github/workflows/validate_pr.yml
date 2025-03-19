@@ -1,0 +1,54 @@
+name: Validate PR
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches-ignore: [ main ]
+
+jobs:
+  unit_tests:
+    name: Run unit tests
+    uses: communitiesuk/funding-service-design-workflows/.github/workflows/pre-deploy.yml@main
+    with:
+      postgres_unit_testing: true
+      db_name: fab_store_test
+
+  e2e_tests:
+    name: Run E2E tests
+    permissions:
+      id-token: write
+      contents: read
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.47.0-noble@sha256:3d41153494e2b12a5a5fa6e26cf1e854c3997d13758754d46e7bf902b5ba09b1
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: password # pragma: allowlist secret
+          POSTGRES_USER: postgres # pragma: allowlist secret
+          POSTGRES_DB: fab_store # pragma: allowlist secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test_user -d test_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - name: Install uv with Caching
+        uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5
+        with:
+          enable-cache: true
+      - name: Apply Database Migrations
+        run: uv run --frozen flask db upgrade
+        env:
+          DATABASE_URL: postgresql://postgres:password@postgres:5432/fab_store # pragma: allowlist secret
+      - name: Start Flask Application
+        run: uv run --frozen flask run --no-debugger --host 0.0.0.0 --port 8080 &
+        env:
+          DATABASE_URL: postgresql://postgres:password@postgres:5432/fab_store # pragma: allowlist secret
+          RSA256_PUBLIC_KEY_BASE64: "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZU1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTUFEQ0JpQUtCZ0hHYnRGMXlWR1crckNBRk9JZGFrVVZ3Q2Z1dgp4SEUzOGxFL2kwS1dwTXdkU0haRkZMWW5IakJWT09oMTVFaWl6WXphNEZUSlRNdkwyRTRRckxwcVlqNktFNnR2CkhyaHlQL041ZnlwU3p0OHZDajlzcFo4KzBrRnVjVzl6eU1rUHVEaXNZdG1rV0dkeEJta2QzZ3RZcDNtT0k1M1YKVkRnS2J0b0lGVTNzSWs1TkFnTUJBQUU9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==" # pragma: allowlist secret
+      - name: Execute End-to-End Tests
+        run: uv run --frozen pytest --e2e --e2e-env e2e
