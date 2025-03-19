@@ -1,7 +1,5 @@
 name: Validate PR
 on:
-  pull_request:
-    branches: [ main ]
   push:
     branches-ignore: [ main ]
 
@@ -12,6 +10,18 @@ jobs:
     with:
       postgres_unit_testing: true
       db_name: fab_store_test
+
+  paketo_build:
+    name: Package and build application
+    needs: [ unit_tests ]
+    permissions:
+      packages: write
+    uses: communitiesuk/funding-service-design-workflows/.github/workflows/package.yml@main
+    with:
+      version_to_build: sha-${{ github.sha }}
+      owner: ${{ github.repository_owner }}
+      application: funding-service-design-fund-application-builder
+      assets_required: true
 
   e2e_tests:
     name: Run E2E tests
