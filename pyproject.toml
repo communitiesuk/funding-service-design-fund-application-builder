@@ -57,7 +57,7 @@ dev = [
     "debugpy==1.8.13",
     "djlint==1.36.4",
     "invoke==2.2.0",
-    "pre-commit==4.1.0",
+    "pre-commit==4.2.0",
     "pytest-env==1.1.5",
     "pytest-html==4.1.1",
     "pytest-mock==3.14.0",
@@ -65,5 +65,5 @@ dev = [
     "python-dotenv==1.0.1",
     "ruff==0.11.0",
     "pytest-playwright==0.7.0",
-    "Faker==37.0.0",
+    "Faker==37.0.1",
 ]

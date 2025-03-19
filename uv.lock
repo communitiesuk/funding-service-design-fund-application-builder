@@ -324,14 +324,14 @@ wheels = [
 
 [[package]]
 name = "faker"
-version = "37.0.0"
+version = "37.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "tzdata" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/82/c6/6820408cdd87c11f1fbbd2349b05bbda28174d746e6d708ad0f0a934f9d7/faker-37.0.0.tar.gz", hash = "sha256:d2e4e2a30d459a8ec0ae52a552aa51c48973cb32cf51107dee90f58a8322a880", size = 1875487 }
+sdist = { url = "https://files.pythonhosted.org/packages/ad/ab/031aa33d72420f074aceaa77e262476d30992db8b9b1bb2bf5dc9fcd8418/faker-37.0.1.tar.gz", hash = "sha256:3a71763f28d796c1d770b90e6b7519d75120a84b5dc4cdd27237870cc0451ff7", size = 1875530 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c6/03/0ffcbc5ab352c266a648d029f79de54ca205c04661203d46a42e3f03492b/faker-37.0.0-py3-none-any.whl", hash = "sha256:2598f78b76710a4ed05e197dda5235be409b4c291ba5c9c7514989cfbc7a5144", size = 1918764 },
+    { url = "https://files.pythonhosted.org/packages/f3/ee/a01924560811622e742d4b9b2e796f481f5852a265515f3e5eab9b97af1e/faker-37.0.1-py3-none-any.whl", hash = "sha256:92bb009dcc708244b446be2f0c11a843fca90ea6e412a2addfef0cf2849c94f9", size = 1918376 },
 ]
 
 [[package]]
@@ -512,9 +512,9 @@ requires-dist = [
 dev = [
     { name = "debugpy", specifier = "==1.8.13" },
     { name = "djlint", specifier = "==1.36.4" },
-    { name = "faker", specifier = "==37.0.0" },
+    { name = "faker", specifier = "==37.0.1" },
     { name = "invoke", specifier = "==2.2.0" },
-    { name = "pre-commit", specifier = "==4.1.0" },
+    { name = "pre-commit", specifier = "==4.2.0" },
     { name = "pytest", specifier = "==8.3.5" },
     { name = "pytest-env", specifier = "==1.1.5" },
     { name = "pytest-html", specifier = "==4.1.1" },
@@ -846,7 +846,7 @@ wheels = [
 
 [[package]]
 name = "pre-commit"
-version = "4.1.0"
+version = "4.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cfgv" },
@@ -855,9 +855,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "virtualenv" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2a/13/b62d075317d8686071eb843f0bb1f195eb332f48869d3c31a4c6f1e063ac/pre_commit-4.1.0.tar.gz", hash = "sha256:ae3f018575a588e30dfddfab9a05448bfbd6b73d78709617b5a2b853549716d4", size = 193330 }
+sdist = { url = "https://files.pythonhosted.org/packages/08/39/679ca9b26c7bb2999ff122d50faa301e49af82ca9c066ec061cfbc0c6784/pre_commit-4.2.0.tar.gz", hash = "sha256:601283b9757afd87d40c4c4a9b2b5de9637a8ea02eaff7adc2d0fb4e04841146", size = 193424 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/43/b3/df14c580d82b9627d173ceea305ba898dca135feb360b6d84019d0803d3b/pre_commit-4.1.0-py2.py3-none-any.whl", hash = "sha256:d29e7cb346295bcc1cc75fc3e92e343495e3ea0196c9ec6ba53f49f10ab6ae7b", size = 220560 },
+    { url = "https://files.pythonhosted.org/packages/88/74/a88bf1b1efeae488a0c0b7bdf71429c313722d1fc0f377537fbe554e6180/pre_commit-4.2.0-py2.py3-none-any.whl", hash = "sha256:a009ca7205f1eb497d10b845e52c838a98b6cdd2102a6c8e4540e94ee75c58bd", size = 220707 },
 ]
 
 [[package]]
