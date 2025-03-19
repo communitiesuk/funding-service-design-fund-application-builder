@@ -233,7 +233,6 @@ class RoundForm(FlaskForm):
 
     def validate(self, extra_validators=None):
         form_status = super().validate(extra_validators)
-
         # Convert welsh_available string to boolean
         if isinstance(self.welsh_available.data, str):
             self.welsh_available.data = self.welsh_available.data == "True"
@@ -243,7 +242,29 @@ class RoundForm(FlaskForm):
             self.title_cy.errors.append("Enter the Welsh application round")
             form_status = False
 
-        return form_status
+        # Validate that the application closing date is after the opening date
+        if self.opens.data and self.deadline.data:
+            if self.deadline.data <= self.opens.data:
+                self.opens.errors.append(
+                    "The date the application round opens must be before the date the application closes"
+                )
+                self.deadline.errors.append(
+                    "The date the application round closes must be after the date the application opens"
+                )
+                form_status = False
+
+        # Validate that the assessment closing date is after the assessment start date
+        if self.assessment_start.data and self.assessment_deadline.data:
+            if self.assessment_deadline.data <= self.assessment_start.data:
+                self.assessment_start.errors.append(
+                    "The date the assessment opens must be before the date the assessment closes"
+                )
+                self.assessment_deadline.errors.append(
+                    "The date the assessment closes must be after the date the assessment opens"
+                )
+                form_status = False
+
+        return form_status  # Return True only if all validations pass
 
 
 class CloneRoundForm(FlaskForm):

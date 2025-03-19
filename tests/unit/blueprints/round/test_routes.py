@@ -433,3 +433,86 @@ def test_round_search_functionality(flask_test_client, _db):
         _db.session.delete(test_round)
         _db.session.delete(test_fund)
         _db.session.commit()
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_round_with_application_close_date_before_open_date(flask_test_client, seed_dynamic_data):
+    """
+    Tests that a round can be successfully created using the /rounds/create route
+    Verifies that the created round has the correct attributes
+    """
+    round_data_info = {
+        "opens": ["01", "10", "2024", "09", "00"],
+        "deadline": ["01", "09", "2024", "17", "00"],
+        "assessment_start": ["02", "12", "2024", "09", "00"],
+        "reminder_date": ["15", "11", "2024", "09", "00"],
+        "assessment_deadline": ["12", "12", "2024", "17", "00"],
+        "prospectus_link": "https://example.com/prospectus",
+        "privacy_notice_link": "https://example.com/privacy",
+        "contact_email": "contact@example.com",
+        "feedback_link": "https://example.com/feedback",
+        "project_name_field_id": 1,
+        "guidance_url": "https://example.com/guidance",
+    }
+    test_fund = seed_dynamic_data["funds"][0]
+    new_round_data = {
+        "fund_id": test_fund.fund_id,
+        "title_en": "New Round",
+        "short_name": "NR123",
+        "save_and_return_home": True,
+        **round_data_info,
+    }
+    url = f"/rounds/create?fund_id={test_fund.fund_id}"
+
+    response = submit_form(flask_test_client, url, new_round_data)
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+    expected = [
+        "The date the application round opens must be before the date the application closes",
+        "The date the application round closes must be after the date the application opens",
+    ]
+    error_messages = [li.get_text(strip=True) for li in soup.select(".govuk-error-summary__list li")]
+
+    assert error_messages == expected
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_create_round_with_assessment_close_date_before_open_date(flask_test_client, seed_dynamic_data):
+    """
+    Tests that a round can be successfully created using the /rounds/create route
+    Verifies that the created round has the correct attributes
+    """
+    round_data_info = {
+        "opens": ["01", "10", "2024", "09", "00"],
+        "deadline": ["11", "10", "2024", "17", "00"],
+        "assessment_start": ["02", "12", "2024", "09", "00"],
+        "reminder_date": ["15", "11", "2024", "09", "00"],
+        "assessment_deadline": ["9", "09", "2024", "17", "00"],
+        "prospectus_link": "https://example.com/prospectus",
+        "privacy_notice_link": "https://example.com/privacy",
+        "contact_email": "contact@example.com",
+        "feedback_link": "https://example.com/feedback",
+        "project_name_field_id": 1,
+        "guidance_url": "https://example.com/guidance",
+    }
+    test_fund = seed_dynamic_data["funds"][0]
+    new_round_data = {
+        "fund_id": test_fund.fund_id,
+        "title_en": "New Round",
+        "short_name": "NR123",
+        "save_and_return_home": True,
+        **round_data_info,
+    }
+    url = f"/rounds/create?fund_id={test_fund.fund_id}"
+
+    response = submit_form(flask_test_client, url, new_round_data)
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+    expected = [
+        "The date the assessment opens must be before the date the assessment closes",
+        "The date the assessment closes must be after the date the assessment opens",
+    ]
+    error_messages = [li.get_text(strip=True) for li in soup.select(".govuk-error-summary__list li")]
+    assert error_messages == expected
