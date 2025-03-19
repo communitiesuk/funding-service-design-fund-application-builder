@@ -18,6 +18,7 @@ on:
         type: boolean
         description: Run e2e tests after deployment
   push:
+    branches: [ main ]
 
 jobs:
   setup:
