@@ -15,7 +15,7 @@ def pytest_addoption(parser):
         action="store",
         default="local",
         help="choose the environment that e2e tests will target",
-        choices=("local", "dev", "test"),
+        choices=("local", "dev", "test", "e2e"),
     )
 
 

@@ -21,7 +21,7 @@ def get_e2e_params(request):
     e2e_env = request.config.getoption("e2e_env", "local")
     vault_profile = request.config.getoption("e2e_aws_vault_profile", None)
     session_token_from_env = os.getenv("AWS_SESSION_TOKEN", None)
-    if not session_token_from_env and e2e_env != "local" and not vault_profile:
+    if not session_token_from_env and e2e_env != "local" and e2e_env != "e2e" and not vault_profile:
         sys.exit("Must supply e2e-aws-vault-profile with e2e-env")
     yield {
         "e2e_env": e2e_env,
@@ -41,6 +41,11 @@ def domains(request: pytest.FixtureRequest, get_e2e_params) -> FabDomains:
         case "local":
             return FabDomains(
                 fab_url="https://fund-application-builder.levellingup.gov.localhost:3011",
+                cookie_domain=".levellingup.gov.localhost",
+            )
+        case "e2e":
+            return FabDomains(
+                fab_url="http://fund-application-builder.levellingup.gov.localhost:8080",
                 cookie_domain=".levellingup.gov.localhost",
             )
         case "dev":
@@ -79,7 +84,7 @@ def e2e_test_secrets(request: pytest.FixtureRequest, get_e2e_params) -> EndToEnd
     e2e_env = get_e2e_params["e2e_env"]
     e2e_aws_vault_profile = get_e2e_params["e2e_aws_vault_profile"]
 
-    if e2e_env == "local":
+    if e2e_env == "local" or e2e_env == "e2e":
         return LocalEndToEndSecrets()
 
     if e2e_env in {"dev", "test"}:
