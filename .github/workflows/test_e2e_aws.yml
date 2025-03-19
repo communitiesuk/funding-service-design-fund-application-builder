@@ -23,7 +23,7 @@ jobs:
       id-token: write # This is required for requesting the JWT
       contents: read  # This is required for actions/checkout
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v1.47.0-noble@sha256:3d41153494e2b12a5a5fa6e26cf1e854c3997d13758754d46e7bf902b5ba09b1
+    container: mcr.microsoft.com/playwright:v1.51.1-noble@sha256:146d046a8d79a1b3a87596c4457b0b1c47f811bf4fc2cc1b99e873ae7f1cbbbd
     environment: ${{ inputs.environment }}
     steps:
       - name: Checkout e2e tests
