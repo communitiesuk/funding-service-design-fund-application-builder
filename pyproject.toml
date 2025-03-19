@@ -66,4 +66,5 @@ dev = [
     "ruff==0.11.0",
     "pytest-playwright==0.7.0",
     "Faker==37.0.1",
+    "playwright==1.51.1",
 ]
