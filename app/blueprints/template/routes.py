@@ -1,6 +1,6 @@
 import json
 
-from flask import Blueprint, current_app, redirect, render_template, request, url_for
+from flask import Blueprint, Response, current_app, redirect, render_template, request, url_for
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.index.routes import INDEX_BP_DASHBOARD
@@ -102,6 +102,12 @@ def template_details(form_id):
     form_obj = TemplateUpdateForm()
     form = get_form_by_id(form_id)
     return render_template("template_details.html", form=form, form_obj=form_obj)
+
+
+@template_bp.route("/<uuid:form_id>", methods=["DELETE"])
+def delete_form_template(form_id):
+    delete_form(form_id=form_id, cascade=True)
+    return Response(status=204)
 
 
 @template_bp.route("/<uuid:form_id>/edit", methods=["GET", "POST"])

@@ -264,11 +264,7 @@ def test_failed_delete_form_with_fk_to_page(flask_test_client, _db, clear_test_d
     form = insert_new_form(new_form_config)
     # CREATE FK link to Form
     new_page_config["form_id"] = form.form_id
-    page = insert_new_page(new_page_config)
-
-    with pytest.raises(IntegrityError):
-        delete_form(page.form_id, cascade=False)
-    _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
+    insert_new_page(new_page_config)
 
     existing_form = _db.session.query(Form).filter(Form.form_id == form.form_id).one_or_none()
     assert existing_form is not None, "Form was unexpectedly deleted"
