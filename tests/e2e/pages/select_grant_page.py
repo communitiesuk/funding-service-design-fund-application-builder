@@ -36,7 +36,7 @@ class SelectGrantPage(PageBase):
 
     def when_click_continue(self):
         self.continue_btn.click()
-        return CreateApplicationPage(self.page, metadata=self.metadata)
+        return CreateApplicationPage(self.page, base_url=self.base_url, metadata=self.metadata)
 
     def then_verify_on_select_grant(self):
         expect(self.select_grant).to_be_visible()

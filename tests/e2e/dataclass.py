@@ -11,3 +11,4 @@ class Account:
 class FabDomains:
     fab_url: str
     cookie_domain: str
+    environment: str

@@ -257,12 +257,18 @@ def delete_form(form_id, cascade: bool = False):
 
     """
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    if cascade:
-        _delete_all_components_in_pages(page_ids=[p.page_id for p in form.pages])
-        _delete_all_pages_in_forms(form_ids=[form_id])
-    db.session.delete(form)
-    db.session.commit()
-    return form
+    if not form:
+        raise ValueError(f"Form template with id {Form.form_id} not found")
+    try:
+        if cascade:
+            _delete_all_components_in_pages(page_ids=[p.page_id for p in form.pages])
+            _delete_all_pages_in_forms(form_ids=[form_id])
+        db.session.delete(form)
+        db.session.commit()
+        return form
+    except Exception as e:
+        db.session.rollback()
+        print(f"Failed to delete form template {Form.form_id} : Error {e}")
 
 
 # CRUD PAGE

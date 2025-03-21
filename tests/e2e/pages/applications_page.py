@@ -19,7 +19,7 @@ class ApplicationsPage(PageBase):
         self.create_new_application.click()
         from tests.e2e.pages.select_grant_page import SelectGrantPage
 
-        return SelectGrantPage(self.page, metadata=self.metadata)
+        return SelectGrantPage(self.page, base_url=self.base_url, metadata=self.metadata)
 
     def then_verify_on_applications(self):
         expect(self.title).to_be_visible()

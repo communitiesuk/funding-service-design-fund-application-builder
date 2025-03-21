@@ -16,7 +16,7 @@ class BuildApplicationPage(PageBase):
 
         from tests.e2e.pages.create_section_page import CreateSectionPage
 
-        return CreateSectionPage(self.page, metadata=self.metadata)
+        return CreateSectionPage(self.page, base_url=self.base_url, metadata=self.metadata)
 
     def when_click_edit_first_section(self):
         assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
@@ -29,13 +29,13 @@ class BuildApplicationPage(PageBase):
 
         from tests.e2e.pages.edit_section_page import EditSectionPage
 
-        return EditSectionPage(self.page, metadata=self.metadata)
+        return EditSectionPage(self.page, base_url=self.base_url, metadata=self.metadata)
 
     def when_click_mark_application_complete(self):
         self.mark_application_complete.click()
         from tests.e2e.pages.application_complete_page import CompleteApplicationPage
 
-        return CompleteApplicationPage(self.page, metadata=self.metadata)
+        return CompleteApplicationPage(self.page, base_url=self.base_url, metadata=self.metadata)
 
     def then_verify_on_build_application(self):
         expect(self.title).to_be_visible()
@@ -44,6 +44,7 @@ class BuildApplicationPage(PageBase):
     def when_click_down_on_section(self):
         assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
         task_element = self.page.get_by_role("heading", name=self.metadata.get("sections")[0])
+        expect(task_element).to_be_visible()
         task_parent = task_element.locator("xpath=ancestor::li")
         expect(task_parent).to_be_visible()
         down_link = task_parent.get_by_role("link", name="Down")
