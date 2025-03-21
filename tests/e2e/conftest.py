@@ -76,7 +76,7 @@ def context(
         "width": 1920,
         "height": 1080,
     }
-    return new_context(http_credentials=http_credentials, viewport=viewport)
+    return new_context(http_credentials=http_credentials, viewport=viewport, ignore_https_errors=True)
 
 
 @pytest.fixture
@@ -156,7 +156,8 @@ def created_grant(page: Page, domains: FabDomains, user_auth):
         .given_user_is_on_dashboard()
         .when_click_add_a_new_grant()
         .when_fill_non_welsh_competitive_grant_details()
-        .when_click_save_and_return_home(return_self=True)
+        .when_click_save_and_return_home()
+        .and_validate_grant_success_message()
     )
 
 

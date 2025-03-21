@@ -37,21 +37,19 @@ class CreateGrantPage(PageBase):
         self.ggis_field.fill(self.fake.uuid4())
         return self
 
-    def when_click_save_and_return_home(self, return_self=False):
+    def when_click_save_and_return_home(self):
         """Clicks the 'Save and return home' button."""
         self.save_and_return_home.click()
-        if return_self:
-            return self
         from tests.e2e.pages.dashboard_page import DashboardPage
 
-        return DashboardPage(self.page, metadata=self.metadata)
+        return DashboardPage(self.page, base_url=self.base_url, metadata=self.metadata)
 
     def when_click_save_and_continue(self):
         """Clicks the 'Save and continue' button."""
         self.save_and_continue.click()
         from tests.e2e.pages.create_application_page import CreateApplicationPage
 
-        return CreateApplicationPage(self.page, metadata=self.metadata)
+        return CreateApplicationPage(self.page, base_url=self.base_url, metadata=self.metadata)
 
     def then_verify_on_create_grant(self):
         expect(self.title).to_be_visible()
