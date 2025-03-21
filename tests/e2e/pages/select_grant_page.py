@@ -2,7 +2,6 @@ import random
 
 from playwright.sync_api import Locator, Page, expect
 
-from tests.e2e.pages.create_application_page import CreateApplicationPage
 from tests.e2e.pages.page_base import PageBase
 
 
@@ -36,7 +35,17 @@ class SelectGrantPage(PageBase):
 
     def when_click_continue(self):
         self.continue_btn.click()
+        return self
+
+    def then_expect_create_application(self):
+        from tests.e2e.pages.create_application_page import CreateApplicationPage
+
         return CreateApplicationPage(self.page, metadata=self.metadata)
+
+    def then_expect_select_application(self):
+        from tests.e2e.pages.select_application_page import SelectApplicationPage
+
+        return SelectApplicationPage(self.page, metadata=self.metadata)
 
     def then_verify_on_select_grant(self):
         expect(self.select_grant).to_be_visible()
