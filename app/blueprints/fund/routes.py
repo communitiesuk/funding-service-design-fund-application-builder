@@ -1,16 +1,10 @@
 from datetime import datetime
 
-from flask import (
-    Blueprint,
-    redirect,
-    render_template,
-    request,
-    url_for,
-)
+from flask import Blueprint, Response, redirect, render_template, request, url_for
 
 from app.blueprints.fund.forms import FundForm
 from app.db.models.fund import Fund, FundingType
-from app.db.queries.fund import add_fund, get_fund_by_id, get_paginated_funds, update_fund
+from app.db.queries.fund import add_fund, delete_selected_fund, get_fund_by_id, get_paginated_funds, update_fund
 from app.shared.helpers import flash_message
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -52,6 +46,12 @@ def view_fund_details(fund_id):
     form = FundForm()
     fund = get_fund_by_id(fund_id)
     return render_template("fund_details.html", form=form, fund=fund)
+
+
+@fund_bp.route("/<uuid:fund_id>", methods=["DELETE"])
+def delete_fund(fund_id):
+    delete_selected_fund(fund_id)
+    return Response(status=204)
 
 
 def _create_fund_get_previous_url(actions):
