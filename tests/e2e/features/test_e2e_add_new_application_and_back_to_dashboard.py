@@ -25,7 +25,8 @@ def test_add_application_from_dashboard_view(page: Page, domains: FabDomains, us
             .and_validate_application_success_message()
         )
     finally:
-        HttpClient().delete(created_grant, "grants")
+        if domains.environment != "e2e":
+            HttpClient().delete(created_grant, "grants")
 
 
 # TC-003-[2]: Add application from applications page and comeback dashboard
@@ -48,7 +49,8 @@ def test_add_application_from_applications_page_and_goback_dashboard(
             .and_validate_application_success_message()
         )
     finally:
-        HttpClient().delete(created_grant, "grants")
+        if domains.environment != "e2e":
+            HttpClient().delete(created_grant, "grants")
 
 
 # TC-003-[3]: Add application from applications page and comeback applications page
@@ -72,4 +74,5 @@ def test_add_application_from_applications_page_and_goback_application_page(
             .and_validate_application_success_message()
         )
     finally:
-        HttpClient().delete(created_grant, "grants")
+        if domains.environment != "e2e":
+            HttpClient().delete(created_grant, "grants")
