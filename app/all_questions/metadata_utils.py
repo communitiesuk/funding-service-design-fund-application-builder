@@ -500,8 +500,8 @@ def generate_print_headings_for_page(
         is_form_heading (bool, optional): Whether or not this is the heading for the entire form. Defaults to False.
     """
     page_path = page["path"]
-    # If we've already done this page, don't do it again
-    if page_path not in pages_to_do:
+    # If we've already done this page, don't do it again or skip if page is summary page
+    if page_path not in pages_to_do or "summary.js" in form_json_page.get("controller", ""):
         return
 
     title = strip_leading_numbers(form_json_page["title"])
