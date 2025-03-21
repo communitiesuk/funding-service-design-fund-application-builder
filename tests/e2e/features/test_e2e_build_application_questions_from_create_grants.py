@@ -69,5 +69,6 @@ def test_e2e_grant_creation_to_application_completion_flow(page: Page, domains: 
             .then_validate_download_success()
         )
     finally:
-        HttpClient().delete(output, "grants")
-        HttpClient().delete(output, "templates")
+        if domains.environment != "e2e":
+            HttpClient().delete(output, "grants")
+            HttpClient().delete(output, "templates")
