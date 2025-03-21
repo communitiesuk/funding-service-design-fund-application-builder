@@ -1,5 +1,6 @@
 import random
 import string
+from datetime import datetime, timedelta
 
 from playwright.sync_api import Locator, Page, expect
 
@@ -34,11 +35,12 @@ class CreateApplicationPage(PageBase):
         self.update_metadata("application_name", application_name)
         self.application_round.fill(application_name)
         self.round_short_name.fill("".join(random.choices(string.ascii_letters + string.digits, k=6)))
-        self._fill_date_time_field(self.application_round_open)
-        self._fill_date_time_field(self.application_round_close)
+        # Ensure date logic consistency using Faker
+        application_open = self._fill_date_time_field(self.application_round_open)
+        self._fill_date_time_field(self.application_round_close, after_date=application_open)
         self._fill_date_time_field(self.application_reminder)
-        self._fill_date_time_field(self.assessment_open)
-        self._fill_date_time_field(self.assessment_close)
+        assessment_open = self._fill_date_time_field(self.assessment_open)
+        self._fill_date_time_field(self.assessment_close, after_date=assessment_open)
         self.prospectus_link.fill(self.fake.url())
         self.privacy_notice_link.fill(self.fake.url())
         self.project_name_field_id.fill(self.fake.uuid4())
@@ -81,16 +83,23 @@ class CreateApplicationPage(PageBase):
         assert grant_name in self.grant_name, "Given grant name is not in the create application page"
         return self
 
-    def _fill_date_time_field(self, fieldset: Locator):
-        # Generate fake date and time values
-        fake_day = str(self.fake.random_int(min=1, max=28))
-        fake_month = str(self.fake.random_int(min=1, max=12))
-        fake_year = str(self.fake.random_int(min=2024, max=2030))
-        fake_hour = str(self.fake.random_int(min=0, max=23))
-        fake_minute = str(self.fake.random_int(min=0, max=59))
-        # Fill the fields with fake data
-        fieldset.get_by_role("textbox", name="Day").fill(fake_day)
-        fieldset.get_by_role("textbox", name="Month").fill(fake_month)
-        fieldset.get_by_role("textbox", name="Year").fill(fake_year)
-        fieldset.get_by_role("textbox", name="Hour").fill(fake_hour)
-        fieldset.get_by_role("textbox", name="Minute").fill(fake_minute)
+    def _fill_date_time_field(self, fieldset: Locator, after_date: datetime = None):
+        """Fills a date-time fieldset with a valid date, ensuring it is after a given reference date.
+
+        Args:
+            fieldset (Locator): The Playwright locator for the date-time input fields.
+            after_date (datetime, optional): The earliest date allowed for the generated value.
+
+        Returns:
+            datetime: The generated date that was filled in.
+        """
+        start_date = after_date + timedelta(days=1) if after_date else datetime.now() + timedelta(days=1)
+        date_value = self.fake.date_time_between(start_date=start_date, end_date=start_date + timedelta(days=7))
+
+        fieldset.get_by_role("textbox", name="Day").fill(str(date_value.day))
+        fieldset.get_by_role("textbox", name="Month").fill(str(date_value.month))
+        fieldset.get_by_role("textbox", name="Year").fill(str(date_value.year))
+        fieldset.get_by_role("textbox", name="Hour").fill(str(date_value.hour))
+        fieldset.get_by_role("textbox", name="Minute").fill(str(date_value.minute))
+
+        return date_value
