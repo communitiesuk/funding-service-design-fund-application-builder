@@ -37,7 +37,7 @@ class EditSectionPage(PageBase):
         self.save_and_continue.click()
         from tests.e2e.pages.build_application_page import BuildApplicationPage
 
-        return BuildApplicationPage(self.page, metadata=self.metadata)
+        return BuildApplicationPage(self.page, base_url=self.base_url, metadata=self.metadata)
 
     def then_verify_on_edit_section(self):
         expect(self.title).to_be_visible()
