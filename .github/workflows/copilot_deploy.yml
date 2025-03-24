@@ -50,6 +50,9 @@ jobs:
     name: Deploy to Dev
     needs: [ paketo_build ]
     if: ${{ contains(fromJSON(needs.setup.outputs.jobs_to_run), 'dev') }}
+    concurrency:
+      group: deploy-dev
+      cancel-in-progress: false
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
       AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
@@ -74,6 +77,9 @@ jobs:
     needs: [ paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'test') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     name: Deploy to Test
+    concurrency:
+      group: deploy-test
+      cancel-in-progress: false
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
       AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
@@ -100,6 +106,9 @@ jobs:
     needs: [ test_e2e_test, paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'uat') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     name: Deploy to UAT
+    concurrency:
+      group: deploy-uat
+      cancel-in-progress: false
     uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
     secrets:
       AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
