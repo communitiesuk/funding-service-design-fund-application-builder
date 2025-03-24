@@ -21,7 +21,7 @@ class TemplatesPage(PageBase):
         self.upload_template.click()
         from tests.e2e.pages.upload_new_template import UploadNewTemplatePage
 
-        return UploadNewTemplatePage(self.page, base_url=self.base_url, metadata=self.metadata)
+        return UploadNewTemplatePage(self.page, metadata=self.metadata)
 
     def then_verify_on_templates(self):
         expect(self.title).to_be_visible()
