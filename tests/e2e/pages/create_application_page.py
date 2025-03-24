@@ -51,7 +51,7 @@ class CreateApplicationPage(PageBase):
         self.save_and_return_home.click()
         from tests.e2e.pages.dashboard_page import DashboardPage
 
-        return DashboardPage(self.page, base_url=self.base_url, metadata=self.metadata)
+        return DashboardPage(self.page, metadata=self.metadata)
 
     def when_click_save_and_continue(self):
         self.save_and_continue.click()
@@ -60,12 +60,12 @@ class CreateApplicationPage(PageBase):
     def then_expect_applications(self):
         from tests.e2e.pages.applications_page import ApplicationsPage
 
-        return ApplicationsPage(self.page, base_url=self.base_url, metadata=self.metadata)
+        return ApplicationsPage(self.page, metadata=self.metadata)
 
     def then_expect_build_application(self):
         from tests.e2e.pages.build_application_page import BuildApplicationPage
 
-        return BuildApplicationPage(self.page, base_url=self.base_url, metadata=self.metadata)
+        return BuildApplicationPage(self.page, metadata=self.metadata)
 
     def then_verify_on_create_application(self):
         expect(self.title).to_be_visible()

@@ -22,7 +22,7 @@ class UploadNewTemplatePage(PageBase):
         self.save_and_continue.click()
         from tests.e2e.pages.templates_page import TemplatesPage
 
-        return TemplatesPage(self.page, base_url=self.base_url, metadata=self.metadata)
+        return TemplatesPage(self.page, metadata=self.metadata)
 
     def when_click_upload_file(self):
         """Clicks the 'Upload a file' button."""
@@ -39,7 +39,7 @@ class UploadNewTemplatePage(PageBase):
 
     def when_click_save_and_return_home(self):
         self.save_and_return_home.click()
-        return DashboardPage(self.page, base_url=self.base_url, metadata=self.metadata)
+        return DashboardPage(self.page, metadata=self.metadata)
 
     def then_verify_on_upload_new_template(self):
         expect(self.title).to_be_visible()

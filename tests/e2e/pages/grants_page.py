@@ -21,7 +21,7 @@ class GrantsPage(PageBase):
         self.add_new_grant.click()
         from tests.e2e.pages.create_grant_page import CreateGrantPage
 
-        return CreateGrantPage(self.page, base_url=self.base_url, metadata=self.metadata)
+        return CreateGrantPage(self.page, metadata=self.metadata)
 
     def then_verify_on_grants(self):
         expect(self.title).to_be_visible()

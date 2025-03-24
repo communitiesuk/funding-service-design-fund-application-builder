@@ -23,7 +23,7 @@ def test_add_new_grant_from_dashboard_and_back_to_dashboard(page: Page, domains:
         )
     finally:
         if domains.environment != "e2e":
-            HttpClient().delete(output, "grants")
+            HttpClient(base_url=domains.fab_url).delete(output, "grants")
 
 
 # TC-002-[2]: Add new grant from grant page
@@ -43,4 +43,4 @@ def test_add_new_grant_from_grants_and_back_to_dashboard(page: Page, domains: Fa
         )
     finally:
         if domains.environment != "e2e":
-            HttpClient().delete(output, "grants")
+            HttpClient(base_url=domains.fab_url).delete(output, "grants")

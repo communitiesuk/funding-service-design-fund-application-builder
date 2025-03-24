@@ -70,5 +70,5 @@ def test_e2e_grant_creation_to_application_completion_flow(page: Page, domains: 
         )
     finally:
         if domains.environment != "e2e":
-            HttpClient().delete(output, "grants")
-            HttpClient().delete(output, "templates")
+            HttpClient(base_url=domains.fab_url).delete(output, "grants")
+            HttpClient(base_url=domains.fab_url).delete(output, "templates")
