@@ -1,7 +1,6 @@
 from playwright.sync_api import Page
 
 from tests.e2e.dataclass import FabDomains
-from tests.e2e.http_client import HttpClient
 from tests.e2e.pages.applications_page import ApplicationsPage
 from tests.e2e.pages.dashboard_page import DashboardPage
 
@@ -25,8 +24,9 @@ def test_add_application_from_dashboard_view(page: Page, domains: FabDomains, us
             .and_validate_application_success_message()
         )
     finally:
-        if domains.environment != "e2e":
-            HttpClient(base_url=domains.fab_url).delete(created_grant, "grants")
+        grant_id = created_grant.metadata.get("grant_id")
+        if grant_id and domains.environment != "e2e":
+            page.request.fetch(f"{domains.fab_url}/grants/{grant_id}", method="DELETE")
 
 
 # TC-003-[2]: Add application from applications page and comeback dashboard
@@ -49,8 +49,9 @@ def test_add_application_from_applications_page_and_goback_dashboard(
             .and_validate_application_success_message()
         )
     finally:
-        if domains.environment != "e2e":
-            HttpClient(base_url=domains.fab_url).delete(created_grant, "grants")
+        grant_id = created_grant.metadata.get("grant_id")
+        if grant_id and domains.environment != "e2e":
+            page.request.fetch(f"{domains.fab_url}/grants/{grant_id}", method="DELETE")
 
 
 # TC-003-[3]: Add application from applications page and comeback applications page
@@ -74,5 +75,6 @@ def test_add_application_from_applications_page_and_goback_application_page(
             .and_validate_application_success_message()
         )
     finally:
-        if domains.environment != "e2e":
-            HttpClient(base_url=domains.fab_url).delete(created_grant, "grants")
+        grant_id = created_grant.metadata.get("grant_id")
+        if grant_id and domains.environment != "e2e":
+            page.request.fetch(f"{domains.fab_url}/grants/{grant_id}", method="DELETE")

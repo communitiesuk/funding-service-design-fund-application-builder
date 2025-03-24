@@ -1,7 +1,6 @@
 from playwright.sync_api import Page
 
 from tests.e2e.dataclass import FabDomains
-from tests.e2e.http_client import HttpClient
 from tests.e2e.pages.dashboard_page import DashboardPage
 from tests.e2e.pages.grants_page import GrantsPage
 
@@ -22,8 +21,9 @@ def test_add_new_grant_from_dashboard_and_back_to_dashboard(page: Page, domains:
             .and_validate_grant_success_message()
         )
     finally:
-        if domains.environment != "e2e":
-            HttpClient(base_url=domains.fab_url).delete(output, "grants")
+        grant_id = output.metadata.get("grant_id")
+        if grant_id and domains.environment != "e2e":
+            page.request.fetch(f"{domains.fab_url}/grants/{grant_id}", method="DELETE")
 
 
 # TC-002-[2]: Add new grant from grant page
@@ -42,5 +42,6 @@ def test_add_new_grant_from_grants_and_back_to_dashboard(page: Page, domains: Fa
             .and_validate_grant_success_message()
         )
     finally:
-        if domains.environment != "e2e":
-            HttpClient(base_url=domains.fab_url).delete(output, "grants")
+        grant_id = output.metadata.get("grant_id")
+        if grant_id and domains.environment != "e2e":
+            page.request.fetch(f"{domains.fab_url}/grants/{grant_id}", method="DELETE")

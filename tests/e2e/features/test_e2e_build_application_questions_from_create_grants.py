@@ -1,7 +1,6 @@
 from playwright.sync_api import Page
 
 from tests.e2e.dataclass import FabDomains
-from tests.e2e.http_client import HttpClient
 from tests.e2e.pages.templates_page import TemplatesPage
 
 
@@ -70,5 +69,7 @@ def test_e2e_grant_creation_to_application_completion_flow(page: Page, domains: 
         )
     finally:
         if domains.environment != "e2e":
-            HttpClient(base_url=domains.fab_url).delete(output, "grants")
-            HttpClient(base_url=domains.fab_url).delete(output, "templates")
+            if grant_id := output.metadata.get("grant_id"):
+                page.request.fetch(f"{domains.fab_url}/grants/{grant_id}", method="DELETE")
+            if template_id := output.metadata.get("template_id"):
+                page.request.fetch(f"{domains.fab_url}/templates/{template_id}", method="DELETE")
