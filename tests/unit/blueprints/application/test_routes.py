@@ -235,29 +235,21 @@ def test_application_complete_page(flask_test_client, seed_dynamic_data):
     status_text = soup.find(
         "p",
         class_="govuk-body",
-        string=lambda text: "status of this application has been changed" in text if text else False,
+        string=lambda text: "You can still edit your application at any time" in text if text else False,
     )
     assert status_text is not None
 
     # Check for the "What happens next" heading
-    next_heading = soup.find("h3", class_="govuk-heading-m", string="What happens next")
+    next_heading = soup.find("h3", class_="govuk-heading-m", string="What you need to do next")
     assert next_heading is not None
-
-    # Check for the bullet points
-    bullet_list = soup.find("ul", class_="govuk-list--bullet")
-    assert bullet_list is not None
-    bullet_points = bullet_list.find_all("li")
-    assert len(bullet_points) == 2
 
     # Check for the back to application link
     back_link = soup.find("a", string="Back to application")
     assert back_link is not None
 
-    # Check for the back to home button
-    home_button = soup.find(
-        "a", class_="govuk-button--secondary", string=lambda text: "Back to home" in text if text else False
-    )
-    assert home_button is not None
+    # Check for the go to home link
+    home_link = soup.find("a", string="Go to home page")
+    assert home_link is not None
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
