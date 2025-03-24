@@ -9,24 +9,17 @@
       </h1>
     </div>
 
-    <p class="govuk-body">The status of this application has been changed to 'complete'.</p>
+    <p class="govuk-body">You can still edit your application at any time.</p>
 
-    <h3 class="govuk-heading-m">What happens next</h3>
+    <h3 class="govuk-heading-m">What you need to do next</h3>
 
-    <ul class="govuk-list govuk-list--bullet">
-      <li><a href="{{ url_for('application_bp.create_export_files', round_id=round.round_id) }}" class="govuk-link">Download the application ZIP file</a> and send it to the Live Services team</li>
-      <li>The application can be edited at any time. Editing a complete application will automatically change its status to 'In progress'.</li>
-    </ul>
-
-    <p class="govuk-body">
+    <p class="govuk-body"><a href="{{ url_for('application_bp.create_export_files', round_id=round.round_id) }}" class="govuk-link">Download the application ZIP file</a> and send it to the Live Services team.</p>
+    <p class="govuk-body govuk-!-margin-top-9">
       <a href="{{ url_for('application_bp.build_application', round_id=round.round_id) }}" class="govuk-link">Back to application</a>
     </p>
-
-    <div class="govuk-button-group">
-      <a href="{{ url_for('index_bp.dashboard') }}" class="govuk-button govuk-button--secondary">
-        Back to home
-      </a>
-    </div>
+    <p class="govuk-body">
+      <a href="{{ url_for('index_bp.dashboard') }}" class="govuk-link">Go to home page</a>
+    </p>
   </div>
 </div>
 {% endblock %}
