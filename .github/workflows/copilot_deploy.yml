@@ -139,7 +139,7 @@ jobs:
     with:
       environment: prod
       app_name: fund-application-builder
-      run_db_migrations: true
+      run_db_migrations: false
       image_location: ${{ needs.paketo_build.outputs.image_location }}
       notify_slack: true
       notify_slack_on_deployment: true
