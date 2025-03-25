@@ -18,7 +18,7 @@ from app.export_config.generate_form import (
     build_start_page,
     human_to_kebab_case,
 )
-from tests.unit.unit_test_data import (
+from tests.unit_test_data import (
     mock_c_1,
     mock_c_2,
     mock_form_1,

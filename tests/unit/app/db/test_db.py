@@ -19,7 +19,7 @@ from app.db.queries.application import (
 )
 from app.db.queries.fund import add_fund, add_organisation, delete_selected_fund, get_all_funds, get_fund_by_id
 from app.db.queries.round import add_round, delete_selected_round, get_round_by_id
-from tests.unit.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
+from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 
 
 def test_add_organisation(flask_test_client, _db, clear_test_data):

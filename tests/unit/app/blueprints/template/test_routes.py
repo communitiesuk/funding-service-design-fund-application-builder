@@ -1,6 +1,6 @@
-import os
 import uuid
 from io import BytesIO
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -138,9 +138,8 @@ def test_template_create_invalid_json_file(flask_test_client):
 def test_template_create_success(flask_test_client, clean_db):
     flask_test_client.get("/templates/create")
     with flask_test_client.session_transaction():
-        test_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-        test_data_dir = os.path.join(test_root, "test_data")
-        file_path = os.path.join(test_data_dir, "asset-information.json")
+        filename = "asset-information.json"
+        file_path = Path("tests") / "test_data" / filename
         data = {
             "template_name": f"existing_template-{uuid.uuid4()}",
             "tasklist_name": f"tasklist1-{uuid.uuid4()}",
@@ -265,9 +264,7 @@ def test_edit_template_post_with_file_without_actions(
     form_id = str(form_mock_id)
     flask_test_client.get(f"/templates/{form_id}/edit")
     with flask_test_client.session_transaction():
-        test_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-        test_data_dir = os.path.join(test_root, "test_data")
-        file_path = os.path.join(test_data_dir, "asset-information.json")
+        file_path = Path("tests") / "test_data" / "asset-information.json"
         form_data = {
             "template_name": "Updated Template",
             "tasklist_name": "Updated Tasklist",

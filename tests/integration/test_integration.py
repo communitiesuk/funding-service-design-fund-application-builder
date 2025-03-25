@@ -1,6 +1,6 @@
 import json
-import os
 from dataclasses import asdict
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -15,7 +15,7 @@ from app.export_config.generate_fund_round_form_jsons import (
 )
 from app.import_config.load_form_json import load_form_jsons
 from app.shared.data_classes import Condition, ConditionValue
-from tests.unit.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
+from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 
 
 def test_build_form_json_no_conditions(seed_dynamic_data):
@@ -285,9 +285,7 @@ def test_generate_config_to_verify_form_sections(
     temp_output_dir,
 ):
     form_configs = []
-    script_dir = os.path.dirname(__file__)
-    test_data_dir = os.path.join(script_dir, "test_data")
-    file_path = os.path.join(test_data_dir, input_filename)
+    file_path = Path("tests") / "test_data" / input_filename
     with open(file_path, "r") as json_file:
         input_form = json.load(json_file)
         input_form["filename"] = input_filename
@@ -355,9 +353,7 @@ def test_generate_config_for_round_valid_input(
     temp_output_dir,
 ):
     form_configs = []
-    script_dir = os.path.dirname(__file__)
-    test_data_dir = os.path.join(script_dir, "test_data")
-    file_path = os.path.join(test_data_dir, input_filename)
+    file_path = Path("tests") / "test_data" / input_filename
     with open(file_path, "r") as json_file:
         input_form = json.load(json_file)
         input_form["filename"] = input_filename

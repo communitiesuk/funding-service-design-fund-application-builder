@@ -1,5 +1,4 @@
 import json
-import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
@@ -23,9 +22,7 @@ from app.import_config.load_form_json import load_form_jsons, load_json_from_fil
 )
 def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename, form_section_count):
     form_configs = []
-    script_dir = os.path.dirname(__file__)
-    test_data_dir = os.path.join(script_dir, "test_data")
-    file_path = os.path.join(test_data_dir, filename)
+    file_path = Path("tests") / "test_data" / filename
     with open(file_path, "r") as json_file:
         form = json.load(json_file)
         form["filename"] = filename
@@ -76,7 +73,7 @@ def test_generate_config_for_round_valid_input_file(seed_dynamic_data, _db):
 
 
 def test_import_multi_input_field(seed_dynamic_data, _db):
-    with open(Path("tests") / "unit" / "test_data" / "multi_input.json", "r") as json_file:
+    with open(Path("tests") / "test_data" / "multi_input.json", "r") as json_file:
         form = json.load(json_file)
 
     load_json_from_file(form, template_name="test_input_multi_input", filename="multi_input.json")
