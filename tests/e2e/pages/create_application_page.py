@@ -71,6 +71,9 @@ class CreateApplicationPage(PageBase):
         expect(self.title).to_be_visible()
         return self
 
+    def and_verify_on_create_application(self):
+        return self.then_verify_on_create_application()
+
     def and_validate_grant_success_message(self):
         banner = self.page.locator(".govuk-notification-banner--success")
         expect(banner.get_by_role("heading", name="New grant added successfully")).to_be_visible()
