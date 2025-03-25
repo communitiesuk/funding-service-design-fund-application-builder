@@ -114,24 +114,23 @@ environments:
         value: 80
       requests: 30
       response_time: 2s
-#   prod:
-#     http:
-#       alias: ["fund-application-builder.prod.access-funding.levellingup.gov.uk", "fund-application-builder.access-funding.levellingup.gov.uk"]
-#       hosted_zone: Z0686469NF3ZJTU9I02M
-#     variables:
-#       COOKIE_DOMAIN: ".levellingup.gov.uk"
-#       AUTHENTICATOR_HOST: "https://authenticator.access-funding.levellingup.gov.uk"
-#       APPLICANT_fund-application-builder_HOST: "https://fund-application-builder.access-funding.levellingup.gov.uk"
-#       ASSESSMENT_fund-application-builder_HOST: "https://assessment.access-funding.levellingup.gov.uk"
-#       FORMS_SERVICE_PUBLIC_HOST: "https://forms.access-funding.levellingup.gov.uk"
-#       FLASK_ENV: production
-#     count:
-#       range: 2-4
-#       cooldown:
-#         in: 60s
-#         out: 30s
-#       cpu_percentage:
-#         value: 70
-#       memory_percentage:
-#         value: 80
-#       requests: 30
+  prod:
+    http:
+      alias: "fund-application-builder.access-funding.communities.gov.uk"
+    variables:
+      FUND_APPLICATION_BUILDER_HOST: "https://fund-application-builder.access-funding.communities.gov.uk"
+      AUTHENTICATOR_HOST: "https://account.access-funding.communities.gov.uk"
+      FLASK_ENV: production
+      SENTRY_TRACES_SAMPLE_RATE: 1
+      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.communities.gov.uk"
+      FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.communities.gov.uk"
+    count:
+      range: 2-4
+      cooldown:
+        in: 60s
+        out: 30s
+      cpu_percentage:
+        value: 70
+      memory_percentage:
+        value: 80
+      requests: 30
