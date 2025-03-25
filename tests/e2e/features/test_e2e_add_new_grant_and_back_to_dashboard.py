@@ -7,29 +7,41 @@ from tests.e2e.pages.grants_page import GrantsPage
 
 # TC-002-[1]: Add new grant and back to dashboard
 def test_add_new_grant_from_dashboard_and_back_to_dashboard(page: Page, domains: FabDomains, user_auth):
-    (
-        DashboardPage(page, domains.fab_url)
-        .given_user_is_on_dashboard()
-        .then_verify_on_dashboard()
-        .when_click_add_a_new_grant()
-        .then_verify_on_create_grant()
-        .when_fill_non_welsh_competitive_grant_details()
-        .when_click_save_and_return_home()
-        .then_verify_on_dashboard()
-        .and_validate_grant_success_message()
-    )
+    output = None
+    try:
+        output = (
+            DashboardPage(page, domains.fab_url)
+            .given_user_is_on_dashboard()
+            .then_verify_on_dashboard()
+            .when_click_add_a_new_grant()
+            .then_verify_on_create_grant()
+            .when_fill_non_welsh_competitive_grant_details()
+            .when_click_save_and_return_home()
+            .then_verify_on_dashboard()
+            .and_validate_grant_success_message()
+        )
+    finally:
+        grant_id = output.metadata.get("grant_id")
+        if grant_id and domains.environment != "e2e":
+            page.request.fetch(f"{domains.fab_url}/grants/{grant_id}", method="DELETE")
 
 
 # TC-002-[2]: Add new grant from grant page
 def test_add_new_grant_from_grants_and_back_to_dashboard(page: Page, domains: FabDomains, user_auth):
-    (
-        GrantsPage(page, domains.fab_url)
-        .given_user_is_on_grants()
-        .then_verify_on_grants()
-        .when_click_add_new_grant()
-        .then_verify_on_create_grant()
-        .when_fill_non_welsh_competitive_grant_details()
-        .when_click_save_and_return_home()
-        .then_verify_on_dashboard()
-        .and_validate_grant_success_message()
-    )
+    output = None
+    try:
+        output = (
+            GrantsPage(page, domains.fab_url)
+            .given_user_is_on_grants()
+            .then_verify_on_grants()
+            .when_click_add_new_grant()
+            .then_verify_on_create_grant()
+            .when_fill_non_welsh_competitive_grant_details()
+            .when_click_save_and_return_home()
+            .then_verify_on_dashboard()
+            .and_validate_grant_success_message()
+        )
+    finally:
+        grant_id = output.metadata.get("grant_id")
+        if grant_id and domains.environment != "e2e":
+            page.request.fetch(f"{domains.fab_url}/grants/{grant_id}", method="DELETE")

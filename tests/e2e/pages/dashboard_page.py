@@ -1,3 +1,5 @@
+import re
+
 from playwright.sync_api import Page, expect
 
 from tests.e2e.pages.page_base import PageBase
@@ -41,9 +43,10 @@ class DashboardPage(PageBase):
         banner = self.page.locator(".govuk-notification-banner--success")
         expect(banner.get_by_role("heading", name="Template uploaded")).to_be_visible()
         expect(banner.locator("a")).to_have_count(1)
-        template_name = banner.locator("a").first.inner_text()
-        template_name_metadata = self.metadata.get("template_name")
-        assert template_name == f"View {template_name_metadata}"
+        template_name = self.metadata.get("template_name")
+        grant_link = self.page.get_by_role("link", name=f"View {template_name}")
+        expect(grant_link).to_be_visible()
+        self.update_metadata("template_id", re.search(r"[0-9a-fA-F-]{36}$", grant_link.get_attribute("href")).group(0))
         return self
 
     def and_validate_grant_success_message(self):
@@ -51,6 +54,10 @@ class DashboardPage(PageBase):
         banner = self.page.locator(".govuk-notification-banner--success")
         expect(banner.get_by_role("heading", name="New grant added successfully")).to_be_visible()
         expect(banner.locator("a")).to_have_count(2)
+        grant_name = self.metadata.get("grant_name")
+        grant_link = self.page.get_by_role("link", name=f"View {grant_name}")
+        expect(grant_link).to_be_visible()
+        self.update_metadata("grant_id", re.search(r"[0-9a-fA-F-]{36}$", grant_link.get_attribute("href")).group(0))
         next_step_link = banner.get_by_role("link", name="Set up a new application")
         expect(next_step_link).to_be_visible()
         return self

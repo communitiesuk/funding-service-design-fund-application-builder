@@ -1,4 +1,5 @@
 import random
+import re
 import string
 from datetime import datetime, timedelta
 
@@ -74,9 +75,10 @@ class CreateApplicationPage(PageBase):
         banner = self.page.locator(".govuk-notification-banner--success")
         expect(banner.get_by_role("heading", name="New grant added successfully")).to_be_visible()
         expect(banner.locator("a")).to_have_count(1)
-        grant_link_name = banner.locator("a").first.inner_text()
-        grant_name_metadata = self.metadata.get("grant_name")
-        assert grant_link_name == f"View {grant_name_metadata}"
+        grant_name = self.metadata.get("grant_name")
+        grant_link = self.page.get_by_role("link", name=f"View {grant_name}")
+        expect(grant_link).to_be_visible()
+        self.update_metadata("grant_id", re.search(r"[0-9a-fA-F-]{36}$", grant_link.get_attribute("href")).group(0))
         return self
 
     def and_verify_grant_on_create_application(self, grant_name: str):

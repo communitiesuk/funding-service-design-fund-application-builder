@@ -37,11 +37,9 @@ class CreateGrantPage(PageBase):
         self.ggis_field.fill(self.fake.uuid4())
         return self
 
-    def when_click_save_and_return_home(self, return_self=False):
+    def when_click_save_and_return_home(self):
         """Clicks the 'Save and return home' button."""
         self.save_and_return_home.click()
-        if return_self:
-            return self
         from tests.e2e.pages.dashboard_page import DashboardPage
 
         return DashboardPage(self.page, metadata=self.metadata)

@@ -44,6 +44,7 @@ class BuildApplicationPage(PageBase):
     def when_click_down_on_section(self):
         assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
         task_element = self.page.get_by_role("heading", name=self.metadata.get("sections")[0])
+        expect(task_element).to_be_visible()
         task_parent = task_element.locator("xpath=ancestor::li")
         expect(task_parent).to_be_visible()
         down_link = task_parent.get_by_role("link", name="Down")
