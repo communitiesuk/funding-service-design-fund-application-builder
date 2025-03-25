@@ -4,6 +4,26 @@ from app.db import db
 from app.db.models import Round
 
 
+def get_round_by_id(round_id: str) -> Round:
+    """
+    Retrieves a Round object by its ID
+
+    Args:
+        round_id: The ID of the round to retrieve
+
+    Returns:
+        The Round object with the given ID
+
+    Raises:
+        ValueError: If no Round with the given ID is found
+    """
+    stmt = select(Round).where(Round.round_id == round_id)
+    round = db.session.scalars(stmt).first()
+    if not round:
+        raise ValueError(f"Round with ID '{round_id}' not found")
+    return round
+
+
 def get_round_by_title(title: str) -> Round:
     """
     Retrieves a Round object by its title

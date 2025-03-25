@@ -13,7 +13,7 @@ from app.db.queries.application import (
     move_section_up,
     swap_elements_in_list,
 )
-from app.db.queries.round import get_round_by_id
+from tests.helpers import get_round_by_id
 from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 
 section_id = uuid4()
