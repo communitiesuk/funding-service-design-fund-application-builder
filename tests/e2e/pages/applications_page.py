@@ -25,8 +25,7 @@ class ApplicationsPage(PageBase):
         expect(self.title).to_be_visible()
         return self
 
-    def and_verify_on_applications(self):
-        return self.then_verify_on_applications()
+    and_verify_on_applications = then_verify_on_applications
 
     def and_validate_application_success_message(self):
         banner = self.page.locator(".govuk-notification-banner--success")
