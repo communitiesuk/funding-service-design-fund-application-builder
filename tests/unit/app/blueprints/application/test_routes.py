@@ -1,7 +1,12 @@
+import secrets
+import string
+from pathlib import Path
+
 import pytest
 from bs4 import BeautifulSoup
 from flask import url_for
 
+from app.blueprints.application.routes import create_export_zip
 from tests.helpers import submit_form
 
 
@@ -293,3 +298,14 @@ def test_mark_application_in_progress(flask_test_client, seed_dynamic_data):
     if len(seed_dynamic_data["rounds"][0].sections) > 0:
         edit_buttons = soup.find_all("a", string="Edit")
         assert len(edit_buttons) > 0
+
+
+def test_create_export_zip(temp_output_dir):
+    test_data_path = Path("tests") / "test_data"
+    random_post_fix = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+    output = create_export_zip(
+        directory_to_zip=test_data_path, zip_file_name="test_zip", random_post_fix=random_post_fix
+    )
+    assert output
+    output_path = Path(output)
+    assert output_path.exists()

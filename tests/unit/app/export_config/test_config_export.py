@@ -1,11 +1,6 @@
-import secrets
-import string
-from pathlib import Path
-
 import pytest
 from bs4 import BeautifulSoup
 
-from app.blueprints.application.routes import create_export_zip
 from app.export_config.generate_fund_round_html import (
     frontend_html_prefix,
     frontend_html_suffix,
@@ -47,17 +42,6 @@ def test_generate_fund_round_html_invalid_input(seed_dynamic_data):
     # Execute and Assert: Ensure the function raises an exception for invalid inputs
     with pytest.raises(ValueError):
         generate_all_round_html(round_id)
-
-
-def test_create_export_zip(temp_output_dir):
-    test_data_path = Path("tests") / "test_data"
-    random_post_fix = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5))
-    output = create_export_zip(
-        directory_to_zip=test_data_path, zip_file_name="test_zip", random_post_fix=random_post_fix
-    )
-    assert output
-    output_path = Path(output)
-    assert output_path.exists()
 
 
 def _normalize_html(html):
