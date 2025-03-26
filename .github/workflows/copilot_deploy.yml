@@ -18,7 +18,7 @@ on:
         type: boolean
         description: Run e2e tests after deployment
   push:
-    branches: [ main, deploy-to-prod ]
+    branches: [ main ]
 
 jobs:
   setup:
@@ -125,7 +125,7 @@ jobs:
 
   prod_deploy:
     needs: [ test_e2e_test, paketo_build, setup ]
-    if: ${{ always() && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
+    if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'prod') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     name: Deploy to prod
     concurrency:
       group: deploy-prod
@@ -139,7 +139,7 @@ jobs:
     with:
       environment: prod
       app_name: fund-application-builder
-      run_db_migrations: false
+      run_db_migrations: true
       image_location: ${{ needs.paketo_build.outputs.image_location }}
       notify_slack: true
       notify_slack_on_deployment: true

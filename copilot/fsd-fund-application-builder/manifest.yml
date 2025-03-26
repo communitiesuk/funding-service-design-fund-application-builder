@@ -122,8 +122,9 @@ environments:
       AUTHENTICATOR_HOST: "https://account.access-funding.communities.gov.uk"
       FLASK_ENV: production
       SENTRY_TRACES_SAMPLE_RATE: 1
-      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.communities.gov.uk"
-      FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.communities.gov.uk"
+      # Prod points to UAT runner because prod runner does not support /publish endpoint needed for previewing forms
+      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.uat.communities.gov.uk"
+      FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.test.communities.gov.uk"
     count:
       range: 2-4
       cooldown:

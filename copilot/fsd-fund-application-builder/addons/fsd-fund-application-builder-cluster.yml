@@ -104,7 +104,7 @@ Resources:
         !Join [ "",  [ '{{resolve:secretsmanager:', !Ref fsdfundapplicationbuilderclusterAuroraSecret, ":SecretString:password}}" ]]  # pragma: allowlist secret
       DatabaseName: !Ref fsdfundapplicationbuilderclusterDBName
       Engine: 'aurora-postgresql'
-      EngineVersion: '14.4'
+      EngineVersion: '14.9'
       DBClusterParameterGroupName: !Ref fsdfundapplicationbuilderclusterDBClusterParameterGroup
       DBSubnetGroupName: !Ref fsdfundapplicationbuilderclusterDBSubnetGroup
       Port: 5432
