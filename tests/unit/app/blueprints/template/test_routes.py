@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from flask import g
 
 from app.db.models import Form
+from tests.helpers import submit_form
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "db_with_templates")
@@ -365,3 +366,27 @@ def test_template_search_functionality(flask_test_client, _db):
         # Clean up test data
         _db.session.delete(test_template)
         _db.session.commit()
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
+def test_template_delete(flask_test_client, seed_dynamic_data):
+    form: Form = seed_dynamic_data["forms"][0]
+
+    response = flask_test_client.get(
+        f"/templates/{form.form_id}",
+    )
+
+    assert response.status_code == 200
+
+    delete_template_link = f"/templates/{form.form_id}/delete"
+    confirmation_response = flask_test_client.get(delete_template_link)
+
+    soup = BeautifulSoup(confirmation_response.data, "html.parser")
+    confirmation_heading = soup.find("h1", class_="govuk-panel__title")
+    assert confirmation_response.status_code == 200
+    assert confirmation_heading.text == "Are you sure you want to delete this template?"
+
+    response = submit_form(
+        flask_test_client, delete_template_link, data={"csrf_token": g.csrf_token}, follow_redirects=True
+    )
+    assert response.status_code == 200
