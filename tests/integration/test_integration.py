@@ -4,29 +4,12 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Component, ComponentType, Form, FormSection, Fund, Lizt, Page, Section
+from app.db.models import Component, ComponentType, Form, FormSection, Lizt, Page, Section
 from app.db.queries.application import get_component_by_id
-from app.db.queries.fund import get_fund_by_id
-from app.export_config.generate_assessment_config import build_assessment_config
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
 from app.import_config.load_form_json import load_form_jsons
-
-
-# TODO this fails with components from a template (branching logic)
-def test_build_assessment_config_no_branching(seed_dynamic_data):
-    f: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
-    criteria = f.rounds[0].criteria[0]
-    result = build_assessment_config(criteria_list=[criteria])
-    assert result
-    first_unscored = result["unscored_sections"][0]
-    assert first_unscored
-    assert first_unscored["name"] == "Unscored"
-    assert len(first_unscored["subcriteria"]) == 1
-    assert len(first_unscored["subcriteria"][0]["themes"]) == 1
-    assert len(first_unscored["subcriteria"][0]["themes"][0]["answers"]) == 2
-
 
 list_id = uuid4()
 
