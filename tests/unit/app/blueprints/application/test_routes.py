@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
-from flask import url_for
+from flask import g, url_for
 
 from app.blueprints.application.routes import create_export_zip
 from tests.helpers import submit_form
@@ -99,6 +99,34 @@ def test_update_section_name(flask_test_client, seed_dynamic_data):
     soup = BeautifulSoup(response.data, "html.parser")
     section = soup.find("h3", class_="govuk-heading-m", string="1. section updated")
     assert section
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+def test_delete_section(flask_test_client, seed_dynamic_data):
+    test_round = seed_dynamic_data["rounds"][0]
+    url = f"/rounds/{test_round.round_id}/sections/create"
+    data = {"name_in_apply_en": "section 1", "save_section": True}
+    response = submit_form(flask_test_client, url, data, follow_redirects=True)
+    soup = BeautifulSoup(response.data, "html.parser")
+    edit_section_link = soup.find("a", class_="govuk-button--secondary", string="Edit").get("href")
+    section_id = edit_section_link.split("/")[-1]
+
+    delete_section_link = f"/rounds/{test_round.round_id}/sections/{section_id}/delete"
+    delete_confirmation_response = flask_test_client.get(delete_section_link)
+    soup = BeautifulSoup(delete_confirmation_response.data, "html.parser")
+    confirmation_heading = soup.find("h1", class_="govuk-panel__title")
+    assert delete_confirmation_response.status_code == 200
+    assert confirmation_heading.text == "Are you sure you want to delete this section?"
+
+    response = submit_form(
+        flask_test_client,
+        delete_section_link,
+        data={
+            "csrf_token": g.csrf_token,
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
