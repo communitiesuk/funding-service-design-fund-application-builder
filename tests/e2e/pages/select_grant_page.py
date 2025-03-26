@@ -15,7 +15,7 @@ class SelectGrantPage(PageBase):
     def when_select_a_grant(self, grant_name: str = None):
         """Select a grant from the dropdown."""
         self.select_grant.wait_for(state="visible")
-        self.page.wait_for_function("document.querySelector('select').options.length > 1")
+        self.page.query_selector_all("select option")
         grant_options = [
             {"label": option.text_content(), "value": option.get_attribute("value")}
             for option in self.select_grant.locator("option").all()[1:]
