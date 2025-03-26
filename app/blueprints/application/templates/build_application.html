@@ -7,7 +7,8 @@
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-l">{% if round.status == 'Complete' %}View{% else %}Build{% endif %} application</h1>
+            <h1 class="govuk-heading-l">{% if round.status == 'Complete' %}View{% else %}Build{% endif %}
+                application</h1>
             {% if round.status == 'In progress' %}
                 <p class="govuk-body">Build the application by adding sections and using templates.</p>
             {% endif %}
@@ -21,19 +22,21 @@
             {% endif %}
         </div>
         {% if round.sections|length > 0 and round.status == 'Complete' %}
-        <div class="govuk-grid-column-one-third govuk-!-text-align-right">
-            <a href="{{ url_for('application_bp.mark_application_in_progress', round_id=round.round_id) }}" class="govuk-button govuk-button--secondary" data-module="govuk-button">
-                Edit application
-            </a>
-        </div>
+            <div class="govuk-grid-column-one-third govuk-!-text-align-right">
+                <a href="{{ url_for('application_bp.mark_application_in_progress', round_id=round.round_id) }}"
+                   class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                    Edit application
+                </a>
+            </div>
         {% endif %}
     </div>
     {% if round.sections|length > 0 %}
         <ul class="app-task-list__items">
             {% for section in round.sections %}
-            <li class="task-list__new-design govuk-!-margin-bottom-2">
+                <li class="task-list__new-design govuk-!-margin-bottom-2">
                     <span class="app-task-list__task-name">
-                        <h3 class="govuk-heading-m">{{ section.index }}. {{ section.name_in_apply_json["en"] }}</h3>
+                        <h3 class="govuk-heading-m"
+                            id="section-{{ section.index }}">{{ section.index }}. {{ section.name_in_apply_json["en"] }}</h3>
                     </span>
                     <span class="app-task-list__task-actions">
                         {% if round.status == 'In progress' %}
@@ -53,66 +56,73 @@
                                href='{{ url_for("application_bp.section", round_id=round.round_id, section_id=section.section_id) }}'>Edit</a>
                         {% endif %}
                     </span>
-            </li>
-            <li>
-                <ul class="app-task-list__items">
-                    {% for form in section.forms %}
-                        <li class="app-task-list__item task-list__new-design">
+                </li>
+                <li>
+                    <ul class="app-task-list__items">
+                        {% for form in section.forms %}
+                            <li class="app-task-list__item task-list__new-design">
                             <span class="app-task-list__task-name">
                                 <h3 class="govuk-body">
                                     <a class="govuk-link govuk-link--no-visited-state"
-                                        target="_blank"
-                                        href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
+                                       target="_blank"
+                                       href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
                                         {{ form.name_in_apply_json["en"] }} (previews in a new tab)
                                     </a>
                                 </h3>
                             </span>
-                            <span class="app-task-list__task-actions">
-                                <a class="govuk-link--no-visited-state govuk-!-font-size-19" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions</a>
+                                <span class="app-task-list__task-actions">
+                                <a class="govuk-link--no-visited-state govuk-!-font-size-19"
+                                   href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions</a>
                             </span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
             {% endfor %}
         </ul>
     {% endif %}
     {% if round.status == 'In progress' %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
-                {{
-                    govukButton({
+                {{ govukButton({
                         "text": "Add section",
                         "href": url_for("application_bp.section", round_id=round.round_id),
                         "classes": "govuk-button--secondary"
-                    })
-                }}
+                    }) }}
             </div>
             {% if round.sections|length > 0 %}
                 <div class="govuk-grid-column-one-third govuk-!-text-align-right">
                     <p class="govuk-body">
-                        <a class="govuk-link" href="{{ url_for('application_bp.view_all_questions', round_id=round.round_id) }}">View all application questions</a>
+                        <a class="govuk-link"
+                           href="{{ url_for('application_bp.view_all_questions', round_id=round.round_id) }}">View all
+                            application questions</a>
                     </p>
                 </div>
-            </div>
-            <div class="govuk-grid-row">
-                <div class="govuk-grid-column-two-thirds">
-                    <p class="govuk-body">
-                        <a class="govuk-link" href="{{ url_for('application_bp.create_export_files', round_id=round.round_id) }}">Download application ZIP file</a>
-                    </p>
                 </div>
-            </div>
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-two-thirds">
+                        <p class="govuk-body">
+                            <a class="govuk-link"
+                               href="{{ url_for('application_bp.create_export_files', round_id=round.round_id) }}">Download
+                                application ZIP file</a>
+                        </p>
+                    </div>
+                </div>
             {% endif %}
     {% elif round.sections|length > 0 %}
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
                 <p class="govuk-body">
-                    <a class="govuk-link" href="{{ url_for('application_bp.create_export_files', round_id=round.round_id) }}">Download application ZIP file</a>
+                    <a class="govuk-link"
+                       href="{{ url_for('application_bp.create_export_files', round_id=round.round_id) }}">Download
+                        application ZIP file</a>
                 </p>
             </div>
             <div class="govuk-grid-column-one-third govuk-!-text-align-right">
                 <p class="govuk-body">
-                    <a class="govuk-link" href="{{ url_for('application_bp.view_all_questions', round_id=round.round_id) }}">View all application questions</a>
+                    <a class="govuk-link"
+                       href="{{ url_for('application_bp.view_all_questions', round_id=round.round_id) }}">View all
+                        application questions</a>
                 </p>
             </div>
         </div>
@@ -121,7 +131,8 @@
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-three-quarters">
                 <p class="govuk-body">
-                    <a href="{{ url_for('application_bp.mark_application_complete', round_id=round.round_id) }}" class="govuk-button govuk-button--success" data-module="govuk-button">
+                    <a href="{{ url_for('application_bp.mark_application_complete', round_id=round.round_id) }}"
+                       class="govuk-button govuk-button--success" data-module="govuk-button">
                         Mark application complete
                     </a>
                 </p>

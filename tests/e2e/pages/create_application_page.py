@@ -79,7 +79,7 @@ class CreateApplicationPage(PageBase):
         expect(banner.locator("a")).to_have_count(1)
         grant_name = self.metadata.get("grant_name")
         grant_link = self.page.get_by_role("link", name=f"View {grant_name}")
-        expect(grant_link).to_be_visible()
+        grant_link.wait_for(state="visible")
         self.update_metadata("grant_id", re.search(r"[0-9a-fA-F-]{36}$", grant_link.get_attribute("href")).group(0))
         return self
 

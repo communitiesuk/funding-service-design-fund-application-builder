@@ -63,17 +63,17 @@ class BuildApplicationPage(PageBase):
         return self
 
     def then_verify_section_gone_down(self):
-        self.page.wait_for_selector(".task-list__new-design.govuk-\\!-margin-bottom-2")
-        sections = self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2").all()
-        second_section = sections[1]
-        expect(second_section.get_by_role("heading", name=self.metadata.get("sections")[0])).to_be_visible()
+        self.page.wait_for_selector('[id^="section-"]')
+        second_section = self.page.locator("#section-2")
+        second_section.wait_for(state="visible")
+        assert self.metadata.get("sections")[0] in second_section.text_content(), "Invalid section gone down"
         return self
 
     def then_verify_section_gone_up(self):
-        self.page.wait_for_selector(".task-list__new-design.govuk-\\!-margin-bottom-2")
-        sections = self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2").all()
-        first_section = sections[0]
-        expect(first_section.get_by_role("heading", name=self.metadata.get("sections")[0])).to_be_visible()
+        self.page.wait_for_selector('[id^="section-"]')
+        first_section = self.page.locator("#section-1")
+        first_section.wait_for(state="visible")
+        assert self.metadata.get("sections")[0] in first_section.text_content(), "Invalid section gone up"
         return self
 
     def and_validate_application_success_message(self):
