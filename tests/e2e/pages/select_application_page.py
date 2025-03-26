@@ -15,6 +15,7 @@ class SelectApplicationPage(PageBase):
 
     def when_select_a_application(self):
         self.select_application.wait_for(state="visible")
+        self.page.query_selector_all("select option")
         application_options = [
             {"label": opt.text_content(), "value": opt.get_attribute("value")}
             for opt in self.select_application.locator("option").all()[1:]
