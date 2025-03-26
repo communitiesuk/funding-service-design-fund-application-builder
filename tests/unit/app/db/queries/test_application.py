@@ -13,6 +13,7 @@ from app.db.queries.application import (
     delete_page,
     delete_section,
     delete_section_from_round,
+    get_component_by_id,
     get_section_by_id,
     insert_new_component,
     insert_new_form,
@@ -959,3 +960,40 @@ def test_move_form_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
 def test_swap_elements(input_list, idx_a, idx_b, exp_result):
     result = swap_elements_in_list(input_list, idx_a, idx_b)
     assert result == exp_result
+
+
+list_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "lists": [
+            Lizt(
+                list_id=list_id,
+                name="classifications_list",
+                type="string",
+                items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
+            )
+        ],
+        "components": [
+            Component(
+                component_id=uuid4(),
+                page_id=None,
+                title="How is your organisation classified?",
+                type=ComponentType.RADIOS_FIELD,
+                page_index=1,
+                theme_id=None,
+                theme_index=6,
+                options={"hideTitle": False, "classes": ""},
+                runner_component_name="organisation_classification",
+                list_id=list_id,
+            )
+        ],
+    }
+)
+def test_list_relationship(seed_dynamic_data):
+    result = get_component_by_id(seed_dynamic_data["components"][0].component_id)
+    assert result
+    assert result.list_id == list_id
+    assert result.lizt
+    assert result.lizt.name == "classifications_list"

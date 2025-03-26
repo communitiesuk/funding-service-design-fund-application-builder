@@ -1,51 +1,13 @@
 import json
 from pathlib import Path
-from uuid import uuid4
 
 import pytest
 
-from app.db.models import Component, ComponentType, Form, FormSection, Lizt, Page, Section
-from app.db.queries.application import get_component_by_id
+from app.db.models import Component, Form, FormSection, Page, Section
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
 from app.import_config.load_form_json import load_form_jsons
-
-list_id = uuid4()
-
-
-@pytest.mark.seed_config(
-    {
-        "lists": [
-            Lizt(
-                list_id=list_id,
-                name="classifications_list",
-                type="string",
-                items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
-            )
-        ],
-        "components": [
-            Component(
-                component_id=uuid4(),
-                page_id=None,
-                title="How is your organisation classified?",
-                type=ComponentType.RADIOS_FIELD,
-                page_index=1,
-                theme_id=None,
-                theme_index=6,
-                options={"hideTitle": False, "classes": ""},
-                runner_component_name="organisation_classification",
-                list_id=list_id,
-            )
-        ],
-    }
-)
-def test_list_relationship(seed_dynamic_data):
-    result = get_component_by_id(seed_dynamic_data["components"][0].component_id)
-    assert result
-    assert result.list_id == list_id
-    assert result.lizt
-    assert result.lizt.name == "classifications_list"
 
 
 @pytest.mark.parametrize(
