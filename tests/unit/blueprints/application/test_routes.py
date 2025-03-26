@@ -181,7 +181,7 @@ def test_mark_application_complete(flask_test_client, seed_dynamic_data):
     soup = BeautifulSoup(response.data, "html.parser")
 
     # Title should be "View application"
-    assert soup.find("h1", class_="govuk-heading-l").text.strip() == "View application"
+    assert " ".join(soup.find("h1", class_="govuk-heading-l").text.strip().split()) == "View application"
 
     # Status tag should be green
     status_tag = soup.find("span", class_="govuk-tag")
@@ -269,7 +269,7 @@ def test_mark_application_in_progress(flask_test_client, seed_dynamic_data):
     soup = BeautifulSoup(response.data, "html.parser")
 
     # Title should be "Build application"
-    assert soup.find("h1", class_="govuk-heading-l").text.strip() == "Build application"
+    assert " ".join(soup.find("h1", class_="govuk-heading-l").text.strip().split()) == "Build application"
 
     # Status tag should be blue
     status_tag = soup.find("span", class_="govuk-tag")
