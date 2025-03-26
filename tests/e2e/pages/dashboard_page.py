@@ -35,6 +35,13 @@ class DashboardPage(PageBase):
 
         return SelectGrantPage(self.page, metadata=self.metadata)
 
+    def when_click_design_your_application(self):
+        """Clicks the 'Add a new grant' button."""
+        self.design_your_application.click()
+        from tests.e2e.pages.select_grant_page import SelectGrantPage
+
+        return SelectGrantPage(self.page, metadata=self.metadata)
+
     def then_verify_on_dashboard(self):
         expect(self.title).to_be_visible()
         return self
