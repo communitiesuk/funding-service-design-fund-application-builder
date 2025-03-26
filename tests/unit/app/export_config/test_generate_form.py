@@ -5,8 +5,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Component, ComponentType, FormSection, Lizt, Page
-from app.db.models.application_config import Form
+from app.db.models import Component, ComponentType, Form, FormSection, Fund, Lizt, Page, Round, Section
 from app.export_config.generate_form import (
     build_component,
     build_conditions,
@@ -18,7 +17,10 @@ from app.export_config.generate_form import (
     build_start_page,
     human_to_kebab_case,
 )
-from tests.unit.unit_test_data import (
+from app.shared.data_classes import Condition, ConditionValue
+from tests.helpers import get_fund_by_id
+from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
+from tests.unit_test_data import (
     mock_c_1,
     mock_c_2,
     mock_form_1,
@@ -995,3 +997,192 @@ def test_build_form_sections(input_form, sections_count):
     assert len(sections) == sections_count
     assert sections[0]["title"] == "Test section"
     assert sections[0]["name"] == "test"
+
+
+def test_build_form_json_no_conditions(seed_dynamic_data):
+    f: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
+    form: Form = f.rounds[0].sections[0].forms[0]
+
+    result = build_form_json(form=form)
+    assert result
+    assert len(result["pages"]) == 3
+    exp_start_path = "/intro-about-your-organisation"
+    exp_second_path = "/organisation-name"
+    assert result["startPage"] == exp_start_path
+    intro_page = next((p for p in result["pages"] if p["path"] == exp_start_path), None)
+    assert intro_page
+    assert intro_page["next"][0]["path"] == exp_second_path
+
+    org_name_page = next((p for p in result["pages"] if p["path"] == exp_second_path), None)
+    assert org_name_page
+    assert len(org_name_page["next"]) == 1
+
+    assert len(org_name_page["next"]) == 1
+    assert org_name_page["next"][0]["path"] == "/summary"
+    assert len(org_name_page["components"]) == 2
+
+    summary = next((p for p in result["pages"] if p["path"] == "/summary"), None)
+    assert summary
+
+
+fund_id = uuid4()
+round_id = uuid4()
+section_id = uuid4()
+form_id = uuid4()
+page_1_id = uuid4()
+page_2_id = uuid4()
+
+
+@pytest.mark.seed_config(
+    {
+        "funds": [Fund(fund_id=fund_id, short_name="UTFWC", **BASIC_FUND_INFO)],
+        "rounds": [
+            Round(
+                round_id=round_id, title_json={"en": "UT RWC"}, fund_id=fund_id, short_name="UTRWC", **BASIC_ROUND_INFO
+            )
+        ],
+        "sections": [
+            Section(
+                section_id=section_id, index=1, round_id=round_id, name_in_apply_json={"en": "Organisation Information"}
+            )
+        ],
+        "forms": [
+            Form(
+                form_id=form_id,
+                section_id=section_id,
+                name_in_apply_json={"en": "About your organisation"},
+                section_index=1,
+                runner_publish_name="about-your-org",
+            )
+        ],
+        "pages": [
+            Page(
+                page_id=page_1_id,
+                form_id=form_id,
+                display_path="organisation-name",
+                name_in_apply_json={"en": "Organisation Name"},
+                form_index=1,
+            ),
+            Page(
+                page_id=page_2_id,
+                form_id=form_id,
+                display_path="organisation-alternative-names",
+                name_in_apply_json={"en": "Alternative names of your organisation"},
+                form_index=2,
+                is_template=True,
+            ),
+        ],
+        "default_next_pages": [
+            {"page_id": page_1_id, "default_next_page_id": page_2_id},
+        ],
+        "components": [
+            Component(
+                component_id=uuid4(),
+                page_id=page_1_id,
+                title="What is your organisation's name?",
+                hint_text="This must match the regsitered legal organisation name",
+                type=ComponentType.TEXT_FIELD,
+                page_index=1,
+                theme_id=None,
+                options={"hideTitle": False, "classes": ""},
+                runner_component_name="organisation_name",
+            ),
+            Component(
+                component_id=uuid4(),
+                page_id=page_1_id,
+                title="Does your organisation use any other names?",
+                type=ComponentType.YES_NO_FIELD,
+                page_index=2,
+                theme_id=None,
+                options={"hideTitle": False, "classes": ""},
+                runner_component_name="does_your_organisation_use_other_names",
+                is_template=True,
+                conditions=[
+                    asdict(
+                        Condition(
+                            name="organisation_other_names_no",
+                            display_name="org other names no",
+                            destination_page_path="/summary",
+                            source_page_path="/organisation-name",
+                            value=ConditionValue(
+                                name="org other names no",
+                                conditions=[
+                                    {
+                                        "field": {
+                                            "name": "org_other_names",
+                                            "type": "YesNoField",
+                                            "display": "org other names",
+                                        },
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "false", "display": "false"},
+                                        "coordinator": None,
+                                    },
+                                ],
+                            ),
+                        ),
+                    ),
+                    asdict(
+                        Condition(
+                            name="organisation_other_names_yes",
+                            display_name="org other names yes",
+                            destination_page_path="/organisation-alternative-names",
+                            source_page_path="/organisation-name",
+                            value=ConditionValue(
+                                name="org other names yes",
+                                conditions=[
+                                    {
+                                        "field": {
+                                            "name": "org_other_names",
+                                            "type": "YesNoField",
+                                            "display": "org other names",
+                                        },
+                                        "operator": "is",
+                                        "value": {"type": "Value", "value": "true", "display": "false"},
+                                        "coordinator": None,
+                                    },
+                                ],
+                            ),
+                        ),
+                    ),
+                ],
+            ),
+            Component(
+                component_id=uuid4(),
+                page_id=page_2_id,
+                title="Alternative Name 1",
+                type=ComponentType.TEXT_FIELD,
+                page_index=1,
+                theme_id=None,
+                options={"hideTitle": False, "classes": ""},
+                runner_component_name="alt_name_1",
+                is_template=True,
+            ),
+        ],
+    }
+)
+def test_build_form_json_with_conditions(seed_dynamic_data):
+    f: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
+    form: Form = f.rounds[0].sections[0].forms[0]
+
+    result = build_form_json(form=form)
+    assert result
+    assert len(result["pages"]) == 4
+    exp_start_path = "/intro-about-your-organisation"
+    exp_second_path = "/organisation-name"
+    assert result["startPage"] == exp_start_path
+    intro_page = next((p for p in result["pages"] if p["path"] == exp_start_path), None)
+    assert intro_page
+    assert intro_page["next"][0]["path"] == exp_second_path
+
+    org_name_page = next((p for p in result["pages"] if p["path"] == exp_second_path), None)
+    assert org_name_page
+    assert len(org_name_page["next"]) == 3
+    assert len(org_name_page["components"]) == 2
+
+    alt_names_page = next((p for p in result["pages"] if p["path"] == "/organisation-alternative-names"), None)
+    assert alt_names_page
+    assert alt_names_page["next"][0]["path"] == "/summary"
+    assert len(alt_names_page["components"]) == 1
+
+    summary = next((p for p in result["pages"] if p["path"] == "/summary"), None)
+    assert summary

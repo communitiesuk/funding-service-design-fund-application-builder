@@ -1,7 +1,47 @@
 from sqlalchemy import select
 
 from app.db import db
-from app.db.models import Round
+from app.db.models import Fund, Round
+
+
+def get_fund_by_id(fund_id: str):
+    """
+    Retrieves a Fund object by its ID
+
+    Args:
+        fund_id: The ID of the fund to retrieve
+
+    Returns:
+        The Fund object with the given ID
+
+    Raises:
+        ValueError: If no Fund with the given ID is found
+    """
+    stmt = select(Fund).where(Fund.fund_id == fund_id)
+    fund = db.session.scalars(stmt).first()
+    if not fund:
+        raise ValueError(f"Fund with ID '{fund_id}' not found")
+    return fund
+
+
+def get_round_by_id(round_id: str) -> Round:
+    """
+    Retrieves a Round object by its ID
+
+    Args:
+        round_id: The ID of the round to retrieve
+
+    Returns:
+        The Round object with the given ID
+
+    Raises:
+        ValueError: If no Round with the given ID is found
+    """
+    stmt = select(Round).where(Round.round_id == round_id)
+    round = db.session.scalars(stmt).first()
+    if not round:
+        raise ValueError(f"Round with ID '{round_id}' not found")
+    return round
 
 
 def get_round_by_title(title: str) -> Round:
