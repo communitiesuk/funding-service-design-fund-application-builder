@@ -18,8 +18,10 @@ class DefaultConfig(object):
         "FUND_APPLICATION_BUILDER_HOST", "https://fund-application-builder.levellingup.gov.localhost:3011"
     )
     FAB_SAVE_PER_PAGE = getenv("FAB_SAVE_PER_PAGE", "dev/save")
-    FORM_RUNNER_URL = getenv("FORM_RUNNER_INTERNAL_HOST", "http://form-runner:3009")
-    FORM_RUNNER_URL_REDIRECT = getenv("FORM_RUNNER_EXTERNAL_HOST", "https://form-runner.levellingup.gov.localhost:3009")
+    FORM_RUNNER_INTERNAL_HOST = getenv("FORM_RUNNER_INTERNAL_HOST", "http://form-runner:3009")
+    FORM_RUNNER_EXTERNAL_HOST = getenv(
+        "FORM_RUNNER_EXTERNAL_HOST", "https://form-runner.levellingup.gov.localhost:3009"
+    )
     FORM_DESIGNER_URL_REDIRECT = getenv(
         "FORM_DESIGNER_EXTERNAL_HOST", "https://form-designer.levellingup.gov.localhost:3000"
     )

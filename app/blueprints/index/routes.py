@@ -51,13 +51,13 @@ def preview_form(form_id):
 
     try:
         publish_response = requests.post(
-            url=f"{Config.FORM_RUNNER_URL}/publish", json={"id": form_id, "configuration": form_json}
+            url=f"{Config.FORM_RUNNER_INTERNAL_HOST}/publish", json={"id": form_id, "configuration": form_json}
         )
         if not str(publish_response.status_code).startswith("2"):
             return "Error during form publish", 500
     except Exception as e:
         return f"unable to publish form: {str(e)}", 500
-    return redirect(f"{Config.FORM_RUNNER_URL_REDIRECT}/{form_id}?form_session_identifier=preview/{uuid.uuid4()}")
+    return redirect(f"{Config.FORM_RUNNER_EXTERNAL_HOST}/{form_id}?form_session_identifier=preview/{uuid.uuid4()}")
 
 
 @index_bp.route("/download/<form_id>", methods=["GET"])
