@@ -1,4 +1,5 @@
 import json
+import uuid
 from random import randint
 
 import requests
@@ -56,7 +57,7 @@ def preview_form(form_id):
             return "Error during form publish", 500
     except Exception as e:
         return f"unable to publish form: {str(e)}", 500
-    return redirect(f"{Config.FORM_RUNNER_EXTERNAL_HOST}/{form_id}")
+    return redirect(f"{Config.FORM_RUNNER_EXTERNAL_HOST}/{form_id}?form_session_identifier=preview/{uuid.uuid4()}")
 
 
 @index_bp.route("/download/<form_id>", methods=["GET"])
