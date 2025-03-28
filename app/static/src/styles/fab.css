@@ -101,3 +101,17 @@
     margin-bottom: 2px;
     margin-left: 15px;
 }
+
+.govuk-panel--confirmation-blue {
+    color: #fff; /* Keep text white */
+    background: #1d70b8; /* Use GOV.UK blue */
+    font-size: 24px;
+}
+
+.govuk-panel-\!-left {
+    text-align: left !important; /* Override center alignment */
+}
+
+.govuk-link-\!-white {
+    color: #fff !important;
+}

@@ -16,6 +16,7 @@ from app.db.queries.application import (
 from app.export_config.generate_all_questions import generate_html
 from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import human_to_kebab_case
+from app.shared.forms import DeleteConfirmationForm
 from app.shared.helpers import flash_message
 
 template_bp = Blueprint(
@@ -167,7 +168,18 @@ def _save_and_return(updated_form, form):
     return redirect(url_for("index_bp.dashboard"))
 
 
-@template_bp.route("/<form_id>/delete", methods=["GET"])
+@template_bp.route("/<form_id>/delete", methods=["GET", "POST"])  # Sensitive
 def delete_template(form_id):
-    delete_form(form_id=form_id, cascade=True)
-    return redirect(url_for("template_bp.view_templates"))
+    form = DeleteConfirmationForm()
+
+    if form.validate_on_submit():  # If user confirms deletion
+        delete_form(form_id=form_id, cascade=True)
+        return redirect(url_for("template_bp.view_templates"))
+
+    # Render confirmation page
+    return render_template(
+        "delete_confirmation.html",
+        form=form,
+        cancel_url=url_for("template_bp.template_details", form_id=form_id),
+        delete_action_item="template",
+    )
