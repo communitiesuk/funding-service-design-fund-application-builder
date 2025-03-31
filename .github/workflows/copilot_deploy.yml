@@ -12,6 +12,7 @@ on:
           - dev
           - test
           - uat
+          - prod
       run_e2e_tests:
         required: false
         default: true
