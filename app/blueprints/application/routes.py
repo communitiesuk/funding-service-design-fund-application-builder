@@ -41,7 +41,7 @@ from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
 from app.export_config.generate_fund_round_html import generate_all_round_html
-from app.shared.forms import SelectFundForm
+from app.shared.forms import DeleteConfirmationForm, SelectFundForm
 from app.shared.helpers import flash_message
 from config import Config
 
@@ -235,10 +235,21 @@ def section(round_id, section_id=None):
     return render_template("section.html", form=form, **params)
 
 
-@application_bp.route("/<round_id>/sections/<section_id>/delete", methods=["GET"])
+@application_bp.route("/<round_id>/sections/<section_id>/delete", methods=["GET", "POST"])  # Sensitive
 def delete_section(round_id, section_id):
-    delete_section_from_round(round_id=round_id, section_id=section_id, cascade=True)
-    return redirect(url_for("application_bp.build_application", round_id=round_id))
+    form = DeleteConfirmationForm()
+
+    if form.validate_on_submit():  # If user confirms deletion
+        delete_section_from_round(round_id=round_id, section_id=section_id, cascade=True)
+        return redirect(url_for("application_bp.build_application", round_id=round_id))
+
+    # Render confirmation page
+    return render_template(
+        "delete_confirmation.html",
+        form=form,
+        cancel_url=url_for("application_bp.section", round_id=round_id, section_id=section_id),
+        delete_action_item="section",
+    )
 
 
 @application_bp.route("/<round_id>/sections/<section_id>/move-up", methods=["GET"])
