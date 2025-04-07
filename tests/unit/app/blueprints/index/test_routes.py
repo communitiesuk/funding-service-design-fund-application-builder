@@ -15,7 +15,7 @@ def test_index_redirects_to_login_for_unauthenticated_user(flask_test_client):
     assert response.location == "/login"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_index_redirects_to_dashboard_for_authenticated_user(flask_test_client):
     """
     Tests that authenticated users are redirected to the dashboard when trying to access the index route.
@@ -38,10 +38,10 @@ def test_login_renders_for_unauthenticated_user(flask_test_client):
     assert f"{Config.AUTHENTICATOR_HOST}/sessions/sign-out?return_app=fund-application-builder" not in unescape(html)
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
-def test_dashboard_renders_for_internal_user(flask_test_client):
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
+def test_dashboard_renders_for_allowed_domain_user(flask_test_client):
     """
-    Tests that authenticated internal users can access the dashboard.
+    Tests that authenticated users with allowed domains can access the dashboard.
     """
     response = flask_test_client.get("/dashboard")
     assert response.status_code == 200
@@ -53,17 +53,17 @@ def test_dashboard_renders_for_internal_user(flask_test_client):
     assert f"{Config.AUTHENTICATOR_HOST}/sessions/sign-out?return_app=fund-application-builder" in unescape(html)
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_external_user")
-def test_dashboard_forbidden_for_external_user(flask_test_client):
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_disallowed_domain_user")
+def test_dashboard_forbidden_for_disallowed_domain_user(flask_test_client):
     """
-    Tests that authenticated external users are forbidden from accessing the dashboard.
+    Tests that authenticated users with disallowed domains cannot access the dashboard.
     """
     response = flask_test_client.get("/dashboard")
     assert response.status_code == 403
     assert b"You do not have permission to access this page" in response.data
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_internal_server_error(flask_test_client):
     """
     Tests that a 500 internal server error returns the custom 500 page.
@@ -83,3 +83,25 @@ def test_internal_server_error(flask_test_client):
     finally:
         # Restore the original setting
         flask_test_client.application.config["PROPAGATE_EXCEPTIONS"] = old_prop_setting
+
+
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_disallowed_domain_user")
+def test_dashboard_respects_allowed_domains_config(flask_test_client):
+    """
+    Tests that the ALLOWED_DOMAINS config properly controls access.
+    """
+    # Save original config
+    original_config = flask_test_client.application.config.get("ALLOWED_DOMAINS", "")
+
+    try:
+        # Set example.com as an allowed domain
+        flask_test_client.application.config["ALLOWED_DOMAINS"] = "example.com"
+
+        # With example.com now allowed, the "disallowed" user should be able to access
+        response = flask_test_client.get("/dashboard")
+        assert response.status_code == 200
+        assert b"Creating a new grant application" in response.data
+
+    finally:
+        # Restore original config
+        flask_test_client.application.config["ALLOWED_DOMAINS"] = original_config

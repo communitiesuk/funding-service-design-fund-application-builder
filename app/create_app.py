@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request
 from flask_talisman import Talisman
 from fsd_utils import init_sentry
-from fsd_utils.authentication.decorators import SupportedApp, check_internal_user, login_required
+from fsd_utils.authentication.decorators import SupportedApp, login_required
 from fsd_utils.healthchecks.checkers import FlaskRunningChecker
 from fsd_utils.healthchecks.healthcheck import Healthcheck
 from fsd_utils.logging import logging
 from govuk_frontend_wtf.main import WTFormsHelpers
 from jinja2 import ChoiceLoader, PackageLoader, PrefixLoader
 
+from app.auth import check_allowed_domains
 from app.blueprints.application.routes import application_bp
 from app.blueprints.fund.routes import fund_bp
 from app.blueprints.index.routes import index_bp
@@ -28,7 +29,7 @@ def protect_private_routes(flask_app: Flask) -> Flask:
         if endpoint in PUBLIC_ROUTES:
             continue
         flask_app.view_functions[endpoint] = login_required(
-            check_internal_user(view_func),
+            check_allowed_domains(view_func),
             roles_required=["FSD_ADMIN"],
             return_app=SupportedApp.FUND_APPLICATION_BUILDER,
         )

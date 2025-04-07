@@ -11,7 +11,7 @@ from app.db.models import Form
 from tests.helpers import submit_form
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "db_with_templates")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user", "db_with_templates")
 def test_generalized_table_template_with_existing_templates(flask_test_client):
     response = flask_test_client.get(
         "/templates", follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
@@ -58,7 +58,7 @@ def test_generalized_table_template_with_existing_templates(flask_test_client):
     assert "Preview in a new tab" in html, "Preview action is missing"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user", "seed_dynamic_data")
 def test_template_details_view(flask_test_client, seed_dynamic_data):
     form: Form = seed_dynamic_data["forms"][0]
 
@@ -88,14 +88,14 @@ def test_template_details_view(flask_test_client, seed_dynamic_data):
     assert "View template questions" in html, "View template questions is missing"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_template_create_get_form(flask_test_client):
     response = flask_test_client.get("/templates/create")
     assert response.status_code == 200
     assert b"Upload a new template" in response.data
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_template_create_invalid_data(flask_test_client):
     response = flask_test_client.post("/templates/create", data={})
     assert response.status_code == 200
@@ -104,7 +104,7 @@ def test_template_create_invalid_data(flask_test_client):
     assert b"Choose a template file" in response.data
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_template_create_already_existing_template(flask_test_client):
     flask_test_client.get("/templates/create")
     with flask_test_client.session_transaction():
@@ -120,7 +120,7 @@ def test_template_create_already_existing_template(flask_test_client):
             assert b"Template name already exists" in response.data
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_template_create_invalid_json_file(flask_test_client):
     flask_test_client.get("/templates/create")
     with flask_test_client.session_transaction():
@@ -135,7 +135,7 @@ def test_template_create_invalid_json_file(flask_test_client):
         assert b"Upload a valid JSON file" in response.data
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "clean_db")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user", "clean_db")
 def test_template_create_success(flask_test_client, clean_db):
     flask_test_client.get("/templates/create")
     with flask_test_client.session_transaction():
@@ -161,7 +161,7 @@ def test_template_create_success(flask_test_client, clean_db):
 @patch("app.blueprints.template.routes.delete_form")
 @patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_edit_template_get(
     mock_flash, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
 ):
@@ -183,7 +183,7 @@ def test_edit_template_get(
 @patch("app.blueprints.template.routes.delete_form")
 @patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_edit_template_post_update_without_actions(
     mock_flash_message, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
 ):
@@ -218,7 +218,7 @@ def test_edit_template_post_update_without_actions(
 @patch("app.blueprints.template.routes.get_form_by_id")
 @patch("app.blueprints.template.routes.update_form")
 @patch("app.blueprints.template.routes.redirect")
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_edit_template_post_update_with_actions_template_table(
     mock_redirect, mock_update_form, mock_get_form_by_id, flask_test_client
 ):
@@ -257,7 +257,7 @@ def test_edit_template_post_update_with_actions_template_table(
 @patch("app.blueprints.template.routes.delete_form")
 @patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_edit_template_post_with_file_without_actions(
     mock_flash_message, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
 ):
@@ -279,7 +279,7 @@ def test_edit_template_post_with_file_without_actions(
         mock_flash_message.assert_called_with("Template updated")
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user", "seed_dynamic_data")
 def test_template_questions_view(flask_test_client, seed_dynamic_data):
     form: Form = seed_dynamic_data["forms"][0]
 
@@ -295,7 +295,7 @@ def test_template_questions_view(flask_test_client, seed_dynamic_data):
     assert "This template contains the following questions." in html, "Title description is missing"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_template_search_functionality(flask_test_client, _db):
     test_template = Form(
         form_id=uuid.uuid4(),
@@ -368,7 +368,7 @@ def test_template_search_functionality(flask_test_client, _db):
         _db.session.commit()
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "seed_dynamic_data")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user", "seed_dynamic_data")
 def test_template_delete(flask_test_client, seed_dynamic_data):
     form: Form = seed_dynamic_data["forms"][0]
 

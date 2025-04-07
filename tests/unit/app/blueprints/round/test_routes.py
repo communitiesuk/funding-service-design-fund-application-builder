@@ -24,7 +24,7 @@ round_data_info = {
 }
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_select_fund(flask_test_client, seed_dynamic_data):
     """
     Test the /rounds/select-grant route to ensure a user cannot proceed without selecting a fund
@@ -47,7 +47,7 @@ def test_select_fund(flask_test_client, seed_dynamic_data):
     assert response.location == expected_location
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully created using the /rounds/create route
@@ -83,7 +83,7 @@ def test_create_round_with_existing_short_name(flask_test_client, seed_dynamic_d
     assert error_html in response.data.decode("utf-8"), "Error HTML not found in response"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_round_with_invalid_eoi_schema_json(flask_test_client, seed_dynamic_data):
     """
     Tests for rounds/create route verifies that the created round has the correct attributes
@@ -107,7 +107,7 @@ def test_create_round_with_invalid_eoi_schema_json(flask_test_client, seed_dynam
     assert error_html in response.data.decode("utf-8"), "No errors found in response"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_update_existing_round_check_eoi_schema_optional_value(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully updated using the /rounds/<round_id> route
@@ -152,7 +152,7 @@ def test_update_existing_round_check_eoi_schema_optional_value(flask_test_client
     assert eoi_schema == "Not provided"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_round_with_return_home(flask_test_client, seed_dynamic_data):
     """Tests that 'Save and return home' action correctly redirects to dashboard after round creation"""
     test_fund = seed_dynamic_data["funds"][0]
@@ -178,7 +178,7 @@ def test_create_round_with_return_home(flask_test_client, seed_dynamic_data):
     assert notification.text.strip() == "New application created"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_round_from_application_list(flask_test_client, seed_dynamic_data):
     """Tests that 'Save and return to applications list'
     action correctly redirects to application list after round creation"""
@@ -200,7 +200,7 @@ def test_create_round_from_application_list(flask_test_client, seed_dynamic_data
     assert notification.text.strip() == "New application created"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_round_from_application_list_and_return_to_home(flask_test_client, seed_dynamic_data):
     """Tests that 'Save and return home' action correctly redirects to dashboard after round creation"""
     test_fund = seed_dynamic_data["funds"][0]
@@ -221,7 +221,7 @@ def test_create_round_from_application_list_and_return_to_home(flask_test_client
     assert notification.text.strip() == "New application created"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_round_from_dashboard_and_continue_build(flask_test_client, seed_dynamic_data):
     """Tests that 'Save and continue build application'
     action correctly redirects to build application after round creation"""
@@ -244,7 +244,7 @@ def test_create_round_from_dashboard_and_continue_build(flask_test_client, seed_
     assert notification.text.strip() == "New application created"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_all_applications_page(flask_test_client, seed_dynamic_data):
     response = flask_test_client.get("/rounds", follow_redirects=True)
 
@@ -276,7 +276,7 @@ def test_all_applications_page(flask_test_client, seed_dynamic_data):
     assert "Build application" in html, "Build application is not available and table component is missing"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_view_round_details(flask_test_client, seed_dynamic_data):
     """
     Test to check round detail route is working as expected.
@@ -299,7 +299,7 @@ def test_view_round_details(flask_test_client, seed_dynamic_data):
     assert backlink.text == "Back"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_clone_round(flask_test_client, seed_dynamic_data):
     """
     Test to check round detail route is working as expected.
@@ -341,7 +341,7 @@ def test_clone_round(flask_test_client, seed_dynamic_data):
         assert notification.text.strip() == "Error copying application"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_round_search_functionality(flask_test_client, _db):
     test_fund = Fund(
         name_json={"en": "Test Fund For Round Search"},
@@ -435,7 +435,7 @@ def test_round_search_functionality(flask_test_client, _db):
         _db.session.commit()
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_round_with_application_close_date_before_open_date(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully created using the /rounds/create route
@@ -477,7 +477,7 @@ def test_create_round_with_application_close_date_before_open_date(flask_test_cl
     assert error_messages == expected
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_round_with_assessment_close_date_before_open_date(flask_test_client, seed_dynamic_data):
     """
     Tests that a round can be successfully created using the /rounds/create route
