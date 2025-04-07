@@ -132,25 +132,25 @@ def set_auth_cookie(flask_test_client):
 
 
 @pytest.fixture
-def patch_validate_token_rs256_internal_user():
-    # This fixture patches validate_token_rs256 for all tests automatically.
+def patch_validate_token_rs256_allowed_domain_user():
+    # This fixture patches validate_token_rs256 for users with allowed domains
     with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
         mock_validate_token_rs256.return_value = {
             "accountId": "test-account-id",
             "roles": ["FSD_ADMIN"],
-            "email": "test@communities.gov.uk",
+            "email": "user@communities.gov.uk",  # An allowed domain by default
         }
         yield mock_validate_token_rs256
 
 
 @pytest.fixture
-def patch_validate_token_rs256_external_user():
-    # This fixture patches validate_token_rs256 for all tests automatically.
+def patch_validate_token_rs256_disallowed_domain_user():
+    # This fixture patches validate_token_rs256 for users with disallowed domains
     with patch("fsd_utils.authentication.decorators.validate_token_rs256") as mock_validate_token_rs256:
         mock_validate_token_rs256.return_value = {
             "accountId": "test-account-id",
             "roles": ["FSD_ADMIN"],
-            "email": "test@gmail.com",
+            "email": "user@example.com",  # A domain not in the allowed list
         }
         yield mock_validate_token_rs256
 

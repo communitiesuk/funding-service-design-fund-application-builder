@@ -10,7 +10,7 @@ from app.blueprints.application.routes import create_export_zip
 from tests.helpers import submit_form
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_select_fund(flask_test_client, seed_dynamic_data):
     """
     Test the /rounds/sections/select-grant route to ensure:
@@ -34,7 +34,7 @@ def test_select_fund(flask_test_client, seed_dynamic_data):
     assert response.location == expected_location
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_select_application_invalid_access(flask_test_client):
     """Test that proper errors are raised for invalid access attempts"""
     # Test access without fund ID
@@ -47,7 +47,7 @@ def test_select_application_invalid_access(flask_test_client):
         flask_test_client.get(f"/rounds/sections/select-application?fund_id={invalid_fund_id}", follow_redirects=True)
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_select_application_form_submission(flask_test_client, seed_dynamic_data):
     """Test the actual form submission functionality"""
     test_fund = seed_dynamic_data["funds"][0]
@@ -68,7 +68,7 @@ def test_select_application_form_submission(flask_test_client, seed_dynamic_data
     assert response.location == expected_location
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_section(flask_test_client, seed_dynamic_data):
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
@@ -80,7 +80,7 @@ def test_create_section(flask_test_client, seed_dynamic_data):
     assert section
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_update_section_name(flask_test_client, seed_dynamic_data):
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
@@ -101,7 +101,7 @@ def test_update_section_name(flask_test_client, seed_dynamic_data):
     assert section
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_delete_section(flask_test_client, seed_dynamic_data):
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
@@ -129,7 +129,7 @@ def test_delete_section(flask_test_client, seed_dynamic_data):
     assert response.status_code == 200
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_update_section_empty_template_section_name(flask_test_client, seed_dynamic_data):
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
@@ -159,7 +159,7 @@ def test_update_section_empty_template_section_name(flask_test_client, seed_dyna
     assert error_link.get_text() == "Enter section name"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_update_template_form(flask_test_client, seed_dynamic_data):
     test_round = seed_dynamic_data["rounds"][0]
     test_form = seed_dynamic_data["forms"][0]
@@ -192,7 +192,7 @@ def test_update_template_form(flask_test_client, seed_dynamic_data):
     assert found, "Template Form not found"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_mark_application_complete(flask_test_client, seed_dynamic_data):
     """Test marking an application as complete"""
     test_round = seed_dynamic_data["rounds"][0]
@@ -242,7 +242,7 @@ def test_mark_application_complete(flask_test_client, seed_dynamic_data):
     assert len(down_links) == 0
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_application_complete_page(flask_test_client, seed_dynamic_data):
     """Test the application complete confirmation page"""
     test_round = seed_dynamic_data["rounds"][0]
@@ -285,7 +285,7 @@ def test_application_complete_page(flask_test_client, seed_dynamic_data):
     assert home_link is not None
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_mark_application_in_progress(flask_test_client, seed_dynamic_data):
     """Test marking a complete application as in progress"""
     test_round = seed_dynamic_data["rounds"][0]

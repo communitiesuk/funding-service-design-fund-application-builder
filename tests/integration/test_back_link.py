@@ -2,7 +2,7 @@ import pytest
 from flask import session, url_for
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_session_track_visited_pages_fund(flask_test_client, seed_dynamic_data):
     with flask_test_client.session_transaction():
         test_fund = seed_dynamic_data["funds"][0]
@@ -24,7 +24,7 @@ def test_session_track_visited_pages_fund(flask_test_client, seed_dynamic_data):
         assert response.headers["Location"] == url_for("fund_bp.view_all_funds")
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_session_track_visited_pages_template(flask_test_client, seed_dynamic_data):
     with flask_test_client.session_transaction():
         test_form = seed_dynamic_data["forms"][0]
@@ -46,7 +46,7 @@ def test_session_track_visited_pages_template(flask_test_client, seed_dynamic_da
         assert response.headers["Location"] == url_for("template_bp.view_templates")
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 @pytest.mark.parametrize(
     "endpoint, expected_endpoint",
     [
