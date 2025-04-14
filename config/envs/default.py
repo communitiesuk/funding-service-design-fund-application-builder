@@ -87,3 +87,5 @@ class DefaultConfig(object):
         "x_xss_protection": True,
         "content_security_policy_nonce_in": ["script-src"],
     }
+
+    ALLOWED_DOMAINS = getenv("ALLOWED_DOMAINS", "communities.gov.uk,test.communities.gov.uk")

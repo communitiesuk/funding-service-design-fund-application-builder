@@ -9,7 +9,7 @@ from app.db.queries.fund import get_fund_by_id
 from tests.helpers import submit_form
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_fund(flask_test_client, seed_dynamic_data):
     """
     Tests that a fund can be successfully created using the /grants/create route
@@ -44,7 +44,7 @@ def test_create_fund(flask_test_client, seed_dynamic_data):
             assert created_fund.__getattribute__(key) == value
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_fund_with_existing_short_name(flask_test_client, seed_dynamic_data):
     """
     Tests that a fund can be successfully created using the /grants/create route
@@ -78,7 +78,7 @@ def test_create_fund_with_existing_short_name(flask_test_client, seed_dynamic_da
     )
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_update_fund(flask_test_client, seed_dynamic_data):
     """
     Tests that a fund can be successfully updated using the /grants/<fund_id> route
@@ -113,7 +113,7 @@ def test_update_fund(flask_test_client, seed_dynamic_data):
             assert updated_fund.__getattribute__(key) == value
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_update_fund_and_return_home(flask_test_client, seed_dynamic_data):
     """Tests that 'Save and return home' action correctly redirects to dashboard after fund update"""
     test_fund = seed_dynamic_data["funds"][0]
@@ -140,7 +140,7 @@ def test_update_fund_and_return_home(flask_test_client, seed_dynamic_data):
     assert response.request.path == "/dashboard"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_update_fund_and_return_fund_details(flask_test_client, seed_dynamic_data):
     """Tests that 'Save and continue' action correctly redirects to dashboard after fund update"""
     test_fund = seed_dynamic_data["funds"][0]
@@ -167,7 +167,7 @@ def test_update_fund_and_return_fund_details(flask_test_client, seed_dynamic_dat
     assert response.request.path == f"/grants/{test_fund.fund_id}"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_update_fund_and_return_round_details(flask_test_client, seed_dynamic_data):
     """Tests that 'Save and continue' action correctly redirects to dashboard after fund update"""
     test_fund = seed_dynamic_data["funds"][0]
@@ -195,7 +195,7 @@ def test_update_fund_and_return_round_details(flask_test_client, seed_dynamic_da
     assert response.request.path == f"/rounds/{test_round.round_id}"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_fund_with_return_home(flask_test_client):
     """Tests that 'Save and return home' action correctly redirects to dashboard after fund creation"""
     flask_test_client.get("/grants/create")
@@ -223,7 +223,7 @@ def test_create_fund_with_return_home(flask_test_client):
     assert notification.text.strip() == "New grant added successfully"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "clean_db")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user", "clean_db")
 def test_create_fund_from_grant_details(flask_test_client, seed_dynamic_data):
     """Tests that 'Save and continue' action correctly redirects to grants list after fund creation"""
     flask_test_client.get("/grants/create?actions=grants_table")
@@ -251,7 +251,7 @@ def test_create_fund_from_grant_details(flask_test_client, seed_dynamic_data):
         assert notification.text.strip() == "New grant added successfully"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user", "clean_db")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user", "clean_db")
 def test_create_fund_from_select_grant(flask_test_client):
     """Tests that 'Save and continue' action correctly redirects to round creation after fund creation
     when add grant is submitted from select grant page"""
@@ -281,7 +281,7 @@ def test_create_fund_from_select_grant(flask_test_client):
     assert notification.text.strip() == "New grant added successfully"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_view_all_funds(flask_test_client, seed_dynamic_data):
     response = flask_test_client.get(
         "/grants/", follow_redirects=True, headers={"Content-Type": "application/x-www-form-urlencoded"}
@@ -314,7 +314,7 @@ def test_view_all_funds(flask_test_client, seed_dynamic_data):
     assert f"/grants/{test_fund.fund_id}" in html
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_view_fund_details(flask_test_client, seed_dynamic_data):
     """
     Test to check grant detail route is working as expected.
@@ -338,7 +338,7 @@ def test_view_fund_details(flask_test_client, seed_dynamic_data):
     assert '<dt class="govuk-summary-list__key"> Grant name (Welsh)</dt>' not in html
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_create_fund_welsh_error_messages(flask_test_client, seed_dynamic_data):
     """
     Test welsh error messages are rendered as expected.
@@ -359,7 +359,7 @@ def test_create_fund_welsh_error_messages(flask_test_client, seed_dynamic_data):
     assert b"Enter the Welsh grant description" in response.data  # Validation error message
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_update_fund_and_check_optinal_values_not_provided(flask_test_client, seed_dynamic_data):
     test_fund = seed_dynamic_data["funds"][0]
     flask_test_client.get(f"/grants/{test_fund.fund_id}/edit")
@@ -398,7 +398,7 @@ def test_update_fund_and_check_optinal_values_not_provided(flask_test_client, se
     assert ggis_reference_number == "Not provided"
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_fund_search_functionality(flask_test_client, _db):
     test_fund = Fund(
         name_json={"en": "SpecialTestFund_XYZ123"},

@@ -155,7 +155,7 @@ pagination_higher_than_limit_last = create_mock_pagination(
         },
     ],
 )
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_internal_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_pagination_with_less_than_pagination_default(app, pagination_scenario):
     with app.test_request_context():
         page = render_template("view_all_funds.html", table_rows=[], pagination=pagination_scenario["pagination"])
