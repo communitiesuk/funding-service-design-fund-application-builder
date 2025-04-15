@@ -40,14 +40,14 @@ def domains(request: pytest.FixtureRequest, get_e2e_params) -> FabDomains:
     match e2e_env:
         case "local":
             return FabDomains(
-                fab_url="https://fund-application-builder.levellingup.gov.localhost:3011",
-                cookie_domain=".levellingup.gov.localhost",
+                fab_url="https://fund-application-builder.communities.gov.localhost:3011",
+                cookie_domain=".communities.gov.localhost",
                 environment="local",
             )
         case "e2e":
             return FabDomains(
-                fab_url="http://fund-application-builder.levellingup.gov.localhost:8080",
-                cookie_domain=".levellingup.gov.localhost",
+                fab_url="http://fund-application-builder.communities.gov.localhost:8080",
+                cookie_domain=".communities.gov.localhost",
                 environment="e2e",
             )
         case "dev":

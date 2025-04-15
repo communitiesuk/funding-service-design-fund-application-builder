@@ -15,15 +15,15 @@ class DefaultConfig(object):
     SECRET_KEY = CommonConfig.SECRET_KEY
 
     FUND_APPLICATION_BUILDER_HOST = getenv(
-        "FUND_APPLICATION_BUILDER_HOST", "https://fund-application-builder.levellingup.gov.localhost:3011"
+        "FUND_APPLICATION_BUILDER_HOST", "https://fund-application-builder.communities.gov.localhost:3011"
     )
     FAB_SAVE_PER_PAGE = getenv("FAB_SAVE_PER_PAGE", "dev/save")
     FORM_RUNNER_INTERNAL_HOST = getenv("FORM_RUNNER_INTERNAL_HOST", "http://form-runner:3009")
     FORM_RUNNER_EXTERNAL_HOST = getenv(
-        "FORM_RUNNER_EXTERNAL_HOST", "https://form-runner.levellingup.gov.localhost:3009"
+        "FORM_RUNNER_EXTERNAL_HOST", "https://form-runner.communities.gov.localhost:3009"
     )
     FORM_DESIGNER_URL_REDIRECT = getenv(
-        "FORM_DESIGNER_EXTERNAL_HOST", "https://form-designer.levellingup.gov.localhost:3000"
+        "FORM_DESIGNER_EXTERNAL_HOST", "https://form-designer.communities.gov.localhost:3000"
     )
     SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URL")
 
@@ -31,7 +31,7 @@ class DefaultConfig(object):
     GENERATE_LOCAL_CONFIG = False
 
     FSD_USER_TOKEN_COOKIE_NAME = "fsd_user_token"
-    AUTHENTICATOR_HOST = getenv("AUTHENTICATOR_HOST", "https://authenticator.levellingup.gov.localhost:4004")
+    AUTHENTICATOR_HOST = getenv("AUTHENTICATOR_HOST", "https://authenticator.communities.gov.localhost:4004")
     LOGOUT_URL_OVERRIDE = f"{AUTHENTICATOR_HOST}/sessions/sign-out?return_app=fund-application-builder&return_path=/"  # noqa: E501
     # RSA 256 Keys
     RSA256_PUBLIC_KEY_BASE64 = getenv("RSA256_PUBLIC_KEY_BASE64")
