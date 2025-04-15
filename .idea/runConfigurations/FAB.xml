@@ -6,7 +6,7 @@
         <option name="PARENT_ENVS" value="true"/>
         <envs>
             <env name="PYTHONUNBUFFERED" value="1"/>
-            <env name="AUTHENTICATOR_HOST" value="https://authenticator.levellingup.gov.localhost:4004"/>
+            <env name="AUTHENTICATOR_HOST" value="https://authenticator.communities.gov.localhost:4004"/>
             <env name="DATABASE_URL"
                  value="postgresql://postgres:password@localhost:5432/fab_store"/> <!--pragma: allowlist secret-->
             <env name="FLASK_DEBUG" value="0"/>
