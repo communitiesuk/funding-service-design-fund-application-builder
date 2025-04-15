@@ -74,6 +74,9 @@ class DashboardPage(PageBase):
         banner = self.page.locator(".govuk-notification-banner--success")
         expect(banner.get_by_role("heading", name="New application created")).to_be_visible()
         expect(banner.locator("a")).to_have_count(2)
+        self.update_metadata(
+            "round_id", re.search(r"[0-9a-fA-F-]{36}$", banner.locator("a").nth(0).get_attribute("href")).group(0)
+        )
         next_step_link = banner.get_by_role("link", name="Design your application")
         expect(next_step_link).to_be_visible()
         return self

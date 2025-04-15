@@ -1,5 +1,3 @@
-import random
-
 from playwright.sync_api import Locator, Page, expect
 
 from tests.e2e.pages.page_base import PageBase
@@ -12,25 +10,14 @@ class SelectGrantPage(PageBase):
         self.select_grant: Locator = self.page.get_by_role("combobox", name="Select or add a grant")
         self.continue_btn: Locator = self.page.get_by_role("button", name="Continue")
 
-    def when_select_a_grant(self, grant_name: str = None):
+    def when_select_a_grant(self, grant_id: str = None):
         """Select a grant from the dropdown."""
         self.select_grant.wait_for(state="visible")
-        grant_options = [
-            {"label": option.text_content(), "value": option.get_attribute("value")}
-            for option in self.select_grant.locator("option").all()[1:]
-        ]
-        if grant_name is None:
-            selected_grant = random.choice(grant_options)
-        else:
-            matching_grants = [
-                option
-                for option in grant_options
-                if grant_name.lower() in option["label"].lower() or grant_name.lower() in option["value"].lower()
-            ]
-            if not matching_grants:
-                raise ValueError(f"Error: Grant '{grant_name}' not found. No matching grants available.")
-            selected_grant = matching_grants[0]
-        self.select_grant.select_option(value=selected_grant["value"])
+        grant_id = grant_id or self.metadata.get("grant_id")
+        available_grant_ids = [opt.get_attribute("value") for opt in self.select_grant.locator("option").all()[1:]]
+        if not grant_id or grant_id not in available_grant_ids:
+            raise ValueError(f"Grant ID '{grant_id}' not found in available grant IDs: {available_grant_ids}")
+        self.select_grant.select_option(value=grant_id)
         return self
 
     def when_click_continue(self):
