@@ -1,5 +1,3 @@
-import random
-
 from playwright.sync_api import Locator, Page, expect
 
 from tests.e2e.pages.build_application_page import BuildApplicationPage
@@ -13,18 +11,15 @@ class SelectApplicationPage(PageBase):
         self.select_application: Locator = self.page.get_by_role("combobox", name="Select or create an application")
         self.continue_btn: Locator = self.page.get_by_role("button", name="Continue")
 
-    def when_select_a_application(self):
+    def when_select_an_application(self, round_id: str = None):
         self.select_application.wait_for(state="visible")
-        application_options = [
-            {"label": opt.text_content(), "value": opt.get_attribute("value")}
-            for opt in self.select_application.locator("option").all()[1:]
+        round_id = round_id or self.metadata.get("round_id")
+        available_round_ids = [
+            opt.get_attribute("value") for opt in self.select_application.locator("option").all()[1:]
         ]
-        application_name = self.metadata.get("application_name")
-        available_application_names = [option["value"] for option in application_options]
-        if application_name and application_name in available_application_names:
-            self.select_application.select_option(value=application_name)
-        else:
-            self.select_application.select_option(value=random.choice(application_options)["value"])
+        if not round_id or round_id not in available_round_ids:
+            raise ValueError(f"Round ID '{round_id}' not found in available round IDs: {available_round_ids}")
+        self.select_application.select_option(value=round_id)
         return self
 
     def when_click_continue(self):
