@@ -104,7 +104,7 @@ jobs:
     secrets: inherit # pragma: allowlist secret
 
   uat_deploy:
-    needs: [ test_deploy, paketo_build, setup ]
+    needs: [ test_e2e_test, paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'uat') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     name: Deploy to UAT
     concurrency:
@@ -125,7 +125,7 @@ jobs:
       notify_slack_on_deployment: false
 
   prod_deploy:
-    needs: [ uat_deploy, paketo_build, setup ]
+    needs: [ test_e2e_test, paketo_build, setup ]
     if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'prod') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
     name: Deploy to prod
     concurrency:
