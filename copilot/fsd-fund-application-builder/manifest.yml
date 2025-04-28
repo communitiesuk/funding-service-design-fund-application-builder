@@ -139,12 +139,12 @@ environments:
       AUTHENTICATOR_HOST: "https://account.access-funding.communities.gov.uk"
       FLASK_ENV: production
       SENTRY_TRACES_SAMPLE_RATE: 1
-      # Prod points to UAT runner because prod runner does not support /publish endpoint needed for previewing forms
-      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.uat.communities.gov.uk"
+      # Prod points to Test runner because prod runner does not support /publish endpoint needed for previewing forms
+      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.test.communities.gov.uk"
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.test.communities.gov.uk"
       # Internal host needs to be overridden with external host because the internal host points to the service running
-      # in the same AWS env and we are publishing from prod FAB to UAT Runner
-      FORM_RUNNER_INTERNAL_HOST: "https://application-questions.access-funding.uat.communities.gov.uk"
+      # in the same AWS env and we are publishing from prod FAB to Test Runner
+      FORM_RUNNER_INTERNAL_HOST: "https://application-questions.access-funding.test.communities.gov.uk"
     count:
       range: 2-4
       cooldown:
