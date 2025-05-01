@@ -47,7 +47,6 @@ variables:
   FUND_APPLICATION_BUILDER_HOST: "https://fund-application-builder.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
   AUTHENTICATOR_HOST: "https://account.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
   FLASK_ENV: ${COPILOT_ENVIRONMENT_NAME}
-  FORM_RUNNER_INTERNAL_HOST: "http://fsd-form-runner-adapter:3009"
   NOTIFICATION_SERVICE_HOST: http://fsd-notification:8080
   MAINTENANCE_MODE: false
   SENTRY_DSN: https://4128cfd691c439577e8f106968217f72@o1432034.ingest.us.sentry.io/4508496706666497
@@ -58,6 +57,7 @@ secrets:
   RSA256_PUBLIC_KEY_BASE64: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/RSA256_PUBLIC_KEY_BASE64
   SECRET_KEY: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/SECRET_KEY
   ALLOWED_DOMAINS: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/FAB_ALLOWED_DOMAINS
+  FORM_RUNNER_PUBLISH_URL: /copilot/${COPILOT_APPLICATION_NAME}/${COPILOT_ENVIRONMENT_NAME}/secrets/FORM_RUNNER_PUBLISH_URL
 
 # You can override any of the values defined above by environment.
 environments:
@@ -139,12 +139,9 @@ environments:
       AUTHENTICATOR_HOST: "https://account.access-funding.communities.gov.uk"
       FLASK_ENV: production
       SENTRY_TRACES_SAMPLE_RATE: 1
-      # Prod points to Test runner because prod runner does not support /publish endpoint needed for previewing forms
+      # Prod FAB points to Test Runner because Prod Runner doesn't support /publish endpoint needed for previewing forms
       FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.test.communities.gov.uk"
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.test.communities.gov.uk"
-      # Internal host needs to be overridden with external host because the internal host points to the service running
-      # in the same AWS env and we are publishing from prod FAB to Test Runner
-      FORM_RUNNER_INTERNAL_HOST: "https://application-questions.access-funding.test.communities.gov.uk"
     count:
       range: 2-4
       cooldown:
