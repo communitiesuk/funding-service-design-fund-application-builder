@@ -1,5 +1,5 @@
 name: Deploy to AWS
-run-name: ${{ github.event_name == 'workflow_dispatch' && format('Deploy to {0}', github.event.inputs.environment) || (github.ref == 'refs/heads/main' && 'Deploy to Test-UAT-Prod' || 'Build & Unit Test') }}
+run-name: ${{ github.event_name == 'workflow_dispatch' && format('Deploy to {0}', github.event.inputs.environment) || (github.ref == 'refs/heads/main' && 'Deploy to Test-Prod' || 'Build & Unit Test') }}
 
 on:
   workflow_dispatch:
@@ -11,7 +11,6 @@ on:
         options:
           - dev
           - test
-          - uat
           - prod
       run_e2e_tests:
         required: false
@@ -102,27 +101,6 @@ jobs:
     with:
       environment: 'test'
     secrets: inherit # pragma: allowlist secret
-
-  uat_deploy:
-    needs: [ test_e2e_test, paketo_build, setup ]
-    if: ${{ always() && contains(fromJSON(needs.setup.outputs.jobs_to_run), 'uat') && (! contains(needs.*.result, 'failure') ) && (! contains(needs.*.result, 'cancelled') )}}
-    name: Deploy to UAT
-    concurrency:
-      group: deploy-uat
-      cancel-in-progress: false
-    uses: communitiesuk/funding-service-design-workflows/.github/workflows/standard-deploy.yml@main
-    secrets:
-      AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_NOTIFICATION_CHANNEL_ID: ${{ secrets.SLACK_NOTIFICATION_CHANNEL_ID }}
-      SLACK_DEPLOYMENTS_CHANNEL_ID: ${{ secrets.SLACK_DEPLOYMENTS_CHANNEL_ID }}
-    with:
-      environment: uat
-      app_name: fund-application-builder
-      run_db_migrations: true
-      image_location: ${{ needs.paketo_build.outputs.image_location }}
-      notify_slack: true
-      notify_slack_on_deployment: false
 
   prod_deploy:
     needs: [ test_e2e_test, paketo_build, setup ]
