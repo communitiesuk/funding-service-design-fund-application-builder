@@ -50,9 +50,13 @@ def preview_form(form_id):
     form_id = form.runner_publish_name
 
     try:
+        print(f"[PREVIEW] Preview form {form_id}")
+        print(f"[JSON] [{form_json}]")
         publish_response = requests.post(
             url=Config.FORM_RUNNER_PUBLISH_URL, json={"id": form_id, "configuration": form_json}
         )
+        print("[RESPONSE] Status Code:", publish_response.status_code)
+        print("[RESPONSE] Response Body:", publish_response.text)
         if not str(publish_response.status_code).startswith("2"):
             return "Error during form publish", 500
     except Exception as e:
