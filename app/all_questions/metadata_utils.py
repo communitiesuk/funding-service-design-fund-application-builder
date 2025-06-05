@@ -340,7 +340,10 @@ def determine_title_and_text_for_component(
             )
             if child["type"].casefold() in FIELD_TYPES_WITH_MAX_WORDS:
                 first_column_title = component["options"]["columnTitles"][0].casefold()
-                text.append(f"{child_title} (Max {child['options']['maxWords']} words per {first_column_title})")
+                options = child.get("options", {})
+                max_words = options.get("maxWords")
+                if max_words:
+                    text.append(f"{child_title} (Max {max_words} words per {first_column_title})")
             else:
                 text.append(child_title)
             text.extend(child_text)
