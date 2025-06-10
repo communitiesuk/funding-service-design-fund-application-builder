@@ -3,6 +3,7 @@ import fnmatch
 from typing import Tuple
 
 from bs4 import BeautifulSoup, NavigableString
+from flask import current_app
 
 from app.all_questions.read_forms import (
     build_section_header,
@@ -304,7 +305,7 @@ def update_wording_for_multi_input_fields(text: list) -> list:
     return text
 
 
-def determine_title_and_text_for_component(
+def determine_title_and_text_for_component(  # noqa: C901
     component: dict,
     include_html_components: bool = True,
     form_lists: list = None,
@@ -339,11 +340,16 @@ def determine_title_and_text_for_component(
                 child, include_html_components, form_lists, is_child=True
             )
             if child["type"].casefold() in FIELD_TYPES_WITH_MAX_WORDS:
-                first_column_title = component["options"]["columnTitles"][0].casefold()
-                options = child.get("options", {})
-                max_words = options.get("maxWords")
-                if max_words:
-                    text.append(f"{child_title} (Max {max_words} words per {first_column_title})")
+                options = component.get("options", {})
+                column_titles = options.get("columnTitles", [])
+                if column_titles:
+                    first_column_title = column_titles[0].casefold()
+                    child_options = child.get("options", {})
+                    max_words = child_options.get("maxWords")
+                    if max_words:
+                        text.append(f"{child_title} (Max {max_words} words per {first_column_title})")
+                else:
+                    text.append(child_title)
             else:
                 text.append(child_title)
             text.extend(child_text)
@@ -373,9 +379,19 @@ def determine_title_and_text_for_component(
     if "list" in component:
         # include available options for lists
         list_id = component["list"]
-        list_items = next(list["items"] for list in form_lists if list["name"] == list_id)
-        list_display = [item["text"] for item in list_items]
-        text.append(list_display)
+        list_items = None
+
+        for lst in form_lists:
+            if lst["name"] == list_id:
+                list_items = lst["items"]
+                break
+
+        if list_items:
+            list_display = [item["text"] for item in list_items]
+            text.append(list_display)
+        else:
+            # TODO Handle the case where the children in MultiInputFields have lists
+            current_app.logger.warning("List with name '%s' not found in form lists.", list_id)
     return title, text
 
 
