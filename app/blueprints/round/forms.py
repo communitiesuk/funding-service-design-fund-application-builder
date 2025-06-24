@@ -47,12 +47,20 @@ class RoundForm(FlaskForm):
     opens = DateTimeField(
         "Application round opens",
         widget=GovDatetimeInput(),
+        description=(
+            "Dates must be between Tuesday to Thursday (no bank holidays or weekends). The default time is midday - any"
+            " bespoke times must be during working hours (9am to 5pm)"
+        ),
         format="%d %m %Y %H %M",
         validators=[DataRequired(message="Enter the date and time the application round opens")],
     )
     deadline = DateTimeField(
         "Application round closes",
         widget=GovDatetimeInput(),
+        description=(
+            "Dates must be between Tuesday to Thursday (no bank holidays or weekends). The default time is midday - any"
+            " bespoke times must be during working hours (9am to 5pm)"
+        ),
         format="%d %m %Y %H %M",
         validators=[DataRequired(message="Enter the date and time the application round closes")],
     )
