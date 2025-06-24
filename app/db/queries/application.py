@@ -59,6 +59,11 @@ def get_list_by_id(list_id: str) -> Lizt:
     return lizt
 
 
+def get_list_by_name(list_name: str) -> Lizt:
+    lizt = db.session.query(Lizt).where(Lizt.name == list_name).one_or_none()
+    return lizt
+
+
 # CRUD operations for Section, Form, Page, and Component
 # CRUD SECTION
 def insert_new_section(new_section_config):

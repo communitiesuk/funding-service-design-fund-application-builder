@@ -260,6 +260,13 @@ def insert_form_config(form_config, form_id):
             inserted_component = insert_component_as_template(
                 component, inserted_page.page_id, (c_idx + 1), list_names_to_ids
             )
+            if inserted_component.type == ComponentType.MULTI_INPUT_FIELD:
+                for children_component_idx, child_component in enumerate(component.get("children", [])):
+                    inserted_child_component = insert_component_as_template(
+                        child_component, None, (children_component_idx + 1), list_names_to_ids
+                    )
+                    inserted_child_component.parent_component = inserted_component
+                    inserted_components.append(inserted_child_component)
             inserted_components.append(inserted_component)
         db.session.flush()  # flush to make components available for conditions
 

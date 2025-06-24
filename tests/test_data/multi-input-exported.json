@@ -68,7 +68,9 @@
                             "name": "GLQlOh",
                             "options": {},
                             "type": "TextField",
-                            "title": "Describe the cost"
+                            "title": "Describe the cost",
+                            "hint": "",
+                            "schema": {}
                         },
                         {
                             "name": "JtwkMy",

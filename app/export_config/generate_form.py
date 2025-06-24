@@ -101,13 +101,16 @@ def build_component(component: Component) -> dict:
     if component.type.value is ComponentType.YES_NO_FIELD.value:
         # implicit list
         built_component.update({"values": {"type": "listRef"}})
-    elif component.lizt:
+    if component.lizt:
         built_component.update({"list": component.lizt.name})
         built_component["metadata"].update({"fund_builder_list_id": str(component.list_id)})
         built_component.update({"values": {"type": "listRef"}})
 
     if component.type is ComponentType.MULTI_INPUT_FIELD:
-        built_component.update({"children": component.children})
+        child_component_config = []
+        for child_component in component.children_components:
+            child_component_config.append(build_component(child_component))
+        built_component.update({"children": child_component_config})
 
     return built_component
 
@@ -134,9 +137,10 @@ def build_page(page: Page = None) -> dict:
         built_page["controller"] = page.controller
 
     for component in page.components:
-        built_component = build_component(component)
+        if not component.parent_component:
+            built_component = build_component(component)
 
-        built_page["components"].append(built_component)
+            built_page["components"].append(built_component)
 
     return built_page
 
@@ -202,23 +206,33 @@ def build_form_section(form_section_list, form_section):
 
 
 def build_lists(pages: list[dict]) -> list:
-    # Takes in the form builder format json and copies in any lists used in those pages
     lists = []
+    seen_names = set()
     for page in pages:
         for component in page["components"]:
-            if component.get("list"):
-                list_from_db = get_list_by_id(component["metadata"]["fund_builder_list_id"])
-                list_dict = {
-                    "type": list_from_db.type,
-                    "items": list_from_db.items,
-                    "name": list_from_db.name,
-                    "title": list_from_db.title,
-                }
-                # Check if the list already exists in lists by name
-                if not any(existing_list["name"] == list_dict["name"] for existing_list in lists):
-                    lists.append(list_dict)
-            # Remove the metadata key from component (no longer needed)
-            component.pop("metadata", None)  # The second argument prevents KeyError if 'metadata' is not found
+            components_to_check = (
+                component["children"]
+                if component.get("type") == "MultiInputField" and component.get("children")
+                else [component]
+            )
+
+            for comp in components_to_check:
+                if not comp.get("list"):
+                    comp.pop("metadata", None)
+                    continue
+                list_from_db = get_list_by_id(comp["metadata"]["fund_builder_list_id"])
+                if list_from_db and list_from_db.name not in seen_names:
+                    lists.append(
+                        {
+                            "type": list_from_db.type,
+                            "items": list_from_db.items,
+                            "name": list_from_db.name,
+                            "title": list_from_db.title,
+                        }
+                    )
+                    seen_names.add(list_from_db.name)
+                comp.pop("metadata", None)
+            component.pop("metadata", None)
 
     return lists
 

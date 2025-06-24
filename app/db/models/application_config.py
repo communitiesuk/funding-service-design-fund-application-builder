@@ -250,6 +250,17 @@ class Component(BaseModel):
     list_id: Mapped[UUID | None] = mapped_column(ForeignKey("lizt.list_id"), nullable=True)
     lizt: Mapped[Lizt | None] = relationship("Lizt")
 
+    parent_component_id = Column(UUID(as_uuid=True), ForeignKey("component.component_id"), nullable=True)
+    parent_component: Mapped["Component | None"] = relationship(
+        "Component", remote_side=[component_id], back_populates="children_components"
+    )
+
+    children_components: Mapped[List["Component"]] = relationship(
+        "Component",
+        back_populates="parent_component",
+        lazy="joined",
+    )
+
     def __repr__(self):
         return f"Component({self.title}, {self.type.value})"
 
