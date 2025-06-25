@@ -422,34 +422,6 @@
     ],
     "lists": [
         {
-            "title": "orgslist",
-            "name": "MKPFgi",
-            "type": "string",
-            "items": [
-                {
-                    "text": "org1",
-                    "value": "org1",
-                    "condition": "FRfKzH"
-                },
-                {
-                    "text": "org2",
-                    "value": "org2",
-                    "condition": "FOtfdc"
-                }
-            ]
-        },
-        {
-            "title": "other",
-            "name": "bErzTp",
-            "type": "string",
-            "items": [
-                {
-                    "text": "others",
-                    "value": "other"
-                }
-            ]
-        },
-        {
             "title": "Organisation operating time",
             "name": "RfMTRE",
             "type": "string",
@@ -2104,28 +2076,6 @@
                             "type": "Value",
                             "value": "Limited company",
                             "display": "Limited company"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "displayName": "Local authority",
-            "name": "bqoyEo",
-            "value": {
-                "name": "Local authority",
-                "conditions": [
-                    {
-                        "field": {
-                            "name": "nweebX.TiKRCy",
-                            "type": "RadiosField",
-                            "display": "How is your organisation classified?"
-                        },
-                        "operator": "is",
-                        "value": {
-                            "type": "Value",
-                            "value": "Local authority",
-                            "display": "Local authority"
                         }
                     }
                 ]

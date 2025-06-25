@@ -1,0 +1,352 @@
+{
+    "metadata": {},
+    "startPage": "/what-we-need-to-know",
+    "pages": [
+        {
+            "title": "What we need to know",
+            "path": "/what-we-need-to-know",
+            "components": [
+                {
+                    "name": "MlaYdI",
+                    "options": {},
+                    "type": "Para",
+                    "content": "In this section, we’ll ask about:\n<ul>\n<li>whether you can provide details of any projects that your Neighbourhood Board has already identified for funding</li>\n<li>details of the projects, where applicable</li>\n</ul>",
+                    "schema": {}
+                },
+                {
+                    "name": "PceZnx",
+                    "options": {},
+                    "type": "Para",
+                    "content": "This section is optional but we would encourage you to provide details where possible.",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/can-you-provide-details-of-any-projects-you-have-identified-for-funding"
+                }
+            ],
+            "section": "FabDefault"
+        },
+        {
+            "path": "/can-you-provide-details-of-any-projects-you-have-identified-for-funding",
+            "title": "Can you provide details of any projects you have identified for funding? ",
+            "components": [
+                {
+                    "name": "wmpvjb",
+                    "options": {
+                        "hideTitle": true
+                    },
+                    "type": "YesNoField",
+                    "title": "Can you provide details of any projects you have identified for funding? ",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/tell-us-about-your-project",
+                    "condition": "AcZTSt"
+                },
+                {
+                    "path": "/check-your-answers",
+                    "condition": "qRJIfp"
+                }
+            ],
+            "section": "FabDefault"
+        },
+        {
+            "path": "/check-your-answers",
+            "title": "Check your answers",
+            "components": [],
+            "next": [],
+            "controller": "./pages/summary.js",
+            "section": "FabDefault"
+        },
+        {
+            "path": "/tell-us-about-your-project",
+            "title": "Tell us about your project.",
+            "components": [
+                {
+                    "name": "dEyfRq",
+                    "options": {
+                        "columnTitles": [
+                            "Project name",
+                            "Brief description of project",
+                            "Primary intervention",
+                            "Project status",
+                            "Name of delivery organisation",
+                            "Type of organisation",
+                            "Amount of funding allocated",
+                            "Other sources of project funding",
+                            "Total project budget"
+                        ]
+                    },
+                    "type": "MultiInputField",
+                    "title": "Tell us about your project.",
+                    "children": [
+                        {
+                            "type": "TextField",
+                            "name": "AeuWAj",
+                            "options": {
+                                "columnTitles": [
+                                    "Project name",
+                                    "Brief description of project",
+                                    "Primary intervention",
+                                    "Project status",
+                                    "Name of delivery organisation",
+                                    "Type of organisation"
+                                ]
+                            },
+                            "title": "Project name",
+                            "hint": "",
+                            "schema": {}
+                        },
+                        {
+                            "type": "TextField",
+                            "name": "tXQbHW",
+                            "options": {
+                                "maxWords": 10
+                            },
+                            "title": "Brief description of project",
+                            "hint": "(maximum 10 words)",
+                            "schema": {}
+                        },
+                        {
+                            "type": "RadiosField",
+                            "name": "ojLAmd",
+                            "options": {
+                                "required": false
+                            },
+                            "title": "Primary intervention",
+                            "hint": "",
+                            "schema": {},
+                            "list": "EagaHu",
+                            "values": {
+                                "type": "listRef"
+                            }
+                        },
+                        {
+                            "type": "RadiosField",
+                            "name": "YzhoTC",
+                            "options": {},
+                            "title": "Project status",
+                            "hint": "",
+                            "schema": {},
+                            "list": "wvJWwE",
+                            "values": {
+                                "type": "listRef"
+                            }
+                        },
+                        {
+                            "type": "TextField",
+                            "name": "qaHSDG",
+                            "options": {
+                                "required": false
+                            },
+                            "title": "Name of delivery organisation",
+                            "hint": "",
+                            "schema": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "type": "TextField",
+                            "name": "GeundE",
+                            "options": {
+                                "required": false
+                            },
+                            "title": "Type of organisation",
+                            "hint": "",
+                            "schema": {
+                                "required": false
+                            }
+                        },
+                        {
+                            "type": "NumberField",
+                            "name": "nYQcxZ",
+                            "options": {
+                                "prefix": "£"
+                            },
+                            "title": "Amount of funding allocated from the Plan for Neighbourhoods programme",
+                            "hint": "",
+                            "schema": {}
+                        },
+                        {
+                            "type": "MultilineTextField",
+                            "name": "EhzAeB",
+                            "options": {},
+                            "title": "Other sources of project funding",
+                            "hint": "",
+                            "schema": {}
+                        },
+                        {
+                            "type": "NumberField",
+                            "name": "HbiXPn",
+                            "options": {
+                                "prefix": "£"
+                            },
+                            "title": "Total project budget",
+                            "hint": "This is the sum of the funding allocated from the Plan for Neighbourhoods programme and other funding sources.",
+                            "schema": {}
+                        }
+                    ],
+                    "schema": {}
+                },
+                {
+                    "name": "NznEbN",
+                    "options": {},
+                    "type": "Para",
+                    "content": "Once you have completed the fields, 'Save and add another' to add another project or continue to the next question. ",
+                    "schema": {}
+                }
+            ],
+            "next": [
+                {
+                    "path": "/check-your-answers"
+                }
+            ],
+            "section": "FabDefault",
+            "options": {
+                "summaryDisplayMode": {
+                    "samePage": true,
+                    "separatePage": false,
+                    "hideRowTitles": false
+                },
+                "customText": {
+                    "samePageTitle": "Project information",
+                    "samePageTableItemName": "project"
+                }
+            },
+            "controller": "RepeatingFieldPageController"
+        }
+    ],
+    "lists": [
+        {
+            "title": "Primary intervention",
+            "name": "EagaHu",
+            "type": "string",
+            "items": [
+                {
+                    "text": "Cohesion",
+                    "value": "Cohesion"
+                },
+                {
+                    "text": "Education and opportunity",
+                    "value": "Education and opportunity"
+                },
+                {
+                    "text": "Health and wellbeing",
+                    "value": "Health and wellbeing"
+                },
+                {
+                    "text": "Housing",
+                    "value": "Housing"
+                },
+                {
+                    "text": "Regeneration, high streets and heritage",
+                    "value": "Regeneration, high streets and heritage"
+                },
+                {
+                    "text": "Safety and security",
+                    "value": "Safety and security"
+                },
+                {
+                    "text": "Transport",
+                    "value": "Transport"
+                },
+                {
+                    "text": "Work, productivity and skills",
+                    "value": "Work, productivity and skills"
+                }
+            ]
+        },
+        {
+            "title": "Project status",
+            "name": "wvJWwE",
+            "type": "string",
+            "items": [
+                {
+                    "text": "In pipeline",
+                    "value": "In pipeline"
+                },
+                {
+                    "text": "Selected by Neighbourhood Board",
+                    "value": "Selected by Neighbourhood Board"
+                },
+                {
+                    "text": "Funding committed",
+                    "value": "Funding committed"
+                }
+            ]
+        }
+    ],
+    "sections": [
+        {
+            "name": "FabDefault",
+            "title": "Default Section",
+            "hideTitle": true
+        }
+    ],
+    "conditions": [
+        {
+            "displayName": "If Yes",
+            "name": "AcZTSt",
+            "value": {
+                "name": "If Yes",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "FabDefault.wmpvjb",
+                            "type": "YesNoField",
+                            "display": "Can you provide details of any projects you have identified for funding? "
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "true",
+                            "display": "true"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "displayName": "If No",
+            "name": "qRJIfp",
+            "value": {
+                "name": "If No",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "FabDefault.wmpvjb",
+                            "type": "YesNoField",
+                            "display": "Can you provide details of any projects you have identified for funding? "
+                        },
+                        "operator": "is",
+                        "value": {
+                            "type": "Value",
+                            "value": "false",
+                            "display": "false"
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "fees": [],
+    "outputs": [],
+    "version": 2,
+    "skipSummary": false,
+    "feeOptions": {
+        "allowSubmissionWithoutPayment": true,
+        "maxAttempts": 3,
+        "showPaymentSkippedWarningPage": false
+    },
+    "markAsComplete": false,
+    "name": "Projects",
+    "feedback": {
+        "feedbackForm": false,
+        "url": ""
+    },
+    "phaseBanner": {}
+}
