@@ -28,6 +28,12 @@ class GovDatetimeInput(GovFormBase):
         elif field.data:
             day, month, year, hour, minute = field.data.strftime("%d %m %Y %H %M").split(" ")
 
+        if field.name in ["opens", "deadline"]:
+            if not hour:
+                hour = "12"
+            if not minute:
+                minute = "0"
+
         params.setdefault(
             "fieldset",
             {
