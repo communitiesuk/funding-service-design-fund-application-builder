@@ -43,6 +43,28 @@
                     }
                 ]
             }
+        },
+        {
+            "displayName": "not many fruit",
+            "name": "eoCHtF",
+            "value": {
+                "name": "not many fruit",
+                "conditions": [
+                    {
+                        "field": {
+                            "name": "GyudBp",
+                            "type": "NumberField",
+                            "display": "How many fruits does this plant produce per year?"
+                        },
+                        "operator": "is at most",
+                        "value": {
+                            "type": "Value",
+                            "value": "9",
+                            "display": "9"
+                        }
+                    }
+                ]
+            }
         }
     ],
     "startPage": "/all-components",
