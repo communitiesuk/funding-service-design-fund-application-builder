@@ -4,11 +4,11 @@ requires-python = ">=3.10.0, <3.11"
 
 [[package]]
 name = "airium"
-version = "0.2.6"
+version = "0.2.7"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/c3/98/f843cd8969409e913b0535ae15771f86d35aed87484372de6fa4e48b283f/airium-0.2.6.tar.gz", hash = "sha256:ccab36b798b6cce3d0c5074e52ce8059f6e82991caae4985f42cadfad80b1de4", size = 19496, upload-time = "2023-09-17T20:12:45.238Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/b2/b03d50eaf3ddbc258d376e1f8439cf2575afaff93d07a42c9de720792e46/airium-0.2.7.tar.gz", hash = "sha256:6b4dd8b69838b7766179ab90078a049dc337b1da4fc0f7754f30f74d6eed706e", size = 20269, upload-time = "2025-06-10T14:01:53.879Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cb/bc/d174ebf44e4cf8cd967bca5e181e254bd2f95afbb5367471382713736bf5/airium-0.2.6-py3-none-any.whl", hash = "sha256:50af5cf491e084f27909e29a93550b4170e587cde01334d58c6249644ee8c6c2", size = 13313, upload-time = "2023-09-17T20:12:43.423Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/cb/d92ab9a9571e82f8107865bda7d7cbdaf43d48eec94ec69f45bff6dc4e4c/airium-0.2.7-py3-none-any.whl", hash = "sha256:35e3ae334327b17b7c2fc39bb57ab2c48171ca849f8cf3dff11437d1e054952e", size = 13806, upload-time = "2025-06-10T14:01:52.83Z" },
 ]
 
 [[package]]
@@ -486,7 +486,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "airium", specifier = "==0.2.6" },
+    { name = "airium", specifier = "==0.2.7" },
     { name = "beautifulsoup4", specifier = "==4.13.3" },
     { name = "flask", specifier = "==3.1.1" },
     { name = "flask-debugtoolbar", specifier = "==0.16.0" },
