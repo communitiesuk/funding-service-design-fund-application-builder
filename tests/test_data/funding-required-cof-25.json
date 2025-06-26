@@ -121,7 +121,9 @@
               "name": "GLQlOh",
               "options": {},
               "type": "TextField",
-              "title": "Describe the cost"
+              "title": "Describe the cost",
+              "hint": "",
+              "schema": {}
             },
             {
               "name": "JtwkMy",
@@ -232,7 +234,9 @@
               "name": "JKqLWU",
               "options": {},
               "type": "TextField",
-              "title": "Source of secured funding"
+              "title": "Source of secured funding",
+              "hint": "",
+              "schema": {}
             },
             {
               "name": "LVJcDC",
@@ -315,7 +319,9 @@
               "name": "iMJdfs",
               "options": {},
               "type": "TextField",
-              "title": "Source of unsecured match funding"
+              "title": "Source of unsecured match funding",
+              "hint": "",
+              "schema": {}
             },
             {
               "name": "THOdae",
@@ -409,7 +415,9 @@
               "name": "hGsUaZ",
               "options": {},
               "type": "TextField",
-              "title": "Describe the cost"
+              "title": "Describe the cost",
+              "hint": "",
+              "schema": {}
             },
             {
               "name": "UyaAHw",

@@ -65,6 +65,7 @@ def test_generate_config_to_verify_form_sections(
     "input_filename, output_filename,expected_page_count_for_form,expected_component_count_for_form, "
     "expected_form_section_count",
     [
+        ("projects.json", "projects.json", 4, 5, 1),
         ("asset-information.json", "asset-information.json", 23, 29, 2),
         ("org-info.json", "org-info.json", 18, 43, 2),
         ("optional-all-components.json", "optional-all-components.json", 8, 27, 4),
@@ -154,6 +155,8 @@ def test_generate_config_for_round_valid_input(
     output_condition_count = len(output_form.get("conditions", []))
     assert output_condition_count <= input_condition_count  # sometime we remove specified but unused conditions
 
+    _assert_sorted_equal(output_form, input_form, "lists")
+
     # check that content of each page (including page[components] and page[next] within form[pages] is the same
     for input_page in input_form["pages"]:
         # find page in output pages
@@ -181,3 +184,10 @@ def test_generate_config_for_round_valid_input(
 
             for key in input_component:
                 assert input_component[key] == output_component[key]
+
+
+def _assert_sorted_equal(output, input_data, key):
+    if key in input_data and input_data[key]:
+        sorted_output = sorted(output[key], key=lambda x: x["name"])
+        sorted_input = sorted(input_data[key], key=lambda x: x["name"])
+        assert sorted_output == sorted_input

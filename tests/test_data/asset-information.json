@@ -636,29 +636,6 @@
       ]
     },
     {
-      "title": "Risk of closure",
-      "name": "RGVpbi",
-      "type": "string",
-      "items": [
-        {
-          "text": "For sale or listed for disposal",
-          "value": "for-sale-or-listed-for-disposal"
-        },
-        {
-          "text": "Future use not secured",
-          "value": "future-use-not-secured"
-        },
-        {
-          "text": "Unprofitable under current business model",
-          "value": "unprofitable-under-current-business-model"
-        },
-        {
-          "text": "Current ownership not tenable",
-          "value": "current-ownership-not-tenable"
-        }
-      ]
-    },
-    {
       "title": "Why is the asset at risk of closure?",
       "name": "YNTnCC",
       "type": "string",

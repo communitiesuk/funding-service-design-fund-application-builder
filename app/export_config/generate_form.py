@@ -107,7 +107,10 @@ def build_component(component: Component) -> dict:
         built_component.update({"values": {"type": "listRef"}})
 
     if component.type is ComponentType.MULTI_INPUT_FIELD:
-        built_component.update({"children": component.children})
+        child_component_config = []
+        for child_component in component.children_components:
+            child_component_config.append(build_component(child_component))
+        built_component.update({"children": child_component_config})
 
     return built_component
 
@@ -135,7 +138,6 @@ def build_page(page: Page = None) -> dict:
 
     for component in page.components:
         built_component = build_component(component)
-
         built_page["components"].append(built_component)
 
     return built_page
@@ -202,23 +204,34 @@ def build_form_section(form_section_list, form_section):
 
 
 def build_lists(pages: list[dict]) -> list:
-    # Takes in the form builder format json and copies in any lists used in those pages
+    def get_child_components(component: dict) -> list:
+        if component.get("type") == "MultiInputField" and component.get("children"):
+            return component["children"]
+        return [component]
+
+    def process_component(comp: dict, seen_names: set, lists: list):
+        metadata = comp.get("metadata")
+        if metadata:
+            list_from_db = get_list_by_id(metadata.get("fund_builder_list_id"))
+            if list_from_db and list_from_db.name not in seen_names:
+                lists.append(
+                    {
+                        "type": list_from_db.type,
+                        "items": list_from_db.items,
+                        "name": list_from_db.name,
+                        "title": list_from_db.title,
+                    }
+                )
+                seen_names.add(list_from_db.name)
+        comp.pop("metadata", None)
+
     lists = []
+    seen_names = set()
+
     for page in pages:
         for component in page["components"]:
-            if component.get("list"):
-                list_from_db = get_list_by_id(component["metadata"]["fund_builder_list_id"])
-                list_dict = {
-                    "type": list_from_db.type,
-                    "items": list_from_db.items,
-                    "name": list_from_db.name,
-                    "title": list_from_db.title,
-                }
-                # Check if the list already exists in lists by name
-                if not any(existing_list["name"] == list_dict["name"] for existing_list in lists):
-                    lists.append(list_dict)
-            # Remove the metadata key from component (no longer needed)
-            component.pop("metadata", None)  # The second argument prevents KeyError if 'metadata' is not found
+            for comp in get_child_components(component):
+                process_component(comp, seen_names, lists)
 
     return lists
 

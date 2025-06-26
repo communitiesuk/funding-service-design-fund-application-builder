@@ -838,21 +838,6 @@
           "value": "Other"
         }
       ]
-    },
-    {
-      "title": "Section as Complete",
-      "name": "dwPYuR",
-      "type": "string",
-      "items": [
-        {
-          "text": "Yes, I’ve completed this section",
-          "value": "Yes"
-        },
-        {
-          "text": "No, I’ll come back to it later",
-          "value": "No"
-        }
-      ]
     }],
   "sections": [
     {

@@ -437,25 +437,6 @@
     ],
     "lists": [
         {
-            "name": "yesNoUnsure",
-            "title": "Yes/No/Not sure",
-            "type": "string",
-            "items": [
-                {
-                    "text": "Yes",
-                    "value": "yes"
-                },
-                {
-                    "text": "No",
-                    "value": "no"
-                },
-                {
-                    "text": "Not sure",
-                    "value": "unsure"
-                }
-            ]
-        },
-        {
             "name": "companyType",
             "title": "Company type",
             "type": "string",
