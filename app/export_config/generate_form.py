@@ -101,7 +101,7 @@ def build_component(component: Component) -> dict:
     if component.type.value is ComponentType.YES_NO_FIELD.value:
         # implicit list
         built_component.update({"values": {"type": "listRef"}})
-    if component.lizt:
+    elif component.lizt:
         built_component.update({"list": component.lizt.name})
         built_component["metadata"].update({"fund_builder_list_id": str(component.list_id)})
         built_component.update({"values": {"type": "listRef"}})
@@ -137,10 +137,8 @@ def build_page(page: Page = None) -> dict:
         built_page["controller"] = page.controller
 
     for component in page.components:
-        if not component.parent_component:
-            built_component = build_component(component)
-
-            built_page["components"].append(built_component)
+        built_component = build_component(component)
+        built_page["components"].append(built_component)
 
     return built_page
 
@@ -212,25 +210,19 @@ def build_lists(pages: list[dict]) -> list:
         return [component]
 
     def process_component(comp: dict, seen_names: set, lists: list):
-        if not comp.get("list"):
-            comp.pop("metadata", None)
-            return
-
         metadata = comp.get("metadata")
-        if not metadata:
-            return
-
-        list_from_db = get_list_by_id(metadata.get("fund_builder_list_id"))
-        if list_from_db and list_from_db.name not in seen_names:
-            lists.append(
-                {
-                    "type": list_from_db.type,
-                    "items": list_from_db.items,
-                    "name": list_from_db.name,
-                    "title": list_from_db.title,
-                }
-            )
-            seen_names.add(list_from_db.name)
+        if metadata:
+            list_from_db = get_list_by_id(metadata.get("fund_builder_list_id"))
+            if list_from_db and list_from_db.name not in seen_names:
+                lists.append(
+                    {
+                        "type": list_from_db.type,
+                        "items": list_from_db.items,
+                        "name": list_from_db.name,
+                        "title": list_from_db.title,
+                    }
+                )
+                seen_names.add(list_from_db.name)
         comp.pop("metadata", None)
 
     lists = []
@@ -240,7 +232,6 @@ def build_lists(pages: list[dict]) -> list:
         for component in page["components"]:
             for comp in get_child_components(component):
                 process_component(comp, seen_names, lists)
-            component.pop("metadata", None)
 
     return lists
 

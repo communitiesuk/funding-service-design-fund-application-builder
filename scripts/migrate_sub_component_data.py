@@ -45,7 +45,6 @@ def run_migration():
                     number_of_components_created = number_of_components_created + 1
                     db.session.add(new_component)
 
-            components_with_children = db.session.query(Component).where(Component.children != None).all()  # noqa: E711
             for p_component in components_with_children:
                 json_child_config = p_component.children
                 new_json_child_config = []
@@ -64,6 +63,7 @@ def run_migration():
                             f"Error: {key} {child_component[key]} != {filter_new_component[0][key]}"
                         )
 
+            db.session.flush()
             components_with_children = db.session.query(Component).where(Component.parent_component_id != None).all()  # noqa: E711
 
             assert len(components_with_children) == number_of_components_created
