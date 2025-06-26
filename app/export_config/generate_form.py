@@ -206,32 +206,40 @@ def build_form_section(form_section_list, form_section):
 
 
 def build_lists(pages: list[dict]) -> list:
+    def get_child_components(component: dict) -> list:
+        if component.get("type") == "MultiInputField" and component.get("children"):
+            return component["children"]
+        return [component]
+
+    def process_component(comp: dict, seen_names: set, lists: list):
+        if not comp.get("list"):
+            comp.pop("metadata", None)
+            return
+
+        metadata = comp.get("metadata")
+        if not metadata:
+            return
+
+        list_from_db = get_list_by_id(metadata.get("fund_builder_list_id"))
+        if list_from_db and list_from_db.name not in seen_names:
+            lists.append(
+                {
+                    "type": list_from_db.type,
+                    "items": list_from_db.items,
+                    "name": list_from_db.name,
+                    "title": list_from_db.title,
+                }
+            )
+            seen_names.add(list_from_db.name)
+        comp.pop("metadata", None)
+
     lists = []
     seen_names = set()
+
     for page in pages:
         for component in page["components"]:
-            components_to_check = (
-                component["children"]
-                if component.get("type") == "MultiInputField" and component.get("children")
-                else [component]
-            )
-
-            for comp in components_to_check:
-                if not comp.get("list"):
-                    comp.pop("metadata", None)
-                    continue
-                list_from_db = get_list_by_id(comp["metadata"]["fund_builder_list_id"])
-                if list_from_db and list_from_db.name not in seen_names:
-                    lists.append(
-                        {
-                            "type": list_from_db.type,
-                            "items": list_from_db.items,
-                            "name": list_from_db.name,
-                            "title": list_from_db.title,
-                        }
-                    )
-                    seen_names.add(list_from_db.name)
-                comp.pop("metadata", None)
+            for comp in get_child_components(component):
+                process_component(comp, seen_names, lists)
             component.pop("metadata", None)
 
     return lists

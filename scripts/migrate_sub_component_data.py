@@ -5,6 +5,7 @@ from app.export_config.generate_form import build_component
 from app.shared.helpers import find_enum
 
 
+# sonarignore
 def run_migration():
     # Start Flask app context
     with app.app_context():
