@@ -238,7 +238,6 @@ class Component(BaseModel):
     template_name = Column(String(), nullable=True)
     is_template = Column(Boolean, default=False, nullable=False)
     audit_info = Column(JSON(none_as_null=True))
-    children = Column(JSON(none_as_null=True))  # TODO model this as a proper hierarchy
     page_index = Column(Integer())
     theme_index = Column(Integer())
     conditions = Column(JSON(none_as_null=True))

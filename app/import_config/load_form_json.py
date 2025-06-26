@@ -163,7 +163,6 @@ def insert_component_as_template(component, page_id, page_index, list_names_to_i
         # theme_index=component.get('theme_index', None), TODO: add theme_index to json
         runner_component_name=component.get("name", None),
         list_id=list_id,
-        children=component.get("children", None),
         schema=component.get("schema", None),
     )
     try:

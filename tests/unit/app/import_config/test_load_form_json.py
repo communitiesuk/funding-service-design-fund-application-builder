@@ -100,7 +100,7 @@ def test_import_multi_input_field(seed_dynamic_data, _db):
     multi_input_component = next(c for c in page_with_multi_input.components if c.title == "Capital costs")
     assert multi_input_component
     assert multi_input_component.type == ComponentType.MULTI_INPUT_FIELD
-    assert len(multi_input_component.children) == 4
+    assert len(multi_input_component.children_components) == 4
 
 
 def test_creates_unique_lists_per_form_with_shared_list_name(app: Flask, clean_db: SQLAlchemy):
