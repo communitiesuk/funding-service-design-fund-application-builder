@@ -111,7 +111,7 @@ def test_initiate_cloned_component(mock_new_uuid):
         component_id="old-id",
         page_id="pre-clone",
         title="Template question 1?",
-        type=ComponentType.TEXT_FIELD,
+        type=ComponentType.MULTI_INPUT_FIELD,
         template_name="Template Component",
         is_template=True,
         page_index=1,
@@ -120,6 +120,22 @@ def test_initiate_cloned_component(mock_new_uuid):
         options={"hideTitle": False, "classes": "test-class"},
         runner_component_name="template_question_name",
         conditions={"a": "b"},
+    )
+    clone.children_components.append(
+        Component(
+            component_id="new-id",
+            page_id="pre-clone",
+            title="New question 2?",
+            type=ComponentType.TEXT_FIELD,
+            template_name="New Template Component",
+            is_template=True,
+            page_index=1,
+            theme_id="pre-clone",
+            theme_index=3,
+            options={"hideTitle": True, "classes": "new-class"},
+            runner_component_name="new_question_name",
+            conditions={"x": "y"},
+        )
     )
     result = _initiate_cloned_component(clone, "page-123", "theme-234")
 
@@ -141,6 +157,7 @@ def test_initiate_cloned_component(mock_new_uuid):
 
     assert result.page_id == "page-123"
     assert result.theme_id == "theme-234"
+    assert len(result.children_components) == 1
 
 
 # =====================================================================================================================
