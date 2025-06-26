@@ -30,7 +30,7 @@ def _initiate_cloned_component(to_clone: Component, new_page_id=None, new_theme_
             clone_child.parent_component_id = clone.component_id
             clone_child.theme_id = new_theme_id
             clone_child.is_template = False
-            clone_child.source_template_id = to_clone.component_id
+            clone_child.source_template_id = child_component.component_id
             clone_child.template_name = None
             child_list.append(clone_child)
         clone.children_components = child_list

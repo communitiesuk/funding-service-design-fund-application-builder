@@ -107,7 +107,7 @@ def test_initiate_cloned_page(mock_new_uuid):
 
 
 def test_initiate_cloned_component(mock_new_uuid):
-    clone: Component = Component(
+    to_clone: Component = Component(
         component_id="old-id",
         page_id="pre-clone",
         title="Template question 1?",
@@ -121,7 +121,7 @@ def test_initiate_cloned_component(mock_new_uuid):
         runner_component_name="template_question_name",
         conditions={"a": "b"},
     )
-    clone.children_components.append(
+    to_clone.children_components.append(
         Component(
             component_id="new-id",
             page_id="pre-clone",
@@ -137,27 +137,39 @@ def test_initiate_cloned_component(mock_new_uuid):
             conditions={"x": "y"},
         )
     )
-    result = _initiate_cloned_component(clone, "page-123", "theme-234")
+    clone = _initiate_cloned_component(to_clone, "page-123", "theme-234")
 
-    assert result
+    assert clone
 
     # Check new ID
-    assert result.component_id == mock_new_uuid
+    assert clone.component_id == mock_new_uuid
 
     # Check other bits are the same
-    assert result.title == clone.title
-    assert result.type == clone.type
-    assert result.options == clone.options
-    assert result.conditions == clone.conditions
+    assert clone.title == to_clone.title
+    assert clone.type == to_clone.type
+    assert clone.options == to_clone.options
+    assert clone.conditions == to_clone.conditions
 
     # check template settings
-    assert result.is_template is False
-    assert result.source_template_id == "old-id"
-    assert result.template_name is None
+    assert clone.is_template is False
+    assert clone.source_template_id == "old-id"
+    assert clone.template_name is None
 
-    assert result.page_id == "page-123"
-    assert result.theme_id == "theme-234"
-    assert len(result.children_components) == 1
+    assert clone.page_id == "page-123"
+    assert clone.theme_id == "theme-234"
+    assert clone.children_components
+
+    # Check other bits are the same
+    assert clone.children_components[0].title == to_clone.children_components[0].title
+    assert clone.children_components[0].type == to_clone.children_components[0].type
+    assert clone.children_components[0].options == to_clone.children_components[0].options
+    assert clone.children_components[0].conditions == to_clone.children_components[0].conditions
+
+    # check template settings
+    assert clone.children_components[0].is_template is False
+    assert clone.children_components[0].source_template_id == to_clone.children_components[0].component_id
+    assert clone.children_components[0].template_name is None
+    assert clone.children_components[0].parent_component
 
 
 # =====================================================================================================================
