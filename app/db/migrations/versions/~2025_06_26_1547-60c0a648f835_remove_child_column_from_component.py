@@ -1,4 +1,4 @@
-"""Remove child column from component
+"""Remove children column from a component
 
 Revision ID: 60c0a648f835
 Revises: 8bb21a84a0e2
