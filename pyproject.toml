@@ -7,7 +7,7 @@ license = "MIT License"
 
 requires-python = "~=3.10.0"
 dependencies = [
-    "airium==0.2.6",
+    "airium==0.2.7",
     "beautifulsoup4==4.13.3",
     "flask-migrate==4.1.0",
     "flask-sqlalchemy==3.1.1",
