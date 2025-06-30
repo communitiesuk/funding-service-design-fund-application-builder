@@ -156,6 +156,7 @@ def test_generate_config_for_round_valid_input(
     assert output_condition_count <= input_condition_count  # sometime we remove specified but unused conditions
 
     _assert_sorted_equal(output_form, input_form, "lists")
+    _assert_sorted_equal(output_form, input_form, "conditions")
 
     # check that content of each page (including page[components] and page[next] within form[pages] is the same
     for input_page in input_form["pages"]:

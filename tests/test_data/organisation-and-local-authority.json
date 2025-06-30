@@ -2082,28 +2082,6 @@
             }
         },
         {
-            "displayName": "Local authority",
-            "name": "bqoyEo",
-            "value": {
-                "name": "Local authority",
-                "conditions": [
-                    {
-                        "field": {
-                            "name": "nweebX.TiKRCy",
-                            "type": "RadiosField",
-                            "display": "How is your organisation classified?"
-                        },
-                        "operator": "is",
-                        "value": {
-                            "type": "Value",
-                            "value": "Local authority",
-                            "display": "Local authority"
-                        }
-                    }
-                ]
-            }
-        },
-        {
             "displayName": "Alternative organisation name",
             "name": "zUeXwK",
             "value": {
