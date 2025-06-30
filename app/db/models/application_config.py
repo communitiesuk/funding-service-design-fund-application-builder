@@ -15,6 +15,7 @@ from sqlalchemy.types import Boolean
 from app.db import db
 
 BaseModel: DefaultMeta = db.Model
+PAGE_FOREIGN_KEY = "page.page_id"
 
 
 class ComponentType(Enum):
@@ -165,7 +166,7 @@ class Page(BaseModel):
     audit_info = Column(JSON(none_as_null=True))
     form_index = Column(Integer())
     display_path = Column(String())
-    default_next_page_id = Column(UUID(as_uuid=True), ForeignKey("page.page_id"), nullable=True)
+    default_next_page_id = Column(UUID(as_uuid=True), ForeignKey(PAGE_FOREIGN_KEY), nullable=True)
     components: Mapped[List["Component"]] = relationship(
         "Component",
         order_by="Component.page_index",
@@ -247,7 +248,7 @@ class PageCondition(BaseModel):
 
     page_condition_id: UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     condition_id = Column(UUID(as_uuid=True), ForeignKey("condition.condition_id"), nullable=False)
-    page_id = Column(UUID(as_uuid=True), ForeignKey("page.page_id"), nullable=False)
+    page_id = Column(UUID(as_uuid=True), ForeignKey(PAGE_FOREIGN_KEY), nullable=False)
     destination_page_path = Column(String(), nullable=True)
     is_template: Boolean = Column(Boolean, default=False, nullable=False)
 
@@ -264,7 +265,7 @@ class Component(BaseModel):
     )
     page_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("page.page_id"),
+        ForeignKey(PAGE_FOREIGN_KEY),
         nullable=True,  # will be null where this is a template and not linked to a page
     )
     theme_id = Column(
