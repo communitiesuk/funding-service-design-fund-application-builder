@@ -261,6 +261,9 @@ def delete_form(form_id, cascade: bool = False):
         raise ValueError(f"Form template with id {Form.form_id} not found")
     try:
         if cascade:
+            if form.conditions:
+                _delete_all_page_conditions_in_form(pages=form.pages)
+                _delete_all_conditions_in_form(conditions=form.conditions)
             _delete_all_components_in_pages(page_ids=[p.page_id for p in form.pages])
             _delete_all_pages_in_forms(form_ids=[form_id])
         db.session.delete(form)
@@ -443,6 +446,19 @@ def _delete_all_components_in_pages(page_ids):
     stmt = delete(Component).filter(Component.page_id.in_(page_ids))
     db.session.execute(stmt)
     db.session.commit()
+
+
+def _delete_all_conditions_in_form(conditions: list[Condition]):
+    stmt = delete(Condition).filter(Condition.condition_id.in_(condition.condition_id for condition in conditions))
+    db.session.execute(stmt)
+    db.session.commit()
+
+
+def _delete_all_page_conditions_in_form(pages: list[Page]):
+    page_ids = [page.page_id for page in pages if page.conditions]
+    if page_ids:
+        db.session.execute(delete(PageCondition).where(PageCondition.page_id.in_(page_ids)))
+        db.session.commit()
 
 
 # Section and form reordering

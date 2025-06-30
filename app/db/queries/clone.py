@@ -1,4 +1,4 @@
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from app.db import db
 from app.db.models import Component, Condition, Form, Lizt, Page, PageCondition, Round, Section
@@ -49,12 +49,13 @@ def _initiate_cloned_page(to_clone: Page, new_form_id=None):
     return clone
 
 
-def _initiate_condition_clone(clonned: Page, to_clone: Page):
+def _initiate_condition_clone(clonned: Page, to_clone: Page, form_id: UUID):
     cloned_conditions = []
     for clone_to_condition in to_clone.conditions:
         clone_condition = Condition(**clone_to_condition.as_dict())
         clone_condition.condition_id = uuid4()
         clone_condition.is_template = False
+        clone_condition.form_id = form_id
         if clone_to_condition.page_conditions:
             for page_condition in clone_to_condition.page_conditions:
                 clone_page_condition = PageCondition(
@@ -150,7 +151,7 @@ def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> For
     cloned_lizts = []
     for page_to_clone in form_to_clone.pages:
         cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=clone.form_id)
-        cloned_conditions = cloned_conditions + _initiate_condition_clone(cloned_page, page_to_clone)
+        cloned_conditions = cloned_conditions + _initiate_condition_clone(cloned_page, page_to_clone, clone.form_id)
         cloned_pages.append(cloned_page)
         cloned_component_list_for_page, cloned_lizt_per_page = _initiate_cloned_components_for_page(
             page_to_clone.components, cloned_page.page_id
