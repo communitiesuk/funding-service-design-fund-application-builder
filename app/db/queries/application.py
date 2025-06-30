@@ -1,10 +1,10 @@
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import String, cast, delete, select
 
 from app.db import db
-from app.db.models import Component, Form, FormSection, Lizt, Page, Section
+from app.db.models import Component, Condition, Form, FormSection, Lizt, Page, PageCondition, Section
 from app.db.queries.round import get_round_by_id
 
 
@@ -562,6 +562,40 @@ def move_form_up(section_id, form_id):
     list_index = form.section_index - 1  # Convert from 1-based to 0-based index
     section.forms = swap_elements_in_list(section.forms, list_index, list_index - 1)
     db.session.commit()
+
+
+def insert_condition(condition_config: dict, form_id: UUID, do_commit: bool = True) -> Condition:
+    new_condition = Condition(
+        name=condition_config.get("name", None),
+        display_name=condition_config.get("displayName", None),
+        value=condition_config.get("value", None),
+        form_id=form_id,
+        is_template=True,
+    )
+    try:
+        db.session.add(new_condition)
+    except Exception as e:
+        print(e)
+        raise e
+    if do_commit:
+        db.session.commit()
+    db.session.flush()  # flush to get the list id
+    return new_condition
+
+
+def insert_page_condition(condition_id: UUID, page_id: UUID, path: str, do_commit: bool = True) -> PageCondition:
+    new_page_condition = PageCondition(
+        condition_id=condition_id, page_id=page_id, destination_page_path=path, is_template=True
+    )
+    try:
+        db.session.add(new_page_condition)
+    except Exception as e:
+        print(e)
+        raise e
+    if do_commit:
+        db.session.commit()
+    db.session.flush()  # flush to get the list id
+    return new_page_condition
 
 
 def insert_list(list_config: dict, do_commit: bool = True) -> Lizt:

@@ -115,6 +115,10 @@ class Form(BaseModel):
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     form_json = Column(JSON(none_as_null=True), nullable=True)
 
+    conditions: Mapped[List["Condition"]] = relationship(
+        "Condition", order_by="Condition.name", collection_class=ordering_list("name"), passive_deletes="all"
+    )
+
     def __repr__(self):
         return (
             f"Form({self.section_index}, {self.runner_publish_name}"
@@ -179,6 +183,14 @@ class Page(BaseModel):
     form_section_id: Mapped[int | None] = mapped_column(ForeignKey(FormSection.form_section_id))
     formsection: Mapped[FormSection | None] = relationship()
 
+    conditions: Mapped[List["Condition"]] = relationship(
+        "Condition",
+        secondary="page_condition",
+        primaryjoin="Page.page_id==PageCondition.page_id",
+        secondaryjoin="PageCondition.condition_id==Condition.condition_id",
+        viewonly=True,
+    )
+
     def __repr__(self):
         return f"Page(/{self.display_path} - {self.name_in_apply_json['en']}, Components: {self.components})"
 
@@ -206,6 +218,38 @@ class Lizt(BaseModel):
     type = Column(String())
     items = Column(JSON())
     is_template = Column(Boolean, default=False, nullable=False)
+
+    def as_dict(self):
+        return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}
+
+
+@dataclass
+class Condition(BaseModel):
+    __tablename__ = "condition"
+
+    condition_id: UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String(), nullable=False)
+    display_name = Column(String(), nullable=True)
+    value = Column(JSON(none_as_null=False), nullable=False)
+    form_id = Column(UUID(as_uuid=True), ForeignKey("form.form_id"), nullable=True)
+    form = relationship("Form", back_populates="conditions")
+    is_template: Boolean = Column(Boolean, default=False, nullable=False)
+
+    page_conditions: Mapped[List["PageCondition"]] = relationship("PageCondition", passive_deletes="all")
+
+    def as_dict(self):
+        return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}
+
+
+@dataclass
+class PageCondition(BaseModel):
+    __tablename__ = "page_condition"
+
+    page_condition_id: UUID = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    condition_id = Column(UUID(as_uuid=True), ForeignKey("condition.condition_id"), nullable=False)
+    page_id = Column(UUID(as_uuid=True), ForeignKey("page.page_id"), nullable=False)
+    destination_page_path = Column(String(), nullable=True)
+    is_template: Boolean = Column(Boolean, default=False, nullable=False)
 
     def as_dict(self):
         return {col.name: self.__getattribute__(col.name) for col in inspect(self).mapper.columns}

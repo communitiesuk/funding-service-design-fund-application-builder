@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from app.db import db
-from app.db.models import Component, Form, Lizt, Page, Round, Section
+from app.db.models import Component, Condition, Form, Lizt, Page, PageCondition, Round, Section
 
 
 def _initiate_cloned_lizt(to_clone: Lizt) -> Lizt:
@@ -47,6 +47,27 @@ def _initiate_cloned_page(to_clone: Page, new_form_id=None):
     clone.template_name = None
     clone.components = []
     return clone
+
+
+def _initiate_condition_clone(clonned: Page, to_clone: Page):
+    cloned_conditions = []
+    for clone_to_condition in to_clone.conditions:
+        clone_condition = Condition(**clone_to_condition.as_dict())
+        clone_condition.condition_id = uuid4()
+        clone_condition.is_template = False
+        if clone_to_condition.page_conditions:
+            for page_condition in clone_to_condition.page_conditions:
+                clone_page_condition = PageCondition(
+                    page_condition_id=uuid4(),
+                    condition_id=clone_condition.condition_id,
+                    page_id=clonned.page_id,
+                    destination_page_path=page_condition.destination_page_path,
+                    is_template=False,
+                )
+                clone_condition.page_conditions.append(clone_page_condition)
+        clonned.conditions.append(clone_condition)
+        cloned_conditions.append(clone_condition)
+    return cloned_conditions
 
 
 def _initiate_cloned_form(to_clone: Form, new_section_id: str, section_index=0) -> Form:
@@ -124,17 +145,19 @@ def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> For
     clone = _initiate_cloned_form(form_to_clone, new_section_id, section_index=section_index)
 
     cloned_pages = []
+    cloned_conditions = []
     cloned_components = []
     cloned_lizts = []
     for page_to_clone in form_to_clone.pages:
         cloned_page = _initiate_cloned_page(page_to_clone, new_form_id=clone.form_id)
+        cloned_conditions = cloned_conditions + _initiate_condition_clone(cloned_page, page_to_clone)
         cloned_pages.append(cloned_page)
         cloned_component_list_for_page, cloned_lizt_per_page = _initiate_cloned_components_for_page(
             page_to_clone.components, cloned_page.page_id
         )
         cloned_components.extend(cloned_component_list_for_page)
         cloned_lizts.extend(cloned_lizt_per_page)
-    db.session.add_all([clone, *cloned_pages, *cloned_components, *cloned_lizts])
+    db.session.add_all([clone, *cloned_pages, *cloned_components, *cloned_lizts, *cloned_conditions])
     cloned_pages = _fix_cloned_default_pages(cloned_pages)
     db.session.commit()
 

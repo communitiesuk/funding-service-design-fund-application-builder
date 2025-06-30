@@ -7,7 +7,7 @@ from uuid import UUID
 
 from sqlalchemy.orm.attributes import flag_modified
 
-from app.db.queries.application import insert_form_section, insert_list
+from app.db.queries.application import insert_condition, insert_form_section, insert_list, insert_page_condition
 from app.export_config.helpers import human_to_kebab_case
 
 sys.path.insert(1, ".")
@@ -74,6 +74,15 @@ def _get_component_by_runner_name(db, runner_component_name, page_ids: list):
         .filter(Component.page_id.in_(page_ids))
         .first()
     )
+
+
+def add_conditions_to_pages(page: dict, page_id, conditions_map: dict):
+    if "next" in page:
+        for path in page["next"]:
+            if "condition" in path:
+                insert_page_condition(
+                    condition_id=conditions_map.get(path.get("condition"), None), page_id=page_id, path=path.get("path")
+                )
 
 
 def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
@@ -245,6 +254,13 @@ def insert_form_config(form_config, form_id):
         new_list = insert_list(do_commit=False, list_config={"is_template": True, **lizt})
         list_names_to_ids[lizt["name"]] = new_list.list_id
 
+    conditions_map = {}
+    for condition in form_config.get("conditions", []):
+        condition = insert_condition(
+            form_id=form_id, do_commit=False, condition_config={"is_template": True, **condition}
+        )
+        conditions_map[condition.name] = condition.condition_id
+
     for page in form_config.get("pages", []):
         form_section = page.get("section", None)
         # fetch the form section_id  from db
@@ -268,6 +284,7 @@ def insert_form_config(form_config, form_id):
                     inserted_components.append(inserted_child_component)
             inserted_components.append(inserted_component)
         db.session.flush()  # flush to make components available for conditions
+        add_conditions_to_pages(page, inserted_page.page_id, conditions_map)
 
     # add separately as conditions can reference components on other  pages
     for page in form_config.get("pages", []):
