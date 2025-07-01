@@ -661,3 +661,7 @@ def insert_test_data(db, test_data=None):
     db.session.commit()
     db.session.bulk_save_objects(test_data.get("components", []))
     db.session.commit()
+    db.session.bulk_save_objects(test_data.get("conditions", []))
+    db.session.commit()
+    db.session.bulk_save_objects(test_data.get("page_conditions", []))
+    db.session.commit()

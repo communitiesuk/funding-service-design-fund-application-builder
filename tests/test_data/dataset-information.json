@@ -1,0 +1,505 @@
+{
+  "metadata": {},
+  "startPage": "/dataset-information",
+  "pages": [
+    {
+      "title": "Dataset information",
+      "path": "/dataset-information",
+      "components": [
+        {
+          "name": "FFJINe",
+          "options": {},
+          "type": "Html",
+          "content": "<p class=\"govuk-body govuk-!-font-weight-bold\">In this section, we'll ask about:</p>\n<ul class=\"govuk-list govuk-list--bullet\">\n<li>if your organisation collects datasets for conservation areas, article 4 direction, listed buildings and tree preservation orders</li>\n<li>which datasets you have collected (if applicable)</li>\n<li>which format your datasets are in (if applicable)</li>\n<li>how long you think it will take your organisation to publish all 4 datasets (if applicable)</li>\n<li>what the current known issues and challenges you have with data quality and publication are</li>\n</ul>",
+          "schema": {}
+        }
+      ],
+      "next": [
+        {
+          "path": "/does-your-organisation-collect-at-least-one-of-the-datasets"
+        }
+      ],
+      "controller": "./pages/start.js",
+      "section": "FabDefault"
+    },
+    {
+      "path": "/which-datasets-have-you-collected",
+      "title": "Which datasets have you collected?",
+      "components": [
+        {
+          "name": "PfjXKB",
+          "options": {
+            "hideTitle": true
+          },
+          "type": "CheckboxesField",
+          "title": "Which datasets have you collected?",
+          "hint": "Select all that apply",
+          "list": "FObXEF",
+          "schema": {}
+        }
+      ],
+      "next": [
+        {
+          "path": "/which-format-is-your-dataset-in-for-conservation-areas",
+          "condition": "CNtvCT"
+        },
+        {
+          "path": "/which-format-is-your-dataset-in-for-article-4-direction",
+          "condition": "ZepbPF"
+        },
+        {
+          "path": "/which-format-is-your-dataset-in-for-listed-buildings",
+          "condition": "fIzaVE"
+        },
+        {
+          "path": "/which-format-is-your-dataset-in-for-tree-preservation-orders",
+          "condition": "nSTABU"
+        }
+      ],
+      "section": "FjGMRE"
+    },
+    {
+      "path": "/which-format-is-your-dataset-in-for-conservation-areas",
+      "title": "Which format is your dataset in for conservation areas?",
+      "components": [
+        {
+          "name": "gBIWQr",
+          "options": {
+            "hideTitle": true
+          },
+          "type": "CheckboxesField",
+          "list": "mVaHZk",
+          "title": "Which format is your dataset in for conservation areas?",
+          "hint": "<div class=\"govuk-hint\">Select all that apply</div>",
+          "schema": {}
+        }
+      ],
+      "next": [
+        {
+          "path": "/which-format-is-your-dataset-in-for-article-4-direction",
+          "condition": "ZepbPF"
+        },
+        {
+          "path": "/which-format-is-your-dataset-in-for-listed-buildings",
+          "condition": "fIzaVE"
+        },
+        {
+          "path": "/which-format-is-your-dataset-in-for-tree-preservation-orders",
+          "condition": "nSTABU"
+        },
+        {
+          "path": "/how-long-do-you-think-it-will-take-your-organisation-to-publish-all-4-datasets"
+        }
+      ],
+      "section": "FjGMRE"
+    },
+    {
+      "path": "/which-format-is-your-dataset-in-for-article-4-direction",
+      "title": "Which format is your dataset in for article 4 direction?",
+      "components": [
+        {
+          "name": "JootFe",
+          "options": {
+            "hideTitle": true
+          },
+          "type": "CheckboxesField",
+          "list": "mVaHZk",
+          "title": "Which format is your dataset in for article 4 direction?",
+          "hint": "<div class=\"govuk-hint\">Select all that apply</div>",
+          "schema": {}
+        }
+      ],
+      "next": [
+        {
+          "path": "/which-format-is-your-dataset-in-for-listed-buildings",
+          "condition": "fIzaVE"
+        },
+        {
+          "path": "/which-format-is-your-dataset-in-for-tree-preservation-orders",
+          "condition": "nSTABU"
+        },
+        {
+          "path": "/how-long-do-you-think-it-will-take-your-organisation-to-publish-all-4-datasets"
+        }
+      ],
+      "section": "FjGMRE"
+    },
+    {
+      "path": "/which-format-is-your-dataset-in-for-listed-buildings",
+      "title": "Which format is your dataset in for listed buildings?",
+      "components": [
+        {
+          "name": "KmGRXX",
+          "options": {
+            "hideTitle": true
+          },
+          "type": "CheckboxesField",
+          "title": "Which format is your dataset in for listed buildings?",
+          "hint": "Select all that apply",
+          "list": "mVaHZk",
+          "schema": {}
+        }
+      ],
+      "next": [
+        {
+          "path": "/which-format-is-your-dataset-in-for-tree-preservation-orders",
+          "condition": "nSTABU"
+        },
+        {
+          "path": "/how-long-do-you-think-it-will-take-your-organisation-to-publish-all-4-datasets"
+        }
+      ],
+      "section": "FjGMRE"
+    },
+    {
+      "path": "/which-format-is-your-dataset-in-for-tree-preservation-orders",
+      "title": "Which format is your dataset in for tree preservation orders?",
+      "components": [
+        {
+          "name": "eptZkL",
+          "options": {
+            "hideTitle": true
+          },
+          "type": "CheckboxesField",
+          "hint": "Select all that apply",
+          "title": "Which format is your dataset in for tree preservation orders?",
+          "list": "mVaHZk",
+          "schema": {}
+        }
+      ],
+      "next": [
+        {
+          "path": "/how-long-do-you-think-it-will-take-your-organisation-to-publish-all-4-datasets"
+        }
+      ],
+      "section": "FjGMRE"
+    },
+    {
+      "path": "/what-are-the-current-known-issues-and-challenges-you-have-with-data-quality-and-publication",
+      "title": "What are the current known issues and challenges you have with data quality and publication?",
+      "components": [
+        {
+          "name": "iGqOjq",
+          "options": {
+            "maxWords": "250"
+          },
+          "type": "MultilineTextField",
+          "title": "What are the current known issues and challenges you have with data quality and publication?",
+          "schema": {}
+        }
+      ],
+      "next": [
+        {
+          "path": "/summary"
+        }
+      ],
+      "section": "FjGMRE"
+    },
+    {
+      "path": "/summary",
+      "title": "Check your answers",
+      "components": [],
+      "next": [],
+      "section": "FjGMRE",
+      "controller": "./pages/summary.js"
+    },
+    {
+      "path": "/does-your-organisation-collect-at-least-one-of-the-datasets",
+      "title": "Does your organisation collect at least one of the datasets?",
+      "components": [
+        {
+          "name": "MqKEwS",
+          "options": {},
+          "type": "Html",
+          "content": "<div class=\"govuk-body\">The 4 datasets are:\n<ul class=\"govuk-list govuk-list--bullet\">\n  <li>Conservation areas</li>\n  <li>Article 4 direction</li>\n  <li>Listed buildings</li>\n  <li>Tree preservation orders</li>\n</ul>\n</div>",
+          "schema": {}
+        },
+        {
+          "name": "BQKLZz",
+          "options": {
+            "hideTitle": true
+          },
+          "type": "YesNoField",
+          "title": "Does your organisation collect at least one of the datasets?",
+          "schema": {}
+        }
+      ],
+      "next": [
+        {
+          "path": "/which-datasets-have-you-collected",
+          "condition": "AVvCqQ"
+        },
+        {
+          "path": "/what-are-the-current-known-issues-and-challenges-you-have-with-data-quality-and-publication",
+          "condition": "OKkTYL"
+        }
+      ],
+      "section": "FjGMRE"
+    },
+    {
+      "path": "/how-long-do-you-think-it-will-take-your-organisation-to-publish-all-4-datasets",
+      "title": "How long do you think it will take your organisation to publish all 4 datasets?",
+      "components": [
+        {
+          "name": "tlrpLI",
+          "options": {},
+          "type": "Html",
+          "content": "<div class=\"govuk-body\">Part of this funding is to support your organisation to improve and publish 4 datasets to the Planning Data platform.</div>",
+          "schema": {}
+        },
+        {
+          "name": "WSaPbE",
+          "options": {
+            "hideTitle": true
+          },
+          "type": "RadiosField",
+          "title": "How long do you think it will take your organisation to publish all 4 datasets?",
+          "list": "AgAPHd",
+          "values": {
+            "type": "listRef"
+          },
+          "schema": {}
+        }
+      ],
+      "next": [
+        {
+          "path": "/what-are-the-current-known-issues-and-challenges-you-have-with-data-quality-and-publication"
+        }
+      ],
+      "section": "FjGMRE"
+    }
+  ],
+  "lists": [
+    {
+      "title": "data sets",
+      "name": "FObXEF",
+      "type": "string",
+      "items": [
+        {
+          "text": "Conservation areas",
+          "value": "conservation-areas"
+        },
+        {
+          "text": "Article 4 direction",
+          "value": "article-4-direction"
+        },
+        {
+          "text": "Listed buildings",
+          "value": "listed-buildings"
+        },
+        {
+          "text": "Tree preservation orders",
+          "value": "tree-preservation-orders"
+        }
+      ]
+    },
+    {
+      "title": "dataset formats",
+      "name": "mVaHZk",
+      "type": "string",
+      "items": [
+        {
+          "text": "Paper or PDF copy",
+          "value": "Paper or PDF copy"
+        },
+        {
+          "text": "Spreadsheet (for example, an Excel file)",
+          "value": "Spreadsheet (for example, an Excel file)"
+        },
+        {
+          "text": "Database on a third party software",
+          "value": "Database on a third party software"
+        },
+        {
+          "text": "GIS (geographical information system)",
+          "value": "gis-(geographical-information-system)"
+        }
+      ]
+    },
+    {
+      "title": "time to publish datasets",
+      "name": "AgAPHd",
+      "type": "string",
+      "items": [
+        {
+          "text": "0 to 3 months",
+          "value": "0-to-3-months"
+        },
+        {
+          "text": "4 to 7 months",
+          "value": "4-to-7-months"
+        },
+        {
+          "text": "8 to 11 months",
+          "value": "8-to-11-months"
+        },
+        {
+          "text": "Longer than 11 months",
+          "value": "longer-than-11-months"
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "name": "FjGMRE",
+      "title": "Dataset information",
+      "hideTitle": true
+    },
+    {
+      "name": "FabDefault",
+      "title": "Default Section",
+      "hideTitle": true
+    }
+  ],
+  "conditions": [
+    {
+      "displayName": "conservation areas",
+      "name": "CNtvCT",
+      "value": {
+        "name": "conservation areas",
+        "conditions": [
+          {
+            "field": {
+              "name": "FjGMRE.PfjXKB",
+              "type": "CheckboxesField",
+              "display": "Which datasets have you collected?"
+            },
+            "operator": "contains",
+            "value": {
+              "type": "Value",
+              "value": "conservation-areas",
+              "display": "Conservation areas"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "article 4s",
+      "name": "ZepbPF",
+      "value": {
+        "name": "article 4s",
+        "conditions": [
+          {
+            "field": {
+              "name": "FjGMRE.PfjXKB",
+              "type": "CheckboxesField",
+              "display": "Which datasets have you collected?"
+            },
+            "operator": "contains",
+            "value": {
+              "type": "Value",
+              "value": "article-4-direction",
+              "display": "Article 4 direction"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "listed buildings",
+      "name": "fIzaVE",
+      "value": {
+        "name": "listed buildings",
+        "conditions": [
+          {
+            "field": {
+              "name": "FjGMRE.PfjXKB",
+              "type": "CheckboxesField",
+              "display": "Which datasets have you collected?"
+            },
+            "operator": "contains",
+            "value": {
+              "type": "Value",
+              "value": "listed-buildings",
+              "display": "Listed buildings"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "tree preservation areas",
+      "name": "nSTABU",
+      "value": {
+        "name": "tree preservation areas",
+        "conditions": [
+          {
+            "field": {
+              "name": "FjGMRE.PfjXKB",
+              "type": "CheckboxesField",
+              "display": "Which datasets have you collected?"
+            },
+            "operator": "contains",
+            "value": {
+              "type": "Value",
+              "value": "tree-preservation-orders",
+              "display": "Tree preservation orders"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "data set collect yes",
+      "name": "AVvCqQ",
+      "value": {
+        "name": "data set collect yes",
+        "conditions": [
+          {
+            "field": {
+              "name": "FjGMRE.BQKLZz",
+              "type": "YesNoField",
+              "display": "Does your organisation collect datasets?"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "true",
+              "display": "true"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "displayName": "dataset collect no",
+      "name": "OKkTYL",
+      "value": {
+        "name": "dataset collect no",
+        "conditions": [
+          {
+            "field": {
+              "name": "FjGMRE.BQKLZz",
+              "type": "YesNoField",
+              "display": "Does your organisation collect datasets?"
+            },
+            "operator": "is",
+            "value": {
+              "type": "Value",
+              "value": "false",
+              "display": "false"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "fees": [],
+  "outputs": [],
+  "version": 2,
+  "skipSummary": false,
+  "markAsComplete": false,
+  "name": "DPIF round 4 - Dataset information",
+  "feeOptions": {
+    "allowSubmissionWithoutPayment": true,
+    "maxAttempts": 3,
+    "showPaymentSkippedWarningPage": false
+  },
+  "feedback": {
+    "feedbackForm": false,
+    "url": ""
+  },
+  "phaseBanner": {}
+}

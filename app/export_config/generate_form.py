@@ -1,7 +1,7 @@
 import copy
 from dataclasses import asdict
 
-from app.db.models import Component, Form, Page
+from app.db.models import Component, Condition, Form, Page
 from app.db.models.application_config import READ_ONLY_COMPONENTS, ComponentType
 from app.db.queries.application import get_list_by_id
 from app.export_config.helpers import human_to_kebab_case
@@ -34,6 +34,38 @@ SUMMARY_PAGE = {
     "section": "uLwBuz",
     "controller": "./pages/summary.js",
 }
+
+
+def build_conditions_new(conditions: list[Condition]) -> list:
+    """
+    Takes in a simple set of conditions and builds them into the form runner format
+    """
+    results = []
+    for condition in conditions:
+        result = {
+            "displayName": condition.display_name,
+            "name": condition.name,
+            "value": asdict(
+                ConditionValue(
+                    name=condition.value["name"],
+                    conditions=[],
+                )
+            ),
+        }
+        for sc in condition.value["conditions"]:
+            sub_condition = {
+                "field": sc["field"],
+                "operator": sc["operator"],
+                "value": sc["value"],
+            }
+            # only add coordinator if it exists
+            if "coordinator" in sc and sc.get("coordinator") is not None:
+                sub_condition["coordinator"] = sc.get("coordinator", None)
+            result["value"]["conditions"].append(sub_condition)
+
+        results.append(result)
+
+    return results
 
 
 def build_conditions(component: Component) -> list:
@@ -144,8 +176,13 @@ def build_page(page: Page = None) -> dict:
 
 
 # Goes through the set of pages and updates the conditions and next properties to account for branching
-def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
-    for page in input_pages:
+def build_navigation(partial_form_json: dict, form: Form) -> dict:
+    partial_form_json["conditions"] = []
+    if form.conditions:
+        form_json_conditions = build_conditions_new(form.conditions)
+        partial_form_json["conditions"].extend(form_json_conditions)
+
+    for page in form.pages:
         # find page in prepared output results
         this_page_in_results = next(p for p in partial_form_json["pages"] if p["path"] == f"/{page.display_path}")
 
@@ -153,7 +190,7 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
             continue
         next_page_id = page.default_next_page_id
         if next_page_id:
-            find_next_page = lambda id: next(p for p in input_pages if p.page_id == id)  # noqa:E731
+            find_next_page = lambda id: next(p for p in form.pages if p.page_id == id)  # noqa:E731
             default_next_page = find_next_page(next_page_id)
             next_path = default_next_page.display_path
             # add the default next page
@@ -163,28 +200,20 @@ def build_navigation(partial_form_json: dict, input_pages: list[Page]) -> dict:
             next_path = None
 
         has_conditions = False
-        for component in page.components:
-            if not component.conditions:
-                continue
-            has_conditions = True
-            form_json_conditions = build_conditions(component)
-            partial_form_json["conditions"].extend(form_json_conditions)
-
-            for condition in component.conditions:
-                # If no source page is set use the components parent page
-                source_page_to_update = this_page_in_results
-                if "source_page_path" in condition and condition["source_page_path"] is not None:
-                    source_page_to_update = next(
-                        p for p in partial_form_json["pages"] if p["path"] == f"{condition['source_page_path']}"
+        if page.conditions:
+            for condition in page.conditions:
+                has_conditions = True
+                for page_condition in [
+                    page_condition
+                    for page_condition in condition.page_conditions
+                    if page_condition.page_id == page.page_id
+                ]:
+                    this_page_in_results["next"].append(
+                        {
+                            "path": page_condition.destination_page_path,
+                            "condition": condition.name,
+                        }
                     )
-                destination_path = f"/{condition['destination_page_path'].lstrip('/')}"
-
-                source_page_to_update["next"].append(  # here
-                    {
-                        "path": destination_path,
-                        "condition": condition["name"],
-                    }
-                )
 
         if not has_conditions and not next_path:
             this_page_in_results["next"].append({"path": "/summary"})
@@ -304,7 +333,7 @@ def build_form_json(form: Form, fund_title: str = None) -> dict:
         results["startPage"] = start_page["path"]
 
     # Build navigation and add any pages from branching logic
-    results = build_navigation(results, form.pages)
+    results = build_navigation(results, form)
 
     # Build the list values
     results["lists"] = build_lists(results["pages"])
