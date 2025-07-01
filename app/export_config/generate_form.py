@@ -1,5 +1,6 @@
 import copy
 from dataclasses import asdict
+from typing import Optional
 
 from app.db.models import Component, Condition, Form, Page
 from app.db.models.application_config import READ_ONLY_COMPONENTS, ComponentType
@@ -177,48 +178,50 @@ def build_page(page: Page = None) -> dict:
 
 # Goes through the set of pages and updates the conditions and next properties to account for branching
 def build_navigation(partial_form_json: dict, form: Form) -> dict:
-    partial_form_json["conditions"] = []
-    if form.conditions:
-        form_json_conditions = build_conditions_new(form.conditions)
-        partial_form_json["conditions"].extend(form_json_conditions)
+    partial_form_json["conditions"] = build_conditions_new(form.conditions) if form.conditions else []
 
     for page in form.pages:
-        # find page in prepared output results
-        this_page_in_results = next(p for p in partial_form_json["pages"] if p["path"] == f"/{page.display_path}")
-
         if page.controller and page.controller.endswith("summary.js"):
             continue
-        next_page_id = page.default_next_page_id
-        if next_page_id:
-            find_next_page = lambda id: next(p for p in form.pages if p.page_id == id)  # noqa:E731
-            default_next_page = find_next_page(next_page_id)
-            next_path = default_next_page.display_path
-            # add the default next page
-            this_page_in_results["next"].append({"path": f"/{next_path}"})
-        else:
-            # all page paths are conditionals which will be processed later
-            next_path = None
 
-        has_conditions = False
-        if page.conditions:
-            for condition in page.conditions:
-                has_conditions = True
-                for page_condition in [
-                    page_condition
-                    for page_condition in condition.page_conditions
-                    if page_condition.page_id == page.page_id
-                ]:
-                    this_page_in_results["next"].append(
-                        {
-                            "path": page_condition.destination_page_path,
-                            "condition": condition.name,
-                        }
-                    )
-
-        if not has_conditions and not next_path:
-            this_page_in_results["next"].append({"path": "/summary"})
+        this_page_in_results = _get_page_result(partial_form_json, page)
+        _add_next_paths(this_page_in_results, page, form)
 
     return partial_form_json
+
+
+def _get_page_result(partial_form_json: dict, page: Page) -> dict:
+    return next(p for p in partial_form_json["pages"] if p["path"] == f"/{page.display_path}")
+
+
+def _add_next_paths(this_page_result: dict, page: Page, form: Form) -> None:
+    next_path = _get_default_next_path(page, form)
+    if next_path:
+        this_page_result["next"].append({"path": f"/{next_path}"})
+
+    if page.conditions:
+        _add_conditional_paths(this_page_result, page)
+
+    if not page.conditions and not next_path:
+        this_page_result["next"].append({"path": "/summary"})
+
+
+def _get_default_next_path(page: Page, form: Form) -> Optional[str]:
+    if not page.default_next_page_id:
+        return None
+    next_page = next(p for p in form.pages if p.page_id == page.default_next_page_id)
+    return next_page.display_path
+
+
+def _add_conditional_paths(this_page_result: dict, page: Page) -> None:
+    for condition in page.conditions:
+        for page_condition in filter(lambda pc: pc.page_id == page.page_id, condition.page_conditions):
+            this_page_result["next"].append(
+                {
+                    "path": page_condition.destination_page_path,
+                    "condition": condition.name,
+                }
+            )
 
 
 def build_form_section(form_section_list, form_section):
