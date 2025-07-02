@@ -16,7 +16,7 @@ class DevelopmentConfig(Config):
 
     SQLALCHEMY_DATABASE_URI = getenv(
         "DATABASE_URL",
-        "postgresql://postgres:password@fab-db:5432/fab",  # pragma: allowlist secret
+        "postgresql://postgres:password@localhost:5432/fab_store",  # pragma: allowlist secret
     )
     SQLALCHEMY_RECORD_QUERIES = True
     TEMP_FILE_PATH = Path("app") / "export_config" / "output"

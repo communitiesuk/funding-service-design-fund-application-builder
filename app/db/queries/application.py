@@ -392,7 +392,6 @@ def insert_new_component(new_component_config: dict):
         audit_info=new_component_config.get("audit_info", {}),
         page_index=new_component_config.get("page_index"),
         theme_index=new_component_config.get("theme_index"),
-        conditions=new_component_config.get("conditions", []),
         runner_component_name=new_component_config.get("runner_component_name"),
         list_id=new_component_config.get("list_id", None),
     )

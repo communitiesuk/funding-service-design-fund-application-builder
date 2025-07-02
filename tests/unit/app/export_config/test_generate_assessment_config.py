@@ -1,25 +1,25 @@
 from app.db.models import Fund
 from app.export_config.generate_assessment_config import build_assessment_config
 from tests.helpers import get_fund_by_id
-from tests.unit_test_data import cri1, crit_1_id, mock_form_1
+from tests.unit_test_data import mock_criteria_1, mock_criteria_1_id, mock_form_1
 
 
 def test_build_basic_structure(mocker):
     mocker.patch("app.export_config.generate_assessment_config.get_form_for_component", return_value=mock_form_1)
 
-    results = build_assessment_config([cri1])
+    results = build_assessment_config([mock_criteria_1])
     assert "unscored_sections" in results
-    unscored = next(section for section in results["unscored_sections"] if section["id"] == crit_1_id)
+    unscored = next(section for section in results["unscored_sections"] if section["id"] == mock_criteria_1_id)
     assert unscored["name"] == "Unscored"
 
 
 def test_with_field_info(mocker):
     mocker.patch("app.export_config.generate_assessment_config.get_form_for_component", return_value=mock_form_1)
-    results = build_assessment_config([cri1])
+    results = build_assessment_config([mock_criteria_1])
     assert len(results["unscored_sections"]) == 1
-    unscored_subcriteria = next(section for section in results["unscored_sections"] if section["id"] == crit_1_id)[
-        "subcriteria"
-    ]
+    unscored_subcriteria = next(
+        section for section in results["unscored_sections"] if section["id"] == mock_criteria_1_id
+    )["subcriteria"]
     assert unscored_subcriteria
     assert unscored_subcriteria[0]["name"] == "Organisation Information"
 

@@ -5,13 +5,10 @@ import os
 import sys
 from uuid import UUID
 
-from sqlalchemy.orm.attributes import flag_modified
-
 from app.db.queries.application import insert_condition, insert_form_section, insert_list, insert_page_condition
 from app.export_config.helpers import human_to_kebab_case
 
 sys.path.insert(1, ".")
-from dataclasses import asdict  # noqa:E402
 
 from app.create_app import app  # noqa:E402
 from app.db import db  # noqa:E402
@@ -27,7 +24,6 @@ from app.shared.data_classes import (
 )
 from app.shared.helpers import (
     find_enum,  # noqa:E402
-    get_all_pages_in_parent_form,  # noqa:E402
 )
 
 
@@ -83,60 +79,6 @@ def add_conditions_to_pages(page: dict, page_id, conditions_map: dict):
                 insert_page_condition(
                     condition_id=conditions_map.get(path.get("condition"), None), page_id=page_id, path=path.get("path")
                 )
-
-
-def add_conditions_to_components(db, page: dict, conditions: dict, page_id):
-    # Convert conditions list to a dictionary for faster lookup
-    conditions_dict = {cond["name"]: cond for cond in conditions}
-
-    # Initialize a cache for components to reduce database queries
-    components_cache = {}
-
-    if "next" in page:
-        page_ids = get_all_pages_in_parent_form(db, page_id)
-
-        for path in page["next"]:
-            if "condition" in path:
-                target_condition_name = path["condition"]
-                # Use the conditions dictionary for faster lookup
-                if target_condition_name in conditions_dict:
-                    condition_data = conditions_dict[target_condition_name]
-                    # for condition in condition_data["value"]["conditions"]:
-                    # sometimes its in this format '"name": "nweebX.TiKRCy"'
-                    # ("section_name" + "." + "component_name"),
-                    # so we need to extract the component name
-                    if "." in condition_data["value"]["conditions"][0]["field"]["name"]:
-                        runner_component_name = condition_data["value"]["conditions"][0]["field"]["name"].split(".")[1]
-                    else:
-                        runner_component_name = condition_data["value"]["conditions"][0]["field"]["name"]
-
-                    # Use the cache to reduce database queries
-                    if runner_component_name not in components_cache:
-                        # the condition might be referencing a component on another page, so we should pass
-                        # through all possible page ids
-                        component_to_update = _get_component_by_runner_name(db, runner_component_name, page_ids)
-                        components_cache[runner_component_name] = component_to_update
-                    else:
-                        component_to_update = components_cache[runner_component_name]
-
-                    # Create a new Condition instance with a different variable name
-                    new_condition = _build_condition(
-                        condition_data, source_page_path=page["path"], destination_page_path=path["path"]
-                    )  # here
-
-                    # Add the new condition to the conditions list of the component to update
-                    if component_to_update.conditions:
-                        # check is there similar condition is added into a component and if yes then it will be ignored,
-                        # this search will be done based on the unique name
-                        if any(d["name"] == new_condition.name for d in component_to_update.conditions) is False:
-                            component_to_update.conditions.append(asdict(new_condition))
-                            # Mark the conditions column as modified so SQLAlchemy knows it has changed
-                            # When you directly modify an element in a JSON column (like appending to a list),
-                            # SQLAlchemy may not automatically recognize it. Explicitly marking the attribute as
-                            # modified solves this issue.
-                            flag_modified(component_to_update, "conditions")
-                    else:
-                        component_to_update.conditions = [asdict(new_condition)]
 
 
 def _find_form_section(form_section_name: str, form_section_list: list[dict]) -> UUID:
@@ -286,11 +228,7 @@ def insert_form_config(form_config, form_id):
         db.session.flush()  # flush to make components available for conditions
         add_conditions_to_pages(page, inserted_page.page_id, conditions_map)
 
-    # add separately as conditions can reference components on other  pages
-    for page in form_config.get("pages", []):
-        add_conditions_to_components(db, page, form_config["conditions"], inserted_page.page_id)
-        # flush so that the updated components are available for the next iteration
-        db.session.flush()
+    db.session.flush()
 
     insert_page_default_next_page(form_config.get("pages", None), inserted_pages)
     db.session.commit()

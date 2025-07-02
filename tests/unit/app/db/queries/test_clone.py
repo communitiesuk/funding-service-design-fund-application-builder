@@ -119,7 +119,6 @@ def test_initiate_cloned_component(mock_new_uuid):
         theme_index=2,
         options={"hideTitle": False, "classes": "test-class"},
         runner_component_name="template_question_name",
-        conditions={"a": "b"},
     )
     to_clone.children_components.append(
         Component(
@@ -134,7 +133,6 @@ def test_initiate_cloned_component(mock_new_uuid):
             theme_index=3,
             options={"hideTitle": True, "classes": "new-class"},
             runner_component_name="new_question_name",
-            conditions={"x": "y"},
         )
     )
     clone = _initiate_cloned_component(to_clone, "page-123", "theme-234")
@@ -148,7 +146,6 @@ def test_initiate_cloned_component(mock_new_uuid):
     assert clone.title == to_clone.title
     assert clone.type == to_clone.type
     assert clone.options == to_clone.options
-    assert clone.conditions == to_clone.conditions
 
     # check template settings
     assert clone.is_template is False
@@ -163,7 +160,6 @@ def test_initiate_cloned_component(mock_new_uuid):
     assert clone.children_components[0].title == to_clone.children_components[0].title
     assert clone.children_components[0].type == to_clone.children_components[0].type
     assert clone.children_components[0].options == to_clone.children_components[0].options
-    assert clone.children_components[0].conditions == to_clone.children_components[0].conditions
 
     # check template settings
     assert clone.children_components[0].is_template is False
@@ -236,7 +232,6 @@ def test_clone_single_component(flask_test_client, _db):
     assert result.title == template_component.title
     assert result.type == template_component.type
     assert result.options == template_component.options
-    assert result.conditions is None
 
     # check template settings
     assert result.is_template is False
