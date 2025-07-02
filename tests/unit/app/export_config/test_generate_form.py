@@ -4,9 +4,10 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Component, ComponentType, Form, FormSection, Fund, Lizt, Page
+from app.db.models import Component, ComponentType, Condition, Form, FormSection, Fund, Lizt, Page
 from app.export_config.generate_form import (
     build_component,
+    build_conditions,
     build_form_json,
     build_form_section,
     build_lists,
@@ -23,6 +24,9 @@ from tests.unit_test_data import (
     mock_page_3_condition,
     mock_page_4_condition,
     seeded_form,
+    test_form_json_condition_org_type_a,
+    test_form_json_condition_org_type_b,
+    test_form_json_condition_org_type_c,
     test_form_json_page_org_type_a,
     test_form_json_page_org_type_b,
     test_form_json_page_org_type_c,
@@ -206,8 +210,74 @@ id = uuid4()
 id2 = uuid4()
 
 
-def test_same_condition_used_in_different_pages():
-    pass
+@pytest.mark.parametrize(
+    "input_condition, output_condition",
+    [
+        (
+            [
+                Condition(
+                    name="org_type_a",
+                    value={
+                        "name": "org type a",
+                        "conditions": [
+                            {
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "A", "display": "A"},
+                            }
+                        ],
+                    },
+                    is_template=False,
+                    display_name="org type a",
+                ),
+                Condition(
+                    name="org_type_b",
+                    value={
+                        "name": "org type b",
+                        "conditions": [
+                            {
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "B", "display": "B"},
+                            }
+                        ],
+                    },
+                    is_template=False,
+                    display_name="org type b",
+                ),
+                Condition(
+                    name="org_type_c",
+                    value={
+                        "name": "org type c",
+                        "conditions": [
+                            {
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "C1", "display": "C1"},
+                            },
+                            {
+                                "coordinator": "or",
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "C2", "display": "C2"},
+                            },
+                        ],
+                    },
+                    is_template=False,
+                    display_name="org type c",
+                ),
+            ],
+            [
+                test_form_json_condition_org_type_a,
+                test_form_json_condition_org_type_b,
+                test_form_json_condition_org_type_c,
+            ],
+        ),
+    ],
+)
+def test_build_conditions(input_condition, output_condition):
+    results = build_conditions(input_condition)
+    assert results == output_condition
 
 
 list_id = uuid4()

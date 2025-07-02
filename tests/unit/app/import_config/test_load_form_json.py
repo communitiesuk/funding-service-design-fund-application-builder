@@ -162,7 +162,3 @@ def test_build_conditions(input_condition, exp_result):
         condition_data=input_condition, source_page_path=None, destination_page_path=exp_result.destination_page_path
     )
     assert result == exp_result
-
-
-def test_same_condition_used_in_different_pages():
-    pass
