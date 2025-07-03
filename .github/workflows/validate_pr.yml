@@ -32,7 +32,7 @@ jobs:
     container: mcr.microsoft.com/playwright:v1.51.1-noble@sha256:146d046a8d79a1b3a87596c4457b0b1c47f811bf4fc2cc1b99e873ae7f1cbbbd
     services:
       postgres:
-        image: postgres@sha256:6cf6142afacfa89fb28b894d6391c7dcbf6523c33178bdc33e782b3b533a9342
+        image: postgres@sha256:3962158596daaef3682838cc8eb0e719ad1ce520f88e34596ce8d5de1b6330a1
         env:
           POSTGRES_PASSWORD: password # pragma: allowlist secret
           POSTGRES_USER: postgres # pragma: allowlist secret
