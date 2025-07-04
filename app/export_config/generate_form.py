@@ -37,7 +37,7 @@ SUMMARY_PAGE = {
 }
 
 
-def build_conditions_new(conditions: list[Condition]) -> list:
+def build_conditions(conditions: list[Condition]) -> list:
     """
     Takes in a simple set of conditions and builds them into the form runner format
     """
@@ -54,38 +54,6 @@ def build_conditions_new(conditions: list[Condition]) -> list:
             ),
         }
         for sc in condition.value["conditions"]:
-            sub_condition = {
-                "field": sc["field"],
-                "operator": sc["operator"],
-                "value": sc["value"],
-            }
-            # only add coordinator if it exists
-            if "coordinator" in sc and sc.get("coordinator") is not None:
-                sub_condition["coordinator"] = sc.get("coordinator", None)
-            result["value"]["conditions"].append(sub_condition)
-
-        results.append(result)
-
-    return results
-
-
-def build_conditions(component: Component) -> list:
-    """
-    Takes in a simple set of conditions and builds them into the form runner format
-    """
-    results = []
-    for condition in component.conditions:
-        result = {
-            "displayName": condition["display_name"],
-            "name": condition["name"],
-            "value": asdict(
-                ConditionValue(
-                    name=condition["value"]["name"],
-                    conditions=[],
-                )
-            ),
-        }
-        for sc in condition["value"]["conditions"]:
             sub_condition = {
                 "field": sc["field"],
                 "operator": sc["operator"],
@@ -178,7 +146,7 @@ def build_page(page: Page = None) -> dict:
 
 # Goes through the set of pages and updates the conditions and next properties to account for branching
 def build_navigation(partial_form_json: dict, form: Form) -> dict:
-    partial_form_json["conditions"] = build_conditions_new(form.conditions) if form.conditions else []
+    partial_form_json["conditions"] = build_conditions(form.conditions) if form.conditions else []
 
     for page in form.pages:
         if page.controller and page.controller.endswith("summary.js"):

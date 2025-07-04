@@ -1,11 +1,10 @@
 from copy import deepcopy
-from dataclasses import asdict
 from unittest import mock
 from uuid import uuid4
 
 import pytest
 
-from app.db.models import Component, ComponentType, Form, FormSection, Fund, Lizt, Page
+from app.db.models import Component, ComponentType, Condition, Form, FormSection, Fund, Lizt, Page
 from app.export_config.generate_form import (
     build_component,
     build_conditions,
@@ -19,13 +18,12 @@ from app.export_config.generate_form import (
 )
 from tests.helpers import get_fund_by_id
 from tests.unit_test_data import (
-    mock_c_1,
-    mock_c_2,
+    mock_component_1_text_field,
+    mock_component_2_email_field,
     mock_form_1,
+    mock_page_3_condition,
+    mock_page_4_condition,
     seeded_form,
-    test_condition_org_type_a,
-    test_condition_org_type_b,
-    test_condition_org_type_c,
     test_form_json_condition_org_type_a,
     test_form_json_condition_org_type_b,
     test_form_json_condition_org_type_c,
@@ -35,8 +33,6 @@ from tests.unit_test_data import (
     test_page_object_org_type_a,
     test_page_object_org_type_b,
     test_page_object_org_type_c,
-    test_page_object_org_type_page_with_comp,
-    test_page_object_org_type_page_with_comp_2,
 )
 
 
@@ -114,7 +110,7 @@ def test_build_lists(mocker, pages, exp_result):
                 display_path="organisation-single-name",
                 name_in_apply_json={"en": "Organisation Name"},
                 form_index=1,
-                components=[mock_c_1],
+                components=[mock_component_1_text_field],
             ),
             {
                 "path": "/organisation-single-name",
@@ -164,7 +160,7 @@ def test_build_page_controller_not_specified():
                 display_path="organisation-single-name",
                 name_in_apply_json={"en": "Organisation Name"},
                 form_index=1,
-                components=[mock_c_1],
+                components=[mock_component_1_text_field],
             )
         ),
         (
@@ -174,7 +170,7 @@ def test_build_page_controller_not_specified():
                 display_path="organisation-single-name",
                 name_in_apply_json={"en": "Organisation Name"},
                 form_index=1,
-                components=[mock_c_1, mock_c_2],
+                components=[mock_component_1_text_field, mock_component_2_email_field],
             )
         ),
         (
@@ -215,58 +211,73 @@ id2 = uuid4()
 
 
 @pytest.mark.parametrize(
-    "input_component, exp_results",
+    "input_condition, output_condition",
     [
-        # single condition
         (
-            Component(
-                component_id=id,
-                title="org type",
-                type=ComponentType.TEXT_FIELD,
-                conditions=[
-                    asdict(test_condition_org_type_a),
-                ],
-                runner_component_name="org_type",
-            ),
-            [test_form_json_condition_org_type_a],
-        ),
-        # 2 conditions
-        (
-            Component(
-                component_id=id2,
-                title="test_title_2",
-                type=ComponentType.TEXT_FIELD,
-                conditions=[
-                    asdict(test_condition_org_type_a),
-                    asdict(test_condition_org_type_b),
-                ],
-                runner_component_name="test_name",
-            ),
+            [
+                Condition(
+                    name="org_type_a",
+                    value={
+                        "name": "org type a",
+                        "conditions": [
+                            {
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "A", "display": "A"},
+                            }
+                        ],
+                    },
+                    is_template=False,
+                    display_name="org type a",
+                ),
+                Condition(
+                    name="org_type_b",
+                    value={
+                        "name": "org type b",
+                        "conditions": [
+                            {
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "B", "display": "B"},
+                            }
+                        ],
+                    },
+                    is_template=False,
+                    display_name="org type b",
+                ),
+                Condition(
+                    name="org_type_c",
+                    value={
+                        "name": "org type c",
+                        "conditions": [
+                            {
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "C1", "display": "C1"},
+                            },
+                            {
+                                "coordinator": "or",
+                                "field": {"name": "org_type", "type": "RadiosField", "display": "org type"},
+                                "operator": "is",
+                                "value": {"type": "Value", "value": "C2", "display": "C2"},
+                            },
+                        ],
+                    },
+                    is_template=False,
+                    display_name="org type c",
+                ),
+            ],
             [
                 test_form_json_condition_org_type_a,
                 test_form_json_condition_org_type_b,
-            ],
-        ),
-        # single complex condition
-        (
-            Component(
-                component_id=id2,
-                title="test_title_2",
-                type=ComponentType.TEXT_FIELD,
-                conditions=[asdict(test_condition_org_type_c)],
-                runner_component_name="test_name",
-            ),
-            [
                 test_form_json_condition_org_type_c,
             ],
         ),
     ],
 )
-def test_build_conditions(input_component, exp_results, ids=None):
-    if ids is None:
-        ids = ["single condition", "2 conditions", "single condition with coordinator"]
-    results = build_conditions(input_component)
-    assert results == exp_results
+def test_build_conditions(input_condition, output_condition):
+    results = build_conditions(input_condition)
+    assert results == output_condition
 
 
 list_id = uuid4()
@@ -636,11 +647,11 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
         (
             Form(
                 pages=[
-                    test_page_object_org_type_page_with_comp,
+                    mock_page_3_condition,
                     test_page_object_org_type_b,
                     test_page_object_org_type_c,
                 ],
-                conditions=test_page_object_org_type_page_with_comp.conditions,
+                conditions=mock_page_3_condition.conditions,
                 name_in_apply_json={"en": "test-1"},
             ),
             {
@@ -677,12 +688,12 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
         (
             Form(
                 pages=[
-                    test_page_object_org_type_page_with_comp_2,
+                    mock_page_4_condition,
                     test_page_object_org_type_a,
                     test_page_object_org_type_b,
                     test_page_object_org_type_c,
                 ],
-                conditions=test_page_object_org_type_page_with_comp_2.conditions,
+                conditions=mock_page_4_condition.conditions,
                 name_in_apply_json={"en": "test-1"},
             ),
             {
@@ -735,7 +746,7 @@ def test_build_navigation_with_conditions(mocker, input_form, input_partial_json
     for page in results["pages"]:
         exp_next_this_page = exp_next[page["path"]]
         assert page["next"] == exp_next_this_page, f"next for page {page['path']} does not match expected"
-    assert len(results["conditions"]) == exp_cond_count
+    assert results["conditions"] == ["mock list"]
 
 
 @pytest.mark.parametrize(

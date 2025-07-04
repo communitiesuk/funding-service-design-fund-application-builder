@@ -431,20 +431,6 @@ new_component_config = {
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
     "page_index": 1,
     "theme_index": 1,
-    "conditions": [
-        {
-            "name": "organisation_other_names_no",
-            "value": "false",  # this must be lowercaes or the navigation doesn't work
-            "operator": "is",
-            "destination_page_path": "CONTINUE",
-        },
-        {
-            "name": "organisation_other_names_yes",
-            "value": "true",  # this must be lowercaes or the navigation doesn't work
-            "operator": "is",
-            "destination_page_path": "organisation-alternative-names",
-        },
-    ],
     "runner_component_name": "test-component",
     "list_id": uuid.uuid4(),
 }
@@ -463,20 +449,6 @@ new_template_component_config = {
     "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
     "page_index": 1,
     "theme_index": 2,
-    "conditions": [
-        {
-            "name": "path_start_no",
-            "value": "false",  # this must be lowercaes or the navigation doesn't work
-            "operator": "is",
-            "destination_page_path": "path-1",
-        },
-        {
-            "name": "path_start_yes",
-            "value": "true",  # this must be lowercaes or the navigation doesn't work
-            "operator": "is",
-            "destination_page_path": "path-2",
-        },
-    ],
     "runner_component_name": "test-component",
     "list_id": uuid.uuid4(),
 }
@@ -507,7 +479,6 @@ def test_insert_new_component(flask_test_client, _db, clear_test_data, seed_dyna
     assert component.audit_info == new_component_config["audit_info"]
     assert component.page_index == new_component_config["page_index"]
     assert component.theme_index == new_component_config["theme_index"]
-    assert component.conditions == new_component_config["conditions"]
     assert component.runner_component_name == new_component_config["runner_component_name"]
     assert component.list_id == new_component_config["list_id"]
 
@@ -525,7 +496,6 @@ def test_insert_new_component(flask_test_client, _db, clear_test_data, seed_dyna
     assert template_component.audit_info == new_template_component_config["audit_info"]
     assert template_component.page_index == new_template_component_config["page_index"]
     assert template_component.theme_index == new_template_component_config["theme_index"]
-    assert template_component.conditions == new_template_component_config["conditions"]
     assert template_component.runner_component_name == new_template_component_config["runner_component_name"]
     assert template_component.list_id == new_template_component_config["list_id"]
 

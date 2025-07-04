@@ -285,7 +285,6 @@ class Component(BaseModel):
     audit_info = Column(JSON(none_as_null=True))
     page_index = Column(Integer())
     theme_index = Column(Integer())
-    conditions = Column(JSON(none_as_null=True))
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     runner_component_name = Column(
         String(),
