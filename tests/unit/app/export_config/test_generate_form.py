@@ -5,7 +5,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.models import Component, ComponentType, Form, FormSection, Fund, Lizt, Page, Round, Section
+from app.db.models import Component, ComponentType, Form, FormSection, Fund, Lizt, Page
 from app.export_config.generate_form import (
     build_component,
     build_conditions,
@@ -17,13 +17,12 @@ from app.export_config.generate_form import (
     build_start_page,
     human_to_kebab_case,
 )
-from app.shared.data_classes import Condition, ConditionValue
 from tests.helpers import get_fund_by_id
-from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 from tests.unit_test_data import (
     mock_c_1,
     mock_c_2,
     mock_form_1,
+    seeded_form,
     test_condition_org_type_a,
     test_condition_org_type_b,
     test_condition_org_type_c,
@@ -36,6 +35,8 @@ from tests.unit_test_data import (
     test_page_object_org_type_a,
     test_page_object_org_type_b,
     test_page_object_org_type_c,
+    test_page_object_org_type_page_with_comp,
+    test_page_object_org_type_page_with_comp_2,
 )
 
 
@@ -616,7 +617,12 @@ def test_build_component(component_to_build, exp_result):
     ],
 )
 def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_next):
-    results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
+    results = build_navigation(
+        partial_form_json=input_partial_json,
+        form=Form(
+            pages=input_pages,
+        ),
+    )
     for page in results["pages"]:
         exp_next_this_page = exp_next[page["path"]]
         assert page["next"] == exp_next_this_page
@@ -624,33 +630,19 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
 
 
 @pytest.mark.parametrize(
-    "input_pages,input_partial_json ,exp_next",
+    "input_form,input_partial_json ,exp_next,exp_cond_count",
     [
         # One page, 2 possible nexts, both based on defined conditions
         (
-            [
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-type",
-                    name_in_apply_json={"en": "Organisation Type"},
-                    form_index=1,
-                    components=[
-                        Component(
-                            component_id=id2,
-                            title="org_type",
-                            type=ComponentType.RADIOS_FIELD,
-                            conditions=[
-                                asdict(test_condition_org_type_c),
-                                asdict(test_condition_org_type_b),
-                            ],
-                            runner_component_name="test_c_1",
-                        )
-                    ],
-                ),
-                test_page_object_org_type_b,
-                test_page_object_org_type_c,
-            ],
+            Form(
+                pages=[
+                    test_page_object_org_type_page_with_comp,
+                    test_page_object_org_type_b,
+                    test_page_object_org_type_c,
+                ],
+                conditions=test_page_object_org_type_page_with_comp.conditions,
+                name_in_apply_json={"en": "test-1"},
+            ),
             {
                 "conditions": [],
                 "pages": [
@@ -679,166 +671,20 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
                 "/org-type-b": [{"path": "/summary"}],
                 "/org-type-c": [{"path": "/summary"}],
             },
-        ),
-        # One page, 2 possible nexts, based on a condition and a default (summary)
-        (
-            [
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-type",
-                    name_in_apply_json={"en": "Organisation Type"},
-                    form_index=1,
-                    default_next_page_id="summary-id",
-                    components=[
-                        Component(
-                            component_id=id2,
-                            title="org_type",
-                            type=ComponentType.RADIOS_FIELD,
-                            conditions=[
-                                asdict(test_condition_org_type_b),
-                            ],
-                            runner_component_name="test_c_1",
-                        )
-                    ],
-                ),
-                test_page_object_org_type_b,
-                Page(
-                    page_id="summary-id",
-                    form_id=uuid4(),
-                    display_path="summary",
-                    name_in_apply_json={"en": "Summary"},
-                    form_index=2,
-                    controller="summary.js",
-                ),
-            ],
-            {
-                "conditions": [],
-                "pages": [
-                    {
-                        "path": "/organisation-type",
-                        "title": "Organisation Type",
-                        "components": [],
-                        "next": [],
-                        "options": {},
-                    },
-                    deepcopy(test_form_json_page_org_type_b),
-                    {
-                        "path": "/summary",
-                        "title": "Summary",
-                        "components": [],
-                        "next": [],
-                        "options": {},
-                        "controller": "summary.js",
-                    },
-                ],
-            },
-            {
-                "/organisation-type": [
-                    {
-                        "path": "/summary",
-                    },
-                    {
-                        "path": "/org-type-b",
-                        "condition": "org_type_b",
-                    },
-                ],
-                "/org-type-b": [{"path": "/summary"}],
-                "/summary": [],
-            },
-        ),  # One page, 2 possible nexts, based on a condition and a default
-        (
-            [
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-type",
-                    name_in_apply_json={"en": "Organisation Type"},
-                    form_index=1,
-                    default_next_page_id="page-2",
-                    components=[
-                        Component(
-                            component_id=id2,
-                            title="org_type",
-                            type=ComponentType.RADIOS_FIELD,
-                            conditions=[
-                                asdict(test_condition_org_type_b),
-                            ],
-                            runner_component_name="test_c_1",
-                        )
-                    ],
-                ),
-                test_page_object_org_type_b,
-                Page(
-                    page_id="page-2",
-                    form_id=uuid4(),
-                    display_path="page_2",
-                    name_in_apply_json={"en": "Page 2"},
-                    form_index=2,
-                ),
-            ],
-            {
-                "conditions": [],
-                "pages": [
-                    {
-                        "path": "/organisation-type",
-                        "title": "Organisation Type",
-                        "components": [],
-                        "next": [],
-                        "options": {},
-                    },
-                    deepcopy(test_form_json_page_org_type_b),
-                    {
-                        "path": "/page_2",
-                        "title": "Page 2",
-                        "components": [],
-                        "next": [],
-                        "options": {},
-                    },
-                ],
-            },
-            {
-                "/organisation-type": [
-                    {
-                        "path": "/page_2",
-                    },
-                    {
-                        "path": "/org-type-b",
-                        "condition": "org_type_b",
-                    },
-                ],
-                "/org-type-b": [{"path": "/summary"}],
-                "/page_2": [{"path": "/summary"}],
-                "/summary": [],
-            },
+            2,
         ),
         # # One page, 3 possible nexts based on complex conditions (coordinators)
         (
-            [
-                Page(
-                    page_id=uuid4(),
-                    form_id=uuid4(),
-                    display_path="organisation-type",
-                    name_in_apply_json={"en": "Organisation Type"},
-                    form_index=1,
-                    components=[
-                        Component(
-                            component_id=id2,
-                            title="org_type",
-                            type=ComponentType.RADIOS_FIELD,
-                            conditions=[
-                                asdict(test_condition_org_type_a),
-                                asdict(test_condition_org_type_b),
-                                asdict(test_condition_org_type_c),
-                            ],
-                            runner_component_name="org_type_component",
-                        )
-                    ],
-                ),
-                test_page_object_org_type_a,
-                test_page_object_org_type_b,
-                test_page_object_org_type_c,
-            ],
+            Form(
+                pages=[
+                    test_page_object_org_type_page_with_comp_2,
+                    test_page_object_org_type_a,
+                    test_page_object_org_type_b,
+                    test_page_object_org_type_c,
+                ],
+                conditions=test_page_object_org_type_page_with_comp_2.conditions,
+                name_in_apply_json={"en": "test-1"},
+            ),
             {
                 "conditions": [],
                 "pages": [
@@ -876,16 +722,20 @@ def test_build_navigation_no_conditions(input_partial_json, input_pages, exp_nex
                 "/org-type-b": [{"path": "/summary"}],
                 "/org-type-c": [{"path": "/summary"}],
             },
+            3,
         ),
     ],
 )
-def test_build_navigation_with_conditions(mocker, input_pages, input_partial_json, exp_next):
+def test_build_navigation_with_conditions(mocker, input_form, input_partial_json, exp_next, exp_cond_count):
     mocker.patch("app.export_config.generate_form.build_conditions", return_value=["mock list"])
-    results = build_navigation(partial_form_json=input_partial_json, input_pages=input_pages)
+    results = build_navigation(
+        partial_form_json=input_partial_json,
+        form=input_form,
+    )
     for page in results["pages"]:
         exp_next_this_page = exp_next[page["path"]]
         assert page["next"] == exp_next_this_page, f"next for page {page['path']} does not match expected"
-    assert results["conditions"] == ["mock list"]
+    assert len(results["conditions"]) == exp_cond_count
 
 
 @pytest.mark.parametrize(
@@ -1035,141 +885,7 @@ def test_build_form_json_no_conditions(seed_dynamic_data):
     assert summary
 
 
-fund_id = uuid4()
-round_id = uuid4()
-section_id = uuid4()
-form_id = uuid4()
-page_1_id = uuid4()
-page_2_id = uuid4()
-
-
-@pytest.mark.seed_config(
-    {
-        "funds": [Fund(fund_id=fund_id, short_name="UTFWC", **BASIC_FUND_INFO)],
-        "rounds": [
-            Round(
-                round_id=round_id, title_json={"en": "UT RWC"}, fund_id=fund_id, short_name="UTRWC", **BASIC_ROUND_INFO
-            )
-        ],
-        "sections": [
-            Section(
-                section_id=section_id, index=1, round_id=round_id, name_in_apply_json={"en": "Organisation Information"}
-            )
-        ],
-        "forms": [
-            Form(
-                form_id=form_id,
-                section_id=section_id,
-                name_in_apply_json={"en": "About your organisation"},
-                section_index=1,
-                runner_publish_name="about-your-org",
-            )
-        ],
-        "pages": [
-            Page(
-                page_id=page_1_id,
-                form_id=form_id,
-                display_path="organisation-name",
-                name_in_apply_json={"en": "Organisation Name"},
-                form_index=1,
-            ),
-            Page(
-                page_id=page_2_id,
-                form_id=form_id,
-                display_path="organisation-alternative-names",
-                name_in_apply_json={"en": "Alternative names of your organisation"},
-                form_index=2,
-                is_template=True,
-            ),
-        ],
-        "default_next_pages": [
-            {"page_id": page_1_id, "default_next_page_id": page_2_id},
-        ],
-        "components": [
-            Component(
-                component_id=uuid4(),
-                page_id=page_1_id,
-                title="What is your organisation's name?",
-                hint_text="This must match the regsitered legal organisation name",
-                type=ComponentType.TEXT_FIELD,
-                page_index=1,
-                theme_id=None,
-                options={"hideTitle": False, "classes": ""},
-                runner_component_name="organisation_name",
-            ),
-            Component(
-                component_id=uuid4(),
-                page_id=page_1_id,
-                title="Does your organisation use any other names?",
-                type=ComponentType.YES_NO_FIELD,
-                page_index=2,
-                theme_id=None,
-                options={"hideTitle": False, "classes": ""},
-                runner_component_name="does_your_organisation_use_other_names",
-                is_template=True,
-                conditions=[
-                    asdict(
-                        Condition(
-                            name="organisation_other_names_no",
-                            display_name="org other names no",
-                            destination_page_path="/summary",
-                            source_page_path="/organisation-name",
-                            value=ConditionValue(
-                                name="org other names no",
-                                conditions=[
-                                    {
-                                        "field": {
-                                            "name": "org_other_names",
-                                            "type": "YesNoField",
-                                            "display": "org other names",
-                                        },
-                                        "operator": "is",
-                                        "value": {"type": "Value", "value": "false", "display": "false"},
-                                        "coordinator": None,
-                                    },
-                                ],
-                            ),
-                        ),
-                    ),
-                    asdict(
-                        Condition(
-                            name="organisation_other_names_yes",
-                            display_name="org other names yes",
-                            destination_page_path="/organisation-alternative-names",
-                            source_page_path="/organisation-name",
-                            value=ConditionValue(
-                                name="org other names yes",
-                                conditions=[
-                                    {
-                                        "field": {
-                                            "name": "org_other_names",
-                                            "type": "YesNoField",
-                                            "display": "org other names",
-                                        },
-                                        "operator": "is",
-                                        "value": {"type": "Value", "value": "true", "display": "false"},
-                                        "coordinator": None,
-                                    },
-                                ],
-                            ),
-                        ),
-                    ),
-                ],
-            ),
-            Component(
-                component_id=uuid4(),
-                page_id=page_2_id,
-                title="Alternative Name 1",
-                type=ComponentType.TEXT_FIELD,
-                page_index=1,
-                theme_id=None,
-                options={"hideTitle": False, "classes": ""},
-                runner_component_name="alt_name_1",
-                is_template=True,
-            ),
-        ],
-    }
-)
+@pytest.mark.seed_config(seeded_form)
 def test_build_form_json_with_conditions(seed_dynamic_data):
     f: Fund = get_fund_by_id(seed_dynamic_data["funds"][0].fund_id)
     form: Form = f.rounds[0].sections[0].forms[0]

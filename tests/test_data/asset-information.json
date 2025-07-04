@@ -716,50 +716,6 @@
       }
     },
     {
-      "displayName": "Do you know who currently owns your asset-yes",
-      "name": "KZLYTF",
-      "value": {
-        "name": "Do you know who currently owns your asset-yes",
-        "conditions": [
-          {
-            "field": {
-              "name": "hdmYjg",
-              "type": "YesNoField",
-              "display": "Do you know who currently owns your asset?"
-            },
-            "operator": "is",
-            "value": {
-              "type": "Value",
-              "value": "true",
-              "display": "true"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "displayName": "Do you know who currently owns your asset-no",
-      "name": "GRGSGT",
-      "value": {
-        "name": "Do you know who currently owns your asset-no",
-        "conditions": [
-          {
-            "field": {
-              "name": "hdmYjg",
-              "type": "YesNoField",
-              "display": "Do you know who currently owns your asset?"
-            },
-            "operator": "is",
-            "value": {
-              "type": "Value",
-              "value": "false",
-              "display": "false"
-            }
-          }
-        ]
-      }
-    },
-    {
       "displayName": "Is your asset currently publicly owned-yes",
       "name": "oHpvvn",
       "value": {
@@ -792,94 +748,6 @@
               "name": "VGXXyq",
               "type": "YesNoField",
               "display": "Is your asset currently publicly owned?"
-            },
-            "operator": "is",
-            "value": {
-              "type": "Value",
-              "value": "false",
-              "display": "false"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "displayName": "Is this a registered Asset of Community Value (ACV)-yes",
-      "name": "pErRiw",
-      "value": {
-        "name": "Is this a registered Asset of Community Value (ACV)-yes",
-        "conditions": [
-          {
-            "field": {
-              "name": "wjBFTf",
-              "type": "YesNoField",
-              "display": "Is this a registered Asset of Community Value (ACV)?"
-            },
-            "operator": "is",
-            "value": {
-              "type": "Value",
-              "value": "true",
-              "display": "true"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "displayName": "Is the asset listed for disposal, or part of a Community Asset Transfer-yes",
-      "name": "XVOzZh",
-      "value": {
-        "name": "Is the asset listed for disposal, or part of a Community Asset Transfer-yes",
-        "conditions": [
-          {
-            "field": {
-              "name": "HyWPwE",
-              "type": "YesNoField",
-              "display": "Is the asset listed for disposal, or part of a Community Asset Transfer?"
-            },
-            "operator": "is",
-            "value": {
-              "type": "Value",
-              "value": "true",
-              "display": "true"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "displayName": "Is this a registered Asset of Community Value (ACV)-no",
-      "name": "nxnCXz",
-      "value": {
-        "name": "Is this a registered Asset of Community Value (ACV)-no",
-        "conditions": [
-          {
-            "field": {
-              "name": "wjBFTf",
-              "type": "YesNoField",
-              "display": "Is this a registered Asset of Community Value (ACV)?"
-            },
-            "operator": "is",
-            "value": {
-              "type": "Value",
-              "value": "false",
-              "display": "false"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "displayName": "Is the asset listed for disposal, or part of a Community Asset Transfer-no",
-      "name": "lmmYts",
-      "value": {
-        "name": "Is the asset listed for disposal, or part of a Community Asset Transfer-no",
-        "conditions": [
-          {
-            "field": {
-              "name": "HyWPwE",
-              "type": "YesNoField",
-              "display": "Is the asset listed for disposal, or part of a Community Asset Transfer?"
             },
             "operator": "is",
             "value": {
@@ -996,28 +864,6 @@
               "type": "Value",
               "value": "Listed for disposal",
               "display": "Listed for disposal"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "displayName": "part-of-a-community-asset-transfer",
-      "name": "rrSKPO",
-      "value": {
-        "name": "part-of-a-community-asset-transfer",
-        "conditions": [
-          {
-            "field": {
-              "name": "qlqyUq",
-              "type": "CheckboxesField",
-              "display": "Why is the asset at risk of closure?"
-            },
-            "operator": "contains",
-            "value": {
-              "type": "Value",
-              "value": "Part of a Community Asset Transfer",
-              "display": "Part of a Community Asset Transfer"
             }
           }
         ]
