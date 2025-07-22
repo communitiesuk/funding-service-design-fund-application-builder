@@ -69,7 +69,7 @@
         <a class='govuk-link govuk-link--no-visited-state'
         target="_blank"
         href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
-            Preview in a new tab</a>
+            Preview <span class="govuk-visually-hidden">{{ form.template_name }} form</span> in a new tab</a>
         {% endset %}
 
         {% set table_rows.items = table_rows.items + [[
