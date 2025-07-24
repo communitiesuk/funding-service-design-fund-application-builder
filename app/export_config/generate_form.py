@@ -294,7 +294,7 @@ def build_form_json(form: Form, fund_title: str = None) -> dict:
             build_form_section(results["sections"], page.formsection)
 
     # start page is the page with the controller ending start.js
-    start_page = _find_page_by_controller(form.pages, "start.js")
+    start_page = _find_page_by_controller(form.pages, "./pages/start.js")
     if start_page:
         results["startPage"] = f"/{start_page.display_path}"
     else:
