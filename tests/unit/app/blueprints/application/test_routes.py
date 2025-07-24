@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from flask import g, url_for
 
 from app.blueprints.application.routes import create_export_zip
-from tests.helpers import submit_form
+from tests.helpers import find_button_with_text, submit_form
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
@@ -87,7 +87,7 @@ def test_update_section_name(flask_test_client, seed_dynamic_data):
     data = {"name_in_apply_en": "section 1", "save_section": True}
     response = submit_form(flask_test_client, url, data, follow_redirects=True)
     soup = BeautifulSoup(response.data, "html.parser")
-    edit_section_link = soup.find("a", class_="govuk-button--secondary", string="Edit").get("href")
+    edit_section_link = find_button_with_text(soup, "Edit", "govuk-button--secondary").get("href")
     data = {
         "name_in_apply_en": "section updated",
         "save_section": True,
@@ -108,7 +108,7 @@ def test_delete_section(flask_test_client, seed_dynamic_data):
     data = {"name_in_apply_en": "section 1", "save_section": True}
     response = submit_form(flask_test_client, url, data, follow_redirects=True)
     soup = BeautifulSoup(response.data, "html.parser")
-    edit_section_link = soup.find("a", class_="govuk-button--secondary", string="Edit").get("href")
+    edit_section_link = find_button_with_text(soup, "Edit", "govuk-button--secondary").get("href")
     section_id = edit_section_link.split("/")[-1]
 
     delete_section_link = f"/rounds/{test_round.round_id}/sections/{section_id}/delete"
@@ -136,7 +136,7 @@ def test_update_section_empty_template_section_name(flask_test_client, seed_dyna
     data = {"name_in_apply_en": "section 1", "save_section": True}
     response = submit_form(flask_test_client, url, data, follow_redirects=True)
     soup = BeautifulSoup(response.data, "html.parser")
-    edit_section_link = soup.find("a", class_="govuk-button--secondary", string="Edit").get("href")
+    edit_section_link = find_button_with_text(soup, "Edit", "govuk-button--secondary").get("href")
     data = {"name_in_apply_en": "", "add_form": True, "section_id": edit_section_link.split("/")[-1], "template_id": ""}
 
     response = submit_form(flask_test_client, edit_section_link, data, follow_redirects=False)
@@ -167,7 +167,7 @@ def test_update_template_form(flask_test_client, seed_dynamic_data):
     data = {"name_in_apply_en": "section 1", "save_section": True}
     response = submit_form(flask_test_client, url, data, follow_redirects=True)
     soup = BeautifulSoup(response.data, "html.parser")
-    edit_section_link = soup.find("a", class_="govuk-button--secondary", string="Edit").get("href")
+    edit_section_link = find_button_with_text(soup, "Edit", "govuk-button--secondary").get("href")
     data = {
         "name_in_apply_en": "",
         "add_form": True,

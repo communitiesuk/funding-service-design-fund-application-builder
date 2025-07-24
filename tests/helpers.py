@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup, Tag
 from sqlalchemy import select
 
 from app.db import db
@@ -96,3 +97,12 @@ def submit_form(flask_test_client, url, data, follow_redirects=True):
     return flask_test_client.post(
         url, data=data, follow_redirects=follow_redirects, headers={"Content-Type": "application/x-www-form-urlencoded"}
     )
+
+
+def find_button_with_text(soup: BeautifulSoup, text: str, button_class: str | None = None) -> Tag | None:
+    """Find a button/link containing specific text, handling visually hidden content."""
+    buttons = soup.find_all("a", class_=button_class) if button_class else soup.find_all("a")
+    for button in buttons:
+        if text in button.get_text():
+            return button
+    return None

@@ -49,7 +49,7 @@
         {% set action_link %}
         <a class='govuk-link govuk-link--no-visited-state'
         href='{{ url_for("application_bp.build_application", round_id=round.round_id) }}'>
-            {% if round.status == 'Complete' %}View application{% else %}Build application{% endif %}
+            {% if round.status == 'Complete' %}View application<span class="govuk-visually-hidden"> for {{ round.fund.title_json["en"] }} {{ round.title_json["en"] }}</span>{% else %}Build application<span class="govuk-visually-hidden"> for {{ round.fund.title_json["en"] }} {{ round.title_json["en"] }}</span>{% endif %}
         </a>
         {% endset %}
 
