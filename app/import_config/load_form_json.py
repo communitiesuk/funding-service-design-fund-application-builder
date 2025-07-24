@@ -188,7 +188,6 @@ def create_form_sections_db(form_config):
 def insert_form_config(form_config, form_id):
     inserted_pages = []
     inserted_components = []
-    start_page_path = form_config["startPage"]
     form_section_list = create_form_sections_db(form_config)
 
     list_names_to_ids = {}
@@ -208,8 +207,6 @@ def insert_form_config(form_config, form_id):
         # fetch the form section_id  from db
         form_section_id = _find_form_section(form_section, form_section_list)
         page["section"] = form_section_id
-        if page["path"] == start_page_path:
-            page["controller"] = "start.js"
         inserted_page = insert_page_as_template(page, form_id)
         inserted_pages.append(inserted_page)
         db.session.flush()  # flush to get the page id
