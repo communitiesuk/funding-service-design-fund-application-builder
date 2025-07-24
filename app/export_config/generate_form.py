@@ -257,6 +257,8 @@ def build_start_page(content: str, form: Form) -> dict:
     if len(form.pages) > 0:
         ask_about = '<p class="govuk-body">We will ask you about:</p> <ul>'
         for page in form.pages:
+            if page.controller and page.controller.endswith("summary.js"):
+                continue
             ask_about += f"<li>{page.name_in_apply_json['en']}</li>"
         ask_about += "</ul>"
         start_page.update(
