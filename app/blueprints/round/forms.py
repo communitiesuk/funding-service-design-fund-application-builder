@@ -213,29 +213,6 @@ class RoundForm(FlaskForm):
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
     )
-    has_section_feedback = RadioField(
-        "Has section feedback",
-        widget=GovRadioInput(),
-        choices=[("true", "Yes"), ("false", "No")],
-        coerce=lambda value: value == "true",
-        default="false",
-    )
-    is_section_feedback_optional = RadioField(
-        "Is section feedback optional?",
-        widget=GovRadioInput(),
-        choices=[("true", "Yes"), ("false", "No")],
-        coerce=lambda value: value == "true",
-        default="false",
-    )
-    all_uploaded_documents_section_available = RadioField(
-        widget=GovRadioInput(),
-        choices=[("true", "Yes"), ("false", "No")],
-        coerce=lambda value: value == "true",
-        default="false",
-    )
-    application_reminder_sent = RadioField(
-        widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
-    )
     save_and_continue = SubmitField("Save and continue", widget=GovSubmitInput())
     save_and_return_home = SubmitField("Save and return home", widget=GovSubmitInput())
 
