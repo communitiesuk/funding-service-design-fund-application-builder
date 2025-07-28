@@ -22,7 +22,6 @@ class FundForm(FlaskForm):
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
         widget=GovRadioInput(),
-        default="false",
         render_kw={"class": "govuk-radios govuk-radios--inline"},
     )
     name_en = StringField(
