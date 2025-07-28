@@ -9,6 +9,18 @@ from app.db.models import Fund, FundingType, Round
 from app.db.queries.round import get_round_by_id
 from tests.helpers import submit_form
 
+radio_fields = {
+    "application_fields_download_available": "false",
+    "display_logo_on_pdf_exports": "false",
+    "mark_as_complete_enabled": "false",
+    "is_expression_of_interest": "false",
+    "has_feedback_survey": "false",
+    "is_feedback_survey_optional": "false",
+    "has_research_survey": "false",
+    "is_research_survey_optional": "false",
+    "eligibility_config": "false",
+}
+
 round_data_info = {
     "opens": ["01", "10", "2024", "09", "00"],
     "deadline": ["01", "12", "2024", "17", "00"],
@@ -21,6 +33,7 @@ round_data_info = {
     "feedback_link": "https://example.com/feedback",
     "project_name_field_id": 1,
     "guidance_url": "https://example.com/guidance",
+    **radio_fields,
 }
 
 
@@ -453,6 +466,7 @@ def test_create_round_with_application_close_date_before_open_date(flask_test_cl
         "feedback_link": "https://example.com/feedback",
         "project_name_field_id": 1,
         "guidance_url": "https://example.com/guidance",
+        **radio_fields,
     }
     test_fund = seed_dynamic_data["funds"][0]
     new_round_data = {
@@ -495,6 +509,7 @@ def test_create_round_with_assessment_close_date_before_open_date(flask_test_cli
         "feedback_link": "https://example.com/feedback",
         "project_name_field_id": 1,
         "guidance_url": "https://example.com/guidance",
+        **radio_fields,
     }
     test_fund = seed_dynamic_data["funds"][0]
     new_round_data = {
