@@ -66,8 +66,7 @@
   }) | trim | indent(2) }}
 {% endif %}
   <div class="govuk-date-input {%- if params.classes %} {{ params.classes }}{% endif %}"
-    {{- govukAttributes(params.attributes) -}}
-    {%- if params.id %} id="{{ params.id }}"{% endif %}>
+    {{- govukAttributes(params.attributes) -}}>
     {% if params.formGroup and params.formGroup.beforeInputs %}
     {{ params.formGroup.beforeInputs.html | safe | trim | indent(4) if params.formGroup and params.formGroup.beforeInputs.html else params.formGroup.beforeInputs.text }}
     {% endif %}

@@ -30,7 +30,7 @@ class TestDatetimeField:
         assert len(soup.find_all("input")) == 5
 
         assert [el.get("id") for el in soup.find_all("input")] == [
-            "field-day",
+            "field",
             "field-month",
             "field-year",
             "field-hour",

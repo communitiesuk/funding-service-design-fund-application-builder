@@ -45,7 +45,7 @@ class GovDatetimeInput(GovFormBase):
             [
                 {
                     "label": "Day",
-                    "id": "{}-day".format(field.name),
+                    "id": field.name,
                     "name": field.name,
                     "classes": " ".join(
                         [
