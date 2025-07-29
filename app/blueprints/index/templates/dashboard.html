@@ -12,7 +12,7 @@
             <ol class="govuk-list govuk-!-margin-bottom-7">
                 <li>
                     <p class="govuk-body govuk-!-margin-bottom-0">
-                        <a class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state"
+                        <a class="govuk-link govuk-!-font-weight-bold"
                            href="{{ url_for('fund_bp.create_fund') }}">1. Add a new grant</a>
                     </p>
                     <p class="govuk-body">
@@ -21,7 +21,7 @@
                 </li>
                 <li>
                     <p class="govuk-body govuk-!-margin-bottom-0">
-                        <a class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state"
+                        <a class="govuk-link govuk-!-font-weight-bold"
                            href="{{ url_for('round_bp.select_fund', action="return_home") }}">2. Set up a new application</a>
                     </p>
                     <p class="govuk-body">
@@ -30,7 +30,7 @@
                 </li>
                 <li>
                     <p class="govuk-body govuk-!-margin-bottom-0">
-                        <a class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state"
+                        <a class="govuk-link govuk-!-font-weight-bold"
                            href="{{ url_for('application_bp.select_fund') }}">3. Design your application</a>
                     </p>
                     <p class="govuk-body">
@@ -45,7 +45,7 @@
                 questions if needed.
             </p>
             <p class="govuk-body">
-                <a class="govuk-link govuk-link--no-visited-state" href="{{ url_for('template_bp.view_templates') }}">View
+                <a class="govuk-link" href="{{ url_for('template_bp.view_templates') }}">View
                     and create templates</a>
             </p>
         </div>

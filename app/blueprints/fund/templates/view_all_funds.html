@@ -33,7 +33,7 @@
     {% set table_rows = namespace(items=[]) %}
     {% for fund in pagination.items %}
     {% set fund_detail_link %}
-    <a class='govuk-link govuk-link--no-visited-state'
+    <a class='govuk-link'
        href={{ url_for("fund_bp.view_fund_details", fund_id=fund.fund_id) }}>{{ fund.name_json["en"] }}</a>
     {% endset %}
     {% set table_rows.items = table_rows.items + [
