@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from govuk_frontend_wtf.wtforms_widgets import GovRadioInput, GovSubmitInput, GovTextArea, GovTextInput
 from wtforms import HiddenField, RadioField, StringField, SubmitField, TextAreaField, URLField
 from wtforms.fields.datetime import DateTimeField
-from wtforms.validators import DataRequired, Length, Optional, ValidationError
+from wtforms.validators import DataRequired, InputRequired, Length, Optional, ValidationError
 
 from app.db.queries.round import get_round_by_short_name_and_fund_id
 from app.shared.validators import FlexibleUrl, JsonValidation, NoSpacesBetweenLetters, WelshJsonValidation
@@ -153,88 +153,65 @@ class RoundForm(FlaskForm):
     application_fields_download_available = RadioField(
         "Do you want to allow assessors to download application fields?",
         widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether you want to allow assessors to download application fields")],
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
-        default="false",
     )
     display_logo_on_pdf_exports = RadioField(
         "Do you want to have the MHCLG logo on PDFs?",
         widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether you want to display the MHCLG logo on PDFs")],
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
-        default="false",
     )
     mark_as_complete_enabled = RadioField(
         "Do you want applicants to mark sections as complete?",
         widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether you want applicants to mark sections as complete")],
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
-        default="false",
     )
     is_expression_of_interest = RadioField(
         "Is this application round an expression of interest?",
         widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether this application round is an expression of interest")],
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
-        default="false",
     )
     has_feedback_survey = RadioField(
         "Do you want to include a feedback survey?",
         widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether you want to include a feedback survey")],
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
-        default="false",
     )
     is_feedback_survey_optional = RadioField(
         "Is the feedback survey optional?",
         widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether the feedback survey is optional")],
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
-        default="false",
     )
     has_research_survey = RadioField(
         "Do you want to include a research survey?",
         widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether you want to include a research survey")],
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
-        default="false",
     )
     is_research_survey_optional = RadioField(
         "Is the research survey optional?",
         widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether the research survey is optional")],
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
-        default="false",
     )
     eligibility_config = RadioField(
         "Do applicants need to pass eligibility questions before applying?",
         widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether applicants need to pass eligibility questions")],
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
-        default="false",
-    )
-    has_section_feedback = RadioField(
-        "Has section feedback",
-        widget=GovRadioInput(),
-        choices=[("true", "Yes"), ("false", "No")],
-        coerce=lambda value: value == "true",
-        default="false",
-    )
-    is_section_feedback_optional = RadioField(
-        "Is section feedback optional?",
-        widget=GovRadioInput(),
-        choices=[("true", "Yes"), ("false", "No")],
-        coerce=lambda value: value == "true",
-        default="false",
-    )
-    all_uploaded_documents_section_available = RadioField(
-        widget=GovRadioInput(),
-        choices=[("true", "Yes"), ("false", "No")],
-        coerce=lambda value: value == "true",
-        default="false",
-    )
-    application_reminder_sent = RadioField(
-        widget=GovRadioInput(), choices=[("true", "Yes"), ("false", "No")], default="false"
     )
     save_and_continue = SubmitField("Save and continue", widget=GovSubmitInput())
     save_and_return_home = SubmitField("Save and return home", widget=GovSubmitInput())

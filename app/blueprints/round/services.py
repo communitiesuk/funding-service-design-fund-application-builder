@@ -44,9 +44,6 @@ def populate_form_with_round_data(round_obj, form_class):
             round_obj.application_guidance_json.get("cy", "") if round_obj.application_guidance_json else ""
         ),
         "guidance_url": round_obj.guidance_url,
-        "all_uploaded_documents_section_available": (
-            "true" if round_obj.all_uploaded_documents_section_available else "false"
-        ),
         "application_fields_download_available": (
             "true" if round_obj.application_fields_download_available else "false"
         ),
@@ -58,11 +55,6 @@ def populate_form_with_round_data(round_obj, form_class):
             if round_obj.feedback_survey_config and round_obj.feedback_survey_config.get("has_feedback_survey")
             else "false"
         ),
-        "has_section_feedback": (
-            "true"
-            if round_obj.feedback_survey_config and round_obj.feedback_survey_config.get("has_section_feedback")
-            else "false"
-        ),
         "has_research_survey": (
             "true"
             if round_obj.feedback_survey_config and round_obj.feedback_survey_config.get("has_research_survey")
@@ -71,11 +63,6 @@ def populate_form_with_round_data(round_obj, form_class):
         "is_feedback_survey_optional": (
             "true"
             if round_obj.feedback_survey_config and round_obj.feedback_survey_config.get("is_feedback_survey_optional")
-            else "false"
-        ),
-        "is_section_feedback_optional": (
-            "true"
-            if round_obj.feedback_survey_config and round_obj.feedback_survey_config.get("is_section_feedback_optional")
             else "false"
         ),
         "is_research_survey_optional": (
@@ -107,10 +94,10 @@ def update_existing_round(round_obj, form, user="dummy_user"):
     round_obj.short_name = form.short_name.data
     round_obj.feedback_survey_config = {
         "has_feedback_survey": form.has_feedback_survey.data,
-        "has_section_feedback": form.has_section_feedback.data,
+        "has_section_feedback": False,  # Not used in form
         "has_research_survey": form.has_research_survey.data,
         "is_feedback_survey_optional": form.is_feedback_survey_optional.data,
-        "is_section_feedback_optional": form.is_section_feedback_optional.data,
+        "is_section_feedback_optional": False,  # Not used in form
         "is_research_survey_optional": form.is_research_survey_optional.data,
     }
 
@@ -127,7 +114,7 @@ def update_existing_round(round_obj, form, user="dummy_user"):
     round_obj.feedback_link = form.feedback_link.data
     round_obj.project_name_field_id = form.project_name_field_id.data
     round_obj.guidance_url = form.guidance_url.data
-    round_obj.all_uploaded_documents_section_available = form.all_uploaded_documents_section_available.data
+    round_obj.all_uploaded_documents_section_available = False  # Not used in form
     round_obj.application_fields_download_available = form.application_fields_download_available.data
     round_obj.display_logo_on_pdf_exports = form.display_logo_on_pdf_exports.data
     round_obj.mark_as_complete_enabled = form.mark_as_complete_enabled.data
@@ -171,17 +158,17 @@ def create_new_round(form, user="dummy_user"):
             "cy": form.application_guidance_cy.data or None,
         },
         guidance_url=form.guidance_url.data,
-        all_uploaded_documents_section_available=form.all_uploaded_documents_section_available.data,
+        all_uploaded_documents_section_available=False,  # Not used in form
         application_fields_download_available=form.application_fields_download_available.data,
         display_logo_on_pdf_exports=form.display_logo_on_pdf_exports.data,
         mark_as_complete_enabled=form.mark_as_complete_enabled.data,
         is_expression_of_interest=form.is_expression_of_interest.data,
         feedback_survey_config={
             "has_feedback_survey": form.has_feedback_survey.data,
-            "has_section_feedback": form.has_section_feedback.data,
+            "has_section_feedback": False,  # Not used in form
             "has_research_survey": form.has_research_survey.data,
             "is_feedback_survey_optional": form.is_feedback_survey_optional.data,
-            "is_section_feedback_optional": form.is_section_feedback_optional.data,
+            "is_section_feedback_optional": False,  # Not used in form
             "is_research_survey_optional": form.is_research_survey_optional.data,
         },
         eligibility_config={"has_eligibility": form.eligibility_config.data},

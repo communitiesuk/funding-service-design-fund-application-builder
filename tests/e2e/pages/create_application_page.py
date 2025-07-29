@@ -27,6 +27,24 @@ class CreateApplicationPage(PageBase):
         self.privacy_notice_link = page.get_by_role("textbox", name="Privacy notice link", exact=True)
         self.project_name_field_id = page.get_by_role("textbox", name="Project name field ID", exact=True)
 
+        self.application_fields_download_available = page.get_by_role(
+            "group", name="Do you want to allow assessors to download application fields?"
+        )
+        self.display_logo_on_pdf_exports = page.get_by_role("group", name="Do you want to have the MHCLG logo on PDFs?")
+        self.mark_as_complete_enabled = page.get_by_role(
+            "group", name="Do you want applicants to mark sections as complete?"
+        )
+        self.is_expression_of_interest = page.get_by_role(
+            "group", name="Is this application round an expression of interest?"
+        )
+        self.has_feedback_survey = page.get_by_role("group", name="Do you want to include a feedback survey?")
+        self.is_feedback_survey_optional = page.get_by_role("group", name="Is the feedback survey optional?")
+        self.has_research_survey = page.get_by_role("group", name="Do you want to include a research survey?")
+        self.is_research_survey_optional = page.get_by_role("group", name="Is the research survey optional?")
+        self.eligibility_config = page.get_by_role(
+            "group", name="Do applicants need to pass eligibility questions before applying?"
+        )
+
         self.save_and_continue: Locator = self.page.get_by_role("button", name="Save and continue")
         self.cancel: Locator = self.page.get_by_role("link", name="Cancel")
         self.save_and_return_home: Locator = self.page.get_by_role("button", name="Save and return home")
@@ -36,16 +54,33 @@ class CreateApplicationPage(PageBase):
         self.update_metadata("application_name", application_name)
         self.application_round.fill(application_name)
         self.round_short_name.fill("".join(random.choices(string.ascii_letters + string.digits, k=6)))
+
         # Ensure date logic consistency using Faker
         application_open = self._fill_date_time_field(self.application_round_open)
         self._fill_date_time_field(self.application_round_close, after_date=application_open)
         self._fill_date_time_field(self.application_reminder)
         assessment_open = self._fill_date_time_field(self.assessment_open)
         self._fill_date_time_field(self.assessment_close, after_date=assessment_open)
+
         self.prospectus_link.fill(self.fake.url())
         self.privacy_notice_link.fill(self.fake.url())
         self.project_name_field_id.fill(self.fake.uuid4())
+
+        self._fill_radio_buttons()
+
         return self
+
+    def _fill_radio_buttons(self):
+        """Fill all required radio button fields with default values"""
+        self.application_fields_download_available.get_by_role("radio", name="Yes").check()
+        self.display_logo_on_pdf_exports.get_by_role("radio", name="Yes").check()
+        self.mark_as_complete_enabled.get_by_role("radio", name="Yes").check()
+        self.is_expression_of_interest.get_by_role("radio", name="No").check()
+        self.has_feedback_survey.get_by_role("radio", name="No").check()
+        self.is_feedback_survey_optional.get_by_role("radio", name="Yes").check()
+        self.has_research_survey.get_by_role("radio", name="No").check()
+        self.is_research_survey_optional.get_by_role("radio", name="Yes").check()
+        self.eligibility_config.get_by_role("radio", name="No").check()
 
     def when_click_save_and_return_home(self):
         self.save_and_return_home.click()

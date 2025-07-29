@@ -1,5 +1,6 @@
 function toggleWelshFields() {
-    const welshAvailable = document.querySelector('input[name="welsh_available"]:checked').value;
+    const checked = document.querySelector('input[name="welsh_available"]:checked');
+    const welshAvailable = (checked && checked.value) ? checked.value : false;
     const welshFields = document.querySelectorAll('.welsh-field');
 
     welshFields.forEach(field => {
