@@ -494,7 +494,7 @@ def test_build_component(component_to_build, exp_result):
                     display_path="summary-page",
                     name_in_apply_json={"en": "Summary Page"},
                     form_index=1,
-                    controller="summary.js",
+                    controller="./pages/summary.js",
                 ),
             ],
             {
@@ -525,7 +525,7 @@ def test_build_component(component_to_build, exp_result):
                         "components": [],
                         "next": [],
                         "options": {},
-                        "controller": "summary.js",
+                        "controller": "./pages/summary.js",
                     },
                 ],
             },
@@ -606,7 +606,7 @@ def test_build_component(component_to_build, exp_result):
                     display_path="summary",
                     name_in_apply_json={"en": "Summary"},
                     form_index=1,
-                    controller="summary.js",
+                    controller="./pages/summary.js",
                 )
             ],
             {

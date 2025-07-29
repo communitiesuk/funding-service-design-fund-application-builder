@@ -8,6 +8,8 @@ from app.db.queries.application import get_list_by_id
 from app.export_config.helpers import human_to_kebab_case
 from app.shared.data_classes import ConditionValue, FormSection
 
+SUMMARY_JS_PATH = "./pages/summary.js"
+
 BASIC_FORM_STRUCTURE = {
     "startPage": None,
     "pages": [],
@@ -33,7 +35,7 @@ SUMMARY_PAGE = {
     "components": [],
     "next": [],
     "section": "uLwBuz",
-    "controller": "./pages/summary.js",
+    "controller": SUMMARY_JS_PATH,
 }
 
 
@@ -149,7 +151,7 @@ def build_navigation(partial_form_json: dict, form: Form) -> dict:
     partial_form_json["conditions"] = build_conditions(form.conditions) if form.conditions else []
 
     for page in form.pages:
-        if page.controller and page.controller.endswith("summary.js"):
+        if page.controller and page.controller.endswith(SUMMARY_JS_PATH):
             continue
 
         this_page_in_results = _get_page_result(partial_form_json, page)
@@ -257,6 +259,8 @@ def build_start_page(content: str, form: Form) -> dict:
     if len(form.pages) > 0:
         ask_about = '<p class="govuk-body">We will ask you about:</p> <ul>'
         for page in form.pages:
+            if page.controller and page.controller.endswith(SUMMARY_JS_PATH):
+                continue
             ask_about += f"<li>{page.name_in_apply_json['en']}</li>"
         ask_about += "</ul>"
         start_page.update(
@@ -310,7 +314,7 @@ def build_form_json(form: Form, fund_title: str = None) -> dict:
     results["lists"] = build_lists(results["pages"])
 
     # Add on the summary page
-    summary_page = _find_page_by_controller(form.pages, "summary.js")
+    summary_page = _find_page_by_controller(form.pages, SUMMARY_JS_PATH)
     if not summary_page:
         results["pages"].append(SUMMARY_PAGE)
 
