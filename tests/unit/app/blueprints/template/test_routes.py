@@ -52,9 +52,7 @@ def test_generalized_table_template_with_existing_templates(flask_test_client):
     assert '<th scope="col" class="govuk-table__header">Task name</th>' in html, "Tasklist Name header missing"
     assert '<th scope="col" class="govuk-table__header"></th>' in html, "Action header missing"
     assert "asset-information" in html, "Template name is missing"
-    assert "Apply for funding to save an asset in your community" in html, (
-        "Tasklist name and table component is missing"
-    )
+    assert "funding to save an asset in your community" in html, "Tasklist name and table component is missing"
     assert 'Preview <span class="govuk-visually-hidden">asset-information form</span> in a new tab</a>' in html, (
         "Preview action is missing"
     )

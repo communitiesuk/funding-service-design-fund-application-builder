@@ -49,13 +49,13 @@ class FundForm(FlaskForm):
     title_en = StringField(
         "Application name",
         widget=GovTextInput(),
-        description="For example, Apply for funding to save an asset in your community",
+        description="For example, funding to save an asset in your community",
         validators=[DataRequired(message="Enter the application name")],
     )
     title_cy = StringField(
         "Application name (Welsh)",
         widget=GovTextInput(),
-        description="For example, Apply for funding to save an asset in your community",
+        description="For example, funding to save an asset in your community",
     )
     description_en = TextAreaField(
         "Grant description",
