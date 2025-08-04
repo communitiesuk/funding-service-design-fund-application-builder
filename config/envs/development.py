@@ -27,7 +27,7 @@ class DevelopmentConfig(Config):
     DEBUG_USER = {
         "full_name": "Development User",
         "email": "dev@communities.gov.uk",
-        "roles": [],
+        "roles": ["FSD_ADMIN"],
         "highest_role_map": {},
     }
     DEBUG_USER_ACCOUNT_ID = "00000000-0000-0000-0000-000000000000"
