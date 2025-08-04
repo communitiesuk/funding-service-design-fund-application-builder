@@ -7,7 +7,6 @@ from flask import Blueprint, Response, g, redirect, render_template, session, ur
 from fsd_utils.authentication.decorators import login_requested
 
 from app.db.queries.application import get_form_by_id
-from app.export_config.generate_form import build_form_json
 from config import Config
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -46,7 +45,7 @@ def preview_form(form_id):
     'runner_publish_name' of that form. Returns a redirect to that form in the form-runner
     """
     form = get_form_by_id(form_id)
-    form_json = build_form_json(form)
+    form_json = form.form_json.copy()
     form_id = form.runner_publish_name
 
     try:
@@ -66,7 +65,7 @@ def download_form_json(form_id):
     Generates form json for the selected form and returns it as a file download
     """
     form = get_form_by_id(form_id)
-    form_json = build_form_json(form)
+    form_json = form.form_json.copy()
 
     return Response(
         response=json.dumps(form_json),
