@@ -61,5 +61,6 @@ class DevelopmentConfig(Config):
             "'sha256-SAqGh+YBD7v4qJypLeMBSlsddU4Qd67qmTMVRroKuqk='",  # `color: #0000DD; font-weight: bold`
             "'sha256-rietEaLOHfqNF3pcuzajo55dYo9i4UtLS6HN0KrBhbg='",  # `color: #007020`
             "'sha256-Ut0gFM7k9Dr9sRq/kXKsPL4P6Rh8XX0Vt+tKzrdJo7A='",  # `user-select: none;`
+            "'sha256-9/aFFbAwf+Mwl6MrBQzrJ/7ZK5vo7HdOUR7iKlBk78U='",  # `color: white; filter: brightness(0) invert(1);`
         ]
     )

@@ -2,6 +2,7 @@
 {% from "govuk_frontend_jinja/components/breadcrumbs/macro.html" import govukBreadcrumbs %}
 {% from "govuk_frontend_jinja/components/notification-banner/macro.html" import govukNotificationBanner %}
 {% from "govuk_frontend_jinja/components/back-link/macro.html" import govukBackLink %}
+{% from "partials/mhclg-header.html" import mhclgHeader %}
 {% set assetPath = url_for("static", filename="").rstrip("/") %}
 
 {% set cspNonce = csp_nonce() %}  {# Used in the base template govuk_frontend_jinja/template.html #}
@@ -13,18 +14,20 @@
 {% endblock head %}
 
 {% block header %}
-  {{ govukHeader({
-    "useTudorCrown": "yes",
-    "classes": "govuk-header--full-width-border",
-    "serviceName": "Fund application builder",
-    "serviceUrl": url_for("index_bp.index"),
-    "navigation": [
-        {
-            "text": "Sign out",
-            "href": g.logout_url
-        }
-    ]  if g.is_authenticated else []
-  }) }}
+    {{
+        mhclgHeader(
+            params={
+                "homepageUrl": url_for("index_bp.index"),
+                "assetPath": assetPath,
+                "navigation": [
+                {
+                    "text": "Sign out",
+                    "href": g.logout_url
+                }
+                ]  if g.is_authenticated else []
+            }
+       )
+    }}
 
   {# Only show the custom navigation if showNavigationBar is set #}
   {% if showNavigationBar %}
