@@ -18,7 +18,9 @@ class DefaultConfig(object):
         "FUND_APPLICATION_BUILDER_HOST", "https://fund-application-builder.communities.gov.localhost:3011"
     )
     FAB_SAVE_PER_PAGE = getenv("FAB_SAVE_PER_PAGE", "dev/save")
-    FORM_RUNNER_PUBLISH_URL = getenv("FORM_RUNNER_PUBLISH_URL", "http://form-runner:3009/publish")
+    FORM_RUNNER_PUBLISH_URL = getenv(
+        "FORM_RUNNER_PUBLISH_URL", "https://form-runner.communities.gov.localhost:3009/publish"
+    )
     FORM_RUNNER_EXTERNAL_HOST = getenv(
         "FORM_RUNNER_EXTERNAL_HOST", "https://form-runner.communities.gov.localhost:3009"
     )
