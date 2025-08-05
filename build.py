@@ -81,6 +81,7 @@ def build_all(static_dist_root="app/static/dist", remove_existing=False):
     build_govuk_assets(static_dist_root=static_dist_root)
     copy_static_files("styles", "styles", "*.css")
     copy_static_files("js", "js", "*.js")
+    copy_static_files("images", "images", "*.png")
 
 
 if __name__ == "__main__":
