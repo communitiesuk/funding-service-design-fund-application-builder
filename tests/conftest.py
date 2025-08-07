@@ -10,11 +10,47 @@ from flask_migrate import upgrade
 from sqlalchemy import text
 
 from app.create_app import create_app
-from app.import_config.load_form_json import load_form_jsons
+from app.db.queries.application import insert_new_form
+from app.shared.helpers import human_to_kebab_case
 from config import Config
 from tests.seed_test_data import fund_without_assessment, init_unit_test_data, insert_test_data
 
 pytest_plugins = ["fsd_test_utils.fixtures.db_fixtures"]
+
+
+def read_json_from_directory(directory_path):
+    form_configs = []
+    for filename in os.listdir(directory_path):
+        if filename.endswith(".json"):
+            file_path = os.path.join(directory_path, filename)
+            with open(file_path, "r") as json_file:
+                form_config = {
+                    "filename": filename,
+                    "form_json": json.load(json_file),
+                }
+                form_configs.append(form_config)
+    return form_configs
+
+
+def load_form_jsons(_db, override_fund_config=None):
+    try:
+        if not override_fund_config:
+            script_dir = os.path.dirname(__file__)
+            full_directory_path = os.path.join(script_dir, "test_data")
+            form_configs = read_json_from_directory(full_directory_path)
+        else:
+            form_configs = override_fund_config
+        for form_config in form_configs:
+            insert_new_form(
+                form_name=form_config["form_json"].get("name", "Unnamed form"),
+                template_name=form_config["filename"].split(".")[0],
+                runner_publish_name=human_to_kebab_case(form_config["filename"].split(".")[0]),
+                form_json=form_config["form_json"],
+            )
+    except Exception as e:
+        print(e)
+        _db.session.rollback()
+        raise e
 
 
 @pytest.fixture(scope="session")

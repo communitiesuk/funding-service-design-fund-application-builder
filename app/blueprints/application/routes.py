@@ -32,10 +32,6 @@ from app.db.queries.clone import clone_single_form
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_round_by_id, update_round
 from app.export_config.generate_all_questions import generate_html
-from app.export_config.generate_assessment_config import (
-    generate_assessment_config_for_round,
-)
-from app.export_config.generate_form import _find_page_by_controller, build_form_json
 from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
@@ -146,7 +142,7 @@ def view_all_questions(round_id):
     sections_in_round = round.sections
     section_data = []
     for section in sections_in_round:
-        forms = [{"name": form.runner_publish_name, "form_data": build_form_json(form)} for form in section.forms]
+        forms = [{"name": form.runner_publish_name, "form_data": form.form_json.copy()} for form in section.forms]
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(
@@ -172,8 +168,7 @@ def create_export_files(round_id):
     base_output_dir = Config.TEMP_FILE_PATH / f"{round_short_name}-{random_post_fix}"
     generate_form_jsons_for_round(round_id, base_output_dir)
     generate_all_round_html(round_id, base_output_dir)
-    fund_config, round_config = generate_config_for_round(round_id, base_output_dir)
-    generate_assessment_config_for_round(fund_config, round_config, base_output_dir)
+    generate_config_for_round(round_id, base_output_dir)
     output_zip_path = create_export_zip(
         directory_to_zip=base_output_dir, zip_file_name=round_short_name, random_post_fix=random_post_fix
     )
@@ -291,11 +286,10 @@ def view_form_questions(round_id, section_id, form_id):
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     form = get_form_by_id(form_id=form_id)
-    start_page = _find_page_by_controller(form.pages, "start.js")
     section_data = [
         {
             "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
-            "forms": [{"name": form.runner_publish_name, "form_data": build_form_json(form)}],
+            "forms": [{"name": form.runner_publish_name, "form_data": form.form_json.copy()}],
         }
     ]
 
@@ -309,6 +303,6 @@ def view_form_questions(round_id, section_id, form_id):
         round=round,
         fund=fund,
         question_html=html,
-        title=start_page.name_in_apply_json["en"],
+        title=form.name_in_apply_json["en"],
         all_questions_view=False,
     )

@@ -2,7 +2,13 @@ from dataclasses import asdict, is_dataclass
 
 from flask import flash, render_template
 
-from app.db.models import Page
+
+def human_to_kebab_case(string: str) -> str | None:
+    return string.replace(" ", "-").strip().lower() if string else None
+
+
+def human_to_snake_case(string: str) -> str | None:
+    return string.replace(" ", "_").strip().lower() if string else None
 
 
 def convert_to_dict(obj):
@@ -19,24 +25,6 @@ def find_enum(enum_class, value):
         if enum.value == value:
             return enum
     return None
-
-
-def get_all_pages_in_parent_form(db, page_id):
-    # Get the form_id from page_id
-    page = db.session.query(Page).filter(Page.page_id == page_id).first()
-
-    if page is None:
-        raise ValueError(f"No page found with page_id: {page_id}")
-
-    form_id = page.form_id
-
-    # Get all page ids belonging to the form
-    page_ids = db.session.query(Page.page_id).filter(Page.form_id == form_id).all()
-
-    # Extract page_ids from the result
-    page_ids = [p.page_id for p in page_ids]
-
-    return page_ids
 
 
 def flash_message(

@@ -1,20 +1,8 @@
 import os
 from string import Template
 
-import jsonschema
-from flask import current_app
-from jsonschema import validate
-
-from app.shared.helpers import convert_to_dict
+from app.shared.helpers import convert_to_dict, human_to_kebab_case, human_to_snake_case
 from config import Config
-
-
-def human_to_kebab_case(string: str) -> str | None:
-    return string.replace(" ", "-").strip().lower() if string else None
-
-
-def human_to_snake_case(string: str) -> str | None:
-    return string.replace(" ", "_").strip().lower() if string else None
 
 
 def write_config(config, filename, round_short_name, config_type, base_output_dir=None):
@@ -64,18 +52,6 @@ def write_config(config, filename, round_short_name, config_type, base_output_di
             f.write(content_to_write)
         elif config_type == "assessment":
             f.write(content_to_write)
-
-
-# Function to validate JSON data against the schema
-def validate_json(data, schema):
-    try:
-        validate(instance=data, schema=schema)
-        current_app.logger.info("Given JSON data is valid")
-        return True
-    except jsonschema.exceptions.ValidationError as err:
-        current_app.logger.error("Given JSON data is invalid")
-        current_app.logger.error(err)
-        return False
 
 
 assess_output = Template(

@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.types import Boolean
 
 from app.db import db
-from app.db.models import Criteria, Section
+from app.db.models import Section
 
 if TYPE_CHECKING:
     from .fund import Fund
@@ -51,7 +51,6 @@ class Round(BaseModel):
         collection_class=ordering_list("index", count_from=1),
         passive_deletes="all",
     )
-    criteria: Mapped[list["Criteria"]] = relationship("Criteria")
     # several other fields to add
     application_reminder_sent = Column(Boolean, default=False, nullable=False)
     contact_email = Column(db.String(), nullable=True, unique=False)
