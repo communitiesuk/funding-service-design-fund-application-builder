@@ -1,3 +1,4 @@
+import json
 import uuid
 from io import BytesIO
 from pathlib import Path
@@ -120,7 +121,7 @@ def test_template_create_already_existing_template(flask_test_client):
             assert b"Template name already exists" in response.data
 
 
-@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
+@pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user", "clean_db")
 def test_template_create_invalid_json_file(flask_test_client):
     flask_test_client.get("/templates/create")
     with flask_test_client.session_transaction():
@@ -159,12 +160,9 @@ def test_template_create_success(flask_test_client, clean_db):
 @patch("app.blueprints.template.routes.get_form_by_id")
 @patch("app.blueprints.template.routes.update_form")
 @patch("app.blueprints.template.routes.delete_form")
-@patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_edit_template_get(
-    mock_flash, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
-):
+def test_edit_template_get(mock_flash, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client):
     mock_form = MagicMock()
     mock_form.template_name = "Test Template"
     mock_form.name_in_apply_json = {"en": "Test Tasklist"}
@@ -180,12 +178,10 @@ def test_edit_template_get(
 
 @patch("app.blueprints.template.routes.get_form_by_id")
 @patch("app.blueprints.template.routes.update_form")
-@patch("app.blueprints.template.routes.delete_form")
-@patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_edit_template_post_update_without_actions(
-    mock_flash_message, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
+    mock_flash_message, mock_update_form, mock_get_form_by_id, flask_test_client
 ):
     form_mock_id = uuid.uuid4()
     form_id = str(form_mock_id)
@@ -207,10 +203,10 @@ def test_edit_template_post_update_without_actions(
         assert response.status_code == 200
         mock_update_form.assert_called_once_with(
             form_id=form_mock_id,
-            new_form_config={
-                "name_in_apply_json": {"en": "Updated Tasklist"},
-                "template_name": "Updated Template",
-            },
+            form_name="Updated Tasklist",
+            template_name="Updated Template",
+            runner_publish_name="updated-tasklist.json",
+            form_json=None,
         )
         mock_flash_message.assert_called_with("Template updated")
 
@@ -244,39 +240,46 @@ def test_edit_template_post_update_with_actions_template_table(
         assert response.status_code == 200
         mock_update_form.assert_called_once_with(
             form_id=form_mock_id,
-            new_form_config={
-                "name_in_apply_json": {"en": "Updated Tasklist"},
-                "template_name": "Updated Template",
-            },
+            form_name="Updated Tasklist",
+            template_name="Updated Template",
+            runner_publish_name="updated-tasklist.json",
+            form_json=None,
         )
         mock_redirect.assert_called_once_with("/templates")
 
 
 @patch("app.blueprints.template.routes.get_form_by_id")
 @patch("app.blueprints.template.routes.update_form")
-@patch("app.blueprints.template.routes.delete_form")
-@patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_edit_template_post_with_file_without_actions(
-    mock_flash_message, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
+    mock_flash_message, mock_update_form, mock_get_form_by_id, flask_test_client
 ):
     form_mock_id = uuid.uuid4()
     form_id = str(form_mock_id)
     flask_test_client.get(f"/templates/{form_id}/edit")
-    with flask_test_client.session_transaction():
-        file_path = Path("tests") / "test_data" / "asset-information.json"
-        form_data = {
-            "template_name": "Updated Template",
-            "tasklist_name": "Updated Tasklist",
-            "file": (open(file_path, "rb"), "org-info.json"),
-            "save_and_continue": "true",
-            "csrf_token": g.csrf_token,
-        }
-        flask_test_client.post(f"/templates/{form_id}/edit", data=form_data, follow_redirects=True)
-        mock_delete_form.assert_called_once_with(form_id=form_mock_id, cascade=True)
-        mock_json_import.assert_called_once()
-        mock_flash_message.assert_called_with("Template updated")
+    file_path = Path("tests") / "test_data" / "asset-information.json"
+    with open(file_path, "rb") as file:
+        file_data = file.read().decode("utf-8")
+        file.seek(0)  # Reset file pointer to beginning so can be read by endpoint
+        form_json = json.loads(file_data)
+        with flask_test_client.session_transaction():
+            form_data = {
+                "template_name": "Updated Template",
+                "tasklist_name": "Updated Tasklist",
+                "file": (file, "org-info.json"),
+                "save_and_continue": "true",
+                "csrf_token": g.csrf_token,
+            }
+            flask_test_client.post(f"/templates/{form_id}/edit", data=form_data, follow_redirects=True)
+            mock_update_form.assert_called_once_with(
+                form_id=form_mock_id,
+                form_name="Updated Tasklist",
+                template_name="Updated Template",
+                runner_publish_name="updated-tasklist.json",
+                form_json=form_json,
+            )
+            mock_flash_message.assert_called_with("Template updated")
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user", "seed_dynamic_data")

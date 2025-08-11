@@ -4,7 +4,6 @@ from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_all_questions import generate_html
-from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import write_config
 
 frontend_html_prefix = """
@@ -60,7 +59,7 @@ def generate_all_round_html(round_id, base_output_dir=None):
     sections_in_round = round.sections
     section_data = []
     for section in sections_in_round:
-        forms = [{"name": form.runner_publish_name, "form_data": build_form_json(form)} for form in section.forms]
+        forms = [{"name": form.runner_publish_name, "form_data": form.form_json.copy()} for form in section.forms]
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(

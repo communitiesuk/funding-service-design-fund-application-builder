@@ -1,23 +1,23 @@
 import json
 
 from flask import Blueprint, Response, current_app, redirect, render_template, request, url_for
+from jsonschema import ValidationError
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.index.routes import INDEX_BP_DASHBOARD
 from app.blueprints.template.forms import TemplateCreateForm, TemplateUpdateForm
-from app.blueprints.template.services import json_import
 from app.db.queries.application import (
     delete_form,
     get_form_by_id,
     get_form_by_template_name,
     get_paginated_forms,
+    insert_new_form,
     update_form,
 )
 from app.export_config.generate_all_questions import generate_html
-from app.export_config.generate_form import build_form_json
-from app.export_config.helpers import human_to_kebab_case
+from app.shared.form_json_validation import validate_form_json
 from app.shared.forms import DeleteConfirmationForm
-from app.shared.helpers import flash_message
+from app.shared.helpers import flash_message, human_to_kebab_case
 
 template_bp = Blueprint(
     "template_bp",
@@ -59,10 +59,13 @@ def create_template():
         if file:
             try:
                 file_data = file.read().decode("utf-8")
-                form_data = json.loads(file_data)
-                form_data["name"] = tasklist_name
-                created_form = json_import(
-                    data=form_data, template_name=template_name, filename=human_to_kebab_case(f"{tasklist_name}.json")
+                form_json = json.loads(file_data)
+                validate_form_json(form_json)
+                created_form = insert_new_form(
+                    form_name=tasklist_name,
+                    template_name=template_name,
+                    runner_publish_name=human_to_kebab_case(f"{tasklist_name}.json"),
+                    form_json=form_json,
                 )
                 flash_message(
                     message="Template uploaded",
@@ -71,7 +74,7 @@ def create_template():
                 )
                 if request.form.get("action") == "return_home":
                     return redirect(url_for(INDEX_BP_DASHBOARD))
-            except Exception as e:
+            except ValidationError as e:
                 print(e)
                 form.file.errors.append("Upload a valid JSON file")
                 return render_template("template.html", **params)
@@ -87,7 +90,7 @@ def template_questions(form_id):
     section_data = [
         {
             "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
-            "forms": [{"name": form.runner_publish_name, "form_data": build_form_json(form)}],
+            "forms": [{"name": form.runner_publish_name, "form_data": form.form_json.copy()}],
         }
     ]
     print_data = generate_print_data_for_sections(
@@ -107,7 +110,7 @@ def template_details(form_id):
 
 @template_bp.route("/<uuid:form_id>", methods=["DELETE"])
 def delete_form_template(form_id):
-    delete_form(form_id=form_id, cascade=True)
+    delete_form(form_id=form_id)
     return Response(status=204)
 
 
@@ -126,24 +129,18 @@ def edit_template(form_id):
             params.update({"actions": request.args.get("actions")})
         return render_template("template.html", **params)
     if form.validate_on_submit():
+        form_json = None
+        if form.file and (file := form.file.data):
+            file_data = file.read().decode("utf-8")
+            form_json = json.loads(file_data)
+            validate_form_json(form_json)
         updated_form = update_form(
             form_id=form_id,
-            new_form_config={
-                "name_in_apply_json": {"en": form.tasklist_name.data},
-                "template_name": form.template_name.data,
-            },
+            form_name=form.tasklist_name.data,
+            template_name=form.template_name.data,
+            runner_publish_name=human_to_kebab_case(f"{form.tasklist_name.data}.json"),
+            form_json=form_json,
         )
-        if form.file and form.file.data is not None:
-            delete_form(form_id=form_id, cascade=True)
-            file_data = form.file.data.read().decode("utf-8")
-            form_data = json.loads(file_data)
-            form_data["name"] = form.tasklist_name.data
-            created_form = json_import(
-                data=form_data,
-                template_name=form.template_name.data,
-                filename=human_to_kebab_case(f"{form.tasklist_name.data}.json"),
-            )
-            return _save_and_return(created_form, form)
         return _save_and_return(updated_form, form)
     params.update({"template_name": existing_form.template_name})
     return render_template("template.html", **params)
@@ -173,7 +170,7 @@ def delete_template(form_id):
     form = DeleteConfirmationForm()
 
     if form.validate_on_submit():  # If user confirms deletion
-        delete_form(form_id=form_id, cascade=True)
+        delete_form(form_id=form_id)
         return redirect(url_for("template_bp.view_templates"))
 
     # Render confirmation page
