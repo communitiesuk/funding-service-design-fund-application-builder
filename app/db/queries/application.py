@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID, uuid4
 
 from flask import current_app
@@ -159,6 +160,7 @@ def insert_new_form(
     form_name: str,  # Name as it appears in the Apply tasklist
     template_name: str,  # Our own internal name for the template
     runner_publish_name: str,  # Unique URL-friendly identifier used in request to Form Runner
+    form_json: dict[str, Any],
 ) -> Form:
     form = Form(
         form_id=uuid4(),
@@ -170,6 +172,7 @@ def insert_new_form(
         audit_info=None,
         section_index=None,
         runner_publish_name=runner_publish_name,
+        form_json=form_json,
     )
     try:
         db.session.add(form)
@@ -185,11 +188,14 @@ def update_form(
     form_id: UUID,
     form_name: str,  # Name as it appears in the Apply tasklist
     template_name: str,  # Our own internal name for the template
+    form_json: dict[str, Any] | None = None,
 ):
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     if form:
         form.name_in_apply_json = {"en": form_name}
         form.template_name = template_name
+        if form_json is not None:
+            form.form_json = form_json
         try:
             db.session.commit()
         except SQLAlchemyError as e:
