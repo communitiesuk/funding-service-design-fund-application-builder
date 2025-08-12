@@ -114,7 +114,7 @@ class Form(BaseModel):
     )
     runner_publish_name = Column(db.String())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
-    form_json = Column(JSON(none_as_null=True), nullable=True)
+    form_json = Column(JSON(none_as_null=True), nullable=False, default=lambda: {})
 
     conditions: Mapped[List["Condition"]] = relationship(
         "Condition", order_by="Condition.name", collection_class=ordering_list("name"), passive_deletes="all"
