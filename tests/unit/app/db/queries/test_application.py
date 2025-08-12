@@ -49,6 +49,16 @@ new_section_config = {
 }
 
 
+@pytest.fixture
+def test_form() -> Form:
+    """Fixture that creates a test form with default values."""
+    return insert_new_form(
+        form_name="Test form name",
+        template_name="Test template name",
+        runner_publish_name="test-template-name",
+    )
+
+
 def test_insert_new_section(flask_test_client, _db, clear_test_data, seed_dynamic_data):
     # Access actual round_id from seed_dynamic_data (could also be None)
     round_id = seed_dynamic_data["rounds"][0].round_id
@@ -117,121 +127,68 @@ def test_delete_section(flask_test_client, _db, clear_test_data, seed_dynamic_da
     assert _db.session.query(Section).filter(Section.section_id == new_section.section_id).one_or_none() is None
 
 
-def test_failed_delete_section_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+def test_failed_delete_section_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
     new_section_config["round_id"] = None
     section = insert_new_section(new_section_config)
     # CREATE FK link to Form
-    new_form_config["section_id"] = section.section_id
-    form = insert_new_form(new_form_config)
+    test_form.section_id = section.section_id
     # check inserted form has same section_id
-    assert form.section_id == section.section_id
     assert isinstance(section, Section)
     assert section.audit_info == new_section_config["audit_info"]
-    assert isinstance(form, Form)
-    new_form_id = form.form_id
+    assert isinstance(test_form, Form)
+    new_form_id = test_form.form_id
 
-    delete_section(form.section_id, cascade=True)
+    delete_section(test_form.section_id, cascade=True)
 
     assert _db.session.query(Section).filter(Section.section_id == section.section_id).one_or_none() is None
     assert _db.session.query(Form).where(Form.form_id == new_form_id).one_or_none() is None
 
 
-def test_failed_delete_section_with_fk_to_forms(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+def test_failed_delete_section_with_fk_to_forms(
+    flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form
+):
     new_section_config["round_id"] = None
     section = insert_new_section(new_section_config)
     # CREATE FK link to Form
-    new_form_config["section_id"] = section.section_id
-    form = insert_new_form(new_form_config)
+    test_form.section_id = section.section_id
     # check inserted form has same section_id
-    assert form.section_id == section.section_id
     assert isinstance(section, Section)
     assert section.audit_info == new_section_config["audit_info"]
 
     with pytest.raises(IntegrityError):
-        delete_section(form.section_id, cascade=False)
+        delete_section(test_form.section_id, cascade=False)
     _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
 
     existing_section = _db.session.query(Section).filter(Section.section_id == section.section_id).one_or_none()
     assert existing_section is not None, "Section was unexpectedly deleted"
 
 
-new_form_config = {
-    "section_id": uuid.uuid4(),
-    "name_in_apply_json": {"en": "Form Name"},
-    "is_template": False,
-    "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
-    "section_index": 1,
-    "runner_publish_name": "test-form",
-}
-
-new_template_form_config = {
-    "section_id": uuid.uuid4(),
-    "name_in_apply_json": {"en": "Template Form Name"},
-    "template_name": "Form Template Name",
-    "is_template": True,
-    "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
-    "section_index": 1,
-    "runner_publish_name": None,  # This is a template
-}
-
-
 def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+    new_form: Form = insert_new_form(
+        form_name="Test form name",
+        template_name="Test template name",
+        runner_publish_name="test-template-name",
+    )
+    assert new_form.name_in_apply_json == {"en": "Test form name"}
+    assert new_form.template_name == "Test template name"
+    assert new_form.runner_publish_name == "test-template-name"
+
+
+def test_update_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
     round_id = seed_dynamic_data["rounds"][0].round_id
     new_section_config["round_id"] = round_id
     new_section = insert_new_section(new_section_config)
-    # Point to a section that exists in the db
-    new_form_config["section_id"] = new_section.section_id  # *Does not need to belong to a section
-    new_template_form_config["section_id"] = new_section.section_id  # *Does not need to belong to a section
+    test_form.section_id = new_section.section_id
 
-    new_template_form = insert_new_form(new_template_form_config)
-    assert isinstance(new_template_form, Form)
-    assert new_template_form.section_id == new_template_form_config["section_id"]
-    assert new_template_form.name_in_apply_json == new_template_form_config["name_in_apply_json"]
-    assert new_template_form.template_name == new_template_form_config["template_name"]
-    assert new_template_form.is_template is True
-    assert new_template_form.source_template_id is None
-    assert new_template_form.audit_info == new_template_form_config["audit_info"]
-    assert new_template_form.section_index == new_template_form_config["section_index"]
-    assert new_template_form.runner_publish_name is None
-
-    new_form = insert_new_form(new_form_config)
-    assert isinstance(new_form, Form)
-    assert new_form.section_id == new_form_config["section_id"]
-    assert new_form.name_in_apply_json == new_form_config["name_in_apply_json"]
-    assert new_form.template_name is None
-    assert new_form.source_template_id is None  # not cloned, its a new non-template form
-    assert new_form.is_template is False
-    assert new_form.audit_info == new_form_config["audit_info"]
-    assert new_form.section_index == new_form_config["section_index"]
-    assert new_form.runner_publish_name == new_form_config["runner_publish_name"]
-
-    new_form_config["section_index"] = 2
-    new_form = insert_new_form(new_form_config)
-    assert new_form.section_index == new_form_config["section_index"]
-
-
-def test_update_form(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    round_id = seed_dynamic_data["rounds"][0].round_id
-    new_section_config["round_id"] = round_id
-    new_section = insert_new_section(new_section_config)
-    new_form_config["section_id"] = new_section.section_id
-    new_form = insert_new_form(new_form_config)
-
-    assert new_form.section_id == new_form_config["section_id"]
-    assert new_form.name_in_apply_json == new_form_config["name_in_apply_json"]
-    assert new_form.template_name is None
-    assert new_form.is_template is False
-    assert new_form.source_template_id is None
-    assert new_form.audit_info == new_form_config["audit_info"]
-    assert new_form.section_index == new_form_config["section_index"]
-    assert new_form.runner_publish_name == new_form_config["runner_publish_name"]
-
-    # Update new_form_config
-    updated_form_config = deepcopy(new_form_config)
-    updated_form_config["name_in_apply_json"] = {"en": "Updated Form Name"}
-    updated_form_config["audit_info"] = {"created_by": "Jonny Doe", "created_at": "2024-01-02"}
-
-    updated_form = update_form(new_form.form_id, updated_form_config)
+    updated_form_config = {
+        "section_id": new_section.section_id,
+        "name_in_apply_json": {"en": "Updated form name"},
+        "is_template": False,
+        "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
+        "section_index": 1,
+        "runner_publish_name": "updated-test-form",
+    }
+    updated_form = update_form(test_form.form_id, updated_form_config)
 
     assert isinstance(updated_form, Form)
     assert updated_form.section_id == updated_form_config["section_id"]
@@ -239,45 +196,33 @@ def test_update_form(flask_test_client, _db, clear_test_data, seed_dynamic_data)
     assert updated_form.audit_info == updated_form_config["audit_info"]
 
 
-def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    round_id = seed_dynamic_data["rounds"][0].round_id
-    new_section_config["round_id"] = round_id
-    new_section = insert_new_section(new_section_config)
-    new_form_config["section_id"] = new_section.section_id
-    new_form = insert_new_form(new_form_config)
-
-    assert isinstance(new_form, Form)
-    assert new_form.audit_info == new_form_config["audit_info"]
-
-    delete_form(new_form.form_id)
-    assert _db.session.query(Form).filter(Form.form_id == new_form.form_id).one_or_none() is None
+def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
+    delete_form(test_form.form_id)
+    assert _db.session.query(Form).filter(Form.form_id == test_form.form_id).one_or_none() is None
 
 
-def test_delete_form_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    new_form_config["section_id"] = None
-    new_form = insert_new_form(new_form_config)
+def test_delete_form_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
     # CREATE FK link to Form
-    new_page_config["form_id"] = new_form.form_id
+    new_page_config["form_id"] = test_form.form_id
     new_page = insert_new_page(new_page_config)
 
-    assert isinstance(new_form, Form)
-    assert new_form.audit_info == new_form_config["audit_info"]
+    assert isinstance(test_form, Form)
     assert isinstance(new_page, Page)
     new_page_id = new_page.page_id
 
-    delete_form(new_form.form_id, cascade=True)
-    assert _db.session.query(Form).filter(Form.form_id == new_form.form_id).one_or_none() is None
+    delete_form(test_form.form_id, cascade=True)
+    assert _db.session.query(Form).filter(Form.form_id == test_form.form_id).one_or_none() is None
     assert _db.session.query(Page).where(Page.page_id == new_page_id).one_or_none() is None
 
 
-def test_failed_delete_form_with_fk_to_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    new_form_config["section_id"] = None
-    form = insert_new_form(new_form_config)
+def test_failed_delete_form_with_fk_to_page(
+    flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form
+):
     # CREATE FK link to Form
-    new_page_config["form_id"] = form.form_id
+    new_page_config["form_id"] = test_form.form_id
     insert_new_page(new_page_config)
 
-    existing_form = _db.session.query(Form).filter(Form.form_id == form.form_id).one_or_none()
+    existing_form = _db.session.query(Form).filter(Form.form_id == test_form.form_id).one_or_none()
     assert existing_form is not None, "Form was unexpectedly deleted"
 
 
@@ -306,11 +251,8 @@ new_template_page_config = {
 }
 
 
-def test_insert_new_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    new_form_config["section_id"] = None
-    new_form = insert_new_form(new_form_config)
-
-    new_page_config["form_id"] = new_form.form_id  # *Does not need to belong to a form
+def test_insert_new_page(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
+    new_page_config["form_id"] = test_form.form_id  # *Does not need to belong to a form
     new_template_page_config["form_id"] = None  # *Does not need to belong to a form
 
     new_template_page = insert_new_page(new_template_page_config)
@@ -545,24 +487,21 @@ def test_delete_component(flask_test_client, _db, clear_test_data, seed_dynamic_
     assert _db.session.query(Lizt).where(Lizt.list_id == list_id).one_or_none() is not None
 
 
-def test_delete_section_with_full_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+def test_delete_section_with_full_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
     new_section_config["round_id"] = None
     new_section = insert_new_section(new_section_config)
     assert isinstance(new_section, Section)
     new_section_id = new_section.section_id
 
     # CREATE FK link to Form
-    new_form_config["section_id"] = new_section_id
-    new_form = insert_new_form(new_form_config)
-    assert isinstance(new_form, Form)
-    assert new_form.section_id == new_section_id
-    new_form_id = new_form.form_id
+    test_form.section_id = new_section_id
+    new_form_id = test_form.form_id
 
     # create FK link to page
-    new_page_config["form_id"] = new_form_id
+    new_page_config["form_id"] = test_form.form_id
     new_page = insert_new_page(new_page_config)
     assert isinstance(new_page, Page)
-    assert new_page.form_id == new_form_id
+    assert new_page.form_id == test_form.form_id
     new_page_id = new_page.page_id
 
     # create component on that page

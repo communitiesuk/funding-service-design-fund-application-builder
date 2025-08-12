@@ -243,17 +243,9 @@ def insert_form_as_template(form, template_name=None, filename=None):
         template_name = filename.split(".")[0]
 
     new_form = insert_new_form(
-        {
-            "section_id": None,
-            "name_in_apply_json": {"en": form_name},
-            "template_name": template_name,
-            "is_template": True,
-            "audit_info": None,
-            "section_index": None,
-            "runner_publish_name": human_to_kebab_case(filename.split(".")[0]).lower(),
-            "source_template_id": None,
-            "form_json": form,
-        }
+        form_name=form_name,
+        template_name=template_name,
+        runner_publish_name=human_to_kebab_case(filename.split(".")[0]).lower(),
     )
 
     return new_form
