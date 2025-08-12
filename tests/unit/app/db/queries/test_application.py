@@ -175,25 +175,19 @@ def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_d
 
 
 def test_update_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
-    round_id = seed_dynamic_data["rounds"][0].round_id
-    new_section_config["round_id"] = round_id
-    new_section = insert_new_section(new_section_config)
-    test_form.section_id = new_section.section_id
+    assert test_form.name_in_apply_json == {"en": "Test form name"}
+    assert test_form.template_name == "Test template name"
+    assert test_form.runner_publish_name == "test-template-name"
 
-    updated_form_config = {
-        "section_id": new_section.section_id,
-        "name_in_apply_json": {"en": "Updated form name"},
-        "is_template": False,
-        "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
-        "section_index": 1,
-        "runner_publish_name": "updated-test-form",
-    }
-    updated_form = update_form(test_form.form_id, updated_form_config)
+    updated_form: Form = update_form(
+        form_id=test_form.form_id,
+        form_name="Updated form name",
+        template_name="Updated template name",
+    )
 
-    assert isinstance(updated_form, Form)
-    assert updated_form.section_id == updated_form_config["section_id"]
-    assert updated_form.name_in_apply_json == updated_form_config["name_in_apply_json"]
-    assert updated_form.audit_info == updated_form_config["audit_info"]
+    assert updated_form.form_id == test_form.form_id
+    assert updated_form.name_in_apply_json == {"en": "Updated form name"}
+    assert updated_form.template_name == "Updated template name"
 
 
 def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):

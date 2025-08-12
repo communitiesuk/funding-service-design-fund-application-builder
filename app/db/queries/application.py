@@ -181,27 +181,21 @@ def insert_new_form(
     return form
 
 
-def update_form(form_id, new_form_config):
+def update_form(
+    form_id: UUID,
+    form_name: str,  # Name as it appears in the Apply tasklist
+    template_name: str,  # Our own internal name for the template
+):
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     if form:
-        # Define a list of allowed keys to update
-        allowed_keys = [
-            "section_id",
-            "name_in_apply_json",
-            "template_name",
-            "is_template",
-            "audit_info",
-            "section_index",
-            "runner_publish_name",
-        ]
-
-        # Iterate over the new_form_config dictionary
-        for key, value in new_form_config.items():
-            # Update the form if the key is allowed
-            if key in allowed_keys:
-                setattr(form, key, value)
-
-        db.session.commit()
+        form.name_in_apply_json = {"en": form_name}
+        form.template_name = template_name
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            current_app.logger.error(e)
+            raise e
     return form
 
 

@@ -207,10 +207,8 @@ def test_edit_template_post_update_without_actions(
         assert response.status_code == 200
         mock_update_form.assert_called_once_with(
             form_id=form_mock_id,
-            new_form_config={
-                "name_in_apply_json": {"en": "Updated Tasklist"},
-                "template_name": "Updated Template",
-            },
+            form_name="Updated Tasklist",
+            template_name="Updated Template",
         )
         mock_flash_message.assert_called_with("Template updated")
 
@@ -244,10 +242,8 @@ def test_edit_template_post_update_with_actions_template_table(
         assert response.status_code == 200
         mock_update_form.assert_called_once_with(
             form_id=form_mock_id,
-            new_form_config={
-                "name_in_apply_json": {"en": "Updated Tasklist"},
-                "template_name": "Updated Template",
-            },
+            form_name="Updated Tasklist",
+            template_name="Updated Template",
         )
         mock_redirect.assert_called_once_with("/templates")
 
