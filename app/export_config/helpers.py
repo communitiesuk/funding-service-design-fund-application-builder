@@ -1,16 +1,8 @@
 import os
 from string import Template
 
-from app.shared.helpers import convert_to_dict
+from app.shared.helpers import convert_to_dict, human_to_kebab_case, human_to_snake_case
 from config import Config
-
-
-def human_to_kebab_case(string: str) -> str | None:
-    return string.replace(" ", "-").strip().lower() if string else None
-
-
-def human_to_snake_case(string: str) -> str | None:
-    return string.replace(" ", "_").strip().lower() if string else None
 
 
 def write_config(config, filename, round_short_name, config_type, base_output_dir=None):

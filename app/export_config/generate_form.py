@@ -5,8 +5,8 @@ from typing import Optional
 from app.db.models import Component, Condition, Form, Page
 from app.db.models.application_config import READ_ONLY_COMPONENTS, ComponentType
 from app.db.queries.application import get_list_by_id
-from app.export_config.helpers import human_to_kebab_case
 from app.shared.data_classes import ConditionValue, FormSection
+from app.shared.helpers import human_to_kebab_case
 
 SUMMARY_JS_PATH = "./pages/summary.js"
 

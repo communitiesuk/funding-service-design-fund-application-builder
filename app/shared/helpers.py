@@ -69,3 +69,11 @@ def flash_message(
         ```
     """
     flash(render_template("partials/flash_template.html", **locals()))
+
+
+def human_to_kebab_case(string: str) -> str | None:
+    return string.replace(" ", "-").strip().lower() if string else None
+
+
+def human_to_snake_case(string: str) -> str | None:
+    return string.replace(" ", "_").strip().lower() if string else None
