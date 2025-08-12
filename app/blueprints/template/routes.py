@@ -131,10 +131,8 @@ def edit_template(form_id):
     if form.validate_on_submit():
         updated_form = update_form(
             form_id=form_id,
-            new_form_config={
-                "name_in_apply_json": {"en": form.tasklist_name.data},
-                "template_name": form.template_name.data,
-            },
+            form_name=form.tasklist_name.data,
+            template_name=form.template_name.data,
         )
         if form.file and form.file.data is not None:
             delete_form(form_id=form_id, cascade=True)

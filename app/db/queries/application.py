@@ -1,7 +1,9 @@
 from uuid import UUID, uuid4
 
+from flask import current_app
 from flask_sqlalchemy.pagination import Pagination
 from sqlalchemy import String, cast, delete, select
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.db import db
 from app.db.models import Component, Condition, Form, FormSection, Lizt, Page, PageCondition, Section
@@ -153,67 +155,47 @@ def delete_section(section_id, cascade: bool = False):
 
 
 # CRUD FORM
-def insert_new_form(new_form_config):
-    """
-    Inserts a form object based on the provided configuration.
-
-    Parameters:
-        new_form_config (dict): A dictionary containing the configuration for the new form.
-            new_form_config keys:
-                - section_id (str): The ID of the section to which the form belongs.
-                - name_in_apply_json (dict): The name of the form as it will be in the Application
-                JSON (support multiple languages/keys).
-                - is_template (bool): A flag indicating whether the form is a template.
-                - template_name (str): The name of the template.
-                - source_template_id (str): The ID of the source template.
-                - audit_info (dict): Audit information for the form.
-                - section_index (int): The index of the form within the section.
-                - runner_publish_name (bool): The path of the form in the form runner (kebab case).
-    Returns:
-        Form: The newly created form object.
-    """
-
+def insert_new_form(
+    form_name: str,  # Name as it appears in the Apply tasklist
+    template_name: str,  # Our own internal name for the template
+    runner_publish_name: str,  # Unique URL-friendly identifier used in request to Form Runner
+) -> Form:
     form = Form(
         form_id=uuid4(),
-        section_id=new_form_config.get("section_id", None),
-        name_in_apply_json=new_form_config.get("name_in_apply_json"),
-        is_template=new_form_config.get("is_template", False),
-        template_name=new_form_config.get("template_name", None),
-        source_template_id=new_form_config.get("source_template_id", None),
-        audit_info=new_form_config.get("audit_info", {}),
-        section_index=new_form_config.get("section_index"),
-        runner_publish_name=new_form_config.get("runner_publish_name", None),
+        section_id=None,
+        name_in_apply_json={"en": form_name},
+        is_template=True,
+        template_name=template_name,
+        source_template_id=None,
+        audit_info=None,
+        section_index=None,
+        runner_publish_name=runner_publish_name,
     )
     try:
         db.session.add(form)
         db.session.commit()
-    except Exception as e:
-        print(e)
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        current_app.logger.error(e)
         raise e
     return form
 
 
-def update_form(form_id, new_form_config):
+def update_form(
+    form_id: UUID,
+    form_name: str,  # Name as it appears in the Apply tasklist
+    template_name: str,  # Our own internal name for the template
+):
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     if form:
-        # Define a list of allowed keys to update
-        allowed_keys = [
-            "section_id",
-            "name_in_apply_json",
-            "template_name",
-            "is_template",
-            "audit_info",
-            "section_index",
-            "runner_publish_name",
-        ]
-
-        # Iterate over the new_form_config dictionary
-        for key, value in new_form_config.items():
-            # Update the form if the key is allowed
-            if key in allowed_keys:
-                setattr(form, key, value)
-
-        db.session.commit()
+        form.name_in_apply_json = {"en": form_name}
+        form.template_name = template_name
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            current_app.logger.error(e)
+            raise e
     return form
 
 
