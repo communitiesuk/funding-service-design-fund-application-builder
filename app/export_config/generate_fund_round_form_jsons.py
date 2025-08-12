@@ -1,75 +1,13 @@
 import json
 
 from flask import current_app
+from jsonschema import ValidationError
 
 from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_form import build_form_json
-from app.export_config.helpers import validate_json, write_config
-
-form_schema = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object",
-    "properties": {
-        "name": {"type": "string"},
-        "startPage": {"type": "string"},
-        "sections": {"type": "array"},
-        "pages": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "path": {"type": "string"},
-                    "title": {"type": "string"},
-                    "options": {"type": "object"},
-                    "section": {"type": "string"},
-                    "components": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "options": {
-                                    "type": "object",
-                                    "properties": {"hideTitle": {"type": "boolean"}, "classes": {"type": "string"}},
-                                },
-                                "type": {"type": "string"},
-                                "title": {"type": ["string", "null"]},
-                                "content": {"type": ["string", "null"]},
-                                "hint": {"type": "string"},
-                                "schema": {
-                                    "type": "object",
-                                },
-                                "name": {"type": "string"},
-                                "metadata": {
-                                    "type": "object",
-                                },
-                                "children": {"type": "array"},
-                            },
-                        },
-                    },
-                },
-                "required": ["path", "title", "components"],
-            },
-        },
-        "lists": {"type": "array"},
-        "conditions": {"type": "array"},
-        "outputs": {
-            "type": "array",
-        },
-        "skipSummary": {"type": "boolean"},
-        # Add other top-level keys as needed
-    },
-    "required": [
-        "startPage",
-        "name",
-        "pages",
-        "lists",
-        "conditions",
-        "outputs",
-        "skipSummary",
-        "sections",
-    ],
-}
+from app.export_config.helpers import write_config
+from app.shared.json_validation import validate_form_json
 
 
 def generate_form_jsons_for_round(round_id, base_output_dir=None):
@@ -95,10 +33,10 @@ def generate_form_jsons_for_round(round_id, base_output_dir=None):
         for form in section.forms:
             result = build_form_json(form=form, fund_title=fund.title_json["en"])
             form_json = json.dumps(result, indent=4)
-            valid_json = validate_json(result, form_schema)
-            if valid_json:
+            try:
+                validate_form_json(result)
                 write_config(form_json, form.runner_publish_name, round.short_name, "form_json", base_output_dir)
-            else:
+            except ValidationError:
                 current_app.logger.error(
                     "Form JSON for {runner_publish_name} is invalid.",
                     extra=dict(runner_publish_name=form.runner_publish_name),

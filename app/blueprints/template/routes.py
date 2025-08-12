@@ -1,6 +1,8 @@
 import json
+from json import JSONDecodeError
 
 from flask import Blueprint, Response, current_app, redirect, render_template, request, url_for
+from jsonschema import ValidationError
 
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.index.routes import INDEX_BP_DASHBOARD
@@ -18,6 +20,7 @@ from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import human_to_kebab_case
 from app.shared.forms import DeleteConfirmationForm
 from app.shared.helpers import flash_message
+from app.shared.json_validation import validate_form_json
 
 template_bp = Blueprint(
     "template_bp",
@@ -60,6 +63,7 @@ def create_template():
             try:
                 file_data = file.read().decode("utf-8")
                 form_data = json.loads(file_data)
+                validate_form_json(form_data)
                 form_data["name"] = tasklist_name
                 created_form = json_import(
                     data=form_data, template_name=template_name, filename=human_to_kebab_case(f"{tasklist_name}.json")
@@ -71,8 +75,8 @@ def create_template():
                 )
                 if request.form.get("action") == "return_home":
                     return redirect(url_for(INDEX_BP_DASHBOARD))
-            except Exception as e:
-                print(e)
+            except (JSONDecodeError, ValidationError) as e:
+                current_app.logger.error(e)
                 form.file.errors.append("Upload a valid JSON file")
                 return render_template("template.html", **params)
         if form.save_and_continue.data:
@@ -135,15 +139,21 @@ def edit_template(form_id):
         )
         if form.file and form.file.data is not None:
             delete_form(form_id=form_id, cascade=True)
-            file_data = form.file.data.read().decode("utf-8")
-            form_data = json.loads(file_data)
-            form_data["name"] = form.tasklist_name.data
-            created_form = json_import(
-                data=form_data,
-                template_name=form.template_name.data,
-                filename=human_to_kebab_case(f"{form.tasklist_name.data}.json"),
-            )
-            return _save_and_return(created_form, form)
+            try:
+                file_data = form.file.data.read().decode("utf-8")
+                form_data = json.loads(file_data)
+                validate_form_json(form_data)
+                form_data["name"] = form.tasklist_name.data
+                created_form = json_import(
+                    data=form_data,
+                    template_name=form.template_name.data,
+                    filename=human_to_kebab_case(f"{form.tasklist_name.data}.json"),
+                )
+                return _save_and_return(created_form, form)
+            except (JSONDecodeError, ValidationError) as e:
+                current_app.logger.error(e)
+                form.file.errors.append("Upload a valid JSON file")
+                return render_template("template.html", **params)
         return _save_and_return(updated_form, form)
     params.update({"template_name": existing_form.template_name})
     return render_template("template.html", **params)
