@@ -6,7 +6,7 @@ import sys
 from uuid import UUID
 
 from app.db.queries.application import insert_condition, insert_form_section, insert_list, insert_page_condition
-from app.export_config.helpers import human_to_kebab_case
+from app.shared.helpers import human_to_kebab_case
 
 sys.path.insert(1, ".")
 

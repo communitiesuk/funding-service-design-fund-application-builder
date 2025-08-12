@@ -10,6 +10,7 @@ from app.db.models import Component, Criteria, Section, Subcriteria, Theme
 from app.db.models.application_config import READ_ONLY_COMPONENTS
 from app.db.queries.application import get_form_for_component
 from app.export_config import helpers
+from app.shared.helpers import human_to_kebab_case
 
 
 def generate_field_info_from_forms(forms_dir: str) -> dict:
@@ -210,7 +211,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
     sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
     for _i, section in enumerate(sections, start=1):
         criteria = {
-            "id": helpers.human_to_kebab_case(section.name_in_apply_json["en"]),
+            "id": human_to_kebab_case(section.name_in_apply_json["en"]),
             "name": section.name_in_apply_json["en"],
             "sub_criteria": [],
         }
@@ -226,7 +227,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
                 if page.display_path == "summary":
                     continue
                 theme = {
-                    "id": helpers.human_to_kebab_case(page.name_in_apply_json["en"]),
+                    "id": human_to_kebab_case(page.name_in_apply_json["en"]),
                     "name": page.name_in_apply_json["en"],
                     "answers": [],
                 }

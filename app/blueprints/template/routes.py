@@ -17,9 +17,8 @@ from app.db.queries.application import (
 )
 from app.export_config.generate_all_questions import generate_html
 from app.export_config.generate_form import build_form_json
-from app.export_config.helpers import human_to_kebab_case
 from app.shared.forms import DeleteConfirmationForm
-from app.shared.helpers import flash_message
+from app.shared.helpers import flash_message, human_to_kebab_case
 from app.shared.json_validation import validate_form_json
 
 template_bp = Blueprint(
