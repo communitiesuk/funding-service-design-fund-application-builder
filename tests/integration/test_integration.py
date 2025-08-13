@@ -28,8 +28,11 @@ def test_generate_config_to_verify_form_sections(
     file_path = Path("tests") / "test_data" / input_filename
     with open(file_path, "r") as json_file:
         input_form = json.load(json_file)
-        input_form["filename"] = input_filename
-        form_configs.append(input_form)
+        form_config = {
+            "filename": input_filename,
+            "form_json": input_form,
+        }
+        form_configs.append(form_config)
     load_form_jsons(form_configs)
 
     round_id = seed_dynamic_data["rounds"][0].round_id
@@ -58,7 +61,7 @@ def test_generate_config_to_verify_form_sections(
     with open(generated_json_form, "r") as file:
         output_form = json.load(file)
 
-    assert len(output_form["sections"]) == len(form_configs[0]["sections"])
+    assert len(output_form["sections"]) == len(form_configs[0]["form_json"]["sections"])
 
 
 @pytest.mark.parametrize(
@@ -97,8 +100,11 @@ def test_generate_config_for_round_valid_input(
     file_path = Path("tests") / "test_data" / input_filename
     with open(file_path, "r") as json_file:
         input_form = json.load(json_file)
-        input_form["filename"] = input_filename
-        form_configs.append(input_form)
+        form_config = {
+            "filename": input_filename,
+            "form_json": input_form,
+        }
+        form_configs.append(form_config)
     load_form_jsons(form_configs)
 
     expected_form_count = 1

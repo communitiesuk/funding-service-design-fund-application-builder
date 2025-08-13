@@ -289,7 +289,7 @@ def test_template_questions_view(flask_test_client, seed_dynamic_data):
     # Title component availability check
     assert "About your organization template" in html, "Template title is missing"
     assert "This template contains the following questions." in html, "Title description is missing"
-    assert "Start Page" in html, "Page title is missing"
+    assert "Organisation Name" in html, "Page title is missing"
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")

@@ -1245,5 +1245,6 @@
   },
   "phaseBanner": {
     "phase": "beta"
-  }
+  },
+  "name": "Organisation info"
 }
