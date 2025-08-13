@@ -16,7 +16,6 @@ from app.db.queries.application import (
     update_form,
 )
 from app.export_config.generate_all_questions import generate_html
-from app.export_config.generate_form import build_form_json
 from app.shared.forms import DeleteConfirmationForm
 from app.shared.helpers import flash_message, human_to_kebab_case
 from app.shared.json_validation import validate_form_json
@@ -90,7 +89,7 @@ def template_questions(form_id):
     section_data = [
         {
             "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
-            "forms": [{"name": form.runner_publish_name, "form_data": build_form_json(form)}],
+            "forms": [{"name": form.runner_publish_name, "form_data": form.form_json}],
         }
     ]
     print_data = generate_print_data_for_sections(
