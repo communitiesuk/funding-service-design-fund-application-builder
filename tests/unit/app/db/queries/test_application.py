@@ -56,6 +56,7 @@ def test_form() -> Form:
         form_name="Test form name",
         template_name="Test template name",
         runner_publish_name="test-template-name",
+        form_json={},
     )
 
 
@@ -168,6 +169,7 @@ def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_d
         form_name="Test form name",
         template_name="Test template name",
         runner_publish_name="test-template-name",
+        form_json={},
     )
     assert new_form.name_in_apply_json == {"en": "Test form name"}
     assert new_form.template_name == "Test template name"

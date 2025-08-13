@@ -246,6 +246,7 @@ def insert_form_as_template(form, template_name=None, filename=None):
         form_name=form_name,
         template_name=template_name,
         runner_publish_name=human_to_kebab_case(filename.split(".")[0]).lower(),
+        form_json=form,
     )
 
     return new_form
