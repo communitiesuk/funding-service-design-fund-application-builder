@@ -46,7 +46,7 @@ def preview_form(form_id):
     'runner_publish_name' of that form. Returns a redirect to that form in the form-runner
     """
     form = get_form_by_id(form_id)
-    form_json = build_form_json(form)
+    form_json = form.form_json
     form_id = form.runner_publish_name
 
     try:
