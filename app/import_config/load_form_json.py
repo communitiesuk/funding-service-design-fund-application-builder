@@ -286,9 +286,9 @@ def load_form_jsons(override_fund_config=None):
 def load_json_from_file(data, template_name, filename):
     db = app.extensions["sqlalchemy"]
     try:
-        data["filename"] = human_to_kebab_case(template_name)
         inserted_form = insert_form_as_template(data, template_name=template_name, filename=filename)
         db.session.flush()  # flush to get the form id
+        data["filename"] = filename
         insert_form_config(data, inserted_form.form_id)
         db.session.commit()
         return inserted_form
