@@ -76,6 +76,131 @@ page_five_id = uuid4()
 alt_page_id = uuid4()
 
 
+ABOUT_YOUR_ORG_FORM_JSON = {
+    "startPage": "/organisation-name",
+    "pages": [
+        {
+            "path": "/organisation-name",
+            "title": "Organisation Name",
+            "components": [
+                {
+                    "name": "organisation_name",
+                    "options": {"hideTitle": False, "classes": ""},
+                    "type": "TextField",
+                    "title": "What is your organisation's name?",
+                    "hint": "This must match the registered legal organisation name",
+                    "schema": {},
+                }
+            ],
+            "next": [{"path": "/organisation-alternative-names"}],
+        },
+        {
+            "path": "/organisation-alternative-names",
+            "title": "Alternative names of your organisation",
+            "components": [
+                {"name": "alt_name_1", "options": {}, "type": "TextField", "title": "Alternative name 1", "schema": {}}
+            ],
+            "next": [{"path": "/organisation-address"}],
+        },
+        {
+            "path": "/organisation-address",
+            "title": "Organisation Address",
+            "components": [
+                {
+                    "name": "organisation_address",
+                    "options": {},
+                    "type": "UkAddressField",
+                    "title": "What is your organisation's address?",
+                    "schema": {},
+                }
+            ],
+            "next": [{"path": "/organisation-classification"}],
+        },
+        {
+            "path": "/organisation-classification",
+            "title": "Organisation Classification",
+            "components": [
+                {
+                    "name": "organisation_classification",
+                    "options": {"hideTitle": False, "classes": ""},
+                    "type": "RadiosField",
+                    "title": "How is your organisation classified?",
+                    "list": "classifications_list",
+                    "schema": {},
+                }
+            ],
+            "next": [{"path": "/summary"}],
+        },
+        {
+            "path": "/summary",
+            "title": "Check your answers",
+            "components": [],
+            "next": [],
+            "controller": "./pages/summary.js",
+        },
+    ],
+    "lists": [
+        {
+            "name": "classifications_list",
+            "type": "string",
+            "items": [{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
+        }
+    ],
+    "conditions": [],
+    "sections": [],
+    "outputs": [],
+    "skipSummary": False,
+    "name": "About your organisation",
+}
+
+CONTACT_DETAILS_FORM_JSON = {
+    "startPage": "/lead-contact-details",
+    "pages": [
+        {
+            "path": "/lead-contact-details",
+            "title": "Lead Contact Details",
+            "components": [
+                {
+                    "name": "lead_contact_name",
+                    "options": {},
+                    "type": "TextField",
+                    "title": "Lead contact full name",
+                    "schema": {},
+                },
+                {
+                    "name": "lead_contact_email",
+                    "options": {},
+                    "type": "EmailAddressField",
+                    "title": "Lead contact email address",
+                    "schema": {},
+                },
+                {
+                    "name": "lead_contact_phone",
+                    "options": {},
+                    "type": "TelephoneNumberField",
+                    "title": "Lead contact telephone number",
+                    "schema": {},
+                },
+            ],
+            "next": [{"path": "/summary"}],
+        },
+        {
+            "path": "/summary",
+            "title": "Check your answers",
+            "components": [],
+            "next": [],
+            "controller": "./pages/summary.js",
+        },
+    ],
+    "lists": [],
+    "conditions": [],
+    "sections": [],
+    "outputs": [],
+    "skipSummary": False,
+    "name": "Contact Details",
+}
+
+
 # NOSONAR Ignore since this data is related to unit tests
 def init_salmon_fishing_fund():
     organisation_uuid = uuid4()
@@ -125,6 +250,7 @@ def init_salmon_fishing_fund():
         name_in_apply_json={"en": "About your organisation"},
         section_index=1,
         runner_publish_name="about-your-org",
+        form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
     f2: Form = Form(
         form_id=uuid4(),
@@ -132,6 +258,7 @@ def init_salmon_fishing_fund():
         name_in_apply_json={"en": "Contact Details"},
         section_index=2,
         runner_publish_name="contact-details",
+        form_json=CONTACT_DETAILS_FORM_JSON,
     )
     p1: Page = Page(
         page_id=page_one_id,
@@ -424,16 +551,7 @@ def init_unit_test_data() -> dict:
         section_index=1,
         runner_publish_name="about-your-org",
         template_name="About your organization template",
-        form_json={
-            "name": "Minimal Form",
-            "startPage": "/start",
-            "sections": [],
-            "pages": [{"path": "/start", "title": "Start Page", "components": [], "next": []}],
-            "lists": [],
-            "conditions": [],
-            "outputs": [],
-            "skipSummary": False,
-        },
+        form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
     p1: Page = Page(
         page_id=uuid4(),
@@ -567,6 +685,7 @@ def fund_without_assessment() -> dict:
         section_index=1,
         runner_publish_name="about-your-org",
         template_name="About your organization template",
+        form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
 
     f2_r1_s1_f2: Form = Form(
@@ -576,6 +695,7 @@ def fund_without_assessment() -> dict:
         section_index=1,
         runner_publish_name="about-your-org",
         template_name="About your organization template",
+        form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
 
     f2_r1_s1_f1_p1: Page = Page(

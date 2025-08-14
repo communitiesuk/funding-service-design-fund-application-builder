@@ -80,8 +80,11 @@ def db_with_templates(app, _db):
         if os.path.exists(file_path):
             with open(file_path, "r") as json_file:
                 input_form = json.load(json_file)
-                input_form["filename"] = "asset-information"
-                form_configs.append(input_form)
+                form_config = {
+                    "filename": "asset-information",
+                    "form_json": input_form,
+                }
+                form_configs.append(form_config)
         load_form_jsons(form_configs)
     yield _db
 

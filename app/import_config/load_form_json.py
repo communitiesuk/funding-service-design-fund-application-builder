@@ -275,8 +275,8 @@ def load_form_jsons(override_fund_config=None):
             form_configs = override_fund_config
         for form_config in form_configs:
             # prepare all row commits
-            inserted_form = insert_form_as_template(form_config, None, form_config["filename"])
-            inserted_pages, inserted_components = insert_form_config(form_config, inserted_form.form_id)
+            inserted_form = insert_form_as_template(form_config["form_json"], None, form_config["filename"])
+            inserted_pages, inserted_components = insert_form_config(form_config["form_json"], inserted_form.form_id)
     except Exception as e:
         print(e)
         db.session.rollback()

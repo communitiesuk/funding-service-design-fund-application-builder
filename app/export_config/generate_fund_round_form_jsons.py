@@ -3,9 +3,7 @@ import json
 from flask import current_app
 from jsonschema import ValidationError
 
-from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
-from app.export_config.generate_form import build_form_json
 from app.export_config.helpers import write_config
 from app.shared.json_validation import validate_form_json
 
@@ -27,11 +25,10 @@ def generate_form_jsons_for_round(round_id, base_output_dir=None):
     if not round_id:
         raise ValueError("Round ID is required to generate form JSONs.")
     round = get_round_by_id(round_id)
-    fund = get_fund_by_id(round.fund_id)
     current_app.logger.info("Generating form JSONs for round {round_id}", extra=dict(round_id=round_id))
     for section in round.sections:
         for form in section.forms:
-            result = build_form_json(form=form, fund_title=fund.title_json["en"])
+            result = form.form_json
             form_json = json.dumps(result, indent=4)
             try:
                 validate_form_json(result)

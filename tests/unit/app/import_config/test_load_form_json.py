@@ -34,8 +34,11 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, _db, filename,
     file_path = Path("tests") / "test_data" / filename
     with open(file_path, "r") as json_file:
         form = json.load(json_file)
-        form["filename"] = filename
-        form_configs.append(form)
+        form_config = {
+            "filename": filename,
+            "form_json": form,
+        }
+        form_configs.append(form_config)
     load_form_jsons(form_configs)
 
     expected_form_count = 1
