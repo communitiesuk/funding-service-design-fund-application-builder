@@ -24,7 +24,7 @@ dependencies = [
     #
     # If updating either of the govuk-frontend-* packages below, check whether any changes need to be synced into the
     # govuk_frontend_ext module.
-    "govuk-frontend-jinja==3.5.0",
+    "govuk-frontend-jinja==3.7.0",
     "govuk-frontend-wtf==3.2.0",
 ]
 
