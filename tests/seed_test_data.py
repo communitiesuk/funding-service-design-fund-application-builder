@@ -424,6 +424,16 @@ def init_unit_test_data() -> dict:
         section_index=1,
         runner_publish_name="about-your-org",
         template_name="About your organization template",
+        form_json={
+            "name": "Minimal Form",
+            "startPage": "/start",
+            "sections": [],
+            "pages": [{"path": "/start", "title": "Start Page", "components": [], "next": []}],
+            "lists": [],
+            "conditions": [],
+            "outputs": [],
+            "skipSummary": False,
+        },
     )
     p1: Page = Page(
         page_id=uuid4(),
