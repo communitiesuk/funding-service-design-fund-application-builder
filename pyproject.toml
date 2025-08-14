@@ -54,17 +54,17 @@ mccabe.max-complexity = 12
 
 [dependency-groups]
 dev = [
-    "debugpy==1.8.13",
+    "debugpy==1.8.16",
     "djlint==1.36.4",
     "invoke==2.2.0",
-    "pre-commit==4.2.0",
+    "pre-commit==4.3.0",
     "pytest-env==1.1.5",
     "pytest-html==4.1.1",
-    "pytest-mock==3.14.0",
-    "pytest==8.3.5",
-    "python-dotenv==1.1.0",
+    "pytest-mock==3.14.1",
+    "pytest==8.4.1",
+    "python-dotenv==1.1.1",
     "ruff==0.11.2",
     "pytest-playwright==0.7.0",
-    "Faker==37.1.0",
-    "playwright==1.51.0",
+    "Faker==37.5.3",
+    "playwright==1.54.0",
 ]
