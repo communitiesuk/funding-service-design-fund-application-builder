@@ -20,7 +20,8 @@ class BuildApplicationPage(PageBase):
 
     def when_click_edit_first_section(self):
         assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
-        task_element = self.page.get_by_role("heading", name=self.metadata.get("sections")[0])
+        section_name = self.metadata.get("sections")[0]
+        task_element = self.page.locator(".task-list__new-design h3").filter(has_text=section_name)
         task_parent = task_element.locator("xpath=ancestor::li")
         expect(task_parent).to_be_visible()
         edit_button = task_parent.get_by_role("link", name="Edit")
@@ -43,7 +44,8 @@ class BuildApplicationPage(PageBase):
 
     def when_click_down_on_section(self):
         assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
-        task_element = self.page.get_by_role("heading", name=self.metadata.get("sections")[0])
+        section_name = self.metadata.get("sections")[0]
+        task_element = self.page.locator(".task-list__new-design h3").filter(has_text=section_name)
         expect(task_element).to_be_visible()
         task_parent = task_element.locator("xpath=ancestor::li")
         expect(task_parent).to_be_visible()
@@ -54,7 +56,8 @@ class BuildApplicationPage(PageBase):
 
     def when_click_up_on_section(self):
         assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
-        task_element = self.page.get_by_role("heading", name=self.metadata.get("sections")[0])
+        section_name = self.metadata.get("sections")[0]
+        task_element = self.page.locator(".task-list__new-design h3").filter(has_text=section_name)
         task_parent = task_element.locator("xpath=ancestor::li")
         expect(task_parent).to_be_visible()
         down_link = task_parent.get_by_role("link", name="Up")
@@ -66,14 +69,16 @@ class BuildApplicationPage(PageBase):
         self.page.wait_for_selector(".task-list__new-design.govuk-\\!-margin-bottom-2")
         sections = self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2").all()
         second_section = sections[1]
-        expect(second_section.get_by_role("heading", name=self.metadata.get("sections")[0])).to_be_visible()
+        section_name = self.metadata.get("sections")[0]
+        expect(second_section.locator("h3").filter(has_text=section_name)).to_be_visible()
         return self
 
     def then_verify_section_gone_up(self):
         self.page.wait_for_selector(".task-list__new-design.govuk-\\!-margin-bottom-2")
         sections = self.page.locator(".task-list__new-design.govuk-\\!-margin-bottom-2").all()
         first_section = sections[0]
-        expect(first_section.get_by_role("heading", name=self.metadata.get("sections")[0])).to_be_visible()
+        section_name = self.metadata.get("sections")[0]
+        expect(first_section.locator("h3").filter(has_text=section_name)).to_be_visible()
         return self
 
     def and_validate_application_success_message(self):
@@ -98,7 +103,7 @@ class BuildApplicationPage(PageBase):
     def and_validate_sections_are_available(self):
         assert self.metadata.get("sections") or len(self.metadata.get("sections")) > 0, "No sections available"
         for section in self.metadata.get("sections"):
-            expect(self.page.get_by_role("heading", name=section)).to_be_visible()
+            expect(self.page.locator(".task-list__new-design h3").filter(has_text=section)).to_be_visible()
         return self
 
     def and_verify_on_build_application(self):
