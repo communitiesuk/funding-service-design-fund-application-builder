@@ -13,6 +13,7 @@ from app.db.queries.application import (
     get_form_by_id,
     get_form_by_template_name,
     get_paginated_forms,
+    insert_new_form,
     update_form,
 )
 from app.export_config.generate_all_questions import generate_html
@@ -60,23 +61,25 @@ def create_template():
         if file:
             try:
                 file_data = file.read().decode("utf-8")
-                form_data = json.loads(file_data)
-                validate_form_json(form_data)
-                form_data["name"] = tasklist_name
-                created_form = json_import(
-                    data=form_data, template_name=template_name, filename=human_to_kebab_case(f"{tasklist_name}.json")
-                )
-                flash_message(
-                    message="Template uploaded",
-                    href=url_for("template_bp.template_details", form_id=created_form.form_id),
-                    href_display_name=template_name,
-                )
-                if request.form.get("action") == "return_home":
-                    return redirect(url_for(INDEX_BP_DASHBOARD))
+                form_json = json.loads(file_data)
+                validate_form_json(form_json)
             except (JSONDecodeError, ValidationError) as e:
                 current_app.logger.error(e)
                 form.file.errors.append("Upload a valid JSON file")
                 return render_template("template.html", **params)
+            created_form = insert_new_form(
+                form_name=tasklist_name,
+                template_name=template_name,
+                runner_publish_name=human_to_kebab_case(f"{tasklist_name}.json"),
+                form_json=form_json,
+            )
+            flash_message(
+                message="Template uploaded",
+                href=url_for("template_bp.template_details", form_id=created_form.form_id),
+                href_display_name=template_name,
+            )
+            if request.form.get("action") == "return_home":
+                return redirect(url_for(INDEX_BP_DASHBOARD))
         if form.save_and_continue.data:
             return redirect(url_for("template_bp.view_templates"))
         return redirect(url_for(INDEX_BP_DASHBOARD))
