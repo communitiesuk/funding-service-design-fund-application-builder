@@ -35,7 +35,6 @@ from app.export_config.generate_all_questions import generate_html
 from app.export_config.generate_assessment_config import (
     generate_assessment_config_for_round,
 )
-from app.export_config.generate_form import _find_page_by_controller
 from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
@@ -291,7 +290,7 @@ def view_form_questions(round_id, section_id, form_id):
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     form = get_form_by_id(form_id=form_id)
-    start_page = _find_page_by_controller(form.pages, "start.js")
+    start_page = next((p for p in form["pages"] if p["controller"] and p["controller"].endswith("start.js")), None)
     section_data = [
         {
             "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
