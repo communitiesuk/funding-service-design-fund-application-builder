@@ -5,8 +5,7 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.exc import IntegrityError
 
-from app.db import db
-from app.db.models import Component, Form, Fund, Page, Round, Section
+from app.db.models import Form, Fund, Round, Section
 from app.db.queries.application import (
     delete_form,
     delete_form_from_section,
@@ -25,7 +24,6 @@ from app.db.queries.application import (
 )
 from tests.helpers import get_round_by_id
 from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
-
 
 new_template_section_config = {
     "round_id": uuid.uuid4(),
