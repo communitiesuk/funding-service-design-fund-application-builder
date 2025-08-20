@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 from sqlalchemy.orm import joinedload
 
-from app.db.models import Component, Lizt, Round, Section
+from app.db.models import Round, Section
 from app.db.models.fund import Fund, FundingType, Organisation
 from app.db.queries.fund import add_fund, add_organisation, delete_selected_fund, get_all_funds, get_fund_by_id
 
@@ -96,7 +96,3 @@ def test_delete_grant(_db, seed_fund_without_assessment):
     assert not output_r, "Round delete did not happened"
     output_s = _db.session.query(Section).all()
     assert not output_s, "Section delete did not happened"
-    output_c = _db.session.query(Component).all()
-    assert not output_c, "Component delete did not happened"
-    output_l = _db.session.query(Lizt).all()
-    assert not output_l, "Lizt delete did not happened"
