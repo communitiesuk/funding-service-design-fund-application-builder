@@ -4,7 +4,7 @@ from sqlalchemy import String, cast, select
 from sqlalchemy.orm import joinedload
 
 from app.db import db
-from app.db.models import Component, Form, Lizt, Page, Round
+from app.db.models import Form, Round
 from app.db.models.fund import Fund, Organisation
 from app.db.queries.util import delete_all_related_objects
 
@@ -59,18 +59,8 @@ def _delete_sections_for_fund_round(fund: Fund):
     for round_detail in fund.rounds:
         for section in round_detail.sections:
             if section:
-                lizt_ids = [
-                    component.list_id for form in section.forms for page in form.pages for component in page.components
-                ]
-                page_ids = [page.page_id for form in section.forms for page in form.pages]
-                form_ids = [form.form_id for form in section.forms]
                 section_ids = [section.section_id]
-
-                delete_all_related_objects(db=db, model=Component, column=Component.page_id, ids=page_ids)
-                delete_all_related_objects(db=db, model=Lizt, column=Lizt.list_id, ids=lizt_ids)
-                delete_all_related_objects(db=db, model=Page, column=Page.form_id, ids=form_ids)
                 delete_all_related_objects(db=db, model=Form, column=Form.section_id, ids=section_ids)
-
                 db.session.delete(section)
                 db.session.commit()
 

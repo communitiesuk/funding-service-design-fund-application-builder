@@ -7,7 +7,7 @@ from sqlalchemy import String, cast, delete, select
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.db import db
-from app.db.models import Component, Condition, Form, FormSection, Lizt, Page, PageCondition, Section
+from app.db.models import Form, Section
 from app.db.queries.round import get_round_by_id
 
 
@@ -35,13 +35,6 @@ def get_paginated_forms(page: int, search_term: str = None, items_per_page: int 
     return db.paginate(stmt, page=page, per_page=items_per_page)
 
 
-def get_form_for_component(component: Component) -> Form:
-    page_id = component.page_id
-    page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
-    form = db.session.query(Form).where(Form.form_id == page.form_id).one_or_none()
-    return form
-
-
 def get_form_by_id(form_id: str) -> Form:
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     return form
@@ -52,17 +45,7 @@ def get_form_by_template_name(template_name: str) -> Form:
     return form
 
 
-def get_component_by_id(component_id: str) -> Component:
-    component = db.session.query(Component).where(Component.component_id == component_id).one_or_none()
-    return component
-
-
-def get_list_by_id(list_id: str) -> Lizt:
-    lizt = db.session.query(Lizt).where(Lizt.list_id == list_id).one_or_none()
-    return lizt
-
-
-# CRUD operations for Section, Form, Page, and Component
+# CRUD operations for Section and Form
 # CRUD SECTION
 def insert_new_section(new_section_config):
     """
@@ -147,8 +130,6 @@ def delete_section(section_id, cascade: bool = False):
     """
     section = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
     if cascade:
-        _delete_all_components_in_pages(page_ids=[page.page_id for form in section.forms for page in form.pages])
-        _delete_all_pages_in_forms(form_ids=[f.form_id for f in section.forms])
         _delete_all_forms_in_sections(section_ids=[section_id])
     db.session.delete(section)
     db.session.commit()
@@ -211,9 +192,8 @@ def _delete_all_forms_in_sections(section_ids: list):
     db.session.commit()
 
 
-def delete_form_from_section(section_id, form_id, cascade: bool = False):
-    """Deletes a form from a section and renumbers all remaining forms accordingly. If cascade==True,
-    cascades the delete to pages and then components within this form
+def delete_form_from_section(section_id, form_id):
+    """Deletes a form from a section and renumbers all remaining forms accordingly.
 
     So for example if you have 3 sections:
     - 1 Section A
@@ -226,135 +206,24 @@ def delete_form_from_section(section_id, form_id, cascade: bool = False):
     Args:
         section_id (_type_): Section ID to remove the form from
         form_id (_type_): Form ID of the form to remove
-        cascade (bool, optional): Whether to cascade the delete down the hierarchy. Defaults to False.
     """
-    delete_form(form_id=form_id, cascade=cascade)
+    delete_form(form_id)
     section = get_section_by_id(section_id=section_id)
     section.forms.reorder()
     db.session.commit()
 
 
-def delete_form(form_id, cascade: bool = False):
-    """Deletes a form. If cascade==True, cascades this delete down through the hierarchy to
-    pages within this form and then components on those pages. It DOES NOT update the section_index
-    property of remaining forms. If you want this functionality, call #delete_form_from_section() instead.
-
-    Args:
-        form_id (UUID): ID of the form to delete
-        cascade (bool, optional): Whether to cascade the delete down the hierarchy. Defaults to False.
-
-    """
+def delete_form(form_id):
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
     if not form:
         raise ValueError(f"Form template with id {Form.form_id} not found")
     try:
-        if cascade:
-            if form.conditions:
-                _delete_all_page_conditions_in_form(pages=form.pages)
-                _delete_all_conditions_in_form(conditions=form.conditions)
-            _delete_all_components_in_pages(page_ids=[p.page_id for p in form.pages])
-            _delete_all_pages_in_forms(form_ids=[form_id])
         db.session.delete(form)
         db.session.commit()
         return form
     except Exception as e:
         db.session.rollback()
         print(f"Failed to delete form template {Form.form_id} : Error {e}")
-
-
-def update_page(page_id, new_page_config):
-    page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
-    if page:
-        # Define a list of allowed keys to update
-        allowed_keys = [
-            "form_id",
-            "name_in_apply_json",
-            "template_name",
-            "is_template",
-            "audit_info",
-            "form_index",
-            "display_path",
-            "controller",
-        ]
-
-        for key, value in new_page_config.items():
-            # Update the page if the key is allowed
-            if key in allowed_keys:
-                setattr(page, key, value)
-
-        db.session.commit()
-    return page
-
-
-def _delete_all_pages_in_forms(form_ids: list):
-    stmt = delete(Page).filter(Page.form_id.in_(form_ids))
-    db.session.execute(stmt)
-    db.session.commit()
-
-
-def delete_page(page_id, cascade: bool = False):
-    page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
-    if cascade:
-        _delete_all_components_in_pages(page_ids=[page_id])
-    db.session.delete(page)
-    db.session.commit()
-    return page
-
-
-def update_component(component_id, new_component_config):
-    component = db.session.query(Component).where(Component.component_id == component_id).one_or_none()
-    if component:
-        # Define a list of allowed keys to update to prevent updating unintended fields
-        allowed_keys = [
-            "page_id",
-            "theme_id",
-            "title",
-            "hint_text",
-            "options",
-            "type",
-            "template_name",
-            "is_template",
-            "audit_info",
-            "page_index",
-            "theme_index",
-            "conditions",
-            "runner_component_name",
-            "list_id",
-        ]
-
-        for key, value in new_component_config.items():
-            # Update the component if the key is allowed
-            if key in allowed_keys:
-                setattr(component, key, value)
-
-        db.session.commit()
-    return component
-
-
-def delete_component(component_id):
-    component = db.session.query(Component).where(Component.component_id == component_id).one_or_none()
-    db.session.delete(component)
-    db.session.commit()
-    return component
-
-
-def _delete_all_components_in_pages(page_ids):
-    stmt = delete(Component).filter(Component.page_id.in_(page_ids))
-    db.session.execute(stmt)
-    db.session.commit()
-
-
-def _delete_all_conditions_in_form(conditions: list[Condition]):
-    stmt = delete(Condition).filter(Condition.condition_id.in_(condition.condition_id for condition in conditions))
-    db.session.execute(stmt)
-    db.session.commit()
-
-
-def _delete_all_page_conditions_in_form(pages: list[Page]):
-    page_ids = [page.page_id for page in pages if page.conditions]
-    if page_ids:
-        db.session.execute(delete(PageCondition).where(PageCondition.page_id.in_(page_ids)))
-        db.session.commit()
 
 
 # Section and form reordering
@@ -474,13 +343,3 @@ def move_form_up(section_id, form_id):
     list_index = form.section_index - 1  # Convert from 1-based to 0-based index
     section.forms = swap_elements_in_list(section.forms, list_index, list_index - 1)
     db.session.commit()
-
-
-def get_form_section_by_name(form_section_name: str, form_id) -> FormSection:
-    form_section = db.session.query(FormSection).filter_by(name=form_section_name, form_id=form_id).first()
-    return form_section
-
-
-def get_form_section_by_id(form_section_id: str) -> FormSection:
-    from_section = db.session.query(FormSection).where(FormSection.form_section_id == form_section_id).one_or_none()
-    return from_section

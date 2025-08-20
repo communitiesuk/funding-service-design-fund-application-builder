@@ -1,24 +1,16 @@
-from dataclasses import asdict
 from datetime import datetime
 from random import randint
 from uuid import uuid4
 
 from app.db.models import (
-    Component,
-    ComponentType,
-    Criteria,
     Form,
     Fund,
-    Lizt,
     Organisation,
     Page,
     Round,
     Section,
-    Subcriteria,
-    Theme,
 )
 from app.db.models.fund import FundingType
-from app.shared.data_classes import Condition, ConditionValue
 
 # NOSONAR Ignore since this data is related to unit tests
 BASIC_FUND_INFO = {
@@ -260,196 +252,6 @@ def init_salmon_fishing_fund():
         runner_publish_name="contact-details",
         form_json=CONTACT_DETAILS_FORM_JSON,
     )
-    p1: Page = Page(
-        page_id=page_one_id,
-        form_id=f1.form_id,
-        display_path="organisation-name",
-        name_in_apply_json={"en": "Organisation Name"},
-        form_index=1,
-    )
-    p2: Page = Page(
-        page_id=page_two_id,
-        display_path="organisation-address",
-        form_id=f1.form_id,
-        name_in_apply_json={"en": "Organisation Address"},
-        form_index=3,
-    )
-    p3: Page = Page(
-        page_id=page_three_id,
-        form_id=f2.form_id,
-        display_path="lead-contact-details",
-        name_in_apply_json={"en": "Lead Contact Details"},
-        form_index=1,
-    )
-    p5: Page = Page(
-        page_id=page_five_id,
-        display_path="organisation-classification",
-        form_id=f1.form_id,
-        name_in_apply_json={"en": "Organisation Classification"},
-        form_index=4,
-        default_next_page_id=None,
-    )
-    p_org_alt_names: Page = Page(
-        page_id=alt_page_id,
-        form_id=f1.form_id,
-        display_path="organisation-alternative-names",
-        name_in_apply_json={"en": "Alternative names of your organisation"},
-        form_index=2,
-        is_template=True,
-    )
-    cri1: Criteria = Criteria(criteria_id=uuid4(), index=1, round_id=r.round_id, name="Unscored", weighting=0.0)
-    sc1: Subcriteria = Subcriteria(
-        subcriteria_id=uuid4(), criteria_index=1, criteria_id=cri1.criteria_id, name="Organisation Information"
-    )
-    t1: Theme = Theme(
-        theme_id=uuid4(), subcriteria_id=sc1.subcriteria_id, name="General Information", subcriteria_index=1
-    )
-    t2: Theme = Theme(theme_id=uuid4(), subcriteria_id=sc1.subcriteria_id, name="Contact Details", subcriteria_index=1)
-    c4: Component = Component(
-        component_id=uuid4(),
-        page_id=p3.page_id,
-        title="Main Contact Name",
-        type=ComponentType.TEXT_FIELD,
-        page_index=1,
-        theme_id=t2.theme_id,
-        theme_index=1,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="main_contact_name",
-    )
-    c5: Component = Component(
-        component_id=uuid4(),
-        page_id=p3.page_id,
-        title="Main Contact Email",
-        type=ComponentType.EMAIL_ADDRESS_FIELD,
-        page_index=2,
-        theme_id=t2.theme_id,
-        theme_index=4,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="main_contact_email",
-    )
-    c6: Component = Component(
-        component_id=uuid4(),
-        page_id=p3.page_id,
-        title="Main Contact Address",
-        type=ComponentType.UK_ADDRESS_FIELD,
-        page_index=3,
-        theme_id=t2.theme_id,
-        theme_index=3,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="main_contact_address",
-    )
-    c1: Component = Component(
-        component_id=uuid4(),
-        page_id=p1.page_id,
-        title="What is your organisation's name?",
-        hint_text="This must match the registered legal organisation name",
-        type=ComponentType.TEXT_FIELD,
-        page_index=1,
-        theme_id=t1.theme_id,
-        theme_index=1,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_name",
-    )
-    c3: Component = Component(
-        component_id=uuid4(),
-        page_id=p1.page_id,
-        title="Does your organisation use any other names?",
-        type=ComponentType.YES_NO_FIELD,
-        page_index=2,
-        theme_id=t1.theme_id,
-        theme_index=2,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="does_your_organisation_use_other_names",
-        conditions=[
-            asdict(
-                Condition(
-                    name="organisation_other_names_no",
-                    display_name="Other Name No",
-                    destination_page_path="/organisation-address",
-                    source_page_path="/organisation-name",
-                    value=ConditionValue(
-                        name="Other Name No",
-                        conditions=[
-                            {
-                                "field": {
-                                    "name": "does_your_organisation_use_other_names",
-                                    "type": "YesNoField",
-                                    "display": "Does your organisation use other names?",
-                                },
-                                "operator": "is",
-                                "value": {"type": "Value", "value": "false", "display": "false"},
-                            }
-                        ],
-                    ),
-                )
-            ),
-            asdict(
-                Condition(
-                    name="organisation_other_names_yes",
-                    display_name="Other Name Yes",
-                    destination_page_path="/organisation-alternative-names",
-                    source_page_path="/organisation-name",
-                    value=ConditionValue(
-                        name="Other Name Yes",
-                        conditions=[
-                            {
-                                "field": {
-                                    "name": "does_your_organisation_use_other_names",
-                                    "type": "YesNoField",
-                                    "display": "Does your organisation use other names?",
-                                },
-                                "operator": "is",
-                                "value": {"type": "Value", "value": "true", "display": "true"},
-                            }
-                        ],
-                    ),
-                )
-            ),
-        ],
-    )
-    c2: Component = Component(
-        component_id=uuid4(),
-        page_id=p2.page_id,
-        title="What is your organisation's address?",
-        hint_text="This must match the registered organisation address",
-        type=ComponentType.UK_ADDRESS_FIELD,
-        page_index=1,
-        theme_id=t1.theme_id,
-        theme_index=5,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_address",
-    )
-    c7: Component = Component(
-        component_id=uuid4(),
-        page_id=p_org_alt_names.page_id,
-        title="Alternative Name 1",
-        type=ComponentType.TEXT_FIELD,
-        page_index=1,
-        theme_id=None,
-        theme_index=None,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="alt_name_1",
-    )
-    l1: Lizt = Lizt(
-        list_id=uuid4(),
-        name="classifications_list",
-        type="string",
-        items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
-        is_template=True,
-    )
-    c8: Component = Component(
-        component_id=uuid4(),
-        page_id=p5.page_id,
-        title="How is your organisation classified?",
-        type=ComponentType.RADIOS_FIELD,
-        page_index=1,
-        theme_id=t1.theme_id,
-        theme_index=6,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_classification",
-        list_id=l1.list_id,
-    )
-
     fd: Fund = Fund(
         fund_id=uuid4(),
         name_json={"en": "Cats and Trees Fund"},
@@ -461,7 +263,6 @@ def init_salmon_fishing_fund():
         funding_type=FundingType.COMPETITIVE,
         ggis_scheme_reference_number="G2-SCH-0000092414",
     )
-
     rd: Round = Round(
         round_id=uuid4(),
         fund_id=fd.fund_id,
@@ -470,20 +271,14 @@ def init_salmon_fishing_fund():
         **BASIC_ROUND_INFO,
     )
     return {
-        "lists": [l1],
         "funds": [f, fd],
         "rounds": [r, r2, rd],
         "sections": [s1],
         "forms": [f1, f2],
-        "pages": [p1, p2, p3, p5, p_org_alt_names],
         "default_next_pages": [
             {"page_id": alt_page_id, "default_next_page_id": page_two_id},
             {"page_id": page_two_id, "default_next_page_id": page_five_id},
         ],
-        "components": [c1, c2, c4, c5, c6, c8, c3, c7],
-        "criteria": [cri1],
-        "subcriteria": [sc1],
-        "themes": [t1, t2],
         "organisations": [o],
     }
 
@@ -498,7 +293,6 @@ def init_unit_test_data() -> dict:
         logo_uri="https://www.google.com",
         audit_info={"user": "dummy_user", "timestamp": datetime.now().isoformat(), "action": "create"},
     )
-
     f: Fund = Fund(
         fund_id=uuid4(),
         name_json={"en": "Unit Test Fund 1"},
@@ -510,7 +304,6 @@ def init_unit_test_data() -> dict:
         funding_type=FundingType.COMPETITIVE,
         ggis_scheme_reference_number="G3-SCH-0000092414",
     )
-
     r: Round = Round(
         round_id=uuid4(),
         fund_id=f.fund_id,
@@ -540,7 +333,6 @@ def init_unit_test_data() -> dict:
         eoi_decision_schema={"en": {"valid": True}, "cy": {"valid": False}},
         status="In progress",
     )
-
     s1: Section = Section(
         section_id=uuid4(), index=1, round_id=r.round_id, name_in_apply_json={"en": "Organisation Information"}
     )
@@ -553,67 +345,13 @@ def init_unit_test_data() -> dict:
         template_name="About your organization template",
         form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
-    p1: Page = Page(
-        page_id=uuid4(),
-        form_id=f1.form_id,
-        display_path="organisation-name",
-        name_in_apply_json={"en": "Organisation Name"},
-        form_index=1,
-        default_next_page_id=None,
-    )
 
-    cri1: Criteria = Criteria(criteria_id=uuid4(), index=1, round_id=r.round_id, name="Unscored", weighting=0.0)
-    sc1: Subcriteria = Subcriteria(
-        subcriteria_id=uuid4(), criteria_index=1, criteria_id=cri1.criteria_id, name="Organisation Information"
-    )
-    t1: Theme = Theme(
-        theme_id=uuid4(), subcriteria_id=sc1.subcriteria_id, name="General Information", subcriteria_index=1
-    )
-
-    c1: Component = Component(
-        component_id=uuid4(),
-        page_id=p1.page_id,
-        title="What is your organisation's name?",
-        hint_text="This must match the registered legal organisation name",
-        type=ComponentType.TEXT_FIELD,
-        page_index=1,
-        theme_id=t1.theme_id,
-        theme_index=1,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_name",
-    )
-
-    l1: Lizt = Lizt(
-        list_id=uuid4(),
-        name="classifications_list",
-        type="string",
-        items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
-        is_template=True,
-    )
-    c_with_list: Component = Component(
-        component_id=uuid4(),
-        page_id=p1.page_id,
-        title="How is your organisation classified?",
-        type=ComponentType.RADIOS_FIELD,
-        page_index=2,
-        theme_id=t1.theme_id,
-        theme_index=6,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_classification",
-        list_id=l1.list_id,
-    )
     return {
-        "lists": [l1],
         "funds": [f],
         "organisations": [o],
         "rounds": [r],
         "sections": [s1],
         "forms": [f1],
-        "pages": [p1],
-        "components": [c1, c_with_list],
-        "criteria": [cri1],
-        "subcriteria": [sc1],
-        "themes": [t1],
     }
 
 
@@ -697,63 +435,12 @@ def fund_without_assessment() -> dict:
         template_name="About your organization template",
         form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
-
-    f2_r1_s1_f1_p1: Page = Page(
-        page_id=uuid4(),
-        form_id=f2_r1_s1_f1.form_id,
-        display_path="organisation-name",
-        name_in_apply_json={"en": "Organisation Name"},
-        form_index=1,
-        default_next_page_id=None,
-    )
-
-    f2_r1_s1_f1_p2: Page = Page(
-        page_id=uuid4(),
-        form_id=f2_r1_s1_f2.form_id,
-        display_path="organisation-name",
-        name_in_apply_json={"en": "Organisation Name"},
-        form_index=1,
-        default_next_page_id=None,
-    )
-
-    f2_r1_s1_f1_p1_c1: Component = Component(
-        component_id=uuid4(),
-        page_id=f2_r1_s1_f1_p1.page_id,
-        title="What is your organisation's name?",
-        hint_text="This must match the registered legal organisation name",
-        type=ComponentType.TEXT_FIELD,
-        page_index=1,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_name",
-    )
-
-    l1: Lizt = Lizt(
-        list_id=uuid4(),
-        name="classifications_list",
-        type="string",
-        items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
-        is_template=True,
-    )
-
-    f2_r1_s1_f1_p1_c2_with_list: Component = Component(
-        component_id=uuid4(),
-        page_id=f2_r1_s1_f1_p2.page_id,
-        title="How is your organisation classified?",
-        type=ComponentType.RADIOS_FIELD,
-        page_index=2,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_classification",
-        list_id=l1.list_id,
-    )
     return {
-        "lists": [l1],
         "funds": [f2],
         "organisations": [o],
         "rounds": [f2_r1],
         "sections": [f2_r1_s1, f2_r1_s2],
         "forms": [f2_r1_s1_f1, f2_r1_s1_f2],
-        "pages": [f2_r1_s1_f1_p1, f2_r1_s1_f1_p2],
-        "components": [f2_r1_s1_f1_p1_c1, f2_r1_s1_f1_p1_c2_with_list],
     }
 
 
@@ -777,21 +464,4 @@ def insert_test_data(db, test_data=None):
     db.session.bulk_save_objects(test_data.get("sections", []))
     db.session.commit()
     db.session.bulk_save_objects(test_data.get("forms", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("pages", []))
-    db.session.commit()
-    add_default_page_paths(db, test_data.get("default_next_pages", []))
-    db.session.bulk_save_objects(test_data.get("criteria", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("subcriteria", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("themes", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("lists", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("components", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("conditions", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("page_conditions", []))
     db.session.commit()

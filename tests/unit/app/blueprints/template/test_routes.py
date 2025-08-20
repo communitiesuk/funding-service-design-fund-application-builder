@@ -158,13 +158,9 @@ def test_template_create_success(flask_test_client, clean_db):
 
 @patch("app.blueprints.template.routes.get_form_by_id")
 @patch("app.blueprints.template.routes.update_form")
-@patch("app.blueprints.template.routes.delete_form")
-@patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_edit_template_get(
-    mock_flash, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
-):
+def test_edit_template_get(mock_flash, mock_update_form, mock_get_form_by_id, flask_test_client):
     mock_form = MagicMock()
     mock_form.template_name = "Test Template"
     mock_form.name_in_apply_json = {"en": "Test Tasklist"}
@@ -180,12 +176,10 @@ def test_edit_template_get(
 
 @patch("app.blueprints.template.routes.get_form_by_id")
 @patch("app.blueprints.template.routes.update_form")
-@patch("app.blueprints.template.routes.delete_form")
-@patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_edit_template_post_update_without_actions(
-    mock_flash_message, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
+    mock_flash_message, mock_update_form, mock_get_form_by_id, flask_test_client
 ):
     form_mock_id = uuid.uuid4()
     form_id = str(form_mock_id)
@@ -209,6 +203,7 @@ def test_edit_template_post_update_without_actions(
             form_id=form_mock_id,
             form_name="Updated Tasklist",
             template_name="Updated Template",
+            form_json=None,  # Assuming no file upload in this case
         )
         mock_flash_message.assert_called_with("Template updated")
 
@@ -244,18 +239,17 @@ def test_edit_template_post_update_with_actions_template_table(
             form_id=form_mock_id,
             form_name="Updated Tasklist",
             template_name="Updated Template",
+            form_json=None,  # Assuming no file upload in this case
         )
         mock_redirect.assert_called_once_with("/templates")
 
 
 @patch("app.blueprints.template.routes.get_form_by_id")
 @patch("app.blueprints.template.routes.update_form")
-@patch("app.blueprints.template.routes.delete_form")
-@patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_edit_template_post_with_file_without_actions(
-    mock_flash_message, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
+    mock_flash_message, mock_update_form, mock_get_form_by_id, flask_test_client
 ):
     form_mock_id = uuid.uuid4()
     form_id = str(form_mock_id)
@@ -270,8 +264,7 @@ def test_edit_template_post_with_file_without_actions(
             "csrf_token": g.csrf_token,
         }
         flask_test_client.post(f"/templates/{form_id}/edit", data=form_data, follow_redirects=True)
-        mock_delete_form.assert_called_once_with(form_id=form_mock_id, cascade=True)
-        mock_json_import.assert_called_once()
+        mock_update_form.assert_called_once()
         mock_flash_message.assert_called_with("Template updated")
 
 

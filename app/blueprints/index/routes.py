@@ -1,13 +1,10 @@
-import json
 import uuid
-from random import randint
 
 import requests
-from flask import Blueprint, Response, g, redirect, render_template, session, url_for
+from flask import Blueprint, g, redirect, render_template, session, url_for
 from fsd_utils.authentication.decorators import login_requested
 
 from app.db.queries.application import get_form_by_id
-from app.export_config.generate_form import build_form_json
 from config import Config
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -58,21 +55,6 @@ def preview_form(form_id):
     except Exception as e:
         return f"unable to publish form: {str(e)}", 500
     return redirect(f"{Config.FORM_RUNNER_EXTERNAL_HOST}/{form_id}?form_session_identifier=preview/{uuid.uuid4()}")
-
-
-@index_bp.route("/download/<form_id>", methods=["GET"])
-def download_form_json(form_id):
-    """
-    Generates form json for the selected form and returns it as a file download
-    """
-    form = get_form_by_id(form_id)
-    form_json = build_form_json(form)
-
-    return Response(
-        response=json.dumps(form_json),
-        mimetype="application/json",
-        headers={"Content-Disposition": f"attachment;filename=form-{randint(0, 999)}.json"},  # nosec B311
-    )
 
 
 @index_bp.route("/back")
