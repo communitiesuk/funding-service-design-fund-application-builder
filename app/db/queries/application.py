@@ -262,43 +262,6 @@ def delete_form(form_id, cascade: bool = False):
         print(f"Failed to delete form template {Form.form_id} : Error {e}")
 
 
-# CRUD PAGE
-def insert_new_page(new_page_config):
-    """
-    Inserts a page object based on the provided configuration.
-
-    Parameters:
-        new_page_config (dict): A dictionary containing the configuration for the new page.
-            new_page_config keys:
-                - form_id (str): The ID of the form to which the page belongs.
-                - name_in_apply_json (str): The name of the page as it will be in the Application JSON.
-                - template_name (str): The name of the template.
-                - is_template (bool): A flag indicating whether the page is a template.
-                - source_template_id (str): The ID of the source template.
-                - audit_info (dict): Audit information for the page.
-                - form_index (int): The index of the page within the form.
-                - display_path (str): The form runner display path of the page (kebab case).
-                - controller (str): The form runner controller path for the page (e.g. './pages/summary.js').
-                Returns:
-            Page: The newly created page object.
-    """
-    page = Page(
-        page_id=uuid4(),
-        form_id=new_page_config.get("form_id", None),
-        name_in_apply_json=new_page_config.get("name_in_apply_json"),
-        template_name=new_page_config.get("template_name", None),
-        is_template=new_page_config.get("is_template", False),
-        source_template_id=new_page_config.get("source_template_id", None),
-        audit_info=new_page_config.get("audit_info", {}),
-        form_index=new_page_config.get("form_index"),
-        display_path=new_page_config.get("display_path"),
-        controller=new_page_config.get("controller", None),
-    )
-    db.session.add(page)
-    db.session.commit()
-    return page
-
-
 def update_page(page_id, new_page_config):
     page = db.session.query(Page).where(Page.page_id == page_id).one_or_none()
     if page:
@@ -336,60 +299,6 @@ def delete_page(page_id, cascade: bool = False):
     db.session.delete(page)
     db.session.commit()
     return page
-
-
-# CRUD COMPONENT
-def insert_new_component(new_component_config: dict):
-    """
-    Inserts a component object based on the provided configuration.
-
-    Parameters:
-        new_component_config (dict): A dictionary containing the configuration for the new component.
-            new_component_config keys:
-                - page_id (str): The ID of the page to which the component belongs.
-                - theme_id (str): The ID of the theme to which the component belongs.
-                - title (str): The title of the component.
-                - hint_text (str): The hint text for the component.
-                - options (dict): The options such as classes, prefix etc
-                - type (str): The type of the component.
-                - template_name (str): The name of the template.
-                - is_template (bool): A flag indicating whether the component is a template.
-                - source_template_id (str): The ID of the source template.
-                - audit_info (dict): Audit information for the component.
-                - page_index (int): The index of the component within the page.
-                - theme_index (int): The index of the component within the theme.
-                - conditions (dict): The conditions such as potential routes based on the
-                components value (can specify page path).
-                - runner_component_name (str): The name of the runner component.
-                - list_id (str): The ID of the list to which the component belongs.
-            Returns:
-                Component: The newly created component object.
-    """
-    # Instantiate the Component object with the provided and default values
-    component = Component(
-        component_id=uuid4(),
-        page_id=new_component_config.get("page_id", None),
-        theme_id=new_component_config.get("theme_id", None),
-        title=new_component_config.get("title"),
-        hint_text=new_component_config.get("hint_text"),
-        options=new_component_config.get("options", {}),
-        type=new_component_config.get("type"),
-        is_template=new_component_config.get("is_template", False),
-        template_name=new_component_config.get("template_name", None),
-        source_template_id=new_component_config.get("source_template_id", None),
-        audit_info=new_component_config.get("audit_info", {}),
-        page_index=new_component_config.get("page_index"),
-        theme_index=new_component_config.get("theme_index"),
-        runner_component_name=new_component_config.get("runner_component_name"),
-        list_id=new_component_config.get("list_id", None),
-    )
-
-    # Add the component to the session and commit
-    db.session.add(component)
-    db.session.commit()
-
-    # Return the created component object or its ID based on your requirements
-    return component
 
 
 def update_component(component_id, new_component_config):
@@ -565,77 +474,6 @@ def move_form_up(section_id, form_id):
     list_index = form.section_index - 1  # Convert from 1-based to 0-based index
     section.forms = swap_elements_in_list(section.forms, list_index, list_index - 1)
     db.session.commit()
-
-
-def insert_condition(condition_config: dict, form_id: UUID, do_commit: bool = True) -> Condition:
-    new_condition = Condition(
-        name=condition_config.get("name", None),
-        display_name=condition_config.get("displayName", None),
-        value=condition_config.get("value", None),
-        form_id=form_id,
-        is_template=True,
-    )
-    try:
-        db.session.add(new_condition)
-    except Exception as e:
-        print(e)
-        raise e
-    if do_commit:
-        db.session.commit()
-    db.session.flush()  # flush to get the list id
-    return new_condition
-
-
-def insert_page_condition(condition_id: UUID, page_id: UUID, path: str, do_commit: bool = True) -> PageCondition:
-    new_page_condition = PageCondition(
-        condition_id=condition_id, page_id=page_id, destination_page_path=path, is_template=True
-    )
-    try:
-        db.session.add(new_page_condition)
-    except Exception as e:
-        print(e)
-        raise e
-    if do_commit:
-        db.session.commit()
-    db.session.flush()  # flush to get the list id
-    return new_page_condition
-
-
-def insert_list(list_config: dict, do_commit: bool = True) -> Lizt:
-    new_list = Lizt(
-        is_template=True,
-        name=list_config.get("name"),
-        title=list_config.get("title"),
-        type=list_config.get("type"),
-        items=list_config.get("items"),
-    )
-    try:
-        db.session.add(new_list)
-    except Exception as e:
-        print(e)
-        raise e
-    if do_commit:
-        db.session.commit()
-    db.session.flush()  # flush to get the list id
-    return new_list
-
-
-def insert_form_section(form_section_config: dict, do_commit: bool = True) -> FormSection:
-    new_form_section = FormSection(
-        is_template=True,
-        name=form_section_config.get("name"),
-        title=form_section_config.get("title"),
-        hide_title=form_section_config.get("hideTitle", False),
-    )
-    try:
-        db.session.add(new_form_section)
-    except Exception as e:
-        print(e)
-        raise e
-    if do_commit:
-        db.session.commit()
-    db.session.flush()  # flush to get the list id
-    return new_form_section
 
 
 def get_form_section_by_name(form_section_name: str, form_id) -> FormSection:

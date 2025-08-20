@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from app.db.models import Component, Form, FormSection, Page, Section
+from app.db.models import Form, Section
 from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
@@ -69,18 +69,18 @@ def test_generate_config_to_verify_form_sections(
     "expected_form_section_count",
     [
         ("projects.json", "projects.json", 4, 5, 1),
-        ("asset-information.json", "asset-information.json", 23, 29, 2),
-        ("org-info.json", "org-info.json", 18, 43, 2),
-        ("optional-all-components.json", "optional-all-components.json", 8, 27, 4),
-        ("required-all-components.json", "required-all-components.json", 8, 27, 1),
-        ("favourite-colours.json", "favourite-colours.json", 4, 1, 1),
-        ("funding-required-cof-25.json", "funding-required-cof-25.json", 12, 21, 2),
+        ("asset-information.json", "asset-information.json", 23, 29, 1),
+        ("org-info.json", "org-info.json", 18, 43, 1),
+        ("optional-all-components.json", "optional-all-components.json", 8, 27, 3),
+        ("required-all-components.json", "required-all-components.json", 8, 27, 0),
+        ("favourite-colours.json", "favourite-colours.json", 4, 1, 0),
+        ("funding-required-cof-25.json", "funding-required-cof-25.json", 12, 21, 1),
         (
             "organisation-and-local-authority.json",
             "organisation-and-local-authority.json",
             16,
             24,
-            2,
+            1,
         ),  # noqa: E501
         ("test-section.json", "test-section.json", 3, 1, 2),
     ],
@@ -112,15 +112,13 @@ def test_generate_config_for_round_valid_input(
     forms = _db.session.query(Form).filter(Form.runner_publish_name == input_filename.split(".")[0])
     assert forms.count() == expected_form_count
     form = forms.first()
-    pages = _db.session.query(Page).filter(Page.form_id == form.form_id)
 
-    assert pages.count() == expected_page_count_for_form
-    form_sections = _db.session.query(FormSection)
-    assert form_sections.count() == expected_form_section_count
-    total_components_count = sum(
-        _db.session.query(Component).filter(Component.page_id == page.page_id).count() for page in pages
-    )
-    assert total_components_count == expected_component_count_for_form
+    assert len(form.form_json["pages"]) == expected_page_count_for_form
+    assert len(form.form_json["sections"]) == expected_form_section_count
+    num_components = 0
+    for page in form.form_json["pages"]:
+        num_components += len(page["components"])
+    assert num_components == expected_component_count_for_form
 
     # PART 2 GENERATE FORM JSON'S
     # associate forms with a round
