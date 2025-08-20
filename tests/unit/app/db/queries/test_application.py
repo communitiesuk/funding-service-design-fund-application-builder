@@ -6,15 +6,12 @@ import pytest
 from sqlalchemy.exc import IntegrityError
 
 from app.db import db
-from app.db.models import Component, ComponentType, Form, Fund, Lizt, Page, Round, Section
+from app.db.models import Component, Form, Fund, Page, Round, Section
 from app.db.queries.application import (
-    delete_component,
     delete_form,
     delete_form_from_section,
-    delete_page,
     delete_section,
     delete_section_from_round,
-    get_component_by_id,
     get_section_by_id,
     insert_new_form,
     insert_new_section,
@@ -23,56 +20,11 @@ from app.db.queries.application import (
     move_section_down,
     move_section_up,
     swap_elements_in_list,
-    update_component,
     update_form,
-    update_page,
     update_section,
 )
 from tests.helpers import get_round_by_id
 from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
-
-
-def insert_new_page(new_page_config):
-    """Simple implementation to replace missing function for tests"""
-    page = Page(
-        page_id=uuid4(),
-        form_id=new_page_config.get("form_id"),
-        name_in_apply_json=new_page_config.get("name_in_apply_json"),
-        is_template=new_page_config.get("is_template", False),
-        template_name=new_page_config.get("template_name"),
-        source_template_id=new_page_config.get("source_template_id"),
-        audit_info=new_page_config.get("audit_info", {}),
-        form_index=new_page_config.get("form_index"),
-        display_path=new_page_config.get("display_path"),
-        controller=new_page_config.get("controller"),
-    )
-    db.session.add(page)
-    db.session.commit()
-    return page
-
-
-def insert_new_component(new_component_config):
-    """Simple implementation to replace missing function for tests"""
-    component = Component(
-        component_id=uuid4(),
-        page_id=new_component_config.get("page_id"),
-        theme_id=new_component_config.get("theme_id"),
-        title=new_component_config.get("title"),
-        hint_text=new_component_config.get("hint_text"),
-        options=new_component_config.get("options", {}),
-        type=new_component_config.get("type"),
-        is_template=new_component_config.get("is_template", False),
-        template_name=new_component_config.get("template_name"),
-        source_template_id=new_component_config.get("source_template_id"),
-        audit_info=new_component_config.get("audit_info", {}),
-        page_index=new_component_config.get("page_index"),
-        theme_index=new_component_config.get("theme_index"),
-        runner_component_name=new_component_config.get("runner_component_name"),
-        list_id=new_component_config.get("list_id"),
-    )
-    db.session.add(component)
-    db.session.commit()
-    return component
 
 
 new_template_section_config = {
@@ -240,217 +192,6 @@ def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data,
     assert _db.session.query(Form).filter(Form.form_id == test_form.form_id).one_or_none() is None
 
 
-def test_delete_form_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
-    # CREATE FK link to Form
-    new_page_config["form_id"] = test_form.form_id
-    new_page = insert_new_page(new_page_config)
-
-    assert isinstance(test_form, Form)
-    assert isinstance(new_page, Page)
-    new_page_id = new_page.page_id
-
-    delete_form(test_form.form_id, cascade=True)
-    assert _db.session.query(Form).filter(Form.form_id == test_form.form_id).one_or_none() is None
-    assert _db.session.query(Page).where(Page.page_id == new_page_id).one_or_none() is None
-
-
-def test_failed_delete_form_with_fk_to_page(
-    flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form
-):
-    # CREATE FK link to Form
-    new_page_config["form_id"] = test_form.form_id
-    insert_new_page(new_page_config)
-
-    existing_form = _db.session.query(Form).filter(Form.form_id == test_form.form_id).one_or_none()
-    assert existing_form is not None, "Form was unexpectedly deleted"
-
-
-new_page_config = {
-    "form_id": uuid.uuid4(),
-    "name_in_apply_json": {"en": "Page Name"},
-    "is_template": False,
-    "template_name": None,
-    "source_template_id": None,
-    "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
-    "form_index": 1,
-    "display_path": "test-page",
-    "controller": "./test-controller",
-}
-
-new_template_page_config = {
-    "form_id": uuid.uuid4(),
-    "name_in_apply_json": {"en": "Template Page Name"},
-    "is_template": True,
-    "template_name": "Page Template Name",
-    "source_template_id": None,
-    "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
-    "form_index": 1,
-    "display_path": "test-page",
-    "controller": None,
-}
-
-
-def test_update_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    new_page_config["form_id"] = None
-    new_page = insert_new_page(new_page_config)
-
-    assert new_page.form_id is None
-    assert new_page.name_in_apply_json == new_page_config["name_in_apply_json"]
-    assert new_page.template_name is None
-    assert new_page.is_template is False
-    assert new_page.source_template_id is None
-    assert new_page.audit_info == new_page_config["audit_info"]
-    assert new_page.form_index == new_page_config["form_index"]
-    assert new_page.display_path == new_page_config["display_path"]
-    assert new_page.controller == new_page_config["controller"]
-
-    # Update new_page_config
-    updated_page_config = deepcopy(new_page_config)
-    updated_page_config["name_in_apply_json"] = {"en": "Updated Page Name"}
-    updated_page_config["audit_info"] = {"created_by": "Jonny Doe", "created_at": "2024-01-02"}
-
-    updated_page = update_page(new_page.page_id, updated_page_config)
-
-    assert isinstance(updated_page, Page)
-    assert updated_page.form_id == updated_page_config["form_id"]
-    assert updated_page.name_in_apply_json == updated_page_config["name_in_apply_json"]
-    assert updated_page.audit_info == updated_page_config["audit_info"]
-
-
-def test_delete_page(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    new_page_config["form_id"] = None
-    new_page = insert_new_page(new_page_config)
-
-    assert isinstance(new_page, Page)
-    assert new_page.audit_info == new_page_config["audit_info"]
-
-    delete_page(new_page.page_id)
-    assert _db.session.query(Page).filter(Page.page_id == new_page.page_id).one_or_none() is None
-
-
-def test_delete_page_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    new_page_config["form_id"] = None
-    new_page = insert_new_page(new_page_config)
-
-    assert isinstance(new_page, Page)
-    page_id_to_delete = new_page.page_id
-    assert new_page.audit_info == new_page_config["audit_info"]
-
-    # create component on that page
-    new_component_config["page_id"] = new_page.page_id
-    new_component_config["list_id"] = None
-    new_component_config["theme_id"] = None
-    new_component = insert_new_component(new_component_config=new_component_config)
-    assert isinstance(new_component, Component)
-    component_id_to_delete = new_component.component_id
-
-    delete_page(new_page.page_id, cascade=True)
-    assert _db.session.query(Page).where(Page.page_id == page_id_to_delete).one_or_none() is None
-    assert _db.session.query(Component).where(Component.component_id == component_id_to_delete).one_or_none() is None
-
-
-def test_failed_delete_page_with_fk_to_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    new_page_config["form_id"] = None
-    new_page = insert_new_page(new_page_config)
-    # CREATE FK link to Component
-    new_component_config["page_id"] = new_page.page_id
-    new_component_config["list_id"] = None
-    new_component_config["theme_id"] = None
-    component = insert_new_component(new_component_config)
-    # check inserted component has same page_id
-    assert component.page_id == new_page.page_id
-    assert isinstance(new_page, Page)
-    assert new_page.audit_info == new_page_config["audit_info"]
-
-    with pytest.raises(IntegrityError):
-        delete_page(new_page.page_id, cascade=False)
-    _db.session.rollback()  # Rollback the failed transaction to maintain DB integrity
-
-    existing_page = _db.session.query(Page).filter(Page.page_id == new_page.page_id).one_or_none()
-    assert existing_page is not None, "Page was unexpectedly deleted"
-
-
-new_component_config = {
-    "page_id": uuid.uuid4(),
-    "theme_id": uuid.uuid4(),
-    "title": "Component Title",
-    "hint_text": "Component Hint Text",
-    "options": {"hideTitle": False, "classes": "test-class"},
-    "type": ComponentType.TEXT_FIELD,
-    "is_template": False,
-    "template_name": None,
-    "source_template_id": None,
-    "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
-    "page_index": 1,
-    "theme_index": 1,
-    "runner_component_name": "test-component",
-    "list_id": uuid.uuid4(),
-}
-
-
-new_template_component_config = {
-    "page_id": uuid.uuid4(),
-    "theme_id": uuid.uuid4(),
-    "title": "Template Component Title",
-    "hint_text": "Template Component Hint Text",
-    "options": {"hideTitle": False, "classes": "test-class"},
-    "type": ComponentType.TEXT_FIELD,
-    "is_template": True,
-    "template_name": "Component Template Name",
-    "source_template_id": None,
-    "audit_info": {"created_by": "John Doe", "created_at": "2022-01-01"},
-    "page_index": 1,
-    "theme_index": 2,
-    "runner_component_name": "test-component",
-    "list_id": uuid.uuid4(),
-}
-
-
-def test_update_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    page_id = seed_dynamic_data["pages"][0].page_id
-    list_id = seed_dynamic_data["lists"][0].list_id
-    theme_id = seed_dynamic_data["themes"][0].theme_id
-    new_component_config["page_id"] = page_id
-    new_component_config["list_id"] = list_id
-    new_component_config["theme_id"] = theme_id
-
-    component = insert_new_component(new_component_config)
-
-    assert component.title == new_component_config["title"]
-    assert component.audit_info == new_component_config["audit_info"]
-    assert component.is_template is False
-
-    # Update new_component_config
-    updated_component_config = deepcopy(new_component_config)
-    updated_component_config["title"] = "Updated Component Title"
-    updated_component_config["audit_info"] = {"created_by": "Adam Doe", "created_at": "2024-01-02"}
-
-    updated_component = update_component(component.component_id, updated_component_config)
-
-    assert isinstance(updated_component, Component)
-    assert updated_component.title == updated_component_config["title"]
-    assert updated_component.audit_info == updated_component_config["audit_info"]
-    assert updated_component.is_template is False
-
-
-def test_delete_component(flask_test_client, _db, clear_test_data, seed_dynamic_data):
-    page_id = seed_dynamic_data["pages"][0].page_id
-    list_id = seed_dynamic_data["lists"][0].list_id
-    theme_id = seed_dynamic_data["themes"][0].theme_id
-    new_component_config["page_id"] = page_id
-    new_component_config["list_id"] = list_id
-    new_component_config["theme_id"] = theme_id
-
-    component = insert_new_component(new_component_config)
-
-    assert isinstance(component, Component)
-    assert component.audit_info == new_component_config["audit_info"]
-
-    delete_component(component.component_id)
-    assert _db.session.query(Component).filter(Component.component_id == component.component_id).one_or_none() is None
-    assert _db.session.query(Lizt).where(Lizt.list_id == list_id).one_or_none() is not None
-
-
 def test_delete_section_with_full_cascade(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
     new_section_config["round_id"] = None
     new_section = insert_new_section(new_section_config)
@@ -461,27 +202,10 @@ def test_delete_section_with_full_cascade(flask_test_client, _db, clear_test_dat
     test_form.section_id = new_section_id
     new_form_id = test_form.form_id
 
-    # create FK link to page
-    new_page_config["form_id"] = test_form.form_id
-    new_page = insert_new_page(new_page_config)
-    assert isinstance(new_page, Page)
-    assert new_page.form_id == test_form.form_id
-    new_page_id = new_page.page_id
-
-    # create component on that page
-    new_component_config["page_id"] = new_page_id
-    new_component_config["list_id"] = None
-    new_component_config["theme_id"] = None
-    new_component = insert_new_component(new_component_config=new_component_config)
-    assert isinstance(new_component, Component)
-    new_component_id = new_component.component_id
-
     # Should successfully delete everything with cascade == true
     delete_section(new_section_id, cascade=True)
     assert _db.session.query(Section).where(Section.section_id == new_section_id).one_or_none() is None
     assert _db.session.query(Form).where(Form.form_id == new_form_id).one_or_none() is None
-    assert _db.session.query(Page).where(Page.page_id == new_page_id).one_or_none() is None
-    assert _db.session.query(Component).where(Component.component_id == new_component_id).one_or_none() is None
 
 
 section_id = uuid4()
@@ -833,40 +557,3 @@ def test_move_form_down(seed_dynamic_data, _db, index_to_move, exp_new_index):
 def test_swap_elements(input_list, idx_a, idx_b, exp_result):
     result = swap_elements_in_list(input_list, idx_a, idx_b)
     assert result == exp_result
-
-
-list_id = uuid4()
-
-
-@pytest.mark.seed_config(
-    {
-        "lists": [
-            Lizt(
-                list_id=list_id,
-                name="classifications_list",
-                type="string",
-                items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
-            )
-        ],
-        "components": [
-            Component(
-                component_id=uuid4(),
-                page_id=None,
-                title="How is your organisation classified?",
-                type=ComponentType.RADIOS_FIELD,
-                page_index=1,
-                theme_id=None,
-                theme_index=6,
-                options={"hideTitle": False, "classes": ""},
-                runner_component_name="organisation_classification",
-                list_id=list_id,
-            )
-        ],
-    }
-)
-def test_list_relationship(seed_dynamic_data):
-    result = get_component_by_id(seed_dynamic_data["components"][0].component_id)
-    assert result
-    assert result.list_id == list_id
-    assert result.lizt
-    assert result.lizt.name == "classifications_list"

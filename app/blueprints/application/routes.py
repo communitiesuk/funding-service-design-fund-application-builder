@@ -265,7 +265,7 @@ def move_section_down_route(round_id, section_id):
 
 @application_bp.route("/<round_id>/sections/<section_id>/forms/<form_id>/delete", methods=["GET"])
 def delete_form(round_id, section_id, form_id):
-    delete_form_from_section(section_id=section_id, form_id=form_id, cascade=True)
+    delete_form_from_section(section_id=section_id, form_id=form_id)
     return redirect(url_for("application_bp.section", round_id=round_id, section_id=section_id))
 
 

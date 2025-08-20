@@ -270,7 +270,7 @@ def test_edit_template_post_with_file_without_actions(
             "csrf_token": g.csrf_token,
         }
         flask_test_client.post(f"/templates/{form_id}/edit", data=form_data, follow_redirects=True)
-        mock_delete_form.assert_called_once_with(form_id=form_mock_id, cascade=True)
+        mock_delete_form.assert_called_once_with(form_mock_id)
         mock_json_import.assert_called_once()
         mock_flash_message.assert_called_with("Template updated")
 

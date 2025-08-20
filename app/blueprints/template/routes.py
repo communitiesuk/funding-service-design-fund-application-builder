@@ -109,7 +109,7 @@ def template_details(form_id):
 
 @template_bp.route("/<uuid:form_id>", methods=["DELETE"])
 def delete_form_template(form_id):
-    delete_form(form_id=form_id, cascade=True)
+    delete_form(form_id)
     return Response(status=204)
 
 
@@ -134,7 +134,7 @@ def edit_template(form_id):
             template_name=form.template_name.data,
         )
         if form.file and form.file.data is not None:
-            delete_form(form_id=form_id, cascade=True)
+            delete_form(form_id)
             try:
                 file_data = form.file.data.read().decode("utf-8")
                 form_data = json.loads(file_data)
@@ -179,7 +179,7 @@ def delete_template(form_id):
     form = DeleteConfirmationForm()
 
     if form.validate_on_submit():  # If user confirms deletion
-        delete_form(form_id=form_id, cascade=True)
+        delete_form(form_id)
         return redirect(url_for("template_bp.view_templates"))
 
     # Render confirmation page
