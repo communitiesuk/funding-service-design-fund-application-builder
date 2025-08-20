@@ -158,13 +158,9 @@ def test_template_create_success(flask_test_client, clean_db):
 
 @patch("app.blueprints.template.routes.get_form_by_id")
 @patch("app.blueprints.template.routes.update_form")
-@patch("app.blueprints.template.routes.delete_form")
-@patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_edit_template_get(
-    mock_flash, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
-):
+def test_edit_template_get(mock_flash, mock_update_form, mock_get_form_by_id, flask_test_client):
     mock_form = MagicMock()
     mock_form.template_name = "Test Template"
     mock_form.name_in_apply_json = {"en": "Test Tasklist"}
@@ -180,12 +176,10 @@ def test_edit_template_get(
 
 @patch("app.blueprints.template.routes.get_form_by_id")
 @patch("app.blueprints.template.routes.update_form")
-@patch("app.blueprints.template.routes.delete_form")
-@patch("app.blueprints.template.routes.json_import")
 @patch("app.blueprints.template.routes.flash_message")
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_edit_template_post_update_without_actions(
-    mock_flash_message, mock_json_import, mock_delete_form, mock_update_form, mock_get_form_by_id, flask_test_client
+    mock_flash_message, mock_update_form, mock_get_form_by_id, flask_test_client
 ):
     form_mock_id = uuid.uuid4()
     form_id = str(form_mock_id)
