@@ -3,11 +3,8 @@ from random import randint
 from uuid import uuid4
 
 from app.db.models import (
-    Component,
-    ComponentType,
     Form,
     Fund,
-    Lizt,
     Organisation,
     Page,
     Round,
@@ -438,63 +435,12 @@ def fund_without_assessment() -> dict:
         template_name="About your organization template",
         form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
-
-    f2_r1_s1_f1_p1: Page = Page(
-        page_id=uuid4(),
-        form_id=f2_r1_s1_f1.form_id,
-        display_path="organisation-name",
-        name_in_apply_json={"en": "Organisation Name"},
-        form_index=1,
-        default_next_page_id=None,
-    )
-
-    f2_r1_s1_f1_p2: Page = Page(
-        page_id=uuid4(),
-        form_id=f2_r1_s1_f2.form_id,
-        display_path="organisation-name",
-        name_in_apply_json={"en": "Organisation Name"},
-        form_index=1,
-        default_next_page_id=None,
-    )
-
-    f2_r1_s1_f1_p1_c1: Component = Component(
-        component_id=uuid4(),
-        page_id=f2_r1_s1_f1_p1.page_id,
-        title="What is your organisation's name?",
-        hint_text="This must match the registered legal organisation name",
-        type=ComponentType.TEXT_FIELD,
-        page_index=1,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_name",
-    )
-
-    l1: Lizt = Lizt(
-        list_id=uuid4(),
-        name="classifications_list",
-        type="string",
-        items=[{"text": "Charity", "value": "charity"}, {"text": "Public Limited Company", "value": "plc"}],
-        is_template=True,
-    )
-
-    f2_r1_s1_f1_p1_c2_with_list: Component = Component(
-        component_id=uuid4(),
-        page_id=f2_r1_s1_f1_p2.page_id,
-        title="How is your organisation classified?",
-        type=ComponentType.RADIOS_FIELD,
-        page_index=2,
-        options={"hideTitle": False, "classes": ""},
-        runner_component_name="organisation_classification",
-        list_id=l1.list_id,
-    )
     return {
-        "lists": [l1],
         "funds": [f2],
         "organisations": [o],
         "rounds": [f2_r1],
         "sections": [f2_r1_s1, f2_r1_s2],
         "forms": [f2_r1_s1_f1, f2_r1_s1_f2],
-        "pages": [f2_r1_s1_f1_p1, f2_r1_s1_f1_p2],
-        "components": [f2_r1_s1_f1_p1_c1, f2_r1_s1_f1_p1_c2_with_list],
     }
 
 
@@ -518,21 +464,4 @@ def insert_test_data(db, test_data=None):
     db.session.bulk_save_objects(test_data.get("sections", []))
     db.session.commit()
     db.session.bulk_save_objects(test_data.get("forms", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("pages", []))
-    db.session.commit()
-    add_default_page_paths(db, test_data.get("default_next_pages", []))
-    db.session.bulk_save_objects(test_data.get("criteria", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("subcriteria", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("themes", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("lists", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("components", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("conditions", []))
-    db.session.commit()
-    db.session.bulk_save_objects(test_data.get("page_conditions", []))
     db.session.commit()

@@ -45,7 +45,7 @@ def get_form_by_template_name(template_name: str) -> Form:
     return form
 
 
-# CRUD operations for Section, Form, Page, and Component
+# CRUD operations for Section and Form
 # CRUD SECTION
 def insert_new_section(new_section_config):
     """
