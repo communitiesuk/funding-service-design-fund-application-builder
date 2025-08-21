@@ -6,7 +6,6 @@ from app.db.models import (
     Form,
     Fund,
     Organisation,
-    Page,
     Round,
     Section,
 )
@@ -442,14 +441,6 @@ def fund_without_assessment() -> dict:
         "sections": [f2_r1_s1, f2_r1_s2],
         "forms": [f2_r1_s1_f1, f2_r1_s1_f2],
     }
-
-
-def add_default_page_paths(db, default_next_page_config):
-    # set up the default paths
-    for page_config in default_next_page_config:
-        page = Page.query.filter_by(page_id=page_config["page_id"]).first()
-        page.default_next_page_id = page_config["default_next_page_id"]
-    db.session.commit()
 
 
 def insert_test_data(db, test_data=None):
