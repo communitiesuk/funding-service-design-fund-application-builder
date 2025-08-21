@@ -109,6 +109,12 @@
                 <p class="govuk-body">
                     <a class="govuk-link" href="{{ url_for('application_bp.create_export_files', round_id=round.round_id) }}">Download application ZIP file</a>
                 </p>
+                {% if config.FLASK_ENV == 'development' %}
+                <form method="POST" action="{{ url_for('round_bp.publish_to_pre_award', round_id=round.round_id) }}" style="margin-top: 20px;">
+                    {{ govukButton({ "text": "Send to Pre-Award (Dev Only)", "type": "submit", "classes": "govuk-button--secondary" }) }}
+                </form>
+                <p class="govuk-body-s" style="color: #505a5f; margin-top: 10px;">Developer feature: Only visible in development</p>
+                {% endif %}
             </div>
             <div class="govuk-grid-column-one-third govuk-!-text-align-right">
                 <p class="govuk-body">
