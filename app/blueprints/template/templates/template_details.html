@@ -9,7 +9,7 @@
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l">{{ form.template_name }}</h1>
             <p class="govuk-body">
-                <a class='govuk-link govuk-link--no-visited-state'
+                <a class='govuk-link'
                    target="_blank"
                    href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
                     Preview template (opens in a new tab)
@@ -28,7 +28,7 @@
                         "actions": {
                             "items": [
                                 {
-                                "classes": "govuk-link--no-visited-state",
+                                "classes": "",
                                 "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, actions='template_details', _anchor=form_obj.template_name.id),
                                 "text": "Change",
                                 "visuallyHiddenText": "Template name",
@@ -42,7 +42,7 @@
                         "actions": {
                             "items": [
                                 {
-                                "classes": "govuk-link--no-visited-state",
+                                "classes": "",
                                 "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, actions='template_details', _anchor=form_obj.tasklist_name.id),
                                 "text": "Change",
                                 "visuallyHiddenText": "Task name",
@@ -56,7 +56,7 @@
                         "actions": {
                             "items": [
                                 {
-                                "classes": "govuk-link--no-visited-state",
+                                "classes": "",
                                 "href": url_for(endpoint="template_bp.edit_template", form_id=form.form_id, actions='template_details', _anchor=form_obj.file.id),
                                 "text": "Change",
                                 "visuallyHiddenText": "Template JSON file",
@@ -71,7 +71,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <p class="govuk-body">
-                <a class='govuk-link govuk-link--no-visited-state'
+                <a class='govuk-link'
                    href='{{ url_for("template_bp.template_questions", form_id=form.form_id) }}'>
                     View template questions
                 </a>
