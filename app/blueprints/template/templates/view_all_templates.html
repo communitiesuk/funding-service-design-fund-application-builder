@@ -20,7 +20,7 @@
         <p class="govuk-body">
             View existing templates or upload a new template you have created using
             <br>
-            <a class="govuk-link govuk-link--no-visited-state"
+            <a class='govuk-link'
                target="_blank"
                href="{{ form_designer_url }}">Form Designer (opens in a new tab)</a>.
         </p>
@@ -61,13 +61,13 @@
         {% for form in pagination.items %}
 
         {% set form_link %}
-        <a class='govuk-link govuk-link--no-visited-state'
+        <a class='govuk-link'
            href='{{ url_for('template_bp.template_details', form_id=form.form_id) }}'>{{ form.template_name }}</a>
         {% endset %}
 
         {% set form_preview_link %}
-        <a class='govuk-link govuk-link--no-visited-state'
-        target="_blank"
+        <a class='govuk-link'
+           target="_blank"
         href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
             Preview <span class="govuk-visually-hidden">{{ form.template_name }} form</span> in a new tab</a>
         {% endset %}

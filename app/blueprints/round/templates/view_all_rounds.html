@@ -35,7 +35,7 @@
         {% for round in pagination.items %}
 
         {% set round_detail_link %}
-        <a class='govuk-link govuk-link--no-visited-state'
+        <a class='govuk-link'
            href='{{ url_for("round_bp.round_details", round_id=round.round_id) }}'>
             Apply for {{ round.fund.title_json["en"] }}</a>
         {% endset %}
@@ -47,7 +47,7 @@
         {% endset %}
 
         {% set action_link %}
-        <a class='govuk-link govuk-link--no-visited-state'
+        <a class='govuk-link'
         href='{{ url_for("application_bp.build_application", round_id=round.round_id) }}'>
             {% if round.status == 'Complete' %}View application<span class="govuk-visually-hidden"> for {{ round.fund.title_json["en"] }} {{ round.title_json["en"] }}</span>{% else %}Build application<span class="govuk-visually-hidden"> for {{ round.fund.title_json["en"] }} {{ round.title_json["en"] }}</span>{% endif %}
         </a>

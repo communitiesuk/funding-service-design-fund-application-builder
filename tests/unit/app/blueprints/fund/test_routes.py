@@ -330,7 +330,7 @@ def test_view_fund_details(flask_test_client, seed_dynamic_data):
     html = response.data.decode("utf-8")
     assert f'<h1 class="govuk-heading-l">{test_fund.name_json["en"]}</h1>' in html
     assert (
-        f'<a class="govuk-link govuk-link--no-visited-state" href="/grants/{test_fund.fund_id}/edit#name_en">Change'
+        f'<a class="govuk-link" href="/grants/{test_fund.fund_id}/edit#name_en">Change'
         f'<span class="govuk-visually-hidden"> Grant name</span></a>' in html  # noqa: E501
     )
     assert "Back" in html
