@@ -4,7 +4,6 @@ FORM_SCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",  # NOSONAR
     "type": "object",
     "properties": {
-        "name": {"type": "string"},
         "startPage": {"type": "string"},
         "sections": {"type": "array"},
         "pages": {
@@ -54,7 +53,6 @@ FORM_SCHEMA = {
     },
     "required": [
         "startPage",
-        "name",
         "pages",
         "lists",
         "conditions",
