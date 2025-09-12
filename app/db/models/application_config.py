@@ -6,10 +6,11 @@ from enum import Enum
 from typing import List
 
 from flask_sqlalchemy.model import DefaultMeta
-from sqlalchemy import Column, ForeignKey, Integer, String, inspect
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, inspect
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.sql import func
 from sqlalchemy.types import Boolean
 
 from app.db import db
@@ -111,6 +112,8 @@ class Form(BaseModel):
     runner_publish_name = Column(db.String())
     source_template_id = Column(UUID(as_uuid=True), nullable=True)
     form_json = Column(JSON(none_as_null=True), nullable=False, default=lambda: {})
+    created_at = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, onupdate=func.now(), nullable=True)
 
     def __repr__(self):
         return f"Form({self.section_index}, {self.runner_publish_name}" + f"- {self.name_in_apply_json['en']})"
