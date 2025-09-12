@@ -176,6 +176,7 @@ def create_new_round(form, user="dummy_user"):
             "en": convert_form_data_to_json(form.eoi_decision_schema_en.data),
             "cy": convert_form_data_to_json(form.eoi_decision_schema_cy.data),
         },
+        created_at=datetime.now(),
     )
     add_round(new_round)
     return new_round
