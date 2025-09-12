@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -154,6 +155,7 @@ def insert_new_form(
         section_index=None,
         runner_publish_name=runner_publish_name,
         form_json=form_json,
+        created_at=datetime.now(),
     )
     try:
         db.session.add(form)

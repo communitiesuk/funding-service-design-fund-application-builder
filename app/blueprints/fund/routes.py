@@ -84,6 +84,7 @@ def create_fund():
             ggis_scheme_reference_number=(
                 form.ggis_scheme_reference_number.data if form.ggis_scheme_reference_number.data else ""
             ),
+            created_at=datetime.now(),
         )
 
         add_fund(new_fund)

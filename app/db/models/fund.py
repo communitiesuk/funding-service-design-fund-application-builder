@@ -4,10 +4,11 @@ from enum import Enum
 from typing import TYPE_CHECKING, List
 
 from flask_sqlalchemy.model import DefaultMeta
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import ENUM, JSON, UUID
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.sql import func
 from sqlalchemy.types import Boolean
 
 from app.db import db
@@ -75,5 +76,7 @@ class Fund(BaseModel):
     owner_organisation: Mapped["Organisation"] = relationship("Organisation", back_populates="funds")
     funding_type = Column(ENUM(FundingType), nullable=False, unique=False)
     ggis_scheme_reference_number = Column("ggis_scheme_reference_number", db.String(255), nullable=True, unique=False)
+    created_at = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, onupdate=func.now(), nullable=True)
 
     rounds: Mapped[List["Round"]] = relationship("Round", back_populates="fund", passive_deletes="all")
