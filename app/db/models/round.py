@@ -7,6 +7,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, Sequence, String, 
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm import Mapped, relationship
+from sqlalchemy.sql import func
 from sqlalchemy.types import Boolean
 
 from app.db import db
@@ -74,6 +75,8 @@ class Round(BaseModel):
         server_default=base_path_seq.next_value(),
     )
     status = Column(String(), default="In progress", nullable=False)
+    created_at = Column(DateTime, nullable=True)
+    updated_at = Column(DateTime, onupdate=func.now(), nullable=True)
 
     fund: Mapped["Fund"] = relationship("Fund", back_populates="rounds")
 
