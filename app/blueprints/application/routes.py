@@ -21,6 +21,7 @@ from app.db.queries.application import (
     delete_section_from_round,
     get_form_by_id,
     get_section_by_id,
+    insert_new_form,
     insert_new_section,
     move_form_down,
     move_form_up,
@@ -28,7 +29,6 @@ from app.db.queries.application import (
     move_section_up,
     update_section,
 )
-from app.db.queries.clone import clone_single_form
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_round_by_id, update_round
 from app.export_config.generate_all_questions import generate_html
@@ -36,10 +36,8 @@ from app.export_config.generate_assessment_config import (
     generate_assessment_config_for_round,
 )
 from app.export_config.generate_fund_round_config import generate_config_for_round
-from app.export_config.generate_fund_round_form_jsons import (
-    generate_form_jsons_for_round,
-)
 from app.export_config.generate_fund_round_html import generate_all_round_html
+from app.shared.form_store_api import FormStoreAPIService
 from app.shared.forms import DeleteConfirmationForm, SelectFundForm
 from app.shared.helpers import flash_message
 from config import Config
@@ -140,12 +138,16 @@ def view_all_questions(round_id):
     Generates the form data for all sections in the selected round, then uses that to generate the 'All Questions'
     data for that round and returns that to render in a template.
     """
+    api_service = FormStoreAPIService()
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     sections_in_round = round.sections
     section_data = []
     for section in sections_in_round:
-        forms = [{"name": form.runner_publish_name, "form_data": form.form_json} for form in section.forms]
+        forms = []
+        for form in section.forms:
+            configuration = api_service.get_published_form(form.form_name)
+            forms.append({"name": form.form_name, "form_data": configuration})
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(
@@ -169,7 +171,6 @@ def create_export_files(round_id):
     # Construct the path to the output directory relative to this file's location
     random_post_fix = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     base_output_dir = Config.TEMP_FILE_PATH / f"{round_short_name}-{random_post_fix}"
-    generate_form_jsons_for_round(round_id, base_output_dir)
     generate_all_round_html(round_id, base_output_dir)
     fund_config, round_config = generate_config_for_round(round_id, base_output_dir)
     generate_assessment_config_for_round(fund_config, round_config, base_output_dir)
@@ -197,6 +198,18 @@ def section(round_id, section_id=None):
     params = {
         "round_id": str(round_id),
     }
+    if request.method == "GET":
+        choices = [("", "Select a template")]
+        api_service = FormStoreAPIService()
+        published_forms = api_service.get_published_forms()
+        for published_form in published_forms:
+            form_name = published_form.name
+            display_name = (
+                published_form.name
+            )  # TODO: I think we need to add a new field to FormDefinition for display name
+            if form_name:
+                choices.append((form_name, display_name))
+        form.template_id.choices = choices
     if form.validate_on_submit():
         if not form.add_form.data:
             count_existing_sections = len(round_obj.sections)
@@ -219,10 +232,9 @@ def section(round_id, section_id=None):
                 flash_message("Section added")
             return redirect(url_for("application_bp.build_application", round_id=round_obj.round_id))
 
-        # clone template json if Add button is clicked
         section = get_section_by_id(section_id=section_id)
         new_section_index = max(len(section.forms) + 1, 1)
-        clone_single_form(form_id=form.template_id.data, new_section_id=section_id, section_index=new_section_index)
+        insert_new_form(section_id=section.section_id, form_name=form.template_id.data, section_index=new_section_index)
         form.template_id.data = ""  # Reset the template_id field to default after adding
 
     if section_id:
@@ -287,14 +299,18 @@ def view_form_questions(round_id, section_id, form_id):
     Generates the form data for this form, then uses that to generate the 'All Questions'
     data for that form and returns that to render in a template.
     """
+    api_service = FormStoreAPIService()
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     form = get_form_by_id(form_id=form_id)
-    start_page = next((p for p in form["pages"] if p["controller"] and p["controller"].endswith("start.js")), None)
+    configuration = api_service.get_published_form(form.form_name)
+    start_page = next(
+        (p for p in configuration["pages"] if p.get("controller") and p["controller"].endswith("start.js")), None
+    )
     section_data = [
         {
-            "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
-            "forms": [{"name": form.runner_publish_name, "form_data": form.form_json}],
+            "section_title": f"Preview of form [{form.form_name}]",
+            "forms": [{"name": form.form_name, "form_data": configuration}],
         }
     ]
 
@@ -308,6 +324,6 @@ def view_form_questions(round_id, section_id, form_id):
         round=round,
         fund=fund,
         question_html=html,
-        title=start_page.name_in_apply_json["en"],
+        title=start_page["title"],
         all_questions_view=False,
     )

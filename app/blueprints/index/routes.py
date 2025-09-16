@@ -1,6 +1,5 @@
 import uuid
 
-import requests
 from flask import Blueprint, g, redirect, render_template, session, url_for
 from fsd_utils.authentication.decorators import login_requested
 
@@ -43,18 +42,9 @@ def preview_form(form_id):
     'runner_publish_name' of that form. Returns a redirect to that form in the form-runner
     """
     form = get_form_by_id(form_id)
-    form_json = form.form_json
-    form_id = form.runner_publish_name
-
-    try:
-        publish_response = requests.post(
-            url=Config.FORM_RUNNER_PUBLISH_URL, json={"id": form_id, "configuration": form_json}
-        )
-        if not str(publish_response.status_code).startswith("2"):
-            return "Error during form publish", 500
-    except Exception as e:
-        return f"unable to publish form: {str(e)}", 500
-    return redirect(f"{Config.FORM_RUNNER_EXTERNAL_HOST}/{form_id}?form_session_identifier=preview/{uuid.uuid4()}")
+    return redirect(
+        f"{Config.FORM_RUNNER_EXTERNAL_HOST}/{form.form_name}?form_session_identifier=preview/{uuid.uuid4()}"
+    )
 
 
 @index_bp.route("/back")

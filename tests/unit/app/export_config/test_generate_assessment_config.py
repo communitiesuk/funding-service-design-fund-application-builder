@@ -32,11 +32,8 @@ class TestGenerateAssessmentConfig:
         return fund_config, round_config
 
     @pytest.fixture
-    def mock_form_data(self):
-        mock_form = Mock()
-        mock_form.runner_publish_name = "test-form"
-        mock_form.name_in_apply_json = {"en": "Test Form"}
-        mock_form.form_json = {
+    def mock_form_json(self):
+        return {
             "pages": [
                 {
                     "path": "/contact",
@@ -55,6 +52,26 @@ class TestGenerateAssessmentConfig:
             ]
         }
 
+    @pytest.fixture
+    def mock_form_json_read_only(self):
+        return {
+            "pages": [
+                {
+                    "path": "/readonly",
+                    "title": "Readonly Page",
+                    "components": [
+                        {"name": "html_field", "type": "Html", "title": "HTML"},
+                        {"name": "para_field", "type": "Para", "title": "Paragraph"},
+                    ],
+                }
+            ]
+        }
+
+    @pytest.fixture
+    def mock_form_data(self):
+        mock_form = Mock()
+        mock_form.form_name = "test-form"
+
         mock_section = Mock()
         mock_section.name_in_apply_json = {"en": "Application Details"}
         mock_section.forms = [mock_form]
@@ -67,7 +84,15 @@ class TestGenerateAssessmentConfig:
     @patch("app.export_config.generate_assessment_config.form_json_to_assessment_display_types")
     @patch("app.export_config.generate_assessment_config.human_to_kebab_case")
     def test_basic_config_generation(
-        self, mock_kebab, mock_display_types, mock_helpers, mock_db, mock_deepcopy, configs, mock_form_data
+        self,
+        mock_kebab,
+        mock_display_types,
+        mock_helpers,
+        mock_db,
+        mock_deepcopy,
+        configs,
+        mock_form_json,
+        mock_form_data,
     ):
         fund_config, round_config = configs
         mock_kebab.side_effect = lambda x: x.lower().replace(" ", "-")
@@ -82,7 +107,10 @@ class TestGenerateAssessmentConfig:
         mock_deepcopy.return_value = mock_template
 
         # Run function
-        generate_assessment_config_for_round(fund_config, round_config, "/output")
+        with patch("app.export_config.generate_assessment_config.FormStoreAPIService") as mock_form_store_api:
+            mock_api_instance = mock_form_store_api.return_value
+            mock_api_instance.get_published_form.return_value = mock_form_json
+            generate_assessment_config_for_round(fund_config, round_config, "/output")
 
         # Verify template was called with correct parameters
         mock_template.substitute.assert_called_once()
@@ -100,7 +128,15 @@ class TestGenerateAssessmentConfig:
     @patch("app.export_config.generate_assessment_config.form_json_to_assessment_display_types")
     @patch("app.export_config.generate_assessment_config.human_to_kebab_case")
     def test_unscored_data_structure(
-        self, mock_kebab, mock_display_types, mock_helpers, mock_db, mock_deepcopy, configs, mock_form_data
+        self,
+        mock_kebab,
+        mock_display_types,
+        mock_helpers,
+        mock_db,
+        mock_deepcopy,
+        configs,
+        mock_form_json,
+        mock_form_data,
     ):
         fund_config, round_config = configs
         mock_kebab.side_effect = lambda x: x.lower().replace(" ", "-")
@@ -112,7 +148,11 @@ class TestGenerateAssessmentConfig:
         mock_template.substitute.return_value = "config"
         mock_deepcopy.return_value = mock_template
 
-        generate_assessment_config_for_round(fund_config, round_config, "/output")
+        # Run function
+        with patch("app.export_config.generate_assessment_config.FormStoreAPIService") as mock_form_store_api:
+            mock_api_instance = mock_form_store_api.return_value
+            mock_api_instance.get_published_form.return_value = mock_form_json
+            generate_assessment_config_for_round(fund_config, round_config, "/output")
 
         # Check the unscored data structure
         call_args = mock_template.substitute.call_args[1]
@@ -126,7 +166,7 @@ class TestGenerateAssessmentConfig:
         # Should have one sub_criteria (form)
         assert len(criteria["sub_criteria"]) == 1
         sub_criteria = criteria["sub_criteria"][0]
-        assert sub_criteria["name"] == "Test Form"
+        assert sub_criteria["name"] == "test-form"
 
         # Should have one theme (page, summary skipped)
         assert len(sub_criteria["themes"]) == 1
@@ -149,40 +189,31 @@ class TestGenerateAssessmentConfig:
     @patch("app.export_config.generate_assessment_config.form_json_to_assessment_display_types")
     @patch("app.export_config.generate_assessment_config.human_to_kebab_case")
     def test_readonly_components_filtered(
-        self, mock_kebab, mock_display_types, mock_helpers, mock_db, mock_deepcopy, configs
+        self,
+        mock_kebab,
+        mock_display_types,
+        mock_helpers,
+        mock_db,
+        mock_deepcopy,
+        configs,
+        mock_form_json_read_only,
+        mock_form_data,
     ):
         fund_config, round_config = configs
         mock_kebab.side_effect = lambda x: x.lower().replace(" ", "-")
         mock_display_types.get.return_value = "text"
 
-        # Create form with only readonly components
-        mock_form = Mock()
-        mock_form.runner_publish_name = "readonly-form"
-        mock_form.name_in_apply_json = {"en": "Readonly Form"}
-        mock_form.form_json = {
-            "pages": [
-                {
-                    "path": "/readonly",
-                    "title": "Readonly Page",
-                    "components": [
-                        {"name": "html_field", "type": "Html", "title": "HTML"},
-                        {"name": "para_field", "type": "Para", "title": "Paragraph"},
-                    ],
-                }
-            ]
-        }
-
-        mock_section = Mock()
-        mock_section.name_in_apply_json = {"en": "Test"}
-        mock_section.forms = [mock_form]
-
-        mock_db.session.query.return_value.filter.return_value.order_by.return_value.all.return_value = [mock_section]
+        mock_db.session.query.return_value.filter.return_value.order_by.return_value.all.return_value = mock_form_data
 
         mock_template = Mock()
         mock_template.substitute.return_value = "config"
         mock_deepcopy.return_value = mock_template
 
-        generate_assessment_config_for_round(fund_config, round_config, "/output")
+        # Run function
+        with patch("app.export_config.generate_assessment_config.FormStoreAPIService") as mock_form_store_api:
+            mock_api_instance = mock_form_store_api.return_value
+            mock_api_instance.get_published_form.return_value = mock_form_json_read_only
+            generate_assessment_config_for_round(fund_config, round_config, "/output")
 
         # Should have no answers since all components are readonly
         call_args = mock_template.substitute.call_args[1]
@@ -206,7 +237,10 @@ class TestGenerateAssessmentConfig:
         mock_template.substitute.return_value = "config"
         mock_deepcopy.return_value = mock_template
 
-        generate_assessment_config_for_round(fund_config, round_config, "/output")
+        with patch("app.export_config.generate_assessment_config.FormStoreAPIService") as mock_form_store_api:
+            mock_api_instance = mock_form_store_api.return_value
+            mock_api_instance.get_published_form.return_value = {}
+            generate_assessment_config_for_round(fund_config, round_config, "/output")
 
         # Should have empty unscored list
         call_args = mock_template.substitute.call_args[1]

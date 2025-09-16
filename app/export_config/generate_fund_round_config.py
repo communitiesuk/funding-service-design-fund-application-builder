@@ -60,20 +60,15 @@ def generate_application_display_config(round_id):
         for original_form in forms:
             # Create a deep copy of the form object
             form = copy.deepcopy(original_form)
-            form.name_in_apply_json["en"] = f"{section.index}.{form.section_index} {form.name_in_apply_json['en']}"
-            form.name_in_apply_json["cy"] = (
-                f"{section.index}.{form.section_index} {form.name_in_apply_json['cy']}"
-                if form.name_in_apply_json.get("cy")
-                else ""
-            )
-            form.runner_publish_name = {
-                "en": form.runner_publish_name,
+            name_in_apply_json = {"en": f"{section.index}.{form.section_index} {form.form_name}", "cy": ""}
+            form_name_json = {
+                "en": form.form_name,
                 "cy": "",
             }
             ordered_sections.append(
                 FundSectionForm(
-                    section_name=form.name_in_apply_json,
-                    form_name_json=form.runner_publish_name,
+                    section_name=name_in_apply_json,
+                    form_name_json=form_name_json,
                     tree_path=f"{application_base_path}.{section.index}.{form.section_index}",
                 ).as_dict()
             )

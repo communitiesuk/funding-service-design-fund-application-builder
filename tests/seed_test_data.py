@@ -238,18 +238,14 @@ def init_salmon_fishing_fund():
     f1: Form = Form(
         form_id=uuid4(),
         section_id=s1.section_id,
-        name_in_apply_json={"en": "About your organisation"},
+        form_name="about-your-org",
         section_index=1,
-        runner_publish_name="about-your-org",
-        form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
     f2: Form = Form(
         form_id=uuid4(),
         section_id=s1.section_id,
-        name_in_apply_json={"en": "Contact Details"},
+        form_name="contact-details",
         section_index=2,
-        runner_publish_name="contact-details",
-        form_json=CONTACT_DETAILS_FORM_JSON,
     )
     fd: Fund = Fund(
         fund_id=uuid4(),
@@ -338,11 +334,8 @@ def init_unit_test_data() -> dict:
     f1: Form = Form(
         form_id=uuid4(),
         section_id=s1.section_id,
-        name_in_apply_json={"en": "About your organisation"},
+        form_name="about-your-org",
         section_index=1,
-        runner_publish_name="about-your-org",
-        template_name="About your organization template",
-        form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
 
     return {
@@ -418,21 +411,15 @@ def fund_without_assessment() -> dict:
     f2_r1_s1_f1: Form = Form(
         form_id=uuid4(),
         section_id=f2_r1_s1.section_id,
-        name_in_apply_json={"en": "About your organisation"},
+        form_name="about-your-org",
         section_index=1,
-        runner_publish_name="about-your-org",
-        template_name="About your organization template",
-        form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
 
     f2_r1_s1_f2: Form = Form(
         form_id=uuid4(),
         section_id=f2_r1_s2.section_id,
-        name_in_apply_json={"en": "About your organisation 2"},
+        form_name="about-your-org",
         section_index=1,
-        runner_publish_name="about-your-org",
-        template_name="About your organization template",
-        form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
     return {
         "funds": [f2],

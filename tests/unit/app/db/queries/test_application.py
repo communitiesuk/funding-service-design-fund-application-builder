@@ -19,7 +19,6 @@ from app.db.queries.application import (
     move_section_down,
     move_section_up,
     swap_elements_in_list,
-    update_form,
     update_section,
 )
 from tests.helpers import get_round_by_id
@@ -43,13 +42,17 @@ new_section_config = {
 
 
 @pytest.fixture
-def test_form() -> Form:
+def test_section() -> Section:
+    return Section(**new_section_config)
+
+
+@pytest.fixture
+def test_form(test_section: Section) -> Form:
     """Fixture that creates a test form with default values."""
     return insert_new_form(
-        form_name="Test form name",
-        template_name="Test template name",
-        runner_publish_name="test-template-name",
-        form_json={},
+        section_id=test_section.section_id,
+        form_name="test-template-name",
+        section_index=0,
     )
 
 
@@ -157,32 +160,15 @@ def test_failed_delete_section_with_fk_to_forms(
     assert existing_section is not None, "Section was unexpectedly deleted"
 
 
-def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_data):
+def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_section):
     new_form: Form = insert_new_form(
-        form_name="Test form name",
-        template_name="Test template name",
-        runner_publish_name="test-template-name",
-        form_json={},
+        section_id=test_section.section_id,
+        form_name="test-form-name",
+        section_index=0,
     )
-    assert new_form.name_in_apply_json == {"en": "Test form name"}
-    assert new_form.template_name == "Test template name"
-    assert new_form.runner_publish_name == "test-template-name"
-
-
-def test_update_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
-    assert test_form.name_in_apply_json == {"en": "Test form name"}
-    assert test_form.template_name == "Test template name"
-    assert test_form.runner_publish_name == "test-template-name"
-
-    updated_form: Form = update_form(
-        form_id=test_form.form_id,
-        form_name="Updated form name",
-        template_name="Updated template name",
-    )
-
-    assert updated_form.form_id == test_form.form_id
-    assert updated_form.name_in_apply_json == {"en": "Updated form name"}
-    assert updated_form.template_name == "Updated template name"
+    assert new_form.section_id == test_section.section_id
+    assert new_form.form_name == "test-form-name"
+    assert new_form.section_index == 0
 
 
 def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
@@ -213,7 +199,7 @@ section_id = uuid4()
 @pytest.mark.seed_config(
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
-        "forms": [Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"})],
+        "forms": [Form(form_id=uuid4(), section_id=section_id, form_name="Form 1", section_index=1)],
     }
 )
 def test_form_sorting(seed_dynamic_data, _db):
@@ -223,9 +209,7 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert len(result_section.forms) == 1
 
     # add a form at index 2, confirm ordering
-    form2: Form = Form(
-        form_id=uuid4(), section_id=section.section_id, section_index=2, name_in_apply_json={"en": "Form 2"}
-    )
+    form2: Form = Form(form_id=uuid4(), section_id=section.section_id, form_name="Form 2", section_index=2)
     _db.session.add(form2)
     _db.session.commit()
 
@@ -236,7 +220,10 @@ def test_form_sorting(seed_dynamic_data, _db):
 
     # add a form at index 0, confirm ordering
     form0: Form = Form(
-        form_id=uuid4(), section_id=section.section_id, section_index=0, name_in_apply_json={"en": "Form 0"}
+        form_id=uuid4(),
+        section_id=section.section_id,
+        form_name="Form 0",
+        section_index=0,
     )
     _db.session.add(form0)
     _db.session.commit()
@@ -248,7 +235,7 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert result_section.forms[2].form_id == form2.form_id
 
     # insert a form between 1 and 2, check ordering
-    formX: Form = Form(form_id=uuid4(), section_id=section.section_id, name_in_apply_json={"en": "Form X"})
+    formX: Form = Form(form_id=uuid4(), section_id=section.section_id, form_name="Form X")
     result_section.forms.insert(2, formX)
     _db.session.bulk_save_objects([result_section])
     _db.session.commit()
@@ -269,9 +256,9 @@ section_id = uuid4()
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
         "forms": [
-            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+            Form(form_id=uuid4(), section_id=section_id, form_name="Form 1", section_index=1),
+            Form(form_id=uuid4(), section_id=section_id, form_name="Form 2", section_index=2),
+            Form(form_id=uuid4(), section_id=section_id, form_name="Form 3", section_index=3),
         ],
     }
 )
@@ -480,9 +467,9 @@ section_id = uuid4()
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
         "forms": [
-            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+            Form(form_id=uuid4(), section_id=section_id, form_name="Form 1", section_index=1),
+            Form(form_id=uuid4(), section_id=section_id, form_name="Form 2", section_index=2),
+            Form(form_id=uuid4(), section_id=section_id, form_name="Form 3", section_index=3),
         ],
     }
 )
@@ -514,9 +501,9 @@ section_id = uuid4()
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
         "forms": [
-            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+            Form(form_id=uuid4(), section_id=section_id, form_name="Form 1", section_index=1),
+            Form(form_id=uuid4(), section_id=section_id, form_name="Form 2", section_index=2),
+            Form(form_id=uuid4(), section_id=section_id, form_name="Form 3", section_index=3),
         ],
     }
 )

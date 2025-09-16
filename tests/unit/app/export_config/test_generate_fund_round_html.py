@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from bs4 import BeautifulSoup
 
@@ -6,6 +8,7 @@ from app.export_config.generate_fund_round_html import (
     frontend_html_suffix,
     generate_all_round_html,
 )
+from tests.seed_test_data import ABOUT_YOUR_ORG_FORM_JSON
 
 
 def test_generate_fund_round_html(seed_dynamic_data, temp_output_dir):
@@ -13,8 +16,13 @@ def test_generate_fund_round_html(seed_dynamic_data, temp_output_dir):
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
     fund_short_name = seed_dynamic_data["funds"][0].short_name
+
     # Execute: Call the function with valid inputs
-    generate_all_round_html(round_id)
+    with patch("app.export_config.generate_fund_round_html.FormStoreAPIService") as mock_form_store_api:
+        mock_api_instance = mock_form_store_api.return_value
+        mock_api_instance.get_published_form.return_value = ABOUT_YOUR_ORG_FORM_JSON
+        generate_all_round_html(round_id)
+
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {

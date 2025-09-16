@@ -27,6 +27,7 @@ class DefaultConfig(object):
     FORM_DESIGNER_URL_REDIRECT = getenv(
         "FORM_DESIGNER_EXTERNAL_HOST", "https://form-designer.communities.gov.localhost:3000"
     )
+    FORM_STORE_API_HOST = getenv("FORM_STORE_API_HOST", "https://api.communities.gov.localhost:4004/forms")
     SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URL")
 
     TEMP_FILE_PATH = Path("/tmp")
