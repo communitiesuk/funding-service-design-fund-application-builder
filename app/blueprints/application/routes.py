@@ -290,14 +290,12 @@ def view_form_questions(round_id, section_id, form_id):
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     form = get_form_by_id(form_id=form_id)
-    start_page = next((p for p in form["pages"] if p["controller"] and p["controller"].endswith("start.js")), None)
     section_data = [
         {
-            "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
+            "section_title": "",  # Not used
             "forms": [{"name": form.runner_publish_name, "form_data": form.form_json}],
         }
     ]
-
     print_data = generate_print_data_for_sections(
         section_data,
         lang="en",
@@ -308,6 +306,6 @@ def view_form_questions(round_id, section_id, form_id):
         round=round,
         fund=fund,
         question_html=html,
-        title=start_page.name_in_apply_json["en"],
+        title=f"Preview of form [{form.name_in_apply_json['en']}]",
         all_questions_view=False,
     )
