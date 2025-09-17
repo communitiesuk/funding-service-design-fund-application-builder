@@ -1,3 +1,6 @@
+import re
+
+
 def determine_display_value_for_condition(
     condition_value: str,
     list_name: str = None,
@@ -89,13 +92,7 @@ def strip_leading_numbers(text: str) -> str:
     Returns:
         str: Stripped string, eg. `A Title`
     """
-    result = text
-    for char in text:
-        if char == " ":
-            break
-        if char.isdigit() or char == ".":
-            result = result[1:]  # strip this character
-    return result.strip()
+    return re.sub(r"^[\d.\s]+", "", text).strip()
 
 
 def build_section_header(section_title, lang: str = "en"):
