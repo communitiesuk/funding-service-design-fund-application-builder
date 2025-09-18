@@ -6,6 +6,7 @@ from app.db import db
 from app.db.models import Form, Section
 from app.db.models.application_config import READ_ONLY_COMPONENTS, ComponentType
 from app.export_config import helpers
+from app.shared.form_store_api import FormStoreAPIService
 from app.shared.helpers import find_enum, human_to_kebab_case
 
 
@@ -23,6 +24,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
     # Each form is a sub-critiera, each page a theme. Half scored, half unscored.
     # The output in the assessment_store folder needs to be added to the
     # assessment_mapping_fund_round file in assessment-store
+    api_service = FormStoreAPIService()
     fund_id = fund_config["id"]
     round_id = round_config["id"]
     fund_short_name = fund_config["short_name"]
@@ -43,13 +45,14 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
         unscored.append(criteria)
 
         for form in section.forms:
+            configuration = api_service.get_published_form(form.form_name)
             form: Form
             sc = {
-                "id": form.runner_publish_name,
-                "name": form.name_in_apply_json["en"],
+                "id": form.form_name,
+                "name": form.form_name,  # TODO: We should use some display name
                 "themes": [],
             }
-            for page in form.form_json.get("pages"):
+            for page in configuration.get("pages"):
                 page: dict
                 if page.get("path").lstrip("/") == "summary":
                     continue
@@ -65,7 +68,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
                         continue
                     answer = {
                         "field_id": component.get("name"),
-                        "form_name": form.runner_publish_name,
+                        "form_name": form.form_name,
                         "field_type": component_type.value[0].lower() + component_type.value[1:],
                         "presentation_type": form_json_to_assessment_display_types.get(component_type.name, "text"),
                         "question": component.get("title"),

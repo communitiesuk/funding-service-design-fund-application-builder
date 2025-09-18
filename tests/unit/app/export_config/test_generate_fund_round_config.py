@@ -41,7 +41,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                         "requires_feedback": None,
                     },
                     {
-                        "section_name": {"en": "1.1 About your organisation", "cy": ""},
+                        "section_name": {"en": "1.1 about-your-org", "cy": ""},
                         "form_name_json": {"en": "about-your-org", "cy": ""},
                     },
                 ],

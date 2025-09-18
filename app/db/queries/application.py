@@ -1,6 +1,4 @@
-from datetime import datetime
-from typing import Any
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from flask import current_app
 from flask_sqlalchemy.pagination import Pagination
@@ -138,24 +136,12 @@ def delete_section(section_id, cascade: bool = False):
 
 
 # CRUD FORM
-def insert_new_form(
-    form_name: str,  # Name as it appears in the Apply tasklist
-    template_name: str,  # Our own internal name for the template
-    runner_publish_name: str,  # Unique URL-friendly identifier used in request to Form Runner
-    form_json: dict[str, Any],
-) -> Form:
+def insert_new_form(section_id: str, form_name: str, section_index: int) -> Form:
     form = Form(
         form_id=uuid4(),
-        section_id=None,
-        name_in_apply_json={"en": form_name},
-        is_template=True,
-        template_name=template_name,
-        source_template_id=None,
-        audit_info=None,
-        section_index=None,
-        runner_publish_name=runner_publish_name,
-        form_json=form_json,
-        created_at=datetime.now(),
+        section_id=section_id,
+        form_name=form_name,
+        section_index=section_index,
     )
     try:
         db.session.add(form)
@@ -164,27 +150,6 @@ def insert_new_form(
         db.session.rollback()
         current_app.logger.error(e)
         raise e
-    return form
-
-
-def update_form(
-    form_id: UUID,
-    form_name: str,  # Name as it appears in the Apply tasklist
-    template_name: str,  # Our own internal name for the template
-    form_json: dict[str, Any] | None = None,
-):
-    form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    if form:
-        form.name_in_apply_json = {"en": form_name}
-        form.template_name = template_name
-        if form_json is not None:
-            form.form_json = form_json
-        try:
-            db.session.commit()
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            current_app.logger.error(e)
-            raise e
     return form
 
 
