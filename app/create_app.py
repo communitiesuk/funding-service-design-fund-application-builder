@@ -14,6 +14,7 @@ from app.blueprints.fund.routes import fund_bp
 from app.blueprints.index.routes import index_bp
 from app.blueprints.round.routes import round_bp
 from app.blueprints.template.routes import template_bp
+from app.shared.helpers import to_london_time
 from app.shared.page_tracker import PageTracker
 from config import Config
 
@@ -39,6 +40,11 @@ def protect_private_routes(flask_app: Flask) -> Flask:
 def create_app() -> Flask:
     init_sentry()
     flask_app = Flask("__name__", static_url_path="/assets")
+
+    @flask_app.context_processor
+    def inject_helpers():
+        return {"to_london_time": to_london_time}
+
     flask_app.register_blueprint(index_bp)
     flask_app.register_blueprint(fund_bp)
     flask_app.register_blueprint(round_bp)

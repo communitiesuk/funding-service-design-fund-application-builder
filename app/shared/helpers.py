@@ -1,4 +1,5 @@
 from dataclasses import asdict, is_dataclass
+from zoneinfo import ZoneInfo
 
 from flask import flash, render_template
 
@@ -57,3 +58,15 @@ def human_to_kebab_case(string: str) -> str | None:
 
 def human_to_snake_case(string: str) -> str | None:
     return string.replace(" ", "_").strip().lower() if string else None
+
+
+def to_london_time(dt):
+    """
+    Converts a datetime object to Europe/London local time.
+    """
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        # Assume UTC if naive
+        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+    return dt.astimezone(ZoneInfo("Europe/London"))

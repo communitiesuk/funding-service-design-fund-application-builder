@@ -154,6 +154,12 @@
                             ]
                         }
                     },
+                    {
+                        "key": {"text": "Last updated"},
+                        "value": {
+                            "text": (to_london_time(fund.updated_at or fund.created_at).strftime('%-d %B %Y, %H:%M'))
+                        },
+                    } if fund.updated_at or fund.created_at else {},
                 ]
         }) }}
         </div>
