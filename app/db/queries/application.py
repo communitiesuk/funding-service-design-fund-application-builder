@@ -2,8 +2,7 @@ from datetime import datetime
 from uuid import uuid4
 
 from flask import current_app
-from flask_sqlalchemy.pagination import Pagination
-from sqlalchemy import String, cast, delete, select
+from sqlalchemy import delete
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.db import db
@@ -12,33 +11,13 @@ from app.db.queries.round import get_round_by_id
 from app.shared.form_store_api import FormStoreAPIService
 
 
-def get_all_template_sections() -> list[Section]:
-    return db.session.query(Section).where(Section.is_template == True).all()  # noqa:E712
-
-
 def get_section_by_id(section_id) -> Section:
     s = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
     return s
 
 
-def get_paginated_forms(page: int, search_term: str = None, items_per_page: int = 20) -> Pagination:
-    stmt = select(Form).where(Form.is_template)
-
-    if search_term:
-        # Case-insensitive search on the template_name field
-        stmt = stmt.where(Form.template_name.ilike(f"%{search_term}%"))
-
-    stmt = stmt.order_by(cast(Form.template_name, String))
-    return db.paginate(stmt, page=page, per_page=items_per_page)
-
-
 def get_form_by_id(form_id: str) -> Form:
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    return form
-
-
-def get_form_by_template_name(template_name: str) -> Form:
-    form = db.session.query(Form).where(Form.template_name == template_name).one_or_none()
     return form
 
 
@@ -140,10 +119,6 @@ def insert_form(section_id: str, url_path: str, section_index: int) -> Form:
         form_id=uuid4(),
         section_id=section_id,
         name_in_apply_json={"en": published_form_response.display_name},
-        is_template=False,
-        template_name=published_form_response.display_name,
-        source_template_id=None,
-        audit_info=None,
         section_index=section_index,
         runner_publish_name=url_path,
         form_json=published_form_response.published_json,

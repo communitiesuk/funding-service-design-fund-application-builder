@@ -12,8 +12,6 @@ def mock_form():
     form.form_id = uuid4()
     form.section_id = uuid4()
     form.name_in_apply_json = {"en": "Test Form"}
-    form.template_name = "test-template"
-    form.is_template = True
     form.section_index = 1
     form.runner_publish_name = "test-form"
     form.form_json = {"name": "Test Form", "startPage": "/start", "pages": [{"title": "Start", "path": "/start"}]}
@@ -21,8 +19,6 @@ def mock_form():
         "form_id": form.form_id,
         "section_id": form.section_id,
         "name_in_apply_json": form.name_in_apply_json,
-        "template_name": form.template_name,
-        "is_template": form.is_template,
         "section_index": form.section_index,
         "runner_publish_name": form.runner_publish_name,
         "form_json": form.form_json,

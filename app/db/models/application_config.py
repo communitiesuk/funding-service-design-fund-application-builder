@@ -105,12 +105,8 @@ class Form(BaseModel):
     )
     # TODO rename this to 'name in tasklist' as no longer us as the name in the apply json
     name_in_apply_json = Column(JSON(none_as_null=True), nullable=False, unique=False)
-    template_name = Column(String(), nullable=True)
-    is_template = Column(Boolean, default=False, nullable=False)
-    audit_info = Column(JSON(none_as_null=True))
     section_index = Column(Integer())
     runner_publish_name = Column(db.String())
-    source_template_id = Column(UUID(as_uuid=True), nullable=True)
     form_json = Column(JSON(none_as_null=True), nullable=False, default=lambda: {})
     created_at = Column(DateTime, nullable=True)
     updated_at = Column(DateTime, onupdate=func.now(), nullable=True)
