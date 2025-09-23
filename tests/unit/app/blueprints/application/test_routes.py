@@ -1,6 +1,7 @@
 import secrets
 import string
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from bs4 import BeautifulSoup
@@ -70,7 +71,14 @@ def test_select_application_form_submission(flask_test_client, seed_dynamic_data
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_create_section(flask_test_client, seed_dynamic_data):
+@patch("app.blueprints.application.routes.FormStoreAPIService")
+def test_create_section(mock_form_store_service, flask_test_client, seed_dynamic_data):
+    # Mock the API service
+    mock_published_form = type(
+        "MockForm", (), {"url_path": "about-your-org", "display_name": "About your organisation"}
+    )
+    mock_form_store_service.return_value.get_published_forms.return_value = [mock_published_form]
+
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
     data = {"name_in_apply_en": "section 1", "save_section": True}
@@ -82,7 +90,14 @@ def test_create_section(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_update_section_name(flask_test_client, seed_dynamic_data):
+@patch("app.blueprints.application.routes.FormStoreAPIService")
+def test_update_section_name(mock_form_store_service, flask_test_client, seed_dynamic_data):
+    # Mock the API service
+    mock_published_form = type(
+        "MockForm", (), {"url_path": "about-your-org", "display_name": "About your organisation"}
+    )
+    mock_form_store_service.return_value.get_published_forms.return_value = [mock_published_form]
+
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
     data = {"name_in_apply_en": "section 1", "save_section": True}
@@ -103,7 +118,14 @@ def test_update_section_name(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_delete_section(flask_test_client, seed_dynamic_data):
+@patch("app.blueprints.application.routes.FormStoreAPIService")
+def test_delete_section(mock_form_store_service, flask_test_client, seed_dynamic_data):
+    # Mock the API service
+    mock_published_form = type(
+        "MockForm", (), {"url_path": "about-your-org", "display_name": "About your organisation"}
+    )
+    mock_form_store_service.return_value.get_published_forms.return_value = [mock_published_form]
+
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
     data = {"name_in_apply_en": "section 1", "save_section": True}
@@ -131,7 +153,14 @@ def test_delete_section(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_update_section_empty_template_section_name(flask_test_client, seed_dynamic_data):
+@patch("app.blueprints.application.routes.FormStoreAPIService")
+def test_update_section_empty_template_section_name(mock_form_store_service, flask_test_client, seed_dynamic_data):
+    # Mock the API service
+    mock_published_form = type(
+        "MockForm", (), {"url_path": "about-your-org", "display_name": "About your organisation"}
+    )
+    mock_form_store_service.return_value.get_published_forms.return_value = [mock_published_form]
+
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
     data = {"name_in_apply_en": "section 1", "save_section": True}
@@ -162,28 +191,28 @@ def test_update_section_empty_template_section_name(flask_test_client, seed_dyna
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
 def test_add_form_to_section(flask_test_client, seed_dynamic_data, mocker):
-    # Shared data for both response types
+    test_form = seed_dynamic_data["forms"][0]
+
     form_data = {
         "id": "test-form-id",
-        "url_path": "test-form-path",
-        "display_name": "Test Form Display Name",
+        "url_path": test_form.url_path,
+        "display_name": "About your organisation",
         "created_at": "2024-01-01T00:00:00Z",
         "updated_at": "2024-01-01T00:00:00Z",
         "published_at": "2024-01-01T00:00:00Z",
-        "is_published": True
+        "is_published": True,
     }
-    
+
     mock_api_service = mocker.Mock()
     mock_api_service.get_published_forms.return_value = [FormResponse(**form_data)]
     mock_api_service.get_published_form.return_value = PublishedFormResponse(
         **form_data, published_json={"pages": []}, hash="test-hash"
     )
-    
+
     mocker.patch("app.blueprints.application.routes.FormStoreAPIService", return_value=mock_api_service)
     mocker.patch("app.db.queries.application.FormStoreAPIService", return_value=mock_api_service)
-    
+
     test_round = seed_dynamic_data["rounds"][0]
-    test_form = seed_dynamic_data["forms"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
     data = {"name_in_apply_en": "section 1", "save_section": True}
     response = submit_form(flask_test_client, url, data, follow_redirects=True)
@@ -193,7 +222,7 @@ def test_add_form_to_section(flask_test_client, seed_dynamic_data, mocker):
         "name_in_apply_en": "",
         "add_form": True,
         "section_id": edit_section_link.split("/")[-1],
-        "template_id": test_form.form_id,
+        "template_id": test_form.url_path,
     }
 
     response = submit_form(flask_test_client, edit_section_link, data, follow_redirects=False)
@@ -203,7 +232,7 @@ def test_add_form_to_section(flask_test_client, seed_dynamic_data, mocker):
 
     for span in spans_with_h3:
         h3_tag = span.find("h3", class_="govuk-body")
-        if h3_tag and test_form.name_in_apply_json["en"] in h3_tag.get_text():
+        if h3_tag and "1. About your organisation" in h3_tag.get_text():
             found = True
             break
 
@@ -211,8 +240,15 @@ def test_add_form_to_section(flask_test_client, seed_dynamic_data, mocker):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_mark_application_complete(flask_test_client, seed_dynamic_data):
+@patch("app.blueprints.application.routes.FormStoreAPIService")
+def test_mark_application_complete(mock_form_store_service, flask_test_client, seed_dynamic_data):
     """Test marking an application as complete"""
+    # Mock the API service
+    mock_published_form = type(
+        "MockForm", (), {"url_path": "about-your-org", "display_name": "About your organisation"}
+    )
+    mock_form_store_service.return_value.get_published_forms.return_value = [mock_published_form]
+
     test_round = seed_dynamic_data["rounds"][0]
 
     # Ensure the round starts with "In progress" status
@@ -304,8 +340,15 @@ def test_application_complete_page(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_mark_application_in_progress(flask_test_client, seed_dynamic_data):
+@patch("app.blueprints.application.routes.FormStoreAPIService")
+def test_mark_application_in_progress(mock_form_store_service, flask_test_client, seed_dynamic_data):
     """Test marking a complete application as in progress"""
+    # Mock the API service
+    mock_published_form = type(
+        "MockForm", (), {"url_path": "about-your-org", "display_name": "About your organisation"}
+    )
+    mock_form_store_service.return_value.get_published_forms.return_value = [mock_published_form]
+
     test_round = seed_dynamic_data["rounds"][0]
 
     # First mark the application as complete

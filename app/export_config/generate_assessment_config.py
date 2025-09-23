@@ -6,6 +6,7 @@ from app.db import db
 from app.db.models import Form, Section
 from app.db.models.application_config import READ_ONLY_COMPONENTS, ComponentType
 from app.export_config import helpers
+from app.shared.form_store_api import FormNotFoundError, FormStoreAPIService
 from app.shared.helpers import find_enum, human_to_kebab_case
 
 
@@ -23,6 +24,10 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
     # Each form is a sub-critiera, each page a theme. Half scored, half unscored.
     # The output in the assessment_store folder needs to be added to the
     # assessment_mapping_fund_round file in assessment-store
+    api_service = FormStoreAPIService()
+    published_forms = api_service.get_published_forms()
+    url_path_to_display_name = {pf.url_path: pf.display_name for pf in published_forms}
+
     fund_id = fund_config["id"]
     round_id = round_config["id"]
     fund_short_name = fund_config["short_name"]
@@ -44,9 +49,12 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
 
         for form in section.forms:
             form: Form
+            display_name = url_path_to_display_name.get(form.url_path)
+            if not display_name:
+                raise FormNotFoundError(url_path=form.url_path)
             sc = {
                 "id": form.runner_publish_name,
-                "name": form.name_in_apply_json["en"],
+                "name": display_name,
                 "themes": [],
             }
             for page in form.form_json.get("pages"):

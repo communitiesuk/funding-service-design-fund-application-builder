@@ -32,10 +32,25 @@ class TestGenerateAssessmentConfig:
         return fund_config, round_config
 
     @pytest.fixture
+    def mock_published_forms(self):
+        """Default published forms for most tests"""
+        mock_form = Mock()
+        mock_form.url_path = "test-form"
+        mock_form.display_name = "Test Form"
+        return [mock_form]
+
+    @pytest.fixture
+    def mock_api_service(self, mock_published_forms):
+        """Mock FormStoreAPIService with default published forms"""
+        mock_service = Mock()
+        mock_service.get_published_forms.return_value = mock_published_forms
+        return mock_service
+
+    @pytest.fixture
     def mock_form_data(self):
         mock_form = Mock()
         mock_form.runner_publish_name = "test-form"
-        mock_form.name_in_apply_json = {"en": "Test Form"}
+        mock_form.url_path = "test-form"
         mock_form.form_json = {
             "pages": [
                 {
@@ -61,61 +76,70 @@ class TestGenerateAssessmentConfig:
 
         return [mock_section]
 
-    @patch("app.export_config.generate_assessment_config.copy.deepcopy")
-    @patch("app.export_config.generate_assessment_config.db")
-    @patch("app.export_config.generate_assessment_config.helpers")
-    @patch("app.export_config.generate_assessment_config.form_json_to_assessment_display_types")
-    @patch("app.export_config.generate_assessment_config.human_to_kebab_case")
-    def test_basic_config_generation(
-        self, mock_kebab, mock_display_types, mock_helpers, mock_db, mock_deepcopy, configs, mock_form_data
-    ):
+    @pytest.fixture
+    def common_patches(self, mock_api_service):
+        """Common patches that most tests need"""
+        with (
+            patch("app.export_config.generate_assessment_config.copy.deepcopy") as mock_deepcopy,
+            patch("app.export_config.generate_assessment_config.db") as mock_db,
+            patch("app.export_config.generate_assessment_config.helpers") as mock_helpers,
+            patch(
+                "app.export_config.generate_assessment_config.form_json_to_assessment_display_types"
+            ) as mock_display_types,
+            patch("app.export_config.generate_assessment_config.human_to_kebab_case") as mock_kebab,
+            patch("app.export_config.generate_assessment_config.FormStoreAPIService") as mock_api_service_class,
+        ):
+            # Setup common behavior
+            mock_kebab.side_effect = lambda x: x.lower().replace(" ", "-")
+            mock_display_types.get.return_value = "text"
+            mock_api_service_class.return_value = mock_api_service
+
+            mock_template = Mock()
+            mock_template.substitute.return_value = "generated_config"
+            mock_deepcopy.return_value = mock_template
+
+            yield {
+                "deepcopy": mock_deepcopy,
+                "db": mock_db,
+                "helpers": mock_helpers,
+                "display_types": mock_display_types,
+                "kebab": mock_kebab,
+                "api_service_class": mock_api_service_class,
+                "template": mock_template,
+            }
+
+    def test_basic_config_generation(self, configs, mock_form_data, common_patches):
         fund_config, round_config = configs
-        mock_kebab.side_effect = lambda x: x.lower().replace(" ", "-")
-        mock_display_types.get.return_value = "text"
 
         # Setup database query
-        mock_db.session.query.return_value.filter.return_value.order_by.return_value.all.return_value = mock_form_data
-
-        # Setup template - this is the key fix
-        mock_template = Mock()
-        mock_template.substitute.return_value = "generated_config"
-        mock_deepcopy.return_value = mock_template
+        common_patches[
+            "db"
+        ].session.query.return_value.filter.return_value.order_by.return_value.all.return_value = mock_form_data
 
         # Run function
         generate_assessment_config_for_round(fund_config, round_config, "/output")
 
         # Verify template was called with correct parameters
-        mock_template.substitute.assert_called_once()
-        call_args = mock_template.substitute.call_args[1]
+        common_patches["template"].substitute.assert_called_once()
+        call_args = common_patches["template"].substitute.call_args[1]
         assert call_args["fund_round"] == "TEST_FUNDROUND_1"
         assert call_args["fund_id"] == "fund-123"
         assert call_args["round_id"] == "round-456"
 
         # Verify config was written
-        mock_helpers.write_config.assert_called_once()
+        common_patches["helpers"].write_config.assert_called_once()
 
-    @patch("app.export_config.generate_assessment_config.copy.deepcopy")
-    @patch("app.export_config.generate_assessment_config.db")
-    @patch("app.export_config.generate_assessment_config.helpers")
-    @patch("app.export_config.generate_assessment_config.form_json_to_assessment_display_types")
-    @patch("app.export_config.generate_assessment_config.human_to_kebab_case")
-    def test_unscored_data_structure(
-        self, mock_kebab, mock_display_types, mock_helpers, mock_db, mock_deepcopy, configs, mock_form_data
-    ):
+    def test_unscored_data_structure(self, configs, mock_form_data, common_patches):
         fund_config, round_config = configs
-        mock_kebab.side_effect = lambda x: x.lower().replace(" ", "-")
-        mock_display_types.get.return_value = "text"
 
-        mock_db.session.query.return_value.filter.return_value.order_by.return_value.all.return_value = mock_form_data
-
-        mock_template = Mock()
-        mock_template.substitute.return_value = "config"
-        mock_deepcopy.return_value = mock_template
+        common_patches[
+            "db"
+        ].session.query.return_value.filter.return_value.order_by.return_value.all.return_value = mock_form_data
 
         generate_assessment_config_for_round(fund_config, round_config, "/output")
 
         # Check the unscored data structure
-        call_args = mock_template.substitute.call_args[1]
+        call_args = common_patches["template"].substitute.call_args[1]
         unscored = json.loads(call_args["unscored"])
 
         # Should have one criteria (section)
@@ -143,22 +167,19 @@ class TestGenerateAssessmentConfig:
         assert answer["field_type"] == "textField"  # First letter lowercase
         assert answer["question"] == "Your Name"
 
-    @patch("app.export_config.generate_assessment_config.copy.deepcopy")
-    @patch("app.export_config.generate_assessment_config.db")
-    @patch("app.export_config.generate_assessment_config.helpers")
-    @patch("app.export_config.generate_assessment_config.form_json_to_assessment_display_types")
-    @patch("app.export_config.generate_assessment_config.human_to_kebab_case")
-    def test_readonly_components_filtered(
-        self, mock_kebab, mock_display_types, mock_helpers, mock_db, mock_deepcopy, configs
-    ):
+    def test_readonly_components_filtered(self, configs, common_patches):
         fund_config, round_config = configs
-        mock_kebab.side_effect = lambda x: x.lower().replace(" ", "-")
-        mock_display_types.get.return_value = "text"
+
+        # Override the published forms for this test
+        mock_published_form = Mock()
+        mock_published_form.url_path = "readonly-form"
+        mock_published_form.display_name = "Readonly Form"
+        common_patches["api_service_class"].return_value.get_published_forms.return_value = [mock_published_form]
 
         # Create form with only readonly components
         mock_form = Mock()
         mock_form.runner_publish_name = "readonly-form"
-        mock_form.name_in_apply_json = {"en": "Readonly Form"}
+        mock_form.url_path = "readonly-form"
         mock_form.form_json = {
             "pages": [
                 {
@@ -176,39 +197,30 @@ class TestGenerateAssessmentConfig:
         mock_section.name_in_apply_json = {"en": "Test"}
         mock_section.forms = [mock_form]
 
-        mock_db.session.query.return_value.filter.return_value.order_by.return_value.all.return_value = [mock_section]
-
-        mock_template = Mock()
-        mock_template.substitute.return_value = "config"
-        mock_deepcopy.return_value = mock_template
+        common_patches["db"].session.query.return_value.filter.return_value.order_by.return_value.all.return_value = [
+            mock_section
+        ]
 
         generate_assessment_config_for_round(fund_config, round_config, "/output")
 
         # Should have no answers since all components are readonly
-        call_args = mock_template.substitute.call_args[1]
+        call_args = common_patches["template"].substitute.call_args[1]
         unscored = json.loads(call_args["unscored"])
         answers = unscored[0]["sub_criteria"][0]["themes"][0]["answers"]
         assert len(answers) == 0
 
-    @patch("app.export_config.generate_assessment_config.copy.deepcopy")
-    @patch("app.export_config.generate_assessment_config.db")
-    @patch("app.export_config.generate_assessment_config.helpers")
-    @patch("app.export_config.generate_assessment_config.form_json_to_assessment_display_types")
-    @patch("app.export_config.generate_assessment_config.human_to_kebab_case")
-    def test_empty_sections(self, mock_kebab, mock_display_types, mock_helpers, mock_db, mock_deepcopy, configs):
+    def test_empty_sections(self, configs, common_patches):
         fund_config, round_config = configs
-        mock_kebab.side_effect = lambda x: x.lower().replace(" ", "-")
+
+        # Override to return empty forms
+        common_patches["api_service_class"].return_value.get_published_forms.return_value = []
 
         # No sections
-        mock_db.session.query.return_value.filter.return_value.order_by.return_value.all.return_value = []
-
-        mock_template = Mock()
-        mock_template.substitute.return_value = "config"
-        mock_deepcopy.return_value = mock_template
+        common_patches["db"].session.query.return_value.filter.return_value.order_by.return_value.all.return_value = []
 
         generate_assessment_config_for_round(fund_config, round_config, "/output")
 
         # Should have empty unscored list
-        call_args = mock_template.substitute.call_args[1]
+        call_args = common_patches["template"].substitute.call_args[1]
         unscored = json.loads(call_args["unscored"])
         assert unscored == []

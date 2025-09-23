@@ -118,7 +118,6 @@ def insert_form(section_id: str, url_path: str, section_index: int) -> Form:
     form = Form(
         form_id=uuid4(),
         section_id=section_id,
-        name_in_apply_json={"en": published_form_response.display_name},
         section_index=section_index,
         runner_publish_name=url_path,
         form_json=published_form_response.published_json,

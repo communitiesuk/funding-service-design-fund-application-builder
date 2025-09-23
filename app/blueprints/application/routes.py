@@ -16,6 +16,7 @@ from flask import (
 from app.all_questions.metadata_utils import generate_print_data_for_sections
 from app.blueprints.application.forms import SectionForm, SelectApplicationForm
 from app.blueprints.application.services import create_export_zip
+from app.db.models.application_config import Form
 from app.db.queries.application import (
     delete_form_from_section,
     delete_section_from_round,
@@ -40,7 +41,7 @@ from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
 from app.export_config.generate_fund_round_html import generate_all_round_html
-from app.shared.form_store_api import FormStoreAPIService
+from app.shared.form_store_api import FormNotFoundError, FormStoreAPIService
 from app.shared.forms import DeleteConfirmationForm, SelectFundForm
 from app.shared.helpers import flash_message
 from config import Config
@@ -100,6 +101,20 @@ def build_application(round_id):
         if request.args.get("action") == "application_details"
         else url_for("round_bp.view_all_rounds")
     )
+
+    # Call Pre-Award API to get display names for forms
+    api_service = FormStoreAPIService()
+    published_forms = api_service.get_published_forms()
+    url_path_to_display_name = {pf.url_path: pf.display_name for pf in published_forms}
+    for section in round.sections:
+        for local_form in section.forms:
+            local_form: Form
+            display_name = url_path_to_display_name.get(local_form.url_path)
+            if not display_name:
+                raise FormNotFoundError(url_path=local_form.url_path)
+            # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity
+            local_form.display_name = display_name
+
     return render_template("build_application.html", round=round, fund=fund, back_link=back_link)
 
 
@@ -238,6 +253,7 @@ def section(round_id, section_id=None):
 
     # Get forms from Pre-Award API to show in "Add a task" drop-down
     choices = [("", "Select a template")]
+    url_path_to_display_name = {}
     api_service = FormStoreAPIService()
     published_forms = api_service.get_published_forms()
     for published_form in published_forms:
@@ -245,8 +261,18 @@ def section(round_id, section_id=None):
         display_name = published_form.display_name
         if display_name:
             choices.append((url_path, f"{display_name} ({url_path})"))
+        url_path_to_display_name[url_path] = display_name
     sorted_choices = sorted(choices[1:], key=lambda c: c[1])
     form.template_id.choices = choices[:1] + sorted_choices
+
+    # Match form display names from Pre-Award API to local forms to show display names in "Tasks in this section"
+    for local_form in params.get("forms_in_section", []):
+        local_form: Form
+        display_name = url_path_to_display_name.get(local_form.url_path)
+        if not display_name:
+            raise FormNotFoundError(url_path=local_form.url_path)
+        # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity
+        local_form.display_name = display_name
 
     return render_template("section.html", form=form, **params)
 
@@ -304,9 +330,13 @@ def view_form_questions(round_id, section_id, form_id):
     Generates the form data for this form, then uses that to generate the 'All Questions'
     data for that form and returns that to render in a template.
     """
+    api_service = FormStoreAPIService()
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     form = get_form_by_id(form_id=form_id)
+    published_form_response = api_service.get_published_form(form.url_path)
+    if not published_form_response:
+        raise FormNotFoundError(url_path=form.url_path)
     section_data = [
         {
             "section_title": "",  # Not used
@@ -323,6 +353,6 @@ def view_form_questions(round_id, section_id, form_id):
         round=round,
         fund=fund,
         question_html=html,
-        title=f"Preview of form [{form.name_in_apply_json['en']}]",
+        title=f"Preview of form [{published_form_response.display_name}]",
         all_questions_view=False,
     )
