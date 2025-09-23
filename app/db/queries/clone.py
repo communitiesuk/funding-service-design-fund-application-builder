@@ -1,7 +1,8 @@
 from uuid import uuid4
 
 from app.db import db
-from app.db.models import Form, Round, Section
+from app.db.models import Round, Section
+from app.db.queries.application import insert_new_section_form
 
 
 def clone_single_round(round_id, new_fund_id, new_short_name) -> Round:
@@ -42,20 +43,8 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
     db.session.commit()
 
     for form in section_to_clone.forms:
-        clone_single_form(form.form_id, new_section_id=cloned_section.section_id, section_index=form.section_index)
+        insert_new_section_form(
+            section_id=section_to_clone.section_id, url_path=form.url_path, section_index=form.section_index
+        )
 
     return cloned_section
-
-
-def clone_single_form(form_id: str, new_section_id=None, section_index=0) -> Form:
-    form_to_clone: Form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    clone = Form(**form_to_clone.as_dict())
-    clone.form_id = uuid4()
-    clone.section_id = new_section_id
-    clone.is_template = False
-    clone.source_template_id = form_to_clone.form_id
-    clone.template_name = None
-    clone.section_index = section_index
-    db.session.add(clone)
-    db.session.commit()
-    return clone
