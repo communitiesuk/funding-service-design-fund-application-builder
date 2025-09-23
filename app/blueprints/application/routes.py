@@ -21,6 +21,7 @@ from app.db.queries.application import (
     delete_section_from_round,
     get_form_by_id,
     get_section_by_id,
+    insert_new_form,
     insert_new_section,
     move_form_down,
     move_form_up,
@@ -28,7 +29,6 @@ from app.db.queries.application import (
     move_section_up,
     update_section,
 )
-from app.db.queries.clone import clone_single_form
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_round_by_id, update_round
 from app.export_config.generate_all_questions import generate_html
@@ -36,10 +36,8 @@ from app.export_config.generate_assessment_config import (
     generate_assessment_config_for_round,
 )
 from app.export_config.generate_fund_round_config import generate_config_for_round
-from app.export_config.generate_fund_round_form_jsons import (
-    generate_form_jsons_for_round,
-)
 from app.export_config.generate_fund_round_html import generate_all_round_html
+from app.shared.form_store_api import FormStoreAPIService
 from app.shared.forms import DeleteConfirmationForm, SelectFundForm
 from app.shared.helpers import flash_message
 from config import Config
@@ -99,6 +97,16 @@ def build_application(round_id):
         if request.args.get("action") == "application_details"
         else url_for("round_bp.view_all_rounds")
     )
+
+    # Call Pre-Award API to get display names for forms
+    api_service = FormStoreAPIService()
+    published_forms = api_service.get_published_forms()
+    url_path_to_display_name = {pf.url_path: pf.display_name for pf in published_forms}
+    for section in round.sections:
+        for local_form in section.forms:
+            # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity
+            local_form.display_name = url_path_to_display_name.get(local_form.url_path, local_form.url_path)
+
     return render_template("build_application.html", round=round, fund=fund, back_link=back_link)
 
 
@@ -140,12 +148,16 @@ def view_all_questions(round_id):
     Generates the form data for all sections in the selected round, then uses that to generate the 'All Questions'
     data for that round and returns that to render in a template.
     """
+    api_service = FormStoreAPIService()
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     sections_in_round = round.sections
     section_data = []
     for section in sections_in_round:
-        forms = [{"name": form.runner_publish_name, "form_data": form.form_json} for form in section.forms]
+        forms = []
+        for form in section.forms:
+            configuration = api_service.get_published_form(form.url_path)
+            forms.append({"name": form.url_path, "form_data": configuration})
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(
@@ -169,7 +181,6 @@ def create_export_files(round_id):
     # Construct the path to the output directory relative to this file's location
     random_post_fix = "".join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     base_output_dir = Config.TEMP_FILE_PATH / f"{round_short_name}-{random_post_fix}"
-    generate_form_jsons_for_round(round_id, base_output_dir)
     generate_all_round_html(round_id, base_output_dir)
     fund_config, round_config = generate_config_for_round(round_id, base_output_dir)
     generate_assessment_config_for_round(fund_config, round_config, base_output_dir)
@@ -219,10 +230,9 @@ def section(round_id, section_id=None):
                 flash_message("Section added")
             return redirect(url_for("application_bp.build_application", round_id=round_obj.round_id))
 
-        # clone template json if Add button is clicked
         section = get_section_by_id(section_id=section_id)
         new_section_index = max(len(section.forms) + 1, 1)
-        clone_single_form(form_id=form.template_id.data, new_section_id=section_id, section_index=new_section_index)
+        insert_new_form(section_id=section.section_id, url_path=form.template_id.data, section_index=new_section_index)
         form.template_id.data = ""  # Reset the template_id field to default after adding
 
     if section_id:
@@ -230,6 +240,25 @@ def section(round_id, section_id=None):
         form.section_id.data = section_id
         form.name_in_apply_en.data = existing_section.name_in_apply_json["en"]
         params["forms_in_section"] = existing_section.forms
+
+    # Get forms from Pre-Award API to show in "Add a task" drop-down
+    choices = [("", "Select a template")]
+    url_path_to_display_name = {}
+    api_service = FormStoreAPIService()
+    published_forms = api_service.get_published_forms()
+    for published_form in published_forms:
+        url_path = published_form.url_path
+        display_name = published_form.display_name
+        if display_name:
+            choices.append((url_path, f"{display_name} ({url_path})"))
+        url_path_to_display_name[url_path] = display_name
+    choices.sort(key=lambda c: c[1])
+    form.template_id.choices = choices
+
+    # Match form display names from Pre-Award API to local forms to show display names in "Tasks in this section"
+    for local_form in params.get("forms_in_section", []):
+        # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity
+        local_form.display_name = url_path_to_display_name.get(local_form.url_path, local_form.url_path)
 
     return render_template("section.html", form=form, **params)
 
@@ -287,14 +316,18 @@ def view_form_questions(round_id, section_id, form_id):
     Generates the form data for this form, then uses that to generate the 'All Questions'
     data for that form and returns that to render in a template.
     """
+    api_service = FormStoreAPIService()
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     form = get_form_by_id(form_id=form_id)
-    start_page = next((p for p in form["pages"] if p["controller"] and p["controller"].endswith("start.js")), None)
+    configuration = api_service.get_published_form(form.url_path)
+    start_page = next(
+        (p for p in configuration["pages"] if p.get("controller") and p["controller"].endswith("start.js")), None
+    )
     section_data = [
         {
-            "section_title": f"Preview of form [{form.name_in_apply_json['en']}]",
-            "forms": [{"name": form.runner_publish_name, "form_data": form.form_json}],
+            "section_title": f"Preview of form [{form.url_path}]",
+            "forms": [{"name": form.url_path, "form_data": configuration}],
         }
     ]
 
@@ -308,6 +341,6 @@ def view_form_questions(round_id, section_id, form_id):
         round=round,
         fund=fund,
         question_html=html,
-        title=start_page.name_in_apply_json["en"],
+        title=start_page["title"],
         all_questions_view=False,
     )

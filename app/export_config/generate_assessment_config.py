@@ -6,6 +6,7 @@ from app.db import db
 from app.db.models import Form, Section
 from app.db.models.application_config import READ_ONLY_COMPONENTS, ComponentType
 from app.export_config import helpers
+from app.shared.form_store_api import FormStoreAPIService
 from app.shared.helpers import find_enum, human_to_kebab_case
 
 
@@ -34,6 +35,11 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
     sections: list[Section] = (
         db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
     )
+
+    api_service = FormStoreAPIService()
+    published_forms = api_service.get_published_forms()
+    url_path_to_display_name = {pf.url_path: pf.display_name for pf in published_forms}
+
     for _i, section in enumerate(sections, start=1):
         criteria = {
             "id": human_to_kebab_case(section.name_in_apply_json["en"]),
@@ -43,13 +49,14 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
         unscored.append(criteria)
 
         for form in section.forms:
+            configuration = api_service.get_published_form(form.url_path)
             form: Form
             sc = {
-                "id": form.runner_publish_name,
-                "name": form.name_in_apply_json["en"],
+                "id": form.url_path,
+                "name": url_path_to_display_name.get(form.url_path, form.url_path),
                 "themes": [],
             }
-            for page in form.form_json.get("pages"):
+            for page in configuration.get("pages"):
                 page: dict
                 if page.get("path").lstrip("/") == "summary":
                     continue
@@ -65,7 +72,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
                         continue
                     answer = {
                         "field_id": component.get("name"),
-                        "form_name": form.runner_publish_name,
+                        "form_name": form.url_path,
                         "field_type": component_type.value[0].lower() + component_type.value[1:],
                         "presentation_type": form_json_to_assessment_display_types.get(component_type.name, "text"),
                         "question": component.get("title"),
