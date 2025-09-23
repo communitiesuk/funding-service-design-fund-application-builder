@@ -97,6 +97,16 @@ def build_application(round_id):
         if request.args.get("action") == "application_details"
         else url_for("round_bp.view_all_rounds")
     )
+
+    # Call Pre-Award API to get display names for forms
+    api_service = FormStoreAPIService()
+    published_forms = api_service.get_published_forms()
+    url_path_to_display_name = {pf.url_path: pf.display_name for pf in published_forms}
+    for section in round.sections:
+        for local_form in section.forms:
+            # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity
+            local_form.display_name = url_path_to_display_name.get(local_form.form_name, local_form.form_name)
+
     return render_template("build_application.html", round=round, fund=fund, back_link=back_link)
 
 
@@ -198,18 +208,6 @@ def section(round_id, section_id=None):
     params = {
         "round_id": str(round_id),
     }
-    if request.method == "GET":
-        choices = [("", "Select a template")]
-        api_service = FormStoreAPIService()
-        published_forms = api_service.get_published_forms()
-        for published_form in published_forms:
-            form_name = published_form.name
-            display_name = (
-                published_form.name
-            )  # TODO: I think we need to add a new field to FormDefinition for display name
-            if form_name:
-                choices.append((form_name, display_name))
-        form.template_id.choices = choices
     if form.validate_on_submit():
         if not form.add_form.data:
             count_existing_sections = len(round_obj.sections)
@@ -242,6 +240,25 @@ def section(round_id, section_id=None):
         form.section_id.data = section_id
         form.name_in_apply_en.data = existing_section.name_in_apply_json["en"]
         params["forms_in_section"] = existing_section.forms
+
+    # Get forms from Pre-Award API to show in "Add a task" drop-down
+    choices = [("", "Select a template")]
+    url_path_to_display_name = {}
+    api_service = FormStoreAPIService()
+    published_forms = api_service.get_published_forms()
+    for published_form in published_forms:
+        url_path = published_form.url_path
+        display_name = published_form.display_name
+        if display_name:
+            choices.append((url_path, f"{display_name} ({url_path})"))
+        url_path_to_display_name[url_path] = display_name
+    choices.sort(key=lambda c: c[1])
+    form.template_id.choices = choices
+
+    # Match form display names from Pre-Award API to local forms to show display names in "Tasks in this section"
+    for local_form in params.get("forms_in_section", []):
+        # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity
+        local_form.display_name = url_path_to_display_name.get(local_form.form_name, local_form.form_name)
 
     return render_template("section.html", form=form, **params)
 

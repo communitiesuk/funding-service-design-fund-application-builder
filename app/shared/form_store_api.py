@@ -9,7 +9,8 @@ from flask import current_app
 @dataclass
 class FormDefinition:
     id: str
-    name: str
+    url_path: str
+    display_name: str | None
     created_at: str | None
     updated_at: str | None
     published_at: str | None
