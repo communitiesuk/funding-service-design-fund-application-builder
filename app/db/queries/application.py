@@ -10,6 +10,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.db import db
 from app.db.models import Form, Section
 from app.db.queries.round import get_round_by_id
+from app.shared.form_store_api import FormStoreAPIService
 
 
 def get_all_template_sections() -> list[Section]:
@@ -19,10 +20,6 @@ def get_all_template_sections() -> list[Section]:
 def get_section_by_id(section_id) -> Section:
     s = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
     return s
-
-
-def get_all_template_forms() -> list[Form]:
-    return db.session.query(Form).where(Form.is_template == True).order_by(Form.template_name).all()  # noqa:E712
 
 
 def get_paginated_forms(page: int, search_term: str = None, items_per_page: int = 20) -> Pagination:
@@ -156,6 +153,33 @@ def insert_new_form(
         runner_publish_name=runner_publish_name,
         form_json=form_json,
         created_at=datetime.now(),
+    )
+    try:
+        db.session.add(form)
+        db.session.commit()
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        raise e
+    return form
+
+
+def insert_new_section_form(section_id: str, url_path: str, section_index: int) -> Form:
+    api_service = FormStoreAPIService()
+    published_form_response = api_service.get_published_form(url_path)
+    form = Form(
+        form_id=uuid4(),
+        section_id=section_id,
+        name_in_apply_json={"en": published_form_response.display_name},
+        is_template=False,
+        template_name=published_form_response.display_name,
+        source_template_id=None,
+        audit_info=None,
+        section_index=section_index,
+        runner_publish_name=url_path,
+        form_json=published_form_response.published_json,
+        created_at=datetime.now(),
+        url_path=url_path,
     )
     try:
         db.session.add(form)
