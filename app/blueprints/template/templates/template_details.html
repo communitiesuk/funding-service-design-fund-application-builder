@@ -63,7 +63,13 @@
                                 }
                              ]
                         }
-                    }
+                    },
+                    {
+                        "key": {"text": "Last updated"},
+                        "value": {
+                            "text": (to_london_time(form.updated_at or form.created_at).strftime('%-d %B %Y, %H:%M'))
+                        },
+                    } if form.updated_at or form.created_at else {},
                     ]
             }) }}
         </div>

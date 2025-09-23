@@ -448,6 +448,12 @@
                         ]
                     },
                 },
+                {
+                    "key": {"text": "Last updated"},
+                    "value": {
+                        "text": (to_london_time(round.updated_at or round.created_at).strftime('%-d %B %Y, %H:%M'))
+                    },
+                } if round.updated_at or round.created_at else {},
            ]
     }) }}
     </div>
