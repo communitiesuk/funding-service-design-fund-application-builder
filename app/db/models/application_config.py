@@ -103,8 +103,6 @@ class Form(BaseModel):
         primary_key=True,
         default=uuid.uuid4,
     )
-    # TODO rename this to 'name in tasklist' as no longer us as the name in the apply json
-    name_in_apply_json = Column(JSON(none_as_null=True), nullable=False, unique=False)
     section_index = Column(Integer())
     runner_publish_name = Column(db.String())
     form_json = Column(JSON(none_as_null=True), nullable=False, default=lambda: {})
@@ -113,7 +111,7 @@ class Form(BaseModel):
     url_path = Column(String(), nullable=True)  # Reference to url_path in Pre-Award database
 
     def __repr__(self):
-        return f"Form({self.section_index}, {self.runner_publish_name}" + f"- {self.name_in_apply_json['en']})"
+        return f"Form({self.section_index}, {self.runner_publish_name})"
 
     def as_dict(self, include_relationships=False):
         result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}

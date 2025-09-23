@@ -133,7 +133,7 @@ section_id = uuid4()
 @pytest.mark.seed_config(
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
-        "forms": [Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"})],
+        "forms": [Form(form_id=uuid4(), section_id=section_id, section_index=1, url_path="form-1")],
     }
 )
 def test_form_sorting(seed_dynamic_data, _db):
@@ -143,9 +143,7 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert len(result_section.forms) == 1
 
     # add a form at index 2, confirm ordering
-    form2: Form = Form(
-        form_id=uuid4(), section_id=section.section_id, section_index=2, name_in_apply_json={"en": "Form 2"}
-    )
+    form2: Form = Form(form_id=uuid4(), section_id=section.section_id, section_index=2, url_path="form-2")
     _db.session.add(form2)
     _db.session.commit()
 
@@ -155,9 +153,7 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert result_section.forms[1].form_id == form2.form_id
 
     # add a form at index 0, confirm ordering
-    form0: Form = Form(
-        form_id=uuid4(), section_id=section.section_id, section_index=0, name_in_apply_json={"en": "Form 0"}
-    )
+    form0: Form = Form(form_id=uuid4(), section_id=section.section_id, section_index=0, url_path="form-0")
     _db.session.add(form0)
     _db.session.commit()
 
@@ -168,7 +164,7 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert result_section.forms[2].form_id == form2.form_id
 
     # insert a form between 1 and 2, check ordering
-    formX: Form = Form(form_id=uuid4(), section_id=section.section_id, name_in_apply_json={"en": "Form X"})
+    formX: Form = Form(form_id=uuid4(), section_id=section.section_id, url_path="form-x")
     result_section.forms.insert(2, formX)
     _db.session.bulk_save_objects([result_section])
     _db.session.commit()
@@ -189,9 +185,9 @@ section_id = uuid4()
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
         "forms": [
-            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=1, url_path="form-1"),
+            Form(form_id=uuid4(), section_id=section_id, section_index=2, url_path="form-2"),
+            Form(form_id=uuid4(), section_id=section_id, section_index=3, url_path="form-3"),
         ],
     }
 )
@@ -400,9 +396,9 @@ section_id = uuid4()
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
         "forms": [
-            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=1, url_path="form-1"),
+            Form(form_id=uuid4(), section_id=section_id, section_index=2, url_path="form-2"),
+            Form(form_id=uuid4(), section_id=section_id, section_index=3, url_path="form-3"),
         ],
     }
 )
@@ -434,9 +430,9 @@ section_id = uuid4()
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
         "forms": [
-            Form(form_id=uuid4(), section_id=section_id, section_index=1, name_in_apply_json={"en": "Form 1"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=2, name_in_apply_json={"en": "Form 2"}),
-            Form(form_id=uuid4(), section_id=section_id, section_index=3, name_in_apply_json={"en": "Form 3"}),
+            Form(form_id=uuid4(), section_id=section_id, section_index=1, url_path="form-1"),
+            Form(form_id=uuid4(), section_id=section_id, section_index=2, url_path="form-2"),
+            Form(form_id=uuid4(), section_id=section_id, section_index=3, url_path="form-3"),
         ],
     }
 )

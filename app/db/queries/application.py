@@ -114,15 +114,11 @@ def delete_section(section_id, cascade: bool = False):
 
 def insert_form(section_id: str, url_path: str, section_index: int) -> Form:
     api_service = FormStoreAPIService()
-    published_forms = api_service.get_published_forms()
-    url_path_to_display_name = {pf.url_path: pf.display_name for pf in published_forms}
-    display_name = url_path_to_display_name.get(url_path, url_path)
     published_form = api_service.get_published_form(url_path)
     form_json = published_form or {}
     form = Form(
         form_id=uuid4(),
         section_id=section_id,
-        name_in_apply_json={"en": display_name},
         section_index=section_index,
         runner_publish_name=url_path,
         form_json=form_json,
