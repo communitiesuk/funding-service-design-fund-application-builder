@@ -22,13 +22,13 @@ from app.db.queries.application import (
     get_form_by_id,
     get_section_by_id,
     insert_new_section,
+    insert_new_section_form,
     move_form_down,
     move_form_up,
     move_section_down,
     move_section_up,
     update_section,
 )
-from app.db.queries.clone import clone_single_form
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_round_by_id, update_round
 from app.export_config.generate_all_questions import generate_html
@@ -40,6 +40,7 @@ from app.export_config.generate_fund_round_form_jsons import (
     generate_form_jsons_for_round,
 )
 from app.export_config.generate_fund_round_html import generate_all_round_html
+from app.shared.form_store_api import FormStoreAPIService
 from app.shared.forms import DeleteConfirmationForm, SelectFundForm
 from app.shared.helpers import flash_message
 from config import Config
@@ -219,10 +220,14 @@ def section(round_id, section_id=None):
                 flash_message("Section added")
             return redirect(url_for("application_bp.build_application", round_id=round_obj.round_id))
 
-        # clone template json if Add button is clicked
+        # Add new form if Add button is clicked
         section = get_section_by_id(section_id=section_id)
         new_section_index = max(len(section.forms) + 1, 1)
-        clone_single_form(form_id=form.template_id.data, new_section_id=section_id, section_index=new_section_index)
+        insert_new_section_form(
+            section_id=section.section_id,
+            url_path=form.template_id.data,
+            section_index=new_section_index,
+        )
         form.template_id.data = ""  # Reset the template_id field to default after adding
 
     if section_id:
@@ -230,6 +235,18 @@ def section(round_id, section_id=None):
         form.section_id.data = section_id
         form.name_in_apply_en.data = existing_section.name_in_apply_json["en"]
         params["forms_in_section"] = existing_section.forms
+
+    # Get forms from Pre-Award API to show in "Add a task" drop-down
+    choices = [("", "Select a template")]
+    api_service = FormStoreAPIService()
+    published_forms = api_service.get_published_forms()
+    for published_form in published_forms:
+        url_path = published_form.url_path
+        display_name = published_form.display_name
+        if display_name:
+            choices.append((url_path, f"{display_name} ({url_path})"))
+    sorted_choices = sorted(choices[1:], key=lambda c: c[1])
+    form.template_id.choices = choices[:1] + sorted_choices
 
     return render_template("section.html", form=form, **params)
 
