@@ -13,7 +13,6 @@ from app.blueprints.application.routes import application_bp
 from app.blueprints.fund.routes import fund_bp
 from app.blueprints.index.routes import index_bp
 from app.blueprints.round.routes import round_bp
-from app.blueprints.template.routes import template_bp
 from app.shared.helpers import to_london_time
 from app.shared.page_tracker import PageTracker
 from config import Config
@@ -49,7 +48,6 @@ def create_app() -> Flask:
     flask_app.register_blueprint(fund_bp)
     flask_app.register_blueprint(round_bp)
     flask_app.register_blueprint(application_bp)
-    flask_app.register_blueprint(template_bp)
 
     protect_private_routes(flask_app)
 

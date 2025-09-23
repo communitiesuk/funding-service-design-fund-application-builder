@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from flask import current_app
 from flask_sqlalchemy.pagination import Pagination
@@ -164,27 +164,6 @@ def insert_new_form(
         db.session.rollback()
         current_app.logger.error(e)
         raise e
-    return form
-
-
-def update_form(
-    form_id: UUID,
-    form_name: str,  # Name as it appears in the Apply tasklist
-    template_name: str,  # Our own internal name for the template
-    form_json: dict[str, Any] | None = None,
-):
-    form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    if form:
-        form.name_in_apply_json = {"en": form_name}
-        form.template_name = template_name
-        if form_json is not None:
-            form.form_json = form_json
-        try:
-            db.session.commit()
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            current_app.logger.error(e)
-            raise e
     return form
 
 

@@ -19,7 +19,6 @@ from app.db.queries.application import (
     move_section_down,
     move_section_up,
     swap_elements_in_list,
-    update_form,
     update_section,
 )
 from tests.helpers import get_round_by_id
@@ -167,22 +166,6 @@ def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_d
     assert new_form.name_in_apply_json == {"en": "Test form name"}
     assert new_form.template_name == "Test template name"
     assert new_form.runner_publish_name == "test-template-name"
-
-
-def test_update_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
-    assert test_form.name_in_apply_json == {"en": "Test form name"}
-    assert test_form.template_name == "Test template name"
-    assert test_form.runner_publish_name == "test-template-name"
-
-    updated_form: Form = update_form(
-        form_id=test_form.form_id,
-        form_name="Updated form name",
-        template_name="Updated template name",
-    )
-
-    assert updated_form.form_id == test_form.form_id
-    assert updated_form.name_in_apply_json == {"en": "Updated form name"}
-    assert updated_form.template_name == "Updated template name"
 
 
 def test_delete_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_form: Form):
