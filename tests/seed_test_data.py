@@ -238,13 +238,13 @@ def init_salmon_fishing_fund():
     f1: Form = Form(
         form_id=uuid4(),
         section_id=s1.section_id,
-        form_name="about-your-org",
+        url_path="about-your-org",
         section_index=1,
     )
     f2: Form = Form(
         form_id=uuid4(),
         section_id=s1.section_id,
-        form_name="contact-details",
+        url_path="contact-details",
         section_index=2,
     )
     fd: Fund = Fund(
@@ -334,7 +334,7 @@ def init_unit_test_data() -> dict:
     f1: Form = Form(
         form_id=uuid4(),
         section_id=s1.section_id,
-        form_name="about-your-org",
+        url_path="about-your-org",
         section_index=1,
     )
 
@@ -411,14 +411,14 @@ def fund_without_assessment() -> dict:
     f2_r1_s1_f1: Form = Form(
         form_id=uuid4(),
         section_id=f2_r1_s1.section_id,
-        form_name="about-your-org",
+        url_path="about-your-org",
         section_index=1,
     )
 
     f2_r1_s1_f2: Form = Form(
         form_id=uuid4(),
         section_id=f2_r1_s2.section_id,
-        form_name="about-your-org",
+        url_path="about-your-org",
         section_index=1,
     )
     return {

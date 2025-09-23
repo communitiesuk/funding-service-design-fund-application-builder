@@ -24,7 +24,6 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
     # Each form is a sub-critiera, each page a theme. Half scored, half unscored.
     # The output in the assessment_store folder needs to be added to the
     # assessment_mapping_fund_round file in assessment-store
-    api_service = FormStoreAPIService()
     fund_id = fund_config["id"]
     round_id = round_config["id"]
     fund_short_name = fund_config["short_name"]
@@ -36,6 +35,11 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
     sections: list[Section] = (
         db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
     )
+
+    api_service = FormStoreAPIService()
+    published_forms = api_service.get_published_forms()
+    url_path_to_display_name = {pf.url_path: pf.display_name for pf in published_forms}
+
     for _i, section in enumerate(sections, start=1):
         criteria = {
             "id": human_to_kebab_case(section.name_in_apply_json["en"]),
@@ -45,11 +49,11 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
         unscored.append(criteria)
 
         for form in section.forms:
-            configuration = api_service.get_published_form(form.form_name)
+            configuration = api_service.get_published_form(form.url_path)
             form: Form
             sc = {
-                "id": form.form_name,
-                "name": form.form_name,  # TODO: We should use some display name
+                "id": form.url_path,
+                "name": url_path_to_display_name.get(form.url_path, form.url_path),
                 "themes": [],
             }
             for page in configuration.get("pages"):
@@ -68,7 +72,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
                         continue
                     answer = {
                         "field_id": component.get("name"),
-                        "form_name": form.form_name,
+                        "form_name": form.url_path,
                         "field_type": component_type.value[0].lower() + component_type.value[1:],
                         "presentation_type": form_json_to_assessment_display_types.get(component_type.name, "text"),
                         "question": component.get("title"),

@@ -184,7 +184,7 @@ def test_update_template_form(flask_test_client, seed_dynamic_data):
     # Check each span for the <h3> and if its text contains the search text
     for span in spans_with_h3:
         h3_tag = span.find("h3", class_="govuk-body")
-        if h3_tag and test_form.form_name in h3_tag.get_text():
+        if h3_tag and test_form.url_path in h3_tag.get_text():
             found = True
             break  # No need to check further once found
 

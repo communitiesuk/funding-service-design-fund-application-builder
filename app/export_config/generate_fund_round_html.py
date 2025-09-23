@@ -63,8 +63,8 @@ def generate_all_round_html(round_id, base_output_dir=None):
     for section in sections_in_round:
         forms = []
         for form in section.forms:
-            configuration = api_service.get_published_form(form.form_name)
-            forms.append({"name": form.form_name, "form_data": configuration})
+            configuration = api_service.get_published_form(form.url_path)
+            forms.append({"name": form.url_path, "form_data": configuration})
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(

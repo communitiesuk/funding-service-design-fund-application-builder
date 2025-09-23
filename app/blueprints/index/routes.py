@@ -43,7 +43,7 @@ def preview_form(form_id):
     """
     form = get_form_by_id(form_id)
     return redirect(
-        f"{Config.FORM_RUNNER_EXTERNAL_HOST}/{form.form_name}?form_session_identifier=preview/{uuid.uuid4()}"
+        f"{Config.FORM_RUNNER_EXTERNAL_HOST}/{form.url_path}?form_session_identifier=preview/{uuid.uuid4()}"
     )
 
 

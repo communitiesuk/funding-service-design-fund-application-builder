@@ -67,7 +67,7 @@ def test_clone_single_section(mock_section):
         assert mock_insert_new_form.call_count == len(mock_section.forms)
         mock_insert_new_form.assert_called_with(
             section_id=mock_section.section_id,
-            form_name=mock_section.forms[0].form_name,
+            url_path=mock_section.forms[0].url_path,
             section_index=mock_section.forms[0].section_index,
         )
 

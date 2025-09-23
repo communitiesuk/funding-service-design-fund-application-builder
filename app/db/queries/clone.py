@@ -44,7 +44,7 @@ def clone_single_section(section_id: str, new_round_id=None) -> Section:
 
     for form in section_to_clone.forms:
         insert_new_form(
-            section_id=section_to_clone.section_id, form_name=form.form_name, section_index=form.section_index
+            section_id=section_to_clone.section_id, url_path=form.url_path, section_index=form.section_index
         )
 
     return cloned_section

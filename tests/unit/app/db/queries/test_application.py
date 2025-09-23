@@ -51,7 +51,7 @@ def test_form(test_section: Section) -> Form:
     """Fixture that creates a test form with default values."""
     return insert_new_form(
         section_id=test_section.section_id,
-        form_name="test-template-name",
+        url_path="test-template-name",
         section_index=0,
     )
 
@@ -163,11 +163,11 @@ def test_failed_delete_section_with_fk_to_forms(
 def test_insert_new_form(flask_test_client, _db, clear_test_data, seed_dynamic_data, test_section):
     new_form: Form = insert_new_form(
         section_id=test_section.section_id,
-        form_name="test-form-name",
+        url_path="test-form-name",
         section_index=0,
     )
     assert new_form.section_id == test_section.section_id
-    assert new_form.form_name == "test-form-name"
+    assert new_form.url_path == "test-form-name"
     assert new_form.section_index == 0
 
 
@@ -199,7 +199,7 @@ section_id = uuid4()
 @pytest.mark.seed_config(
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
-        "forms": [Form(form_id=uuid4(), section_id=section_id, form_name="Form 1", section_index=1)],
+        "forms": [Form(form_id=uuid4(), section_id=section_id, url_path="form-1", section_index=1)],
     }
 )
 def test_form_sorting(seed_dynamic_data, _db):
@@ -209,7 +209,7 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert len(result_section.forms) == 1
 
     # add a form at index 2, confirm ordering
-    form2: Form = Form(form_id=uuid4(), section_id=section.section_id, form_name="Form 2", section_index=2)
+    form2: Form = Form(form_id=uuid4(), section_id=section.section_id, url_path="form-2", section_index=2)
     _db.session.add(form2)
     _db.session.commit()
 
@@ -222,7 +222,7 @@ def test_form_sorting(seed_dynamic_data, _db):
     form0: Form = Form(
         form_id=uuid4(),
         section_id=section.section_id,
-        form_name="Form 0",
+        url_path="form-0",
         section_index=0,
     )
     _db.session.add(form0)
@@ -235,7 +235,7 @@ def test_form_sorting(seed_dynamic_data, _db):
     assert result_section.forms[2].form_id == form2.form_id
 
     # insert a form between 1 and 2, check ordering
-    formX: Form = Form(form_id=uuid4(), section_id=section.section_id, form_name="Form X")
+    formX: Form = Form(form_id=uuid4(), section_id=section.section_id, url_path="form-x")
     result_section.forms.insert(2, formX)
     _db.session.bulk_save_objects([result_section])
     _db.session.commit()
@@ -256,9 +256,9 @@ section_id = uuid4()
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
         "forms": [
-            Form(form_id=uuid4(), section_id=section_id, form_name="Form 1", section_index=1),
-            Form(form_id=uuid4(), section_id=section_id, form_name="Form 2", section_index=2),
-            Form(form_id=uuid4(), section_id=section_id, form_name="Form 3", section_index=3),
+            Form(form_id=uuid4(), section_id=section_id, url_path="form-1", section_index=1),
+            Form(form_id=uuid4(), section_id=section_id, url_path="form-2", section_index=2),
+            Form(form_id=uuid4(), section_id=section_id, url_path="form-3", section_index=3),
         ],
     }
 )
@@ -467,9 +467,9 @@ section_id = uuid4()
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
         "forms": [
-            Form(form_id=uuid4(), section_id=section_id, form_name="Form 1", section_index=1),
-            Form(form_id=uuid4(), section_id=section_id, form_name="Form 2", section_index=2),
-            Form(form_id=uuid4(), section_id=section_id, form_name="Form 3", section_index=3),
+            Form(form_id=uuid4(), section_id=section_id, url_path="form-1", section_index=1),
+            Form(form_id=uuid4(), section_id=section_id, url_path="form-2", section_index=2),
+            Form(form_id=uuid4(), section_id=section_id, url_path="form-3", section_index=3),
         ],
     }
 )
@@ -501,9 +501,9 @@ section_id = uuid4()
     {
         "sections": [Section(section_id=section_id, name_in_apply_json={"en": "hello section"})],
         "forms": [
-            Form(form_id=uuid4(), section_id=section_id, form_name="Form 1", section_index=1),
-            Form(form_id=uuid4(), section_id=section_id, form_name="Form 2", section_index=2),
-            Form(form_id=uuid4(), section_id=section_id, form_name="Form 3", section_index=3),
+            Form(form_id=uuid4(), section_id=section_id, url_path="form-1", section_index=1),
+            Form(form_id=uuid4(), section_id=section_id, url_path="form-2", section_index=2),
+            Form(form_id=uuid4(), section_id=section_id, url_path="form-3", section_index=3),
         ],
     }
 )

@@ -105,7 +105,7 @@ def build_application(round_id):
     for section in round.sections:
         for local_form in section.forms:
             # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity
-            local_form.display_name = url_path_to_display_name.get(local_form.form_name, local_form.form_name)
+            local_form.display_name = url_path_to_display_name.get(local_form.url_path, local_form.url_path)
 
     return render_template("build_application.html", round=round, fund=fund, back_link=back_link)
 
@@ -156,8 +156,8 @@ def view_all_questions(round_id):
     for section in sections_in_round:
         forms = []
         for form in section.forms:
-            configuration = api_service.get_published_form(form.form_name)
-            forms.append({"name": form.form_name, "form_data": configuration})
+            configuration = api_service.get_published_form(form.url_path)
+            forms.append({"name": form.url_path, "form_data": configuration})
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(
@@ -232,7 +232,7 @@ def section(round_id, section_id=None):
 
         section = get_section_by_id(section_id=section_id)
         new_section_index = max(len(section.forms) + 1, 1)
-        insert_new_form(section_id=section.section_id, form_name=form.template_id.data, section_index=new_section_index)
+        insert_new_form(section_id=section.section_id, url_path=form.template_id.data, section_index=new_section_index)
         form.template_id.data = ""  # Reset the template_id field to default after adding
 
     if section_id:
@@ -258,7 +258,7 @@ def section(round_id, section_id=None):
     # Match form display names from Pre-Award API to local forms to show display names in "Tasks in this section"
     for local_form in params.get("forms_in_section", []):
         # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity
-        local_form.display_name = url_path_to_display_name.get(local_form.form_name, local_form.form_name)
+        local_form.display_name = url_path_to_display_name.get(local_form.url_path, local_form.url_path)
 
     return render_template("section.html", form=form, **params)
 
@@ -320,14 +320,14 @@ def view_form_questions(round_id, section_id, form_id):
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     form = get_form_by_id(form_id=form_id)
-    configuration = api_service.get_published_form(form.form_name)
+    configuration = api_service.get_published_form(form.url_path)
     start_page = next(
         (p for p in configuration["pages"] if p.get("controller") and p["controller"].endswith("start.js")), None
     )
     section_data = [
         {
-            "section_title": f"Preview of form [{form.form_name}]",
-            "forms": [{"name": form.form_name, "form_data": configuration}],
+            "section_title": f"Preview of form [{form.url_path}]",
+            "forms": [{"name": form.url_path, "form_data": configuration}],
         }
     ]
 

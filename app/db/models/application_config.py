@@ -95,7 +95,7 @@ class Section(BaseModel):
 class Form(BaseModel):
     form_id: Mapped[UUID] = Column(primary_key=True)
     section_id = Column(UUID(as_uuid=True), ForeignKey("section.section_id"))
-    form_name = Column(String(), nullable=False)  # Reference to form_name in Pre-Award database
+    url_path = Column(String(), nullable=False)  # Reference to url_path in Pre-Award database
     section_index = Column(Integer())  # Order within section
 
     section: Mapped[Section] = relationship("Section", back_populates="forms")

@@ -53,18 +53,18 @@ class FormStoreAPIService:
             current_app.logger.error("Error fetching forms from Form Store API: %s", e)
             return []
 
-    def get_published_form(self, form_name: str) -> dict[str, Any] | None:
+    def get_published_form(self, url_path: str) -> dict[str, Any] | None:
         try:
-            response = requests.get(f"{self.base_url}/{form_name}/published")
+            response = requests.get(f"{self.base_url}/{url_path}/published")
             response.raise_for_status()
             result = response.json()
             published_form_response = PublishedFormResponse.from_dict(result)
             return published_form_response.configuration
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == HTTPStatus.NOT_FOUND:
-                current_app.logger.info("Form '%s' not found", form_name)
+                current_app.logger.info("Form '%s' not found", url_path)
             else:
-                current_app.logger.error("Error fetching form %s from Form Store API: %s", form_name, e)
+                current_app.logger.error("Error fetching form %s from Form Store API: %s", url_path, e)
         except Exception as e:
-            current_app.logger.error("Error fetching form %s from Form Store API: %s", form_name, e)
+            current_app.logger.error("Error fetching form %s from Form Store API: %s", url_path, e)
         return None

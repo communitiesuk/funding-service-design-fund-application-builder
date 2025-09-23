@@ -136,11 +136,11 @@ def delete_section(section_id, cascade: bool = False):
 
 
 # CRUD FORM
-def insert_new_form(section_id: str, form_name: str, section_index: int) -> Form:
+def insert_new_form(section_id: str, url_path: str, section_index: int) -> Form:
     form = Form(
         form_id=uuid4(),
         section_id=section_id,
-        form_name=form_name,
+        url_path=url_path,
         section_index=section_index,
     )
     try:

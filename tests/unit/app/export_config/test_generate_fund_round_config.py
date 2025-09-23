@@ -14,6 +14,16 @@ def read_data_from_output_file(file):
     return data
 
 
+class MockPublishedForm:
+    def __init__(self, url_path, display_name):
+        self.url_path = url_path
+        self.display_name = display_name
+
+
+def mock_get_published_forms(self):  # Needs to accept same no. of parameters as FormStoreAPIService.get_published_forms
+    return [MockPublishedForm("about-your-org", "About your org")]
+
+
 def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, temp_output_dir):
     # Setup: Prepare valid input parameters
     fund_short_name = seed_dynamic_data["funds"][0].short_name
@@ -25,6 +35,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
     import app.export_config.generate_fund_round_config as generate_fund_round_config
 
     monkeypatch.setattr(generate_fund_round_config, "ROUND_BASE_PATHS", mock_round_base_paths)
+    monkeypatch.setattr("app.shared.form_store_api.FormStoreAPIService.get_published_forms", mock_get_published_forms)
     # Execute: Call the function with valid inputs
     fund_config, round_config = generate_config_for_round(round_id)
     # Simply writes the files to the output directory so no result is given directly
@@ -41,7 +52,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                         "requires_feedback": None,
                     },
                     {
-                        "section_name": {"en": "1.1 about-your-org", "cy": ""},
+                        "section_name": {"en": "1.1 About your org", "cy": ""},
                         "form_name_json": {"en": "about-your-org", "cy": ""},
                     },
                 ],

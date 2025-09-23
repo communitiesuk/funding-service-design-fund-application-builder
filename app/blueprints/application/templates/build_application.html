@@ -68,7 +68,7 @@
                                 </h3>
                             </span>
                             <span class="app-task-list__task-actions">
-                                <a class="govuk-link govuk-!-font-size-19" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions<span class="govuk-visually-hidden"> for {{ form.form_name }} form</span></a>
+                                <a class="govuk-link govuk-!-font-size-19" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions<span class="govuk-visually-hidden"> for {{ form.display_name }} form</span></a>
                             </span>
                         </li>
                     {% endfor %}

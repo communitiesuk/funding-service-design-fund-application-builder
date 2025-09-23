@@ -70,7 +70,7 @@ class TestGenerateAssessmentConfig:
     @pytest.fixture
     def mock_form_data(self):
         mock_form = Mock()
-        mock_form.form_name = "test-form"
+        mock_form.url_path = "test-form"
 
         mock_section = Mock()
         mock_section.name_in_apply_json = {"en": "Application Details"}
