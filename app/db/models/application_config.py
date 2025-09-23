@@ -114,6 +114,7 @@ class Form(BaseModel):
     form_json = Column(JSON(none_as_null=True), nullable=False, default=lambda: {})
     created_at = Column(DateTime, nullable=True)
     updated_at = Column(DateTime, onupdate=func.now(), nullable=True)
+    url_path = Column(String(), nullable=True)  # Reference to url_path in Pre-Award database
 
     def __repr__(self):
         return f"Form({self.section_index}, {self.runner_publish_name}" + f"- {self.name_in_apply_json['en']})"
