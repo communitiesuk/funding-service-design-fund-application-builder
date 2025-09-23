@@ -341,7 +341,6 @@ def init_unit_test_data() -> dict:
         name_in_apply_json={"en": "About your organisation"},
         section_index=1,
         runner_publish_name="about-your-org",
-        template_name="About your organization template",
         form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
 
@@ -421,7 +420,6 @@ def fund_without_assessment() -> dict:
         name_in_apply_json={"en": "About your organisation"},
         section_index=1,
         runner_publish_name="about-your-org",
-        template_name="About your organization template",
         form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
 
@@ -431,7 +429,6 @@ def fund_without_assessment() -> dict:
         name_in_apply_json={"en": "About your organisation 2"},
         section_index=1,
         runner_publish_name="about-your-org",
-        template_name="About your organization template",
         form_json=ABOUT_YOUR_ORG_FORM_JSON,
     )
     return {
