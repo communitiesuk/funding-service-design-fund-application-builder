@@ -51,24 +51,6 @@ class TestGenerateAssessmentConfig:
         mock_form = Mock()
         mock_form.runner_publish_name = "test-form"
         mock_form.url_path = "test-form"
-        mock_form.form_json = {
-            "pages": [
-                {
-                    "path": "/contact",
-                    "title": "Contact Details",
-                    "components": [
-                        {"name": "name_field", "type": "TextField", "title": "Your Name"},
-                        {"name": "email_field", "type": "EmailAddressField", "title": "Email"},
-                        {"name": "html_content", "type": "Html", "title": "Info Text"},  # Should be filtered
-                    ],
-                },
-                {
-                    "path": "/summary",  # Should be skipped
-                    "title": "Summary",
-                    "components": [{"name": "summary_field", "type": "TextField", "title": "Summary"}],
-                },
-            ]
-        }
 
         mock_section = Mock()
         mock_section.name_in_apply_json = {"en": "Application Details"}
@@ -96,6 +78,26 @@ class TestGenerateAssessmentConfig:
             # Setup mock API service
             mock_api_service = Mock()
             mock_api_service.get_display_name_from_url_path.return_value = "Test Form"
+
+            # Add the get_published_form mock to return the form JSON
+            mock_api_service.get_published_form.return_value = {
+                "pages": [
+                    {
+                        "path": "/contact",
+                        "title": "Contact Details",
+                        "components": [
+                            {"name": "name_field", "type": "TextField", "title": "Your Name"},
+                            {"name": "email_field", "type": "EmailAddressField", "title": "Email"},
+                            {"name": "html_content", "type": "Html", "title": "Info Text"},  # Should be filtered
+                        ],
+                    },
+                    {
+                        "path": "/summary",  # Should be skipped
+                        "title": "Summary",
+                        "components": [{"name": "summary_field", "type": "TextField", "title": "Summary"}],
+                    },
+                ]
+            }
             mock_api_service_class.return_value = mock_api_service
 
             mock_template = Mock()
@@ -179,7 +181,9 @@ class TestGenerateAssessmentConfig:
         mock_form = Mock()
         mock_form.runner_publish_name = "readonly-form"
         mock_form.url_path = "readonly-form"
-        mock_form.form_json = {
+
+        # Set up API service to return form JSON for this form
+        common_patches["api_service"].get_published_form.return_value = {
             "pages": [
                 {
                     "path": "/readonly",

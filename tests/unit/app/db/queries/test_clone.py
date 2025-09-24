@@ -13,13 +13,11 @@ def mock_form():
     form.section_id = uuid4()
     form.section_index = 1
     form.runner_publish_name = "test-form"
-    form.form_json = {"name": "Test Form", "startPage": "/start", "pages": [{"title": "Start", "path": "/start"}]}
     form.as_dict.return_value = {
         "form_id": form.form_id,
         "section_id": form.section_id,
         "section_index": form.section_index,
         "runner_publish_name": form.runner_publish_name,
-        "form_json": form.form_json,
     }
     return form
 

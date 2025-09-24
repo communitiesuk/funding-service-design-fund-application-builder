@@ -154,12 +154,16 @@ def view_all_questions(round_id):
     Generates the form data for all sections in the selected round, then uses that to generate the 'All Questions'
     data for that round and returns that to render in a template.
     """
+    api_service = FormStoreAPIService()
     round = get_round_by_id(round_id)
     fund = get_fund_by_id(round.fund_id)
     sections_in_round = round.sections
     section_data = []
     for section in sections_in_round:
-        forms = [{"name": form.runner_publish_name, "form_data": form.form_json} for form in section.forms]
+        forms = []
+        for form in section.forms:
+            form_json = api_service.get_published_form(form.url_path)
+            forms.append({"name": form.runner_publish_name, "form_data": form_json})
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(
@@ -333,10 +337,13 @@ def view_form_questions(round_id, section_id, form_id):
     display_name = api_service.get_display_name_from_url_path(form.url_path)
     if not display_name:
         raise FormNotFoundError(url_path=form.url_path)
+    form_json = api_service.get_published_form(form.url_path)
+    if not form_json:
+        raise FormNotFoundError(url_path=form.url_path)
     section_data = [
         {
             "section_title": "",  # Not used
-            "forms": [{"name": form.runner_publish_name, "form_data": form.form_json}],
+            "forms": [{"name": form.runner_publish_name, "form_data": form_json}],
         }
     ]
     print_data = generate_print_data_for_sections(

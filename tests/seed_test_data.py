@@ -240,7 +240,6 @@ def init_salmon_fishing_fund():
         section_id=s1.section_id,
         section_index=1,
         runner_publish_name="about-your-org",
-        form_json=ABOUT_YOUR_ORG_FORM_JSON,
         url_path="about-your-org",
     )
     f2: Form = Form(
@@ -248,7 +247,6 @@ def init_salmon_fishing_fund():
         section_id=s1.section_id,
         section_index=2,
         runner_publish_name="contact-details",
-        form_json=CONTACT_DETAILS_FORM_JSON,
         url_path="contact-details",
     )
     fd: Fund = Fund(
@@ -340,7 +338,6 @@ def init_unit_test_data() -> dict:
         section_id=s1.section_id,
         section_index=1,
         runner_publish_name="about-your-org",
-        form_json=ABOUT_YOUR_ORG_FORM_JSON,
         url_path="about-your-org",
     )
 
@@ -419,7 +416,6 @@ def fund_without_assessment() -> dict:
         section_id=f2_r1_s1.section_id,
         section_index=1,
         runner_publish_name="about-your-org",
-        form_json=ABOUT_YOUR_ORG_FORM_JSON,
         url_path="about-your-org",
     )
 
@@ -428,7 +424,6 @@ def fund_without_assessment() -> dict:
         section_id=f2_r1_s2.section_id,
         section_index=1,
         runner_publish_name="about-your-org",
-        form_json=ABOUT_YOUR_ORG_FORM_JSON,
         url_path="about-your-org",
     )
     return {

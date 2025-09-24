@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 from bs4 import BeautifulSoup
 
@@ -6,9 +8,16 @@ from app.export_config.generate_fund_round_html import (
     frontend_html_suffix,
     generate_all_round_html,
 )
+from tests.seed_test_data import ABOUT_YOUR_ORG_FORM_JSON
 
 
-def test_generate_fund_round_html(seed_dynamic_data, temp_output_dir):
+@patch("app.export_config.generate_fund_round_html.FormStoreAPIService")
+def test_generate_fund_round_html(mock_api_service_class, seed_dynamic_data, temp_output_dir):
+    # Setup mock
+    mock_api_service = MagicMock()
+    mock_api_service.get_published_form.return_value = ABOUT_YOUR_ORG_FORM_JSON
+    mock_api_service_class.return_value = mock_api_service
+
     # Setup: Prepare valid input parameters
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
