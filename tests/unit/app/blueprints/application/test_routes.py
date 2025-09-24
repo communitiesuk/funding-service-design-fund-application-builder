@@ -198,7 +198,12 @@ def test_update_template_form(mock_form_store_service, flask_test_client, seed_d
         type("MockForm", (), {"url_path": "about-your-org", "display_name": "About your organisation"}),
         type("MockForm", (), {"url_path": str(test_form.form_id), "display_name": "About your organisation"}),
     ]
-    mock_form_store_service.return_value.get_published_forms.return_value = mock_published_forms
+
+    # Mock the API service instance
+    mock_api_instance = mock_form_store_service.return_value
+    mock_api_instance.get_published_forms.return_value = mock_published_forms
+    # Mock the get_display_name_from_url_path method to return the display name
+    mock_api_instance.get_display_name_from_url_path.return_value = "About your organisation"
 
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"
