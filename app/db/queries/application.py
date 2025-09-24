@@ -8,7 +8,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.db import db
 from app.db.models import Form, Section
 from app.db.queries.round import get_round_by_id
-from app.shared.form_store_api import FormStoreAPIService
 
 
 def get_section_by_id(section_id) -> Section:
@@ -113,14 +112,11 @@ def delete_section(section_id, cascade: bool = False):
 
 
 def insert_form(section_id: str, url_path: str, section_index: int) -> Form:
-    api_service = FormStoreAPIService()
-    published_form_response = api_service.get_published_form(url_path)
     form = Form(
         form_id=uuid4(),
         section_id=section_id,
         section_index=section_index,
         runner_publish_name=url_path,
-        form_json=published_form_response.published_json,
         created_at=datetime.now(),
         url_path=url_path,
     )

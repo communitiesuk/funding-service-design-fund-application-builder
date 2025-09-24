@@ -1,6 +1,5 @@
 import uuid
 from copy import deepcopy
-from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
@@ -22,7 +21,6 @@ from app.db.queries.application import (
     swap_elements_in_list,
     update_section,
 )
-from app.shared.form_store_api import PublishedFormResponse
 from tests.helpers import get_round_by_id
 from tests.seed_test_data import BASIC_FUND_INFO, BASIC_ROUND_INFO
 
@@ -55,30 +53,7 @@ def test_section(test_round_id) -> Section:
 
 
 @pytest.fixture
-def mock_form_store_api():
-    """Mock the FormStoreAPIService.get_published_form method"""
-    with patch("app.db.queries.application.FormStoreAPIService") as mock_service:
-        mock_instance = MagicMock()
-        mock_service.return_value = mock_instance
-
-        # Create a mock PublishedFormResponse
-        mock_response = PublishedFormResponse(
-            id="test-form-id",
-            url_path="test-url-path",
-            display_name="Test Form",
-            created_at="2024-01-01T00:00:00Z",
-            updated_at="2024-01-01T00:00:00Z",
-            published_at="2024-01-01T00:00:00Z",
-            is_published=True,
-            published_json={"test": "data"},
-            hash="test-hash",
-        )
-        mock_instance.get_published_form.return_value = mock_response
-        yield mock_instance
-
-
-@pytest.fixture
-def test_form(test_section: Section, mock_form_store_api) -> Form:
+def test_form(test_section: Section) -> Form:
     """Fixture that creates a test form with default values."""
     return insert_form(
         section_id=test_section.section_id,
@@ -135,7 +110,7 @@ def test_failed_delete_section_with_fk_to_forms(_db, test_section: Section, test
     assert _db.session.query(Section).filter(Section.section_id == test_section.section_id).one_or_none() is not None
 
 
-def test_insert_form(test_section: Section, mock_form_store_api):
+def test_insert_form(test_section: Section):
     new_form: Form = insert_form(
         section_id=test_section.section_id,
         url_path="test-url-path",

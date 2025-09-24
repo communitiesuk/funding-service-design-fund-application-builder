@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
 from bs4 import BeautifulSoup
 
@@ -6,15 +8,39 @@ from app.export_config.generate_fund_round_html import (
     frontend_html_suffix,
     generate_all_round_html,
 )
+from app.shared.form_store_api import PublishedFormResponse
+from tests.seed_test_data import ABOUT_YOUR_ORG_FORM_JSON
 
 
-def test_generate_fund_round_html(seed_dynamic_data, temp_output_dir):
+@patch("app.export_config.generate_fund_round_html.FormStoreAPIService")
+def test_generate_fund_round_html(mock_api_service_class, seed_dynamic_data, temp_output_dir):
+    # Setup mock
+    mock_api_service = MagicMock()
+
+    # Create a PublishedFormResponse object with the test data
+    mock_published_form = PublishedFormResponse(
+        id="test-form-id",
+        url_path="about-your-org",
+        display_name="About your organisation",
+        created_at="2024-01-01T00:00:00Z",
+        updated_at="2024-01-01T00:00:00Z",
+        published_at="2024-01-01T00:00:00Z",
+        is_published=True,
+        published_json=ABOUT_YOUR_ORG_FORM_JSON,
+        hash="test-hash-123",
+    )
+
+    mock_api_service.get_published_form.return_value = mock_published_form
+    mock_api_service_class.return_value = mock_api_service
+
     # Setup: Prepare valid input parameters
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
     fund_short_name = seed_dynamic_data["funds"][0].short_name
+
     # Execute: Call the function with valid inputs
     generate_all_round_html(round_id)
+
     # Assert: Check if the directory structure and files are created as expected
     expected_files = [
         {

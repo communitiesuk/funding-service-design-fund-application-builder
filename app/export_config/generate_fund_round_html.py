@@ -5,6 +5,7 @@ from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.generate_all_questions import generate_html
 from app.export_config.helpers import write_config
+from app.shared.form_store_api import FormNotFoundError, FormStoreAPIService
 
 frontend_html_prefix = """
 {% extends "apply/base.html" %}
@@ -51,6 +52,7 @@ def generate_all_round_html(round_id, base_output_dir=None):
     The generated HTML is intended to provide a comprehensive overview of the round,
     including details of each section and form, for printing or web display purposes.
     """
+    api_service = FormStoreAPIService()
     if not round_id:
         raise ValueError("Round ID is required to generate HTML.")
     current_app.logger.info("Generating HTML for round {round_id}", extra=dict(round_id=round_id))
@@ -59,7 +61,12 @@ def generate_all_round_html(round_id, base_output_dir=None):
     sections_in_round = round.sections
     section_data = []
     for section in sections_in_round:
-        forms = [{"name": form.runner_publish_name, "form_data": form.form_json} for form in section.forms]
+        forms = []
+        for form in section.forms:
+            published_form_response = api_service.get_published_form(form.url_path)
+            if not published_form_response:
+                raise FormNotFoundError(url_path=form.url_path)
+            forms.append({"name": form.runner_publish_name, "form_data": published_form_response.published_json})
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(

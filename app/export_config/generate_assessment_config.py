@@ -47,15 +47,15 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
 
         for form in section.forms:
             form: Form
-            display_name = api_service.get_display_name_from_url_path(form.url_path)
-            if not display_name:
+            published_form_response = api_service.get_published_form(form.url_path)
+            if not published_form_response:
                 raise FormNotFoundError(url_path=form.url_path)
             sc = {
                 "id": form.runner_publish_name,
-                "name": display_name,
+                "name": published_form_response.display_name,
                 "themes": [],
             }
-            for page in form.form_json.get("pages"):
+            for page in published_form_response.published_json.get("pages"):
                 page: dict
                 if page.get("path").lstrip("/") == "summary":
                     continue

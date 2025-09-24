@@ -5,6 +5,7 @@ from flask import Blueprint, g, redirect, render_template, session, url_for
 from fsd_utils.authentication.decorators import login_requested
 
 from app.db.queries.application import get_form_by_id
+from app.shared.form_store_api import FormNotFoundError, FormStoreAPIService
 from config import Config
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -42,13 +43,16 @@ def preview_form(form_id):
     Generates the form json for a chosen form, does not persist this, but publishes it to the form runner using the
     'runner_publish_name' of that form. Returns a redirect to that form in the form-runner
     """
+    api_service = FormStoreAPIService()
     form = get_form_by_id(form_id)
-    form_json = form.form_json
+    published_form_response = api_service.get_published_form(form.url_path)
+    if not published_form_response:
+        raise FormNotFoundError(url_path=form.url_path)
     form_id = form.runner_publish_name
 
     try:
         publish_response = requests.post(
-            url=Config.FORM_RUNNER_PUBLISH_URL, json={"id": form_id, "configuration": form_json}
+            url=Config.FORM_RUNNER_PUBLISH_URL, json={"id": form_id, "configuration": published_form_response.published_json}
         )
         if not str(publish_response.status_code).startswith("2"):
             return "Error during form publish", 500

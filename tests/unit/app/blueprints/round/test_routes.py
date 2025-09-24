@@ -7,7 +7,6 @@ from flask import g, url_for
 
 from app.db.models import Fund, FundingType, Round
 from app.db.queries.round import get_round_by_id
-from app.shared.form_store_api import PublishedFormResponse
 from tests.helpers import submit_form
 
 radio_fields = {
@@ -314,24 +313,11 @@ def test_view_round_details(flask_test_client, seed_dynamic_data):
 
 
 @pytest.mark.usefixtures("set_auth_cookie", "patch_validate_token_rs256_allowed_domain_user")
-def test_clone_round(flask_test_client, seed_dynamic_data, mocker):
+def test_clone_round(flask_test_client, seed_dynamic_data):
     """
     Test to check round detail route is working as expected.
     and verify the round details template is rendered as expected.
     """
-    mock_api_service = mocker.Mock()
-    mock_api_service.get_published_form.return_value = PublishedFormResponse(
-        id="test-form-id",
-        url_path="test-form-path",
-        display_name="Test Form",
-        created_at="2024-01-01T00:00:00Z",
-        updated_at="2024-01-01T00:00:00Z",
-        published_at="2024-01-01T00:00:00Z",
-        is_published=True,
-        published_json={"pages": []},
-        hash="test-hash"
-    )
-    mocker.patch("app.db.queries.application.FormStoreAPIService", return_value=mock_api_service)
     test_round = seed_dynamic_data["rounds"][0]
     test_fund = seed_dynamic_data["funds"][0]
     response = flask_test_client.get(f"/rounds/{test_round.round_id}", follow_redirects=True)

@@ -105,7 +105,6 @@ class Form(BaseModel):
     )
     section_index = Column(Integer())
     runner_publish_name = Column(db.String())
-    form_json = Column(JSON(none_as_null=True), nullable=False, default=lambda: {})
     created_at = Column(DateTime, nullable=True)
     updated_at = Column(DateTime, onupdate=func.now(), nullable=True)
     url_path = Column(String(), nullable=True)  # Reference to url_path in Pre-Award database

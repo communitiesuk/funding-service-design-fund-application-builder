@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from flask import g, url_for
 
 from app.blueprints.application.routes import create_export_zip
-from app.shared.form_store_api import FormResponse, PublishedFormResponse
+from app.shared.form_store_api import FormResponse
 from tests.helpers import find_button_with_text, submit_form
 
 
@@ -205,13 +205,9 @@ def test_add_form_to_section(flask_test_client, seed_dynamic_data, mocker):
 
     mock_api_service = mocker.Mock()
     mock_api_service.get_published_forms.return_value = [FormResponse(**form_data)]
-    mock_api_service.get_published_form.return_value = PublishedFormResponse(
-        **form_data, published_json={"pages": []}, hash="test-hash"
-    )
     mock_api_service.get_display_name_from_url_path.return_value = "About your organisation"
 
     mocker.patch("app.blueprints.application.routes.FormStoreAPIService", return_value=mock_api_service)
-    mocker.patch("app.db.queries.application.FormStoreAPIService", return_value=mock_api_service)
 
     test_round = seed_dynamic_data["rounds"][0]
     url = f"/rounds/{test_round.round_id}/sections/create"

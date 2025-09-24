@@ -5,6 +5,7 @@ import pytest
 
 from app.db.models.application_config import ComponentType
 from app.export_config.generate_assessment_config import _get_component_type, generate_assessment_config_for_round
+from app.shared.form_store_api import PublishedFormResponse
 
 
 class TestGetComponentType:
@@ -51,24 +52,6 @@ class TestGenerateAssessmentConfig:
         mock_form = Mock()
         mock_form.runner_publish_name = "test-form"
         mock_form.url_path = "test-form"
-        mock_form.form_json = {
-            "pages": [
-                {
-                    "path": "/contact",
-                    "title": "Contact Details",
-                    "components": [
-                        {"name": "name_field", "type": "TextField", "title": "Your Name"},
-                        {"name": "email_field", "type": "EmailAddressField", "title": "Email"},
-                        {"name": "html_content", "type": "Html", "title": "Info Text"},  # Should be filtered
-                    ],
-                },
-                {
-                    "path": "/summary",  # Should be skipped
-                    "title": "Summary",
-                    "components": [{"name": "summary_field", "type": "TextField", "title": "Summary"}],
-                },
-            ]
-        }
 
         mock_section = Mock()
         mock_section.name_in_apply_json = {"en": "Application Details"}
@@ -96,6 +79,36 @@ class TestGenerateAssessmentConfig:
             # Setup mock API service
             mock_api_service = Mock()
             mock_api_service.get_display_name_from_url_path.return_value = "Test Form"
+
+            # Add the get_published_form mock to return the form JSON
+            mock_api_service.get_published_form.return_value = PublishedFormResponse(
+                id="form-1",
+                url_path="test-form",
+                display_name="Test Form",
+                created_at=None,
+                updated_at=None,
+                published_at=None,
+                is_published=True,
+                published_json={
+                    "pages": [
+                        {
+                            "path": "/contact",
+                            "title": "Contact Details",
+                            "components": [
+                                {"name": "name_field", "type": "TextField", "title": "Your Name"},
+                                {"name": "email_field", "type": "EmailAddressField", "title": "Email"},
+                                {"name": "html_content", "type": "Html", "title": "Info Text"},
+                            ],
+                        },
+                        {
+                            "path": "/summary",
+                            "title": "Summary",
+                            "components": [{"name": "summary_field", "type": "TextField", "title": "Summary"}],
+                        },
+                    ]
+                },
+                hash="test-hash",
+            )
             mock_api_service_class.return_value = mock_api_service
 
             mock_template = Mock()
@@ -179,18 +192,30 @@ class TestGenerateAssessmentConfig:
         mock_form = Mock()
         mock_form.runner_publish_name = "readonly-form"
         mock_form.url_path = "readonly-form"
-        mock_form.form_json = {
-            "pages": [
-                {
-                    "path": "/readonly",
-                    "title": "Readonly Page",
-                    "components": [
-                        {"name": "html_field", "type": "Html", "title": "HTML"},
-                        {"name": "para_field", "type": "Para", "title": "Paragraph"},
-                    ],
-                }
-            ]
-        }
+
+        # Set up API service to return form JSON for this form
+        common_patches["api_service"].get_published_form.return_value = PublishedFormResponse(
+            id="form-2",
+            url_path="readonly-form",
+            display_name="Readonly Form",
+            created_at=None,
+            updated_at=None,
+            published_at=None,
+            is_published=True,
+            published_json={
+                "pages": [
+                    {
+                        "path": "/readonly",
+                        "title": "Readonly Page",
+                        "components": [
+                            {"name": "html_field", "type": "Html", "title": "HTML"},
+                            {"name": "para_field", "type": "Para", "title": "Paragraph"},
+                        ],
+                    }
+                ]
+            },
+            hash="test-hash-2",
+        )
 
         mock_section = Mock()
         mock_section.name_in_apply_json = {"en": "Test"}
