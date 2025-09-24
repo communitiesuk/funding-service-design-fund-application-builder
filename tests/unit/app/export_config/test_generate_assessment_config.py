@@ -77,7 +77,7 @@ class TestGenerateAssessmentConfig:
         return [mock_section]
 
     @pytest.fixture
-    def common_patches(self, mock_api_service):
+    def common_patches(self):
         """Common patches that most tests need"""
         with (
             patch("app.export_config.generate_assessment_config.copy.deepcopy") as mock_deepcopy,
@@ -92,6 +92,10 @@ class TestGenerateAssessmentConfig:
             # Setup common behavior
             mock_kebab.side_effect = lambda x: x.lower().replace(" ", "-")
             mock_display_types.get.return_value = "text"
+
+            # Setup mock API service
+            mock_api_service = Mock()
+            mock_api_service.get_display_name_from_url_path.return_value = "Test Form"
             mock_api_service_class.return_value = mock_api_service
 
             mock_template = Mock()
@@ -105,6 +109,7 @@ class TestGenerateAssessmentConfig:
                 "display_types": mock_display_types,
                 "kebab": mock_kebab,
                 "api_service_class": mock_api_service_class,
+                "api_service": mock_api_service,
                 "template": mock_template,
             }
 
@@ -170,12 +175,6 @@ class TestGenerateAssessmentConfig:
     def test_readonly_components_filtered(self, configs, common_patches):
         fund_config, round_config = configs
 
-        # Override the published forms for this test
-        mock_published_form = Mock()
-        mock_published_form.url_path = "readonly-form"
-        mock_published_form.display_name = "Readonly Form"
-        common_patches["api_service_class"].return_value.get_published_forms.return_value = [mock_published_form]
-
         # Create form with only readonly components
         mock_form = Mock()
         mock_form.runner_publish_name = "readonly-form"
@@ -197,6 +196,9 @@ class TestGenerateAssessmentConfig:
         mock_section.name_in_apply_json = {"en": "Test"}
         mock_section.forms = [mock_form]
 
+        # Set up API service to return display name for this form
+        common_patches["api_service"].get_display_name_from_url_path.return_value = "Readonly Form"
+
         common_patches["db"].session.query.return_value.filter.return_value.order_by.return_value.all.return_value = [
             mock_section
         ]
@@ -211,9 +213,6 @@ class TestGenerateAssessmentConfig:
 
     def test_empty_sections(self, configs, common_patches):
         fund_config, round_config = configs
-
-        # Override to return empty forms
-        common_patches["api_service_class"].return_value.get_published_forms.return_value = []
 
         # No sections
         common_patches["db"].session.query.return_value.filter.return_value.order_by.return_value.all.return_value = []

@@ -208,6 +208,7 @@ def test_add_form_to_section(flask_test_client, seed_dynamic_data, mocker):
     mock_api_service.get_published_form.return_value = PublishedFormResponse(
         **form_data, published_json={"pages": []}, hash="test-hash"
     )
+    mock_api_service.get_display_name_from_url_path.return_value = "About your organisation"
 
     mocker.patch("app.blueprints.application.routes.FormStoreAPIService", return_value=mock_api_service)
     mocker.patch("app.db.queries.application.FormStoreAPIService", return_value=mock_api_service)

@@ -104,12 +104,10 @@ def build_application(round_id):
 
     # Call Pre-Award API to get display names for forms
     api_service = FormStoreAPIService()
-    published_forms = api_service.get_published_forms()
-    url_path_to_display_name = {pf.url_path: pf.display_name for pf in published_forms}
     for section in round.sections:
         for local_form in section.forms:
             local_form: Form
-            display_name = url_path_to_display_name.get(local_form.url_path)
+            display_name = api_service.get_display_name_from_url_path(local_form.url_path)
             if not display_name:
                 raise FormNotFoundError(url_path=local_form.url_path)
             # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity
@@ -253,7 +251,6 @@ def section(round_id, section_id=None):
 
     # Get forms from Pre-Award API to show in "Add a task" drop-down
     choices = [("", "Select a template")]
-    url_path_to_display_name = {}
     api_service = FormStoreAPIService()
     published_forms = api_service.get_published_forms()
     for published_form in published_forms:
@@ -261,14 +258,13 @@ def section(round_id, section_id=None):
         display_name = published_form.display_name
         if display_name:
             choices.append((url_path, f"{display_name} ({url_path})"))
-        url_path_to_display_name[url_path] = display_name
     sorted_choices = sorted(choices[1:], key=lambda c: c[1])
     form.template_id.choices = choices[:1] + sorted_choices
 
     # Match form display names from Pre-Award API to local forms to show display names in "Tasks in this section"
     for local_form in params.get("forms_in_section", []):
         local_form: Form
-        display_name = url_path_to_display_name.get(local_form.url_path)
+        display_name = api_service.get_display_name_from_url_path(local_form.url_path)
         if not display_name:
             raise FormNotFoundError(url_path=local_form.url_path)
         # Dynamically assigning the undefined display_name attribute to the Form SQLAlchemy model for simplicity

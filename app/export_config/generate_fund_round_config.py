@@ -34,8 +34,6 @@ TEMPLATE_FUND_ROUND_EXPORT = {"sections_config": [], "fund_config": {}, "round_c
 
 def generate_application_display_config(round_id):
     api_service = FormStoreAPIService()
-    published_forms = api_service.get_published_forms()
-    url_path_to_display_name = {pf.url_path: pf.display_name for pf in published_forms}
 
     ordered_sections = []
     # get round
@@ -65,7 +63,7 @@ def generate_application_display_config(round_id):
         for original_form in forms:
             # Create a deep copy of the form object
             form = copy.deepcopy(original_form)
-            display_name = url_path_to_display_name.get(form.url_path)
+            display_name = api_service.get_display_name_from_url_path(form.url_path)
             if not display_name:
                 raise FormNotFoundError(url_path=form.url_path)
             name_in_apply_json = {"en": f"{section.index}.{form.section_index} {display_name}", "cy": ""}
