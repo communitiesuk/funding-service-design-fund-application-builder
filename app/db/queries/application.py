@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any
 from uuid import uuid4
 
 from flask import current_app
@@ -132,36 +131,6 @@ def delete_section(section_id, cascade: bool = False):
     db.session.delete(section)
     db.session.commit()
     return section
-
-
-# CRUD FORM
-def insert_new_form(
-    form_name: str,  # Name as it appears in the Apply tasklist
-    template_name: str,  # Our own internal name for the template
-    runner_publish_name: str,  # Unique URL-friendly identifier used in request to Form Runner
-    form_json: dict[str, Any],
-) -> Form:
-    form = Form(
-        form_id=uuid4(),
-        section_id=None,
-        name_in_apply_json={"en": form_name},
-        is_template=True,
-        template_name=template_name,
-        source_template_id=None,
-        audit_info=None,
-        section_index=None,
-        runner_publish_name=runner_publish_name,
-        form_json=form_json,
-        created_at=datetime.now(),
-    )
-    try:
-        db.session.add(form)
-        db.session.commit()
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        current_app.logger.error(e)
-        raise e
-    return form
 
 
 def insert_new_section_form(section_id: str, url_path: str, section_index: int) -> Form:
