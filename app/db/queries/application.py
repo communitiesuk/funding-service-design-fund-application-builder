@@ -116,7 +116,6 @@ def insert_form(section_id: str, url_path: str, section_index: int) -> Form:
         form_id=uuid4(),
         section_id=section_id,
         section_index=section_index,
-        runner_publish_name=url_path,
         created_at=datetime.now(),
         url_path=url_path,
     )

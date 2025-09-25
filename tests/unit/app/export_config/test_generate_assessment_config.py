@@ -50,7 +50,6 @@ class TestGenerateAssessmentConfig:
     @pytest.fixture
     def mock_form_data(self):
         mock_form = Mock()
-        mock_form.runner_publish_name = "test-form"
         mock_form.url_path = "test-form"
 
         mock_section = Mock()
@@ -190,7 +189,6 @@ class TestGenerateAssessmentConfig:
 
         # Create form with only readonly components
         mock_form = Mock()
-        mock_form.runner_publish_name = "readonly-form"
         mock_form.url_path = "readonly-form"
 
         # Set up API service to return form JSON for this form

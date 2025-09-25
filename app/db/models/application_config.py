@@ -104,13 +104,12 @@ class Form(BaseModel):
         default=uuid.uuid4,
     )
     section_index = Column(Integer())
-    runner_publish_name = Column(db.String())
     created_at = Column(DateTime, nullable=True)
     updated_at = Column(DateTime, onupdate=func.now(), nullable=True)
     url_path = Column(String(), nullable=True)  # Reference to url_path in Pre-Award database
 
     def __repr__(self):
-        return f"Form({self.section_index}, {self.runner_publish_name})"
+        return f"Form({self.section_index}, {self.url_path})"
 
     def as_dict(self, include_relationships=False):
         result = {col.name: getattr(self, col.name) for col in inspect(self).mapper.columns}

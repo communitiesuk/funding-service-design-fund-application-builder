@@ -165,7 +165,7 @@ def view_all_questions(round_id):
             published_form_response = api_service.get_published_form(form.url_path)
             if not published_form_response:
                 raise FormNotFoundError(url_path=form.url_path)
-            forms.append({"name": form.runner_publish_name, "form_data": published_form_response.published_json})
+            forms.append({"name": form.url_path, "form_data": published_form_response.published_json})
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(
@@ -342,7 +342,7 @@ def view_form_questions(round_id, section_id, form_id):
     section_data = [
         {
             "section_title": "",  # Not used
-            "forms": [{"name": form.runner_publish_name, "form_data": published_form_response.published_json}],
+            "forms": [{"name": form.url_path, "form_data": published_form_response.published_json}],
         }
     ]
     print_data = generate_print_data_for_sections(

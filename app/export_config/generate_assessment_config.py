@@ -51,7 +51,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
             if not published_form_response:
                 raise FormNotFoundError(url_path=form.url_path)
             sc = {
-                "id": form.runner_publish_name,
+                "id": form.url_path,
                 "name": published_form_response.display_name,
                 "themes": [],
             }
@@ -71,7 +71,7 @@ def generate_assessment_config_for_round(fund_config, round_config, base_output_
                         continue
                     answer = {
                         "field_id": component.get("name"),
-                        "form_name": form.runner_publish_name,
+                        "form_name": form.url_path,
                         "field_type": component_type.value[0].lower() + component_type.value[1:],
                         "presentation_type": form_json_to_assessment_display_types.get(component_type.name, "text"),
                         "question": component.get("title"),

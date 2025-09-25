@@ -41,14 +41,14 @@ def dashboard():
 def preview_form(form_id):
     """
     Generates the form json for a chosen form, does not persist this, but publishes it to the form runner using the
-    'runner_publish_name' of that form. Returns a redirect to that form in the form-runner
+    'url_path' of that form. Returns a redirect to that form in the form-runner
     """
     api_service = FormStoreAPIService()
     form = get_form_by_id(form_id)
     published_form_response = api_service.get_published_form(form.url_path)
     if not published_form_response:
         raise FormNotFoundError(url_path=form.url_path)
-    form_id = form.runner_publish_name
+    form_id = form.url_path
 
     try:
         publish_response = requests.post(

@@ -32,7 +32,7 @@ def test_generate_form_jsons_for_round_valid_input(mock_api_service_class, seed_
     # Setup: Prepare valid input parameters
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
-    form_publish_name = seed_dynamic_data["forms"][0].runner_publish_name
+    form_publish_name = seed_dynamic_data["forms"][0].url_path
 
     # Execute: Call the function with valid inputs
     generate_form_jsons_for_round(round_id)

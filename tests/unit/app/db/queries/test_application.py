@@ -116,7 +116,7 @@ def test_insert_form(test_section: Section):
         url_path="test-url-path",
         section_index=5,
     )
-    assert new_form.runner_publish_name == "test-url-path"
+    assert new_form.url_path == "test-url-path"
     assert new_form.section_index == 5
 
 
