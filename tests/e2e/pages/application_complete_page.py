@@ -9,7 +9,7 @@ class CompleteApplicationPage(PageBase):
         self.download_data = None
         # Initialize locators
         self.title = self.page.get_by_role("heading", name="Application marked as complete")
-        self.download = self.page.get_by_role("link", name="Download the application ZIP file")
+        self.download = self.page.get_by_role("link", name="Download the application ZIP file (file size may vary)")
 
     def then_verify_on_application_complete(self):
         expect(self.title).to_be_visible()
