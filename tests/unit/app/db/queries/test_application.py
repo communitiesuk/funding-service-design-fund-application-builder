@@ -12,8 +12,8 @@ from app.db.queries.application import (
     delete_section,
     delete_section_from_round,
     get_section_by_id,
+    insert_form,
     insert_new_section,
-    insert_new_section_form,
     move_form_down,
     move_form_up,
     move_section_down,
@@ -55,7 +55,7 @@ def test_section(test_round_id) -> Section:
 @pytest.fixture
 def test_form(test_section: Section) -> Form:
     """Fixture that creates a test form with default values."""
-    return insert_new_section_form(
+    return insert_form(
         section_id=test_section.section_id,
         url_path="test-url-path",
         section_index=1,
@@ -110,8 +110,8 @@ def test_failed_delete_section_with_fk_to_forms(_db, test_section: Section, test
     assert _db.session.query(Section).filter(Section.section_id == test_section.section_id).one_or_none() is not None
 
 
-def test_insert_new_section_form(test_section: Section):
-    new_form: Form = insert_new_section_form(
+def test_insert_form(test_section: Section):
+    new_form: Form = insert_form(
         section_id=test_section.section_id,
         url_path="test-url-path",
         section_index=5,
