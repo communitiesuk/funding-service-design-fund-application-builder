@@ -52,7 +52,8 @@ def preview_form(form_id):
 
     try:
         publish_response = requests.post(
-            url=Config.FORM_RUNNER_PUBLISH_URL, json={"id": form_id, "configuration": published_form_response.published_json}
+            url=Config.FORM_RUNNER_PUBLISH_URL,
+            json={"id": form_id, "configuration": published_form_response.published_json},
         )
         if not str(publish_response.status_code).startswith("2"):
             return "Error during form publish", 500
