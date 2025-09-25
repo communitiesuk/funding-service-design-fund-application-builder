@@ -66,7 +66,7 @@ def generate_all_round_html(round_id, base_output_dir=None):
             form_json = api_service.get_published_form(form.url_path)
             if not form_json:
                 raise FormNotFoundError(url_path=form.url_path)
-            forms.append({"name": form.runner_publish_name, "form_data": form_json})
+            forms.append({"name": form.url_path, "form_data": form_json})
         section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
 
     print_data = generate_print_data_for_sections(

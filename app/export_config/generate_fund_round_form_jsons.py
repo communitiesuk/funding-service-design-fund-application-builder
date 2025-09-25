@@ -36,9 +36,9 @@ def generate_form_jsons_for_round(round_id, base_output_dir=None):
             form_json = json.dumps(result, indent=4)
             try:
                 validate_form_json(result)
-                write_config(form_json, form.runner_publish_name, round.short_name, "form_json", base_output_dir)
+                write_config(form_json, form.url_path, round.short_name, "form_json", base_output_dir)
             except ValidationError:
                 current_app.logger.error(
-                    "Form JSON for {runner_publish_name} is invalid.",
-                    extra=dict(runner_publish_name=form.runner_publish_name),
+                    "Form JSON for {url_path} is invalid.",
+                    extra=dict(url_path=form.url_path),
                 )

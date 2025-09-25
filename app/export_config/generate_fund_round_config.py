@@ -67,14 +67,14 @@ def generate_application_display_config(round_id):
             if not display_name:
                 raise FormNotFoundError(url_path=form.url_path)
             name_in_apply_json = {"en": f"{section.index}.{form.section_index} {display_name}", "cy": ""}
-            form.runner_publish_name = {
-                "en": form.runner_publish_name,
+            form_name_json = {
+                "en": form.url_path,
                 "cy": "",
             }
             ordered_sections.append(
                 FundSectionForm(
                     section_name=name_in_apply_json,
-                    form_name_json=form.runner_publish_name,
+                    form_name_json=form_name_json,
                     tree_path=f"{application_base_path}.{section.index}.{form.section_index}",
                 ).as_dict()
             )
