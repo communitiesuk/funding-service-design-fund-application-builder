@@ -133,7 +133,7 @@ def delete_section(section_id, cascade: bool = False):
     return section
 
 
-def insert_new_section_form(section_id: str, url_path: str, section_index: int) -> Form:
+def insert_form(section_id: str, url_path: str, section_index: int) -> Form:
     api_service = FormStoreAPIService()
     published_form_response = api_service.get_published_form(url_path)
     form = Form(

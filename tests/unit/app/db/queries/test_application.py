@@ -13,8 +13,8 @@ from app.db.queries.application import (
     delete_section,
     delete_section_from_round,
     get_section_by_id,
+    insert_form,
     insert_new_section,
-    insert_new_section_form,
     move_form_down,
     move_form_up,
     move_section_down,
@@ -60,7 +60,7 @@ def mock_form_store_api():
     with patch("app.db.queries.application.FormStoreAPIService") as mock_service:
         mock_instance = MagicMock()
         mock_service.return_value = mock_instance
-        
+
         # Create a mock PublishedFormResponse
         mock_response = PublishedFormResponse(
             id="test-form-id",
@@ -71,7 +71,7 @@ def mock_form_store_api():
             published_at="2024-01-01T00:00:00Z",
             is_published=True,
             published_json={"test": "data"},
-            hash="test-hash"
+            hash="test-hash",
         )
         mock_instance.get_published_form.return_value = mock_response
         yield mock_instance
@@ -80,7 +80,7 @@ def mock_form_store_api():
 @pytest.fixture
 def test_form(test_section: Section, mock_form_store_api) -> Form:
     """Fixture that creates a test form with default values."""
-    return insert_new_section_form(
+    return insert_form(
         section_id=test_section.section_id,
         url_path="test-url-path",
         section_index=1,
@@ -135,8 +135,8 @@ def test_failed_delete_section_with_fk_to_forms(_db, test_section: Section, test
     assert _db.session.query(Section).filter(Section.section_id == test_section.section_id).one_or_none() is not None
 
 
-def test_insert_new_section_form(test_section: Section, mock_form_store_api):
-    new_form: Form = insert_new_section_form(
+def test_insert_form(test_section: Section, mock_form_store_api):
+    new_form: Form = insert_form(
         section_id=test_section.section_id,
         url_path="test-url-path",
         section_index=5,

@@ -21,8 +21,8 @@ from app.db.queries.application import (
     delete_section_from_round,
     get_form_by_id,
     get_section_by_id,
+    insert_form,
     insert_new_section,
-    insert_new_section_form,
     move_form_down,
     move_form_up,
     move_section_down,
@@ -223,7 +223,7 @@ def section(round_id, section_id=None):
         # Add new form if Add button is clicked
         section = get_section_by_id(section_id=section_id)
         new_section_index = max(len(section.forms) + 1, 1)
-        insert_new_section_form(
+        insert_form(
             section_id=section.section_id,
             url_path=form.template_id.data,
             section_index=new_section_index,
