@@ -87,7 +87,7 @@ def test_clone_single_section(mock_section):
         assert cloned_section.source_template_id == mock_section.section_id
         assert cloned_section.template_name is None
 
-        # Verify insert_new_form was called for each form
+        # Verify insert_new_section_form was called for each form
         assert mock_insert_new_section_form.call_count == len(mock_section.forms)
         mock_insert_new_section_form.assert_called_with(
             section_id=mock_section.section_id,
