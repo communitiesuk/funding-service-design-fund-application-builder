@@ -1,15 +1,23 @@
 import json
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from app.export_config.generate_fund_round_form_jsons import generate_form_jsons_for_round
+from tests.seed_test_data import ABOUT_YOUR_ORG_FORM_JSON
 
 
-def test_generate_form_jsons_for_round_valid_input(seed_dynamic_data, temp_output_dir):
+@patch("app.export_config.generate_fund_round_form_jsons.FormStoreAPIService")
+def test_generate_form_jsons_for_round_valid_input(mock_api_service_class, seed_dynamic_data, temp_output_dir):
+    # Setup mock
+    mock_api_service = MagicMock()
+    mock_api_service.get_published_form.return_value = ABOUT_YOUR_ORG_FORM_JSON
+    mock_api_service_class.return_value = mock_api_service
+
     # Setup: Prepare valid input parameters
     round_id = seed_dynamic_data["rounds"][0].round_id
     round_short_name = seed_dynamic_data["rounds"][0].short_name
-    form_publish_name = seed_dynamic_data["forms"][0].runner_publish_name
+    form_publish_name = seed_dynamic_data["forms"][0].url_path
 
     # Execute: Call the function with valid inputs
     generate_form_jsons_for_round(round_id)
