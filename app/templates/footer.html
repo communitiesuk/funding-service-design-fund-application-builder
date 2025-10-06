@@ -1,5 +1,14 @@
 {%- from "govuk_frontend_jinja/components/footer/macro.html" import govukFooter -%}
 
 <div class="footer">
-    {{ govukFooter({}) }}
+    {{ govukFooter({
+        'meta': {
+            'items': [
+                {
+                    'text': 'Accessibility statement',
+                    'href': url_for('index_bp.accessibility_statement')
+                },
+            ]
+        }
+    }) }}
 </div>
