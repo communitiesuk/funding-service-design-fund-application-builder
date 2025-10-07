@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.db.queries.clone import clone_single_form, clone_single_round, clone_single_section
+from app.db.queries.clone import clone_single_round, clone_single_section
 
 
 @pytest.fixture
@@ -11,21 +11,13 @@ def mock_form():
     form = Mock()
     form.form_id = uuid4()
     form.section_id = uuid4()
-    form.name_in_apply_json = {"en": "Test Form"}
-    form.template_name = "test-template"
-    form.is_template = True
     form.section_index = 1
-    form.runner_publish_name = "test-form"
-    form.form_json = {"name": "Test Form", "startPage": "/start", "pages": [{"title": "Start", "path": "/start"}]}
+    form.url_path = "test-form"
     form.as_dict.return_value = {
         "form_id": form.form_id,
         "section_id": form.section_id,
-        "name_in_apply_json": form.name_in_apply_json,
-        "template_name": form.template_name,
-        "is_template": form.is_template,
         "section_index": form.section_index,
-        "runner_publish_name": form.runner_publish_name,
-        "form_json": form.form_json,
+        "url_path": form.url_path,
     }
     return form
 
@@ -65,32 +57,6 @@ def mock_round():
     return round_obj
 
 
-def test_clone_single_form(mock_form):
-    # Arrange
-    new_section_id = str(uuid4())
-    section_index = 2
-
-    with patch("app.db.queries.clone.db") as mock_db:
-        # Mock database query
-        mock_db.session.query.return_value.where.return_value.one_or_none.return_value = mock_form
-
-        # Act
-        cloned_form = clone_single_form(mock_form.form_id, new_section_id, section_index)
-
-        # Assert
-        assert cloned_form.form_id != mock_form.form_id
-        assert cloned_form.section_id == new_section_id
-        assert cloned_form.is_template is False
-        assert cloned_form.source_template_id == mock_form.form_id
-        assert cloned_form.template_name is None
-        assert cloned_form.section_index == section_index
-        assert cloned_form.form_json == mock_form.form_json
-
-        # Verify database operations
-        mock_db.session.add.assert_called_once_with(cloned_form)
-        mock_db.session.commit.assert_called_once()
-
-
 def test_clone_single_section(mock_section):
     """Test that clone_single_section creates a new section and clones its forms."""
     # Arrange
@@ -98,7 +64,7 @@ def test_clone_single_section(mock_section):
 
     with (
         patch("app.db.queries.clone.db") as mock_db,
-        patch("app.db.queries.clone.clone_single_form") as mock_clone_form,
+        patch("app.db.queries.clone.insert_form") as mock_insert_form,
     ):
         # Mock database query
         mock_db.session.query.return_value.where.return_value.one_or_none.return_value = mock_section
@@ -113,8 +79,13 @@ def test_clone_single_section(mock_section):
         assert cloned_section.source_template_id == mock_section.section_id
         assert cloned_section.template_name is None
 
-        # Verify forms were cloned
-        assert mock_clone_form.call_count == len(mock_section.forms)
+        # Verify insert_form was called for each form
+        assert mock_insert_form.call_count == len(mock_section.forms)
+        mock_insert_form.assert_called_with(
+            section_id=mock_section.section_id,
+            url_path=mock_section.forms[0].url_path,
+            section_index=mock_section.forms[0].section_index,
+        )
 
         # Verify database operations
         mock_db.session.add.assert_called_once_with(cloned_section)
