@@ -69,3 +69,8 @@ def go_back():
         return redirect(url_for(prev_page["endpoint"], **prev_page["view_args"], **prev_page["query_params"]))
     else:
         return redirect(url_for("index_bp.index"))  # If no previous page, go home
+
+
+@index_bp.route("/accessibility_statement")
+def accessibility_statement():
+    return render_template("accessibility_statement.html")
