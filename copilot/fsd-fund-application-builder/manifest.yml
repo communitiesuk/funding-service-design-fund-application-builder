@@ -139,8 +139,7 @@ environments:
       AUTHENTICATOR_HOST: "https://account.access-funding.communities.gov.uk"
       FLASK_ENV: production
       SENTRY_TRACES_SAMPLE_RATE: 1
-      # Prod FAB points to Test Runner because Prod Runner doesn't support /publish endpoint needed for previewing forms
-      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.test.communities.gov.uk"
+      FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.communities.gov.uk"
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.test.communities.gov.uk"
     count:
       range: 2-4
