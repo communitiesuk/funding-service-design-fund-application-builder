@@ -63,12 +63,12 @@
                                     <a class="govuk-link"
                                         target="_blank"
                                         href='{{ url_for("index_bp.preview_form", form_id=form.form_id) }}'>
-                                        {{ form.name_in_apply_json["en"] }} (previews in a new tab)
+                                        {{ form.display_name }} (previews in a new tab)
                                     </a>
                                 </h3>
                             </span>
                             <span class="app-task-list__task-actions">
-                                <a class="govuk-link govuk-!-font-size-19" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions<span class="govuk-visually-hidden"> for {{ form.name_in_apply_json["en"] }} form</span></a>
+                                <a class="govuk-link govuk-!-font-size-19" href="{{ url_for('application_bp.view_form_questions', round_id=round.round_id, section_id=section.section_id, form_id=form.form_id) }}">View questions<span class="govuk-visually-hidden"> for {{ form.display_name }} form</span></a>
                             </span>
                         </li>
                     {% endfor %}

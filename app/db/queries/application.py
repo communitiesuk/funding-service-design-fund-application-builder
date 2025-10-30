@@ -1,10 +1,8 @@
 from datetime import datetime
-from typing import Any
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from flask import current_app
-from flask_sqlalchemy.pagination import Pagination
-from sqlalchemy import String, cast, delete, select
+from sqlalchemy import delete
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.db import db
@@ -12,37 +10,13 @@ from app.db.models import Form, Section
 from app.db.queries.round import get_round_by_id
 
 
-def get_all_template_sections() -> list[Section]:
-    return db.session.query(Section).where(Section.is_template == True).all()  # noqa:E712
-
-
 def get_section_by_id(section_id) -> Section:
     s = db.session.query(Section).where(Section.section_id == section_id).one_or_none()
     return s
 
 
-def get_all_template_forms() -> list[Form]:
-    return db.session.query(Form).where(Form.is_template == True).order_by(Form.template_name).all()  # noqa:E712
-
-
-def get_paginated_forms(page: int, search_term: str = None, items_per_page: int = 20) -> Pagination:
-    stmt = select(Form).where(Form.is_template)
-
-    if search_term:
-        # Case-insensitive search on the template_name field
-        stmt = stmt.where(Form.template_name.ilike(f"%{search_term}%"))
-
-    stmt = stmt.order_by(cast(Form.template_name, String))
-    return db.paginate(stmt, page=page, per_page=items_per_page)
-
-
 def get_form_by_id(form_id: str) -> Form:
     form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    return form
-
-
-def get_form_by_template_name(template_name: str) -> Form:
-    form = db.session.query(Form).where(Form.template_name == template_name).one_or_none()
     return form
 
 
@@ -137,25 +111,13 @@ def delete_section(section_id, cascade: bool = False):
     return section
 
 
-# CRUD FORM
-def insert_new_form(
-    form_name: str,  # Name as it appears in the Apply tasklist
-    template_name: str,  # Our own internal name for the template
-    runner_publish_name: str,  # Unique URL-friendly identifier used in request to Form Runner
-    form_json: dict[str, Any],
-) -> Form:
+def insert_form(section_id: str, url_path: str, section_index: int) -> Form:
     form = Form(
         form_id=uuid4(),
-        section_id=None,
-        name_in_apply_json={"en": form_name},
-        is_template=True,
-        template_name=template_name,
-        source_template_id=None,
-        audit_info=None,
-        section_index=None,
-        runner_publish_name=runner_publish_name,
-        form_json=form_json,
+        section_id=section_id,
+        section_index=section_index,
         created_at=datetime.now(),
+        url_path=url_path,
     )
     try:
         db.session.add(form)
@@ -164,27 +126,6 @@ def insert_new_form(
         db.session.rollback()
         current_app.logger.error(e)
         raise e
-    return form
-
-
-def update_form(
-    form_id: UUID,
-    form_name: str,  # Name as it appears in the Apply tasklist
-    template_name: str,  # Our own internal name for the template
-    form_json: dict[str, Any] | None = None,
-):
-    form = db.session.query(Form).where(Form.form_id == form_id).one_or_none()
-    if form:
-        form.name_in_apply_json = {"en": form_name}
-        form.template_name = template_name
-        if form_json is not None:
-            form.form_json = form_json
-        try:
-            db.session.commit()
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            current_app.logger.error(e)
-            raise e
     return form
 
 
