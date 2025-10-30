@@ -13,6 +13,8 @@ from app.all_questions.read_forms import (
     remove_lowest_in_hierarchy,
     strip_leading_numbers,
 )
+from app.db.queries.round import get_round_by_id
+from app.shared.form_store_api import FormNotFoundError
 
 FIELD_TYPES_WITH_MAX_WORDS = ["freetextfield", "multilinetextfield"]
 
@@ -786,3 +788,18 @@ def generate_print_data_for_sections(
         }
         section_idx += 1
     return section_map
+
+
+def prepare_section_data(round_id, api_service):
+    round_obj = get_round_by_id(round_id)
+    sections_in_round = round_obj.sections
+    section_data = []
+    for section in sections_in_round:
+        forms = []
+        for form in section.forms:
+            published_form_response = api_service.get_published_form(form.url_path)
+            if not published_form_response:
+                raise FormNotFoundError(url_path=form.url_path)
+            forms.append({"name": form.url_path, "form_data": published_form_response.published_json})
+        section_data.append({"section_title": section.name_in_apply_json["en"], "forms": forms})
+    return section_data
