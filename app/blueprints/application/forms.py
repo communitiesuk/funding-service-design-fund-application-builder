@@ -4,8 +4,6 @@ from wtforms import HiddenField, SelectField, StringField
 from wtforms.fields.simple import SubmitField
 from wtforms.validators import DataRequired
 
-from app.db.queries.application import get_all_template_forms
-
 
 class SectionForm(FlaskForm):
     round_id = HiddenField("Round ID")
@@ -18,13 +16,6 @@ class SectionForm(FlaskForm):
         widget=GovSelect(),
         validators=[DataRequired(message="Select a template")],
     )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        choices = [("", "Select a template")]
-        for f in get_all_template_forms():
-            choices.append((str(f.form_id), f.template_name + " - " + f.name_in_apply_json["en"]))
-        self.template_id.choices = choices
 
     add_form = SubmitField("Add", widget=GovSubmitInput())
     save_section = SubmitField("Save and continue", widget=GovSubmitInput())

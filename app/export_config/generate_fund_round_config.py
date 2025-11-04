@@ -8,6 +8,7 @@ from app.db.queries.fund import get_fund_by_id
 from app.db.queries.round import get_round_by_id
 from app.export_config.helpers import write_config
 from app.shared.data_classes import FundExport, FundSectionForm, FundSectionSection, RoundExport
+from app.shared.form_store_api import FormNotFoundError, FormStoreAPIService
 
 # TODO : The Round path might be better as a placeholder to avoid conflict in the actual fund store.
 # Decide on this further down the line.
@@ -32,6 +33,8 @@ TEMPLATE_FUND_ROUND_EXPORT = {"sections_config": [], "fund_config": {}, "round_c
 
 
 def generate_application_display_config(round_id):
+    api_service = FormStoreAPIService()
+
     ordered_sections = []
     # get round
     round = get_round_by_id(round_id)
@@ -60,20 +63,18 @@ def generate_application_display_config(round_id):
         for original_form in forms:
             # Create a deep copy of the form object
             form = copy.deepcopy(original_form)
-            form.name_in_apply_json["en"] = f"{section.index}.{form.section_index} {form.name_in_apply_json['en']}"
-            form.name_in_apply_json["cy"] = (
-                f"{section.index}.{form.section_index} {form.name_in_apply_json['cy']}"
-                if form.name_in_apply_json.get("cy")
-                else ""
-            )
-            form.runner_publish_name = {
-                "en": form.runner_publish_name,
+            display_name = api_service.get_display_name_from_url_path(form.url_path)
+            if not display_name:
+                raise FormNotFoundError(url_path=form.url_path)
+            name_in_apply_json = {"en": f"{section.index}.{form.section_index} {display_name}", "cy": ""}
+            form_name_json = {
+                "en": form.url_path,
                 "cy": "",
             }
             ordered_sections.append(
                 FundSectionForm(
-                    section_name=form.name_in_apply_json,
-                    form_name_json=form.runner_publish_name,
+                    section_name=name_in_apply_json,
+                    form_name_json=form_name_json,
                     tree_path=f"{application_base_path}.{section.index}.{form.section_index}",
                 ).as_dict()
             )

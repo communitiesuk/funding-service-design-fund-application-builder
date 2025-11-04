@@ -55,10 +55,13 @@ jobs:
         run: uv run --frozen flask db upgrade
         env:
           DATABASE_URL: postgresql://postgres:password@postgres:5432/fab_store # pragma: allowlist secret
+      - name: Start Mock Pre-Award API
+        run: uv run --frozen python tests/e2e/mock_pre_award.py &
       - name: Start Flask Application
         run: uv run --frozen flask run --no-debugger --host 0.0.0.0 --port 8080 &
         env:
           DATABASE_URL: postgresql://postgres:password@postgres:5432/fab_store # pragma: allowlist secret
           RSA256_PUBLIC_KEY_BASE64: "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUlHZU1BMEdDU3FHU0liM0RRRUJBUVVBQTRHTUFEQ0JpQUtCZ0hHYnRGMXlWR1crckNBRk9JZGFrVVZ3Q2Z1dgp4SEUzOGxFL2kwS1dwTXdkU0haRkZMWW5IakJWT09oMTVFaWl6WXphNEZUSlRNdkwyRTRRckxwcVlqNktFNnR2CkhyaHlQL041ZnlwU3p0OHZDajlzcFo4KzBrRnVjVzl6eU1rUHVEaXNZdG1rV0dkeEJta2QzZ3RZcDNtT0k1M1YKVkRnS2J0b0lGVTNzSWs1TkFnTUJBQUU9Ci0tLS0tRU5EIFBVQkxJQyBLRVktLS0tLQ==" # pragma: allowlist secret
+          FORM_STORE_API_HOST: http://localhost:8081
       - name: Execute End-to-End Tests
         run: uv run --frozen pytest --e2e --e2e-env e2e

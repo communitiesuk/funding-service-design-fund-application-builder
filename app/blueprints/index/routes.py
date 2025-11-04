@@ -5,6 +5,7 @@ from flask import Blueprint, current_app, g, redirect, render_template, request,
 from fsd_utils.authentication.decorators import login_requested
 
 from app.db.queries.application import get_form_by_id
+from app.shared.form_store_api import FormNotFoundError, FormStoreAPIService
 from config import Config
 
 INDEX_BP_DASHBOARD = "index_bp.dashboard"
@@ -42,9 +43,12 @@ def preview_form(form_id):
     Generates the form json for a chosen form, publishes it to the form runner,
     and returns a redirect to that form in preview mode.
     """
+    api_service = FormStoreAPIService()
     form = get_form_by_id(form_id)
-    form_json = form.form_json
-    runner_form_id = form.runner_publish_name
+    published_form_response = api_service.get_published_form(form.url_path)
+    if not published_form_response:
+        raise FormNotFoundError(url_path=form.url_path)
+    runner_form_id = form.url_path
 
     # Get the user's JWT token from their cookie
     user_token = request.cookies.get(Config.FSD_USER_TOKEN_COOKIE_NAME)
@@ -65,7 +69,7 @@ def preview_form(form_id):
 
         publish_response = requests.post(
             url=Config.FORM_RUNNER_PUBLISH_URL,
-            json={"id": runner_form_id, "configuration": form_json},
+            json={"id": runner_form_id, "configuration": published_form_response.published_json},
             headers=headers,
             timeout=10,
         )

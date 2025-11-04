@@ -25,6 +25,26 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
     import app.export_config.generate_fund_round_config as generate_fund_round_config
 
     monkeypatch.setattr(generate_fund_round_config, "ROUND_BASE_PATHS", mock_round_base_paths)
+
+    from app.shared.form_store_api import FormResponse
+
+    def mock_get_published_forms(self):  # Needs same number of parameters as FormStoreAPIService.get_published_forms
+        return [
+            FormResponse(
+                id="1",
+                url_path="about-your-org",
+                display_name="About your organisation",
+                created_at=None,
+                updated_at=None,
+                published_at=None,
+                is_published=True,
+            )
+        ]
+
+    monkeypatch.setattr(
+        "app.export_config.generate_fund_round_config.FormStoreAPIService.get_published_forms", mock_get_published_forms
+    )
+
     # Execute: Call the function with valid inputs
     fund_config, round_config = generate_config_for_round(round_id)
     # Simply writes the files to the output directory so no result is given directly

@@ -1,7 +1,7 @@
 from playwright.sync_api import Page
 
 from tests.e2e.dataclass import FabDomains
-from tests.e2e.pages.templates_page import TemplatesPage
+from tests.e2e.pages.dashboard_page import DashboardPage
 
 
 # TC-004: Build application from dashboard page
@@ -9,17 +9,8 @@ def test_build_application_from_dashboard_page(page: Page, domains: FabDomains, 
     output = None
     try:
         output = (
-            TemplatesPage(page, domains.fab_url)
-            .given_user_is_on_templates()
-            .then_verify_on_templates()
-            .when_click_upload_template()
-            .then_verify_on_upload_new_template()
-            .when_click_upload_file()
-            .when_fill_template_details()
-            .when_click_save_and_return_home()
-            .then_verify_on_dashboard()
-            .and_validate_template_upload_success_message()
-            # after template upload, create the grant and application
+            DashboardPage(page, domains.fab_url)
+            .given_user_is_on_dashboard()
             .when_click_add_a_new_grant()
             .then_verify_on_create_grant()
             .when_fill_non_welsh_competitive_grant_details()

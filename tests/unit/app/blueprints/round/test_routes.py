@@ -318,7 +318,6 @@ def test_clone_round(flask_test_client, seed_dynamic_data):
     Test to check round detail route is working as expected.
     and verify the round details template is rendered as expected.
     """
-
     test_round = seed_dynamic_data["rounds"][0]
     test_fund = seed_dynamic_data["funds"][0]
     response = flask_test_client.get(f"/rounds/{test_round.round_id}", follow_redirects=True)
