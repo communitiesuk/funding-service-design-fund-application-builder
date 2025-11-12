@@ -112,7 +112,7 @@ def generate_metadata(full_form_data: dict) -> dict:
 
     cutdown = {"start_page": full_form_data["startPage"], "all_pages": []}
     for page in full_form_data["pages"]:
-        cp = {"path": page["path"], "next_paths": [p["path"] for p in page["next"]]}
+        cp = {"path": page["path"], "next_paths": [p["path"] for p in page.get("next", [])]}
         cutdown["all_pages"].append(cp)
 
     metadata = copy.deepcopy(cutdown)
