@@ -92,3 +92,6 @@ class DefaultConfig(object):
     }
 
     ALLOWED_DOMAINS = getenv("ALLOWED_DOMAINS", "communities.gov.uk,test.communities.gov.uk")
+
+    # Pre-Award API Configuration
+    PRE_AWARD_API_URL = getenv("PRE_AWARD_API_URL", "https://api.communities.gov.localhost:4004")
