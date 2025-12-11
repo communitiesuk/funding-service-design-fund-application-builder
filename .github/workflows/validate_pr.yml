@@ -51,8 +51,22 @@ jobs:
         uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5
         with:
           enable-cache: true
+      - name: Save expected migration head
+        run: echo "EXPECTED_HEAD=$(cat app/db/migrations/.current-alembic-head)" >> $GITHUB_ENV
       - name: Apply Database Migrations
         run: uv run --frozen flask db upgrade
+        env:
+          DATABASE_URL: postgresql://postgres:password@postgres:5432/fab_store # pragma: allowlist secret
+      - name: Verify .current-alembic-head is up to date
+        run: |
+          CURRENT_HEAD=$(cat app/db/migrations/.current-alembic-head | tr -d '\n')
+          if [ "$CURRENT_HEAD" != "$EXPECTED_HEAD" ]; then
+            echo "ERROR: Migration head mismatch!"
+            echo "Expected: $EXPECTED_HEAD (from PR)"
+            echo "Current:  $CURRENT_HEAD (after running migrations)"
+            echo "Please update the .current-alembic-head file to match the latest migration."
+            exit 1
+          fi
         env:
           DATABASE_URL: postgresql://postgres:password@postgres:5432/fab_store # pragma: allowlist secret
       - name: Start Mock Pre-Award API
