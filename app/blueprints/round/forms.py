@@ -213,6 +213,13 @@ class RoundForm(FlaskForm):
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
     )
+    send_incomplete_application_emails = RadioField(
+        "Do you want to automatically send notification emails for incomplete applications after the deadline?",
+        widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether to send notification emails for incomplete applications")],
+        choices=[("true", "Yes"), ("false", "No")],
+        coerce=lambda value: value if isinstance(value, bool) else value == "true",
+    )
     save_and_continue = SubmitField("Save and continue", widget=GovSubmitInput())
     save_and_return_home = SubmitField("Save and return home", widget=GovSubmitInput())
 

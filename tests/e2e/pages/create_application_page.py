@@ -44,6 +44,13 @@ class CreateApplicationPage(PageBase):
         self.eligibility_config = page.get_by_role(
             "group", name="Do applicants need to pass eligibility questions before applying?"
         )
+        self.send_incomplete_application_emails = page.get_by_role(
+            "group",
+            name=(
+                "Do you want to automatically send notification emails for incomplete applications after the deadline?"
+            ),
+            exact=True,
+        )
 
         self.save_and_continue: Locator = self.page.get_by_role("button", name="Save and continue")
         self.cancel: Locator = self.page.get_by_role("link", name="Cancel")
@@ -81,6 +88,7 @@ class CreateApplicationPage(PageBase):
         self.has_research_survey.get_by_role("radio", name="No").check()
         self.is_research_survey_optional.get_by_role("radio", name="Yes").check()
         self.eligibility_config.get_by_role("radio", name="No").check()
+        self.send_incomplete_application_emails.get_by_role("radio", name="No").check()
 
     def when_click_save_and_return_home(self):
         self.save_and_return_home.click()
