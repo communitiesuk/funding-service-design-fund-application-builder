@@ -75,6 +75,7 @@ def populate_form_with_round_data(round_obj, form_class):
             if round_obj.eligibility_config and round_obj.eligibility_config.get("has_eligibility") == "true"
             else "false"
         ),
+        "send_incomplete_application_emails": "true" if round_obj.send_incomplete_application_emails else "false",
         "eoi_decision_schema_en": (
             convert_json_data_for_form(round_obj.eoi_decision_schema.get("en", ""))
             if round_obj.eoi_decision_schema
@@ -125,6 +126,7 @@ def update_existing_round(round_obj, form, user="dummy_user"):
         "cy": form.application_guidance_cy.data or None,
     }
     round_obj.eligibility_config = {"has_eligibility": form.eligibility_config.data}
+    round_obj.send_incomplete_application_emails = form.send_incomplete_application_emails.data
     round_obj.eoi_decision_schema = {
         "en": convert_form_data_to_json(form.eoi_decision_schema_en.data),
         "cy": convert_form_data_to_json(form.eoi_decision_schema_cy.data)
@@ -172,6 +174,7 @@ def create_new_round(form, user="dummy_user"):
             "is_research_survey_optional": form.is_research_survey_optional.data,
         },
         eligibility_config={"has_eligibility": form.eligibility_config.data},
+        send_incomplete_application_emails=form.send_incomplete_application_emails.data,
         eoi_decision_schema={
             "en": convert_form_data_to_json(form.eoi_decision_schema_en.data),
             "cy": convert_form_data_to_json(form.eoi_decision_schema_cy.data),

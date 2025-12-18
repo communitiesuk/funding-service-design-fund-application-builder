@@ -130,6 +130,7 @@ def generate_round_config(round_id):
         is_expression_of_interest=round.is_expression_of_interest,
         feedback_survey_config=round.feedback_survey_config,
         eligibility_config=round.eligibility_config,
+        send_incomplete_application_emails=round.send_incomplete_application_emails,
         eoi_decision_schema=round.eoi_decision_schema,
     )
 
