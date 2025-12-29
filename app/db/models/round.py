@@ -54,7 +54,6 @@ class Round(BaseModel):
     )
 
     # several other fields to add
-    application_reminder_sent = Column(Boolean, default=False, nullable=False)
     contact_email = Column(db.String(), nullable=True, unique=False)
     instructions_json = Column(JSON(none_as_null=True), nullable=True, unique=False)
     feedback_link = Column(db.String(), unique=False)
