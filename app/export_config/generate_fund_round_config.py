@@ -113,7 +113,6 @@ def generate_round_config(round_id):
         deadline=round.deadline.isoformat(),
         assessment_start=round.assessment_start.isoformat(),
         assessment_deadline=round.assessment_deadline.isoformat(),
-        application_reminder_sent=round.application_reminder_sent,
         reminder_date=round.reminder_date.isoformat(),
         prospectus=round.prospectus_link,
         privacy_notice=round.privacy_notice_link,

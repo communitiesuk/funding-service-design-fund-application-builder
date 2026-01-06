@@ -115,7 +115,6 @@ class RoundExport:
     opens: Optional[str] = None  # Assuming date/time as string; adjust type as needed
     assessment_start: Optional[str] = None  # Adjust type as needed
     deadline: Optional[str] = None  # Adjust type as needed
-    application_reminder_sent: Optional[bool] = None
     reminder_date: Optional[str] = None  # Adjust type as needed
     assessment_deadline: Optional[str] = None  # Adjust type as needed
     prospectus: Optional[str] = None

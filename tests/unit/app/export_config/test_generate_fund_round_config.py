@@ -79,7 +79,6 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                 },
                 "round_config": {
                     "short_name": round_short_name,
-                    "application_reminder_sent": False,
                     "prospectus": "https://www.google.com",
                     "privacy_notice": "https://www.google.com",
                     "contact_email": "test@test.com",
