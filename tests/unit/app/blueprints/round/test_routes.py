@@ -19,6 +19,7 @@ radio_fields = {
     "has_research_survey": "false",
     "is_research_survey_optional": "false",
     "eligibility_config": "false",
+    "send_deadline_reminder_emails": "true",
     "send_incomplete_application_emails": "true",
 }
 

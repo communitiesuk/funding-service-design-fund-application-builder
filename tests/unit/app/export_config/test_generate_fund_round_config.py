@@ -102,6 +102,7 @@ def test_generate_config_for_round_valid_input(seed_dynamic_data, monkeypatch, t
                         "is_research_survey_optional": False,
                     },
                     "eligibility_config": {"has_eligibility": False},
+                    "send_deadline_reminder_emails": True,
                     "send_incomplete_application_emails": True,
                     "title_json": {"en": "round the first"},
                 },

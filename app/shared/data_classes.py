@@ -142,6 +142,7 @@ class RoundExport:
         }
     )
     eligibility_config: Optional[Dict[str, bool]] = field(default_factory=lambda: {"has_eligibility": False})
+    send_deadline_reminder_emails: Optional[bool] = None
     send_incomplete_application_emails: Optional[bool] = None
     title_json: TitleJson = field(default_factory=TitleJson)
 
