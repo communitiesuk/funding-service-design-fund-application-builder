@@ -67,6 +67,7 @@ class Round(BaseModel):
     is_expression_of_interest = Column(Boolean, default=False, nullable=False)
     feedback_survey_config = Column(JSON(none_as_null=True), nullable=True, unique=False)
     eligibility_config = Column(JSON(none_as_null=True), nullable=True, unique=False)
+    send_deadline_reminder_emails = Column(Boolean, default=True, nullable=False)
     send_incomplete_application_emails = Column(Boolean, default=True, nullable=False)
     eoi_decision_schema = Column(JSON(none_as_null=True), nullable=True, unique=False)
     base_path_seq = Sequence("section_base_path_seq", start=1001, increment=1)

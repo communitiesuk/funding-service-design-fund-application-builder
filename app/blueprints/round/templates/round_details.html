@@ -448,6 +448,20 @@
                         ]
                     },
                 },
+                    {
+                "key": {"text": "Send deadline reminder emails before the deadline?"},
+                "value": {"text": "Yes" if round.send_deadline_reminder_emails else "No"},
+                "actions": {
+                    "items": [
+                        {
+                            "href": url_for(endpoint="round_bp.edit_round", round_id=round.round_id, _anchor=form.send_deadline_reminder_emails.id),
+                            "text": "Change",
+                            "classes": "",
+                            "visuallyHiddenText": "Send deadline reminder emails before the deadline?",
+                        }
+                    ]
+                    },
+                },
                 {
                 "key": {"text": "Send notification emails for incomplete applications after the deadline?"},
                 "value": {"text": "Yes" if round.send_incomplete_application_emails else "No"},

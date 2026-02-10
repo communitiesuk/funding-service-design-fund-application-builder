@@ -213,6 +213,13 @@ class RoundForm(FlaskForm):
         choices=[("true", "Yes"), ("false", "No")],
         coerce=lambda value: value == "true",
     )
+    send_deadline_reminder_emails = RadioField(
+        "Do you want to automatically send deadline reminder emails before the deadline?",
+        widget=GovRadioInput(),
+        validators=[InputRequired(message="Select whether to send deadline reminder emails before the deadline")],
+        choices=[("true", "Yes"), ("false", "No")],
+        coerce=lambda value: value if isinstance(value, bool) else value == "true",
+    )
     send_incomplete_application_emails = RadioField(
         "Do you want to automatically send notification emails for incomplete applications after the deadline?",
         widget=GovRadioInput(),
