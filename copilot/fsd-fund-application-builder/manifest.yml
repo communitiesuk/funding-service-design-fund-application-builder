@@ -104,7 +104,6 @@ environments:
     variables:
       # UAT FAB deliberately points to Form Designer test environment.
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.test.communities.gov.uk"
-      SENTRY_TRACES_SAMPLE_RATE: 1
     count:
       range: 2-4
       cooldown:
@@ -139,7 +138,6 @@ environments:
       FUND_APPLICATION_BUILDER_HOST: "https://fund-application-builder.access-funding.communities.gov.uk"
       AUTHENTICATOR_HOST: "https://account.access-funding.communities.gov.uk"
       FLASK_ENV: production
-      SENTRY_TRACES_SAMPLE_RATE: 1
       FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.communities.gov.uk"
       FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.test.communities.gov.uk"
     count:
