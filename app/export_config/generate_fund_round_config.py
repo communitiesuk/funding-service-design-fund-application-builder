@@ -42,7 +42,6 @@ def generate_application_display_config(round_id):
         round.section_base_path
     )  # ROUND_BASE_PATHS.get(round.short_name, 0)  # so this works for dummy data
     application_base_path = f"{round_base_path}.1"
-    TEMPLATE_FUND_ROUND_EXPORT["base_path"] = round_base_path
     "sort by Section.index"
     sections = db.session.query(Section).filter(Section.round_id == round_id).order_by(Section.index).all()
     current_app.logger.info("Generating application display config for round {round_id}", extra=dict(round_id=round_id))
@@ -137,7 +136,7 @@ def generate_round_config(round_id):
     return round_export.as_dict()
 
 
-def generate_config_for_round(round_id, base_output_dir=None):
+def generate_config_for_round(round_id, base_output_dir=None, write_files=True):
     """
     Generates configuration for a specific funding round.
 
@@ -147,6 +146,11 @@ def generate_config_for_round(round_id, base_output_dir=None):
 
     Args:
         round_id (str): The unique identifier for the funding round.
+        base_output_dir (str, optional): Directory to write config files to.
+        write_files (bool): Whether to write config files to disk. Defaults to True.
+
+    Returns:
+        tuple: (fund_config, round_config) or complete fund_round_export dict if write_files=False
 
     The functions called within this function are:
     - generate_fund_config: Generates the fund configuration for the given round ID.
@@ -155,18 +159,30 @@ def generate_config_for_round(round_id, base_output_dir=None):
     """
     if round_id is None:
         raise ValueError("Valid round ID is required to generate configuration.")
+
+    # Create fresh template each time to avoid caching issues
+    fund_round_export = {"sections_config": [], "fund_config": {}, "round_config": [], "base_path": None}
+
     fund_config = generate_fund_config(round_id)
-    TEMPLATE_FUND_ROUND_EXPORT["fund_config"] = fund_config
+    fund_round_export["fund_config"] = fund_config
     round_config = generate_round_config(round_id)
-    TEMPLATE_FUND_ROUND_EXPORT["round_config"] = round_config
+    fund_round_export["round_config"] = round_config
     round_display_config = generate_application_display_config(round_id)
-    TEMPLATE_FUND_ROUND_EXPORT["sections_config"] = round_display_config
-    fund_round_export = TEMPLATE_FUND_ROUND_EXPORT
-    write_config(
-        fund_round_export,
-        fund_config["short_name"],
-        fund_round_export["round_config"]["short_name"],
-        "python_file",
-        base_output_dir,
-    )
-    return fund_config, round_config
+    fund_round_export["sections_config"] = round_display_config
+
+    # Set base_path from round data
+    round = get_round_by_id(round_id)
+    fund_round_export["base_path"] = round.section_base_path
+
+    if write_files:
+        write_config(
+            fund_round_export,
+            fund_config["short_name"],
+            fund_round_export["round_config"]["short_name"],
+            "python_file",
+            base_output_dir,
+        )
+        return fund_config, round_config
+    else:
+        # Return complete structure for API usage
+        return fund_round_export
