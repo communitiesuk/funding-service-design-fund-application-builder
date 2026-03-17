@@ -49,7 +49,7 @@ variables:
   FLASK_ENV: ${COPILOT_ENVIRONMENT_NAME}
   NOTIFICATION_SERVICE_HOST: http://fsd-notification:8080
   MAINTENANCE_MODE: false
-  SENTRY_DSN: https://4128cfd691c439577e8f106968217f72@o1432034.ingest.us.sentry.io/4508496706666497
+  SENTRY_DSN: https://7c437f61cb15062ad2dc4ee2096af679@o4510940714041344.ingest.de.sentry.io/4511038199627856
   SENTRY_TRACES_SAMPLE_RATE: 0.02
   FORM_RUNNER_EXTERNAL_HOST: "https://application-questions.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
   FORM_DESIGNER_EXTERNAL_HOST: "https://form-designer.access-funding.${COPILOT_ENVIRONMENT_NAME}.communities.gov.uk"
