@@ -1,13 +1,16 @@
 from random import randint
 
+import requests
 from flask import (
     Blueprint,
+    current_app,
     flash,
     redirect,
     render_template,
     request,
     url_for,
 )
+from fsd_utils.authentication.decorators import login_required
 
 from app.blueprints.fund.forms import FundForm
 from app.blueprints.round.forms import CloneRoundForm, RoundForm
@@ -19,6 +22,7 @@ from app.blueprints.round.services import (
 from app.db.queries.clone import clone_single_round
 from app.db.queries.fund import get_all_funds, get_fund_by_id
 from app.db.queries.round import get_paginated_rounds, get_round_by_id
+from app.export_config.generate_fund_round_config import generate_config_for_round
 from app.shared.forms import SelectFundForm
 from app.shared.helpers import flash_message
 
@@ -201,3 +205,49 @@ def round_details(round_id):
     return render_template(
         "round_details.html", form=form, fund_form=fund_form, round=fund_round, cloned_form=cloned_form
     )
+
+
+@login_required
+@round_bp.route("/<round_id>/publish", methods=["POST", "GET"])
+def publish_to_pre_award(round_id):
+    """Send fund config to Pre-Award API"""
+    # Block in production environments
+    flask_env = current_app.config.get("FLASK_ENV", "").lower()
+    if flask_env not in ["development", "dev", "test", "unit_test"]:
+        flash("This feature is disabled in production environments", "error")
+        return redirect(url_for("round_bp.round_details", round_id=round_id))
+
+    try:
+        config_data = generate_config_for_round(round_id, write_files=False)
+
+        pre_award_url = f"{current_app.config.get('PRE_AWARD_API_URL')}/fund/import-config"
+        headers = {"Content-Type": "application/json"}
+
+        response = requests.post(
+            pre_award_url,
+            json=config_data,
+            headers=headers,
+            timeout=30,
+            verify=True,
+        )
+
+        if response.status_code in [200, 201]:
+            flash("✅ Successfully sent to Pre-Award!", "success")
+        else:
+            error_msg = f"Failed to send to Pre-Award (Status: {response.status_code})"
+            try:
+                error_detail = response.json().get("error", "Unknown error")
+                error_msg += f" - {error_detail}"
+            except Exception:
+                pass
+            flash(error_msg, "error")
+            current_app.logger.error("Pre-Award API error: %s", error_msg)
+
+    except requests.exceptions.RequestException as e:
+        flash("Network error: Could not connect to Pre-Award", "error")
+        current_app.logger.error("Network error sending to Pre-Award: %s", str(e))
+    except Exception as e:
+        flash(f"Error: {str(e)}", "error")
+        current_app.logger.error("Error sending to Pre-Award: %s", str(e))
+
+    return redirect(url_for("round_bp.round_details", round_id=round_id))
