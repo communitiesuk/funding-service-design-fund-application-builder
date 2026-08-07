@@ -17,7 +17,7 @@ dependencies = [
     "funding-service-design-utils==6.1.4",
     "jsonschema==4.23.0",
     "psycopg2-binary==2.9.10",
-    "requests==2.32.4",
+    "requests==2.33.0",
     "sentry-sdk==2.24.1",
     "sqlalchemy[mypy]==2.0.41",
     "flask-debugtoolbar==0.16.0",
