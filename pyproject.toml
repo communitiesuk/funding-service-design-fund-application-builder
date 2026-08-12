@@ -14,12 +14,12 @@ dependencies = [
     "flask-wtf==1.2.2",
     "flask==3.1.1",
     "flask-talisman==1.1.0",
-    "funding-service-design-utils==6.1.4",
+    "funding-service-design-utils==6.1.5",
     "jsonschema==4.23.0",
-    "psycopg2-binary==2.9.10",
+    "psycopg2-binary==2.9.12",
     "requests==2.32.4",
     "sentry-sdk==2.24.1",
-    "sqlalchemy[mypy]==2.0.41",
+    "sqlalchemy[mypy]==2.0.52",
     "flask-debugtoolbar==0.16.0",
     #
     # If updating either of the govuk-frontend-* packages below, check whether any changes need to be synced into the
