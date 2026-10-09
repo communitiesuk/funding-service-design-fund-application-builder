@@ -30,7 +30,7 @@ memory: 2048
 # See https://aws.github.io/copilot-cli/docs/manifest/lb-web-service/#platform
 platform: linux/x86_64
 # Number of tasks that should be running in your service.
-count: 2
+count: 0
 # Enable running commands in your container.
 exec: true
 
@@ -64,7 +64,7 @@ secrets:
 environments:
   dev:
     count:
-      spot: 1
+      spot: 0
     sidecars:
       nginx:
         port: 8087
