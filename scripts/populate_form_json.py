@@ -7,13 +7,13 @@ in the form_json column, using the existing form JSON generation logic.
 
 import sys
 
+from app.export_config.generate_form import build_form_json
 from flask import current_app
 from sqlalchemy import text
 
 from app.create_app import create_app
 from app.db import db
 from app.db.models import Form
-from app.export_config.generate_form import build_form_json
 
 
 def populate_form_json():
