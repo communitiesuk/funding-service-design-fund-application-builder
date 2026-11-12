@@ -1,3 +1,6 @@
+> [!WARNING]
+> Repository archived as no longer in use
+
 # Fund Application Builder (FAB)
 
 ## What is it?
